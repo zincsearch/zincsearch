@@ -37,7 +37,7 @@ The only viable solution to search was elasticsearch which while is a very good 
 
 ## Download / Installation / Run
 
-Binaries can be downloaded from releases page for appropriate platform.
+Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc/releases) page for appropriate platform.
 
 Create a data folder that will store the data
 > $ mkdir data
