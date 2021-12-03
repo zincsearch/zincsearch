@@ -60,13 +60,20 @@ bas64encoded_creds = base64.b64encode(bytes(user + ":" + password, "utf-8")).dec
 
 
 data = {
-	"author": "Prabhat Sharma",
-	"city": "San Francisco",
-	"hobby": "Chess"
-}
+    "Athlete": "DEMTSCHENKO, Albert",
+    "City": "Turin",
+    "Country": "RUS",
+    "Discipline": "Luge",
+    "Event": "Singles",
+    "Gender": "Men",
+    "Medal": "Silver",
+    "Season": "winter",
+    "Sport": "Luge",
+    "Year": 2006
+  }
 
 headers = {"Content-type": "application/json", "Authorization": "Basic " + bas64encoded_creds}
-index = "person"
+index = "games3"
 zinc_host = "http://localhost:4080"
 zinc_url = zinc_host + "/api/" + index + "/document"
 
@@ -106,7 +113,7 @@ params = {
 #     "search_type": "querystring",
 #     "query":
 #     {
-#         "term": "+City:Paris +Gold",
+#         "term": "+City:Turin +Silver",
 #         "start_time": "2021-06-02T14:28:31.894Z",
 #         "end_time": "2021-12-02T15:28:31.894Z"
 #     },
