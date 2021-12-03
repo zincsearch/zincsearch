@@ -1,0 +1,90 @@
+# create namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: zinc
+  labels:
+    name: zinc
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: z
+  namespace: zinc
+spec:
+  clusterIP: None
+  selector:
+    app: zinc
+  ports:
+  - name: http
+    port: 4080
+    targetPort: 4080
+
+---
+
+# create statefulset
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zinc
+  namespace: zinc
+  labels:
+    name: zinc
+spec:
+  serviceName: z
+  replicas: 1
+  selector:
+    matchLabels:
+      name: zinc
+      app: zinc
+  template:
+    metadata:
+      labels:
+        name: zinc
+        app: zinc
+    spec:
+      securityContext:
+        fsGroup: 2000
+        runAsUser: 10000
+        runAsGroup: 3000
+        runAsNonRoot: true
+      # terminationGracePeriodSeconds: 0
+      containers:
+        - name: zinc
+          image: public.ecr.aws/m5j1b6u0/zinc:v1
+          env:
+            - name: FIRST_ADMIN_USER
+              value: admin
+            - name: FIRST_ADMIN_PASSWORD
+              value: Complexpass#123
+            - name: DATA_PATH
+              value: /go/bin/data
+          # command: ["/bin/bash", "-c", "while true; do sleep 1; done"]
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 1024m
+              memory: 512Mi
+            requests:
+              cpu: 32m
+              memory: 50Mi
+          ports:
+            - containerPort: 4080
+              name: http
+          volumeMounts:
+          - name: data
+            mountPath: /go/bin/data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      # storageClassName: default
+      # NOTE: You can increase the storage size
+      resources:
+        requests:
+          storage: 10Gi
+
+
