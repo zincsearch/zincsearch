@@ -50,7 +50,7 @@ Now point your browser to http://localhost:4080 and login
 
 python example
 
-```
+```py
 import base64, json
 import requests
 
@@ -87,7 +87,7 @@ Bulk ingestion API follows same interface as elasticsearch API defined in [docum
 
 Python example
 
-```
+```py
 import base64
 import json
 import requests
@@ -134,7 +134,7 @@ print(res.text)
 
 output
 
-```
+```json
 {"took":0,"timed_out":false,"max_score":7.6978611753656345,"hits":{"total":{"value":3},"hits":[{"_index":"games3","_type":"games3","_id":"bd3e67f0-679b-4aa4-b0f5-81b9dc86a26a","_score":7.6978611753656345,"@timestamp":"2021-10-20T04:56:39.000871Z","_source":{"Athlete":"DEMTSCHENKO, Albert","City":"Turin","Country":"RUS","Discipline":"Luge","Event":"Singles","Gender":"Men","Medal":"Silver","Season":"winter","Sport":"Luge","Year":2006}},{"_index":"games3","_type":"games3","_id":"230349d9-72b3-4225-bac7-a8ab31af046d","_score":7.6978611753656345,"@timestamp":"2021-10-20T04:56:39.215124Z","_source":{"Athlete":"DEMTSCHENKO, Albert","City":"Sochi","Country":"RUS","Discipline":"Luge","Event":"Singles","Gender":"Men","Medal":"Silver","Season":"winter","Sport":"Luge","Year":2014}},{"_index":"games3","_type":"games3","_id":"338fea31-81f2-4b56-a096-b8294fb6cc92","_score":7.671309826309841,"@timestamp":"2021-10-20T04:56:39.215067Z","_source":{"Athlete":"DEMTSCHENKO, Albert","City":"Sochi","Country":"RUS","Discipline":"Luge","Event":"Mixed Relay","Gender":"Men","Medal":"Silver","Season":"winter","Sport":"Luge","Year":2014}}]},"buckets":null,"error":""}
 ```
 
