@@ -13,7 +13,7 @@ The only viable solution to search was elasticsearch which while is a very good 
 # Features:
 
 1. Provides full text indexing capability
-2. Single binary for installation and running. Binaries avalaible under releases for multiple platforms.
+2. Single binary for installation and running. Binaries available under releases for multiple platforms.
 3. Web UI for querying data written in Vue
 4. Compatibility with elasticsearch APIs for ingestion of data (single record and bulk API)
 5. Out of the box authentication
