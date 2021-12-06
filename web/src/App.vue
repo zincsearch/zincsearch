@@ -121,6 +121,10 @@ export default {
     // const user = ref({});
     const store = useStore();
 
+    if (window.location.origin != "http://localhost:8080") {
+      store.dispatch("endpoint", window.location.origin + "/");
+    }
+
     const _id = localStorage.getItem("_id");
     const base64encoded = localStorage.getItem("base64encoded");
     const name = localStorage.getItem("name");
