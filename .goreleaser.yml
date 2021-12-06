@@ -38,3 +38,53 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+
+snapcrafts:
+  -
+    id: zinc
+    name: zinc
+    summary: Zinc Search engine. A lightweight alternative to elasticsearch.
+    description: |
+      Zinc is a search engine that does full text indexing. It is a lightweight
+      alternative to elasticsearch and runs in less than 100 MB of RAM. It uses
+      bluge as the underlying indexing library.
+      
+      It is very simple and easy to operate as opposed to elasticsearch which
+      requires a couple dozen knobs to understand and tune.
+      
+      It is a drop-in replacement for elasticsearch if you are just ingesting
+      data using APIs and searching using kibana (Kibana is not supported with
+      zinc. Zinc provides its own UI).
+
+    license: Apache-2.0
+    grade: stable
+    confinement: classic
+    base: core18
+    
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+
+    # Whether to publish the snap to the snapcraft store.
+    # Remember you need to `snapcraft login` first.
+    # Defaults to false.
+    publish: false
+
+    # Channels in store where snap will be pushed.
+    # More info about channels here: 
+    # https://snapcraft.io/docs/reference/channels
+    channel_templates:
+      - edge
+      - beta
+      - candidate
+      - stable
+      - {{ .Major }}.{{ .Minor }}/edge
+      - {{ .Major }}.{{ .Minor }}/beta
+      - {{ .Major }}.{{ .Minor }}/candidate
+      - {{ .Major }}.{{ .Minor }}/stable
+
+   
+  
