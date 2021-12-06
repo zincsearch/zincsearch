@@ -3,8 +3,6 @@
 ############################
 # FROM golang:alpine AS builder
 FROM public.ecr.aws/bitnami/golang:latest as builder
-# Install git.
-# Git is required for fetching the dependencies.
 RUN update-ca-certificates
 # RUN apk update && apk add --no-cache git
 # Create appuser.
@@ -38,8 +36,8 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o zinc
 ############################
 # STEP 2 build a small image
 ############################
-FROM public.ecr.aws/lts/ubuntu:latest
-# FROM scratch
+# FROM public.ecr.aws/lts/ubuntu:latest
+FROM scratch
 # Import the user and group files from the builder.
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
@@ -53,6 +51,6 @@ COPY --from=builder  /go/src/github.com/prabhatsharma/zinc/zinc /go/bin/zinc
 # Use an unprivileged user.
 USER appuser:appuser
 # Port on which the service will be exposed.
-EXPOSE 6080
+EXPOSE 4080
 # Run the zinc binary.
 ENTRYPOINT ["/go/bin/zinc"]

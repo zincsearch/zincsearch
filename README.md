@@ -8,7 +8,7 @@ It is a drop-in replacement for elasticsearch if you are just ingesting data usi
 
 # Why zinc
 
-The only viable solution to search was elasticsearch which while is a very good product, is complex and requires lots of resources and is more than a decade old. I built this tool so it becomes easier for folks to use full text search indexing without doing a lot of work.
+  While Elasticsearch is a very good product, it is complex and requires lots of resources and is more than a decade old. I built Zinc so it becomes easier for folks to use full text search indexing without doing a lot of work.
 
 # Features:
 
@@ -37,12 +37,30 @@ The only viable solution to search was elasticsearch which while is a very good 
 
 ## Download / Installation / Run
 
+### Binaries
 Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc/releases) page for appropriate platform.
 
 Create a data folder that will store the data
 > $ mkdir data
 
 > $ FIRST_ADMIN_USER=admin FIRST_ADMIN_PASSWORD=Complexpass#123 zinc 
+
+Now point your browser to http://localhost:4080 and login
+
+
+### Docker
+
+> $ mkdir data
+
+> $ docker run -v /full/path/of/data:/data -e DATA_PATH="/data" -p 4080:4080 -e FIRST_ADMIN_USER=admin -e FIRST_ADMIN_PASSWORD=Complexpass#123 -p 4080:4080 --name zinc public.ecr.aws/m5j1b6u0/zinc:v0.1.1 
+
+Now point your browser to http://localhost:4080 and login
+
+### Kubernetes
+
+> kubectl apply -f kube-deployment.yaml
+
+> kubectl -n zinc port-forward svc/z 4080:4080
 
 Now point your browser to http://localhost:4080 and login
 
@@ -150,7 +168,6 @@ search_type can have following values:
 8. matchphrase
 9. multiphrase
 10. querystring
-
 
 
 
