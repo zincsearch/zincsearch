@@ -220,10 +220,6 @@ export default {
 
     const store = useStore();
 
-    if (window.location.origin != "http://localhost:8080") {
-      store.dispatch("endpoint", window.location.origin + "/");
-    }
-
     const indexList = ref([]);
     const options = ref([]);
     const search_query = ref("");
