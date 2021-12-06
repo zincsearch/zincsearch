@@ -1,0 +1,36 @@
+name: zinc
+version: "0.1.1"
+summary: Zinc Search engine. A lightweight alternative to elasticsearch.
+description: |
+  Zinc is a search engine that does full text indexing. It is a lightweight
+  alternative to elasticsearch and runs in less than 100 MB of RAM. It uses
+  bluge as the underlying indexing library.
+
+  It is very simple and easy to operate as opposed to elasticsearch which
+  requires a couple dozen knobs to understand and tune.
+
+  It is a drop-in replacement for elasticsearch if you are just ingesting
+  data using APIs and searching using kibana (Kibana is not supported with
+  zinc. Zinc provides its own UI).
+base: core20
+grade: stable
+confinement: classic
+
+apps:
+  zinc:
+    command: zinc
+
+architectures:
+  - build-on: amd64
+  - build-on: armhf
+  - build-on: arm64
+
+parts:
+  zinc:
+    plugin: dump
+    source:
+      - on amd64: https://github.com/prabhatsharma/zinc/releases/download/v$SNAPCRAFT_PROJECT_VERSION/zinc_$SNAPCRAFT_PROJECT_VERSION_Linux_x86_64.tar.gz
+      - on arm64: https://github.com/prabhatsharma/zinc/releases/download/v$SNAPCRAFT_PROJECT_VERSION/zinc_$SNAPCRAFT_PROJECT_VERSION_Linux_arm64.tar.gz
+      - on armhf: https://github.com/prabhatsharma/zinc/releases/download/v$SNAPCRAFT_PROJECT_VERSION/zinc_$SNAPCRAFT_PROJECT_VERSION_Linux_armv7.tar.gz
+    stage:
+      - zinc

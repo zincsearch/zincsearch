@@ -21,3 +21,5 @@ __debug_bin
 main
 dist/
 
+# Snap packaging artifacts
+*.snap
