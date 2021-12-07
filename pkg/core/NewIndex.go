@@ -1,19 +1,12 @@
 package core
 
 import (
-	"os"
-
 	"github.com/blugelabs/bluge"
+	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
 func NewIndex(name string) (*Index, error) {
-	DATA_PATH := ""
-	if os.Getenv("DATA_PATH") == "" {
-		DATA_PATH = "./data"
-		// DATA_PATH = "/Users/prabhat/projects/prabhatsharma/zinc/data"
-	} else {
-		DATA_PATH = os.Getenv("DATA_PATH")
-	}
+	DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
 
 	config := bluge.DefaultConfig(DATA_PATH + "/" + name)
 

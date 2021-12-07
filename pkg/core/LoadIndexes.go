@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/prabhatsharma/zinc/pkg/zutils"
 
 	"github.com/rs/zerolog/log"
 )
@@ -42,13 +43,7 @@ func LoadZincIndexes() (map[string]*Index, error) {
 
 	IndexList := make(map[string]*Index)
 
-	DATA_PATH := ""
-	if os.Getenv("DATA_PATH") == "" {
-		DATA_PATH = "./data"
-		// DATA_PATH = "/Users/prabhat/projects/prabhatsharma/zinc/data"
-	} else {
-		DATA_PATH = os.Getenv("DATA_PATH")
-	}
+	DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
 
 	files, err := os.ReadDir(DATA_PATH)
 	if err != nil {

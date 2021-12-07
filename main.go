@@ -1,13 +1,12 @@
 package main
 
 import (
-	"os"
-
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	zerolog "github.com/rs/zerolog/log"
 
 	"github.com/prabhatsharma/zinc/pkg/routes"
+	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
 func main() {
@@ -23,13 +22,9 @@ func main() {
 
 	routes.SetRoutes(r) // Set up all API routes.
 
-	// startup.LoadIndexes() // Load bluge indexes from disk.
-
 	// Run the server
 
-	if os.Getenv("PORT") != "" {
-		r.Run(":" + os.Getenv("PORT"))
-	} else {
-		r.Run(":" + "4080")
-	}
+	PORT := zutils.GetEnv("PORT", "8080")
+
+	r.Run(":" + PORT)
 }

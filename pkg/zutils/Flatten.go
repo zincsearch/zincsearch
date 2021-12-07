@@ -1,4 +1,4 @@
-package rutils
+package zutils
 
 import (
 	"fmt"
