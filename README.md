@@ -52,7 +52,7 @@ Now point your browser to http://localhost:4080 and login
 
 > $ mkdir data
 
-> $ docker run -v /full/path/of/data:/data -e DATA_PATH="/data" -p 4080:4080 -e FIRST_ADMIN_USER=admin -e FIRST_ADMIN_PASSWORD=Complexpass#123 -p 4080:4080 --name zinc public.ecr.aws/m5j1b6u0/zinc:v0.1.1 
+> $ docker run -v /full/path/of/data:/data -e DATA_PATH="/data" -p 4080:4080 -e FIRST_ADMIN_USER=admin -e FIRST_ADMIN_PASSWORD=Complexpass#123 --name zinc public.ecr.aws/m5j1b6u0/zinc:v0.1.1 
 
 Now point your browser to http://localhost:4080 and login
 
@@ -69,13 +69,10 @@ Now point your browser to http://localhost:4080 and login
 python example
 
 ```py
-import base64, json
 import requests
 
 user = "admin"
 password = "Complexpass#123"
-bas64encoded_creds = base64.b64encode(bytes(user + ":" + password, "utf-8")).decode("utf-8")
-
 
 data = {
     "Athlete": "DEMTSCHENKO, Albert",
@@ -90,13 +87,10 @@ data = {
     "Year": 2006
   }
 
-headers = {"Content-type": "application/json", "Authorization": "Basic " + bas64encoded_creds}
 index = "games3"
 zinc_host = "http://localhost:4080"
-zinc_url = zinc_host + "/api/" + index + "/document"
 
-res = requests.put(zinc_url, headers=headers, data=json.dumps(data))
-
+res = requests.put(f"{zinc_host}/api/{index}/document", json=data, auth=(user, password))
 ```
 
 Bulk ingestion API follows same interface as elasticsearch API defined in [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html).
@@ -106,15 +100,10 @@ Bulk ingestion API follows same interface as elasticsearch API defined in [docum
 Python example
 
 ```py
-import base64
-import json
 import requests
 
 user = "admin"
 password = "Complexpass#123"
-bas64encoded_creds = base64.b64encode(
-    bytes(user + ":" + password, "utf-8")).decode("utf-8")
-
 
 params = {
     "search_type": "match",
@@ -138,15 +127,12 @@ params = {
 #     "fields": ["_all"]
 # }
 
-headers = {"Content-type": "application/json",
-           "Authorization": "Basic " + bas64encoded_creds}
 index = "games3"
 zinc_host = "http://localhost:4080"
-zinc_url = zinc_host + "/api/" + index + "/_search"
 
-res = requests.post(zinc_url, headers=headers, data=json.dumps(params))
+res = requests.post(f"{zinc_host}/api/{index}/_search", json=params, auth=(user, password))
 
-print(res.text)
+print(res.json())
 
 ```
 
