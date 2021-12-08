@@ -52,7 +52,7 @@ Now point your browser to http://localhost:4080 and login
 
 > $ mkdir data
 
-> $ docker run -v /full/path/of/data:/data -e DATA_PATH="/data" -p 4080:4080 -e FIRST_ADMIN_USER=admin -e FIRST_ADMIN_PASSWORD=Complexpass#123 -p 4080:4080 --name zinc public.ecr.aws/m5j1b6u0/zinc:v0.1.1 
+> $ docker run -v /full/path/of/data:/data -e DATA_PATH="/data" -e FIRST_ADMIN_USER=admin -e FIRST_ADMIN_PASSWORD=Complexpass#123 -p 4080:4080 --name zinc public.ecr.aws/m5j1b6u0/zinc:v0.1.1 
 
 Now point your browser to http://localhost:4080 and login
 
