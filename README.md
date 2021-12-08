@@ -1,3 +1,4 @@
+Note: Zinc and all its APIs are considered to be alpha stage at this time.
 # Zinc
 
 Zinc is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs in less than 100 MB of RAM. It uses [bluge](https://github.com/blugelabs/bluge) as the underlying indexing library.
@@ -81,6 +82,8 @@ Zinc can be available with an ingress or port-forward:
 
 ## Data ingestion
 
+### Single record
+
 python example
 
 ```py
@@ -114,7 +117,17 @@ res = requests.put(zinc_url, headers=headers, data=json.dumps(data))
 
 ```
 
+### Bulk ingestion
+
 Bulk ingestion API follows same interface as Elasticsearch API defined in [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html).
+
+
+> curl -L https://github.com/prabhatsharma/zinc/releases/download/v0.1.1/https://github.com/prabhatsharma/zinc/releases/download/v0.1.1/olympics.ndjson.gz -o olympics.ndjson.gz
+
+> gzip -d  olympics.ndjson.gz 
+
+> curl http://localhost:4080/es/games/_bulk -i -u admin:Complexpass#123  --data-binary "@olympics.ndjson"
+
 
 ## Search
 
@@ -184,6 +197,11 @@ search_type can have following values:
 9. multiphrase
 10. querystring
 
+# Who uses Zinc ?
+
+1. [Quadrantsec](https://quadrantsec.com/)
+
+Please do raise a PR adding your details if you are using Zinc.
 
 
 

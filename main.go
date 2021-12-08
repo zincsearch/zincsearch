@@ -24,7 +24,7 @@ func main() {
 
 	// Run the server
 
-	PORT := zutils.GetEnv("PORT", "8080")
+	PORT := zutils.GetEnv("PORT", "4080")
 
 	r.Run(":" + PORT)
 }
