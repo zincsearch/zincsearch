@@ -1,10 +1,10 @@
 # Zinc
 
-Zinc is a search engine that does full text indexing. It is a lightweight alternative to elasticsearch and runs in less than 100 MB of RAM. It uses [bluge](https://github.com/blugelabs/bluge) as the underlying indexing library.
+Zinc is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs in less than 100 MB of RAM. It uses [bluge](https://github.com/blugelabs/bluge) as the underlying indexing library.
 
-It is very simple and easy to operate as opposed to elasticsearch which requires a couple dozen knobs to understand and tune. 
+It is very simple and easy to operate as opposed to Elasticsearch which requires a couple dozen knobs to understand and tune. 
 
-It is a drop-in replacement for elasticsearch if you are just ingesting data using APIs and searching using kibana (Kibana is not supported with zinc. Zinc provides its own UI).
+It is a drop-in replacement for Elasticsearch if you are just ingesting data using APIs and searching using kibana (Kibana is not supported with zinc. Zinc provides its own UI).
 
 # Why zinc
 
@@ -15,7 +15,7 @@ It is a drop-in replacement for elasticsearch if you are just ingesting data usi
 1. Provides full text indexing capability
 2. Single binary for installation and running. Binaries available under releases for multiple platforms.
 3. Web UI for querying data written in Vue
-4. Compatibility with elasticsearch APIs for ingestion of data (single record and bulk API)
+4. Compatibility with Elasticsearch APIs for ingestion of data (single record and bulk API)
 5. Out of the box authentication
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
 
@@ -114,7 +114,7 @@ res = requests.put(zinc_url, headers=headers, data=json.dumps(data))
 
 ```
 
-Bulk ingestion API follows same interface as elasticsearch API defined in [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html).
+Bulk ingestion API follows same interface as Elasticsearch API defined in [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html).
 
 ## Search
 
