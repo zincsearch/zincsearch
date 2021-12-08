@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "zinc.fullname" . }}
+  labels:
+    {{- include "zinc.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "zinc.fullname" . }}
+  # Until Zinc is not HA
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "zinc.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "zinc.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      containers:
+        - name: zinc
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: FIRST_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  key: "username"
+                  name: {{ include "zinc.fullname" . }}
+            - name: FIRST_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: "password"
+                  name: {{ include "zinc.fullname" . }}
+            - name: DATA_PATH
+              value: /go/bin/data
+          # command: ["/bin/bash", "-c", "while true; do sleep 1; done"]
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          ports:
+            - containerPort: 4080
+              name: http
+          volumeMounts:
+            - name: data
+              mountPath: /go/bin/data
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- if not .Values.persistence.enabled }}
+      volumes:
+        - name: data
+          emptyDir: {}
+  {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- if .Values.persistence.storageClass }}
+        storageClassName: {{ .Values.persistence.storageClass }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size }}
+  {{- end }}

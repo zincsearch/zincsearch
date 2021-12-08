@@ -58,11 +58,26 @@ Now point your browser to http://localhost:4080 and login
 
 ### Kubernetes
 
+#### Manual Install
+
 > kubectl apply -f kube-deployment.yaml
 
 > kubectl -n zinc port-forward svc/z 4080:4080
 
 Now point your browser to http://localhost:4080 and login
+
+#### Helm
+
+Update Helm values located in [values.yaml](helm/zinc/values.yaml)
+
+Create the namespace:
+> kubectl create ns zinc
+
+Install the chart:
+> helm install zinc helm/zinc -n zinc
+
+Zinc can be available with an ingress or port-forward:
+> kubectl -n zinc port-forward svc/zinc 4080:4080
 
 ## Data ingestion
 

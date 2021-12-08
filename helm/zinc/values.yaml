@@ -1,0 +1,72 @@
+# Default values for Zinc.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: public.ecr.aws/m5j1b6u0/zinc
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+fullnameOverride: "zinc"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# Credentials for authentication
+auth:
+  username: "admin"
+  password: "Complexpass#123"
+
+persistence:
+  # Enable Zinc data persistence using PVC, otherwise empty-dir is used
+  enabled: true
+  # PVC Storage Class for Zinc data volume, if empty - default storage class is used
+  storageClass: ""
+  # PVC Storage Request for Zinc data volume
+  size: "10Gi"
+
+securityContext:
+  fsGroup: 2000
+  runAsUser: 10000
+  runAsGroup: 3000
+  runAsNonRoot: true
+
+service:
+  type: ClusterIP
+  port: 4080
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: zinc.example.local
+      paths:
+        - /
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+   limits:
+     cpu: 1024m
+     memory: 512Mi
+   requests:
+     cpu: 32m
+     memory: 50Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
