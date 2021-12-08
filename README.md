@@ -126,7 +126,7 @@ Bulk ingestion API follows same interface as Elasticsearch API defined in [docum
 
 > gzip -d  olympics.ndjson.gz 
 
-> curl http://localhost:4080/es/games/_bulk -i -u admin:Complexpass#123  --data-binary "@olympics.ndjson"
+> curl http://localhost:4080/es/olympics/_bulk -i -u admin:Complexpass#123  --data-binary "@olympics.ndjson"
 
 
 ## Search
