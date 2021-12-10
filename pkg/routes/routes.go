@@ -54,6 +54,9 @@ func SetRoutes(r *gin.Engine) {
 
 	// Index - https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
 	r.PUT("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
+
+	r.DELETE("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
+
 	r.POST("/es/:target/_doc", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 	r.PUT("/es/:target/_create/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 	r.POST("/es/:target/_create/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
