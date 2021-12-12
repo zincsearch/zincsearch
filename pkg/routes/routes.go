@@ -69,6 +69,15 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
 	r.POST("/es/:target/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
 
+	// Stupid Compatibility
+	r.GET("/es/", handlers.Ping)
+	r.GET("/es/_xpack", handlers.XPackHandler)
+	r.GET("/es/_license", handlers.License)
+	r.HEAD("/es/_index_template/:name", handlers.IndexTemplate)
+	r.GET("/es/_index_template/:name", handlers.IndexTemplate)
+	r.GET("/es/_cat/templates/:name", handlers.CatTemplate)
+	r.PUT("/es/_ingest/pipeline/:name", handlers.IngestPipeline)
+
 	// _search
 	// hey -n 200 -c 20 -m POST -H "Content-Type: application/json" -d '{"author": "kimchy", "text": "Zincsearch: cool. bonsai cool."}' http://localhost:4080/boos/_doc
 
