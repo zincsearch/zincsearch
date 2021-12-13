@@ -20,8 +20,12 @@ It is a drop-in replacement for Elasticsearch if you are just ingesting data usi
 5. Out of the box authentication
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
 
-# Missing features:
-1. Clustering and High Availability
+# Roadmap items:
+1. High Availability
+1. Distributed reads and writes
+1. Geosptial search
+1. Index storage in memory
+1. Index storage in s3
 
 
 # Screenshots
@@ -84,7 +88,15 @@ Zinc can be available with an ingress or port-forward:
 
 ### Single record
 
-python example
+curl example
+
+> curl \
+  -u admin:Complexpass#123 \
+  -XPUT \
+  -d '{"author":"Prabhat Sharma"}' \
+  http://localhost:4080/api/myshinynewindex/document
+
+Python example
 
 ```py
 import base64, json
@@ -178,10 +190,80 @@ print(res.text)
 
 ```
 
-output
+Output
 
 ```json
-{"took":0,"timed_out":false,"max_score":7.6978611753656345,"hits":{"total":{"value":3},"hits":[{"_index":"games3","_type":"games3","_id":"bd3e67f0-679b-4aa4-b0f5-81b9dc86a26a","_score":7.6978611753656345,"@timestamp":"2021-10-20T04:56:39.000871Z","_source":{"Athlete":"DEMTSCHENKO, Albert","City":"Turin","Country":"RUS","Discipline":"Luge","Event":"Singles","Gender":"Men","Medal":"Silver","Season":"winter","Sport":"Luge","Year":2006}},{"_index":"games3","_type":"games3","_id":"230349d9-72b3-4225-bac7-a8ab31af046d","_score":7.6978611753656345,"@timestamp":"2021-10-20T04:56:39.215124Z","_source":{"Athlete":"DEMTSCHENKO, Albert","City":"Sochi","Country":"RUS","Discipline":"Luge","Event":"Singles","Gender":"Men","Medal":"Silver","Season":"winter","Sport":"Luge","Year":2014}},{"_index":"games3","_type":"games3","_id":"338fea31-81f2-4b56-a096-b8294fb6cc92","_score":7.671309826309841,"@timestamp":"2021-10-20T04:56:39.215067Z","_source":{"Athlete":"DEMTSCHENKO, Albert","City":"Sochi","Country":"RUS","Discipline":"Luge","Event":"Mixed Relay","Gender":"Men","Medal":"Silver","Season":"winter","Sport":"Luge","Year":2014}}]},"buckets":null,"error":""}
+{
+  "took": 0,
+  "timed_out": false,
+  "max_score": 7.6978611753656345,
+  "hits": {
+    "total": {
+      "value": 3
+    },
+    "hits": [
+      {
+        "_index": "games3",
+        "_type": "games3",
+        "_id": "bd3e67f0-679b-4aa4-b0f5-81b9dc86a26a",
+        "_score": 7.6978611753656345,
+        "@timestamp": "2021-10-20T04:56:39.000871Z",
+        "_source": {
+          "Athlete": "DEMTSCHENKO, Albert",
+          "City": "Turin",
+          "Country": "RUS",
+          "Discipline": "Luge",
+          "Event": "Singles",
+          "Gender": "Men",
+          "Medal": "Silver",
+          "Season": "winter",
+          "Sport": "Luge",
+          "Year": 2006
+        }
+      },
+      {
+        "_index": "games3",
+        "_type": "games3",
+        "_id": "230349d9-72b3-4225-bac7-a8ab31af046d",
+        "_score": 7.6978611753656345,
+        "@timestamp": "2021-10-20T04:56:39.215124Z",
+        "_source": {
+          "Athlete": "DEMTSCHENKO, Albert",
+          "City": "Sochi",
+          "Country": "RUS",
+          "Discipline": "Luge",
+          "Event": "Singles",
+          "Gender": "Men",
+          "Medal": "Silver",
+          "Season": "winter",
+          "Sport": "Luge",
+          "Year": 2014
+        }
+      },
+      {
+        "_index": "games3",
+        "_type": "games3",
+        "_id": "338fea31-81f2-4b56-a096-b8294fb6cc92",
+        "_score": 7.671309826309841,
+        "@timestamp": "2021-10-20T04:56:39.215067Z",
+        "_source": {
+          "Athlete": "DEMTSCHENKO, Albert",
+          "City": "Sochi",
+          "Country": "RUS",
+          "Discipline": "Luge",
+          "Event": "Mixed Relay",
+          "Gender": "Men",
+          "Medal": "Silver",
+          "Season": "winter",
+          "Sport": "Luge",
+          "Year": 2014
+        }
+      }
+    ]
+  },
+  "buckets": null,
+  "error": ""
+}
 ```
 
 search_type can have following values:
