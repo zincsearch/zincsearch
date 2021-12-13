@@ -13,5 +13,6 @@ type Index struct {
 	Name          string            `json:"name"`
 	Writer        *bluge.Writer     `json:"blugeWriter"`
 	CachedMapping map[string]string `json:"mapping"`
-	IndexType     string            `json:"index_type"` // "system" or "user"
+	IndexType     string            `json:"index_type"`   // "system" or "user"
+	StorageType   string            `json:"storage_type"` // disk, memory, s3
 }
