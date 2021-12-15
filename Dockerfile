@@ -32,7 +32,7 @@ RUN go get -d -v
 #       -w : Omit the DWARF symbol table.
 #       -s : Omit the symbol table and debug information.
 #       Omit the symbol table and debug information will reduce the binary size.
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o zinc
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o zinc cmd/zinc/main.go
 ############################
 # STEP 2 build a small image
 ############################
