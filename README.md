@@ -48,7 +48,7 @@ Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc
 Create a data folder that will store the data
 > $ mkdir data
 
-> $ FIRST_ADMIN_USER=admin FIRST_ADMIN_PASSWORD=Complexpass#123 zinc 
+> $ FIRST_ADMIN_USER=admin FIRST_ADMIN_PASSWORD=Complexpass#123 ./zinc 
 
 Now point your browser to http://localhost:4080 and login
 
@@ -134,7 +134,7 @@ res = requests.put(zinc_url, headers=headers, data=json.dumps(data))
 Bulk ingestion API follows same interface as Elasticsearch API defined in [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html).
 
 
-> curl -L https://github.com/prabhatsharma/zinc/releases/download/v0.1.1/https://github.com/prabhatsharma/zinc/releases/download/v0.1.1/olympics.ndjson.gz -o olympics.ndjson.gz
+> curl -L https://github.com/prabhatsharma/zinc/releases/download/v0.1.1/olympics.ndjson.gz -o olympics.ndjson.gz
 
 > gzip -d  olympics.ndjson.gz 
 
