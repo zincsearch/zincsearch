@@ -7,6 +7,10 @@ It is very simple and easy to operate as opposed to Elasticsearch which requires
 
 It is a drop-in replacement for Elasticsearch if you are just ingesting data using APIs and searching using kibana (Kibana is not supported with zinc. Zinc provides its own UI).
 
+Check the below video for a quick demo of Zinc.
+
+[![Zinc Youtube](./screenshots/zinc-youtube.jpg)](https://www.youtube.com/watch?v=aZXtuVjt1ow)
+
 # Why zinc
 
   While Elasticsearch is a very good product, it is complex and requires lots of resources and is more than a decade old. I built Zinc so it becomes easier for folks to use full text search indexing without doing a lot of work.
