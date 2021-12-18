@@ -11,6 +11,10 @@ Check the below video for a quick demo of Zinc.
 
 [![Zinc Youtube](./screenshots/zinc-youtube.jpg)](https://www.youtube.com/watch?v=aZXtuVjt1ow)
 
+Join slack channel
+
+[![Slack](./screenshots/slack.png)](https://join.slack.com/t/zinc-nvh4832/shared_invite/zt-10a4jb2nl-tQUWwVQgylFEImicA7Fw6A)
+
 # Why zinc
 
   While Elasticsearch is a very good product, it is complex and requires lots of resources and is more than a decade old. I built Zinc so it becomes easier for folks to use full text search indexing without doing a lot of work.
