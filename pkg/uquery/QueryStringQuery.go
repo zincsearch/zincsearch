@@ -20,7 +20,9 @@ func QueryStringQuery(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
 	dateQuery := bluge.NewDateRangeQuery(iQuery.Query.StartTime, iQuery.Query.EndTime).SetField("@timestamp")
 	finalQuery := bluge.NewBooleanQuery().AddMust(dateQuery).AddMust(userQuery)
 
-	searchRequest := bluge.NewTopNSearch(1000, finalQuery).WithStandardAggregations()
+	// sortFields := []string{"-@timestamp"} // adding a - (minus) before the field name will sort the field in descending order
+
+	searchRequest := bluge.NewTopNSearch(iQuery.MaxResults, finalQuery).SortBy(iQuery.SortFields).WithStandardAggregations()
 
 	return searchRequest, nil
 

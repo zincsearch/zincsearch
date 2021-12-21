@@ -9,7 +9,7 @@ func DateRangeQuery(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
 	dateQuery := bluge.NewDateRangeQuery(iQuery.Query.StartTime, iQuery.Query.EndTime).SetField("@timestamp")
 	query := bluge.NewBooleanQuery().AddMust(dateQuery)
 
-	searchRequest := bluge.NewTopNSearch(1000, query).WithStandardAggregations()
+	searchRequest := bluge.NewTopNSearch(iQuery.MaxResults, query).SortBy(iQuery.SortFields).WithStandardAggregations()
 
 	return searchRequest, nil
 }

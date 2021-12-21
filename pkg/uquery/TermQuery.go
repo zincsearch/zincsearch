@@ -18,7 +18,7 @@ func TermQuery(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
 	termQuery := bluge.NewTermQuery(iQuery.Query.Term).SetField(field)
 	query := bluge.NewBooleanQuery().AddMust(dateQuery).AddMust(termQuery)
 
-	searchRequest := bluge.NewTopNSearch(1000, query).WithStandardAggregations()
+	searchRequest := bluge.NewTopNSearch(iQuery.MaxResults, query).SortBy(iQuery.SortFields).WithStandardAggregations()
 
 	return searchRequest, nil
 }

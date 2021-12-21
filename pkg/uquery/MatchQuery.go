@@ -25,7 +25,7 @@ func MatchQuery(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
 	matchQuery := bluge.NewMatchQuery(iQuery.Query.Term).SetField(field).SetAnalyzer(analyzer.NewStandardAnalyzer())
 	query := bluge.NewBooleanQuery().AddMust(dateQuery).AddMust(matchQuery)
 
-	searchRequest := bluge.NewTopNSearch(1000, query).WithStandardAggregations()
+	searchRequest := bluge.NewTopNSearch(iQuery.MaxResults, query).SortBy(iQuery.SortFields).WithStandardAggregations()
 
 	// endTime := time.Now()
 	// fmt.Println("Query time: ", endTime.Sub(startTime))

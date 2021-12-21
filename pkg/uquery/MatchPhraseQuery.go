@@ -19,7 +19,7 @@ func MatchPhraseQuery(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
 	matchPhraseQuery := bluge.NewMatchPhraseQuery(iQuery.Query.Term).SetField(field).SetAnalyzer(analyzer.NewStandardAnalyzer())
 	query := bluge.NewBooleanQuery().AddMust(dateQuery).AddMust(matchPhraseQuery)
 
-	searchRequest := bluge.NewTopNSearch(1000, query).WithStandardAggregations()
+	searchRequest := bluge.NewTopNSearch(iQuery.MaxResults, query).SortBy(iQuery.SortFields).WithStandardAggregations()
 
 	return searchRequest, nil
 }
