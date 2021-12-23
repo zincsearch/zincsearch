@@ -1,5 +1,5 @@
 Note: Zinc and all its APIs are considered to be alpha stage at this time.
-# Zinc
+# Zinc Search Engine
 
 Zinc is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs in less than 100 MB of RAM. It uses [bluge](https://github.com/blugelabs/bluge) as the underlying indexing library.
 
@@ -29,12 +29,10 @@ Join slack channel
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
 
 # Roadmap items:
+1. Index storage in s3
 1. High Availability
 1. Distributed reads and writes
 1. Geosptial search
-1. Index storage in memory
-1. Index storage in s3
-
 
 # Screenshots
 
