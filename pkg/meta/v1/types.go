@@ -9,6 +9,7 @@ import (
 type ZincQuery struct {
 	SearchType string         `json:"search_type"`
 	MaxResults int            `json:"max_results"`
+	From       int            `json:"from"`
 	Explain    bool           `json:"explain"`
 	Highlight  QueryHighlight `json:"highlight"`
 	Query      QueryParams    `json:"query"`
