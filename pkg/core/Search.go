@@ -16,11 +16,15 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 
 	var searchRequest bluge.SearchRequest
 
+	if iQuery.MaxResults == 0 {
+		iQuery.MaxResults = 20
+	}
+
 	var err error
 
 	switch iQuery.SearchType {
 	case "alldocuments":
-		searchRequest, err = uquery.AllDocuments()
+		searchRequest, err = uquery.AllDocuments(iQuery)
 	case "wildcard":
 		searchRequest, err = uquery.WildcardQuery(iQuery)
 	case "fuzzy":

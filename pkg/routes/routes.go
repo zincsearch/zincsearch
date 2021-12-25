@@ -1,17 +1,17 @@
 package routes
 
 import (
-	"log"
+	"net/http"
 	"time"
+
+	"github.com/prabhatsharma/zinc"
+	zerolog "github.com/rs/zerolog/log"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/prabhatsharma/zinc/pkg/auth"
 	"github.com/prabhatsharma/zinc/pkg/handlers"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
-	"github.com/rakyll/statik/fs"
-
-	_ "github.com/prabhatsharma/zinc/statik"
 )
 
 // SetRoutes sets up all gi HTTP API endpoints that can be called by front end
@@ -30,11 +30,12 @@ func SetRoutes(r *gin.Engine) {
 	r.GET("/healthz", v1.GetHealthz)
 	r.GET("/", v1.GUI)
 
-	statikFS, err := fs.New()
+	front, err := zinc.GetFrontendAssets()
 	if err != nil {
-		log.Fatal(err)
+		zerolog.Err(err)
 	}
-	r.StaticFS("/ui", statikFS)
+
+	r.StaticFS("/ui", http.FS(front))
 
 	r.POST("/api/login", handlers.ValidateCredentials)
 
@@ -68,10 +69,5 @@ func SetRoutes(r *gin.Engine) {
 
 	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
 	r.POST("/es/:target/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
-
-	// _search
-	// hey -n 200 -c 20 -m POST -H "Content-Type: application/json" -d '{"author": "kimchy", "text": "Zincsearch: cool. bonsai cool."}' http://localhost:4080/boos/_doc
-
-	// r.POST("/:target/_search", handlers.SearchIndex)
 
 }

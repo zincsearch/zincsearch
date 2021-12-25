@@ -1,11 +1,19 @@
 Note: Zinc and all its APIs are considered to be alpha stage at this time.
-# Zinc
+# Zinc Search Engine
 
 Zinc is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs in less than 100 MB of RAM. It uses [bluge](https://github.com/blugelabs/bluge) as the underlying indexing library.
 
 It is very simple and easy to operate as opposed to Elasticsearch which requires a couple dozen knobs to understand and tune. 
 
 It is a drop-in replacement for Elasticsearch if you are just ingesting data using APIs and searching using kibana (Kibana is not supported with zinc. Zinc provides its own UI).
+
+Check the below video for a quick demo of Zinc.
+
+[![Zinc Youtube](./screenshots/zinc-youtube.jpg)](https://www.youtube.com/watch?v=aZXtuVjt1ow)
+
+Join slack channel
+
+[![Slack](./screenshots/slack.png)](https://join.slack.com/t/zinc-nvh4832/shared_invite/zt-10a4jb2nl-tQUWwVQgylFEImicA7Fw6A)
 
 # Why zinc
 
@@ -21,12 +29,10 @@ It is a drop-in replacement for Elasticsearch if you are just ingesting data usi
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
 
 # Roadmap items:
+1. Index storage in s3
 1. High Availability
 1. Distributed reads and writes
 1. Geosptial search
-1. Index storage in memory
-1. Index storage in s3
-
 
 # Screenshots
 
@@ -42,16 +48,39 @@ It is a drop-in replacement for Elasticsearch if you are just ingesting data usi
 
 ## Download / Installation / Run
 
-### Binaries
+### Windows 
+
+Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc/releases) page for appropriate platform.
+
+```shell
+C:\> set FIRST_ADMIN_USER=admin
+C:\> set FIRST_ADMIN_PASSWORD=Complexpass#123
+C:\> mkdir data
+C:\> zinc.exe
+```
+
+
+
+
+### MacOS - Homebrew 
+
+> $ brew tap prabhatsharma/tap
+
+> $ brew install prabhatsharma/tap/zinc
+
+> $ mkdir data
+
+> $ FIRST_ADMIN_USER=admin FIRST_ADMIN_PASSWORD=Complexpass#123 zinc 
+
+### MacOS/Linux Binaries
 Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc/releases) page for appropriate platform.
 
 Create a data folder that will store the data
 > $ mkdir data
 
-> $ FIRST_ADMIN_USER=admin FIRST_ADMIN_PASSWORD=Complexpass#123 zinc 
+> $ FIRST_ADMIN_USER=admin FIRST_ADMIN_PASSWORD=Complexpass#123 ./zinc 
 
 Now point your browser to http://localhost:4080 and login
-
 
 ### Docker
 
@@ -65,9 +94,9 @@ Now point your browser to http://localhost:4080 and login
 
 #### Manual Install
 
-> kubectl apply -f kube-deployment.yaml
+> $ kubectl apply -f kube-deployment.yaml
 
-> kubectl -n zinc port-forward svc/z 4080:4080
+> $ kubectl -n zinc port-forward svc/z 4080:4080
 
 Now point your browser to http://localhost:4080 and login
 
@@ -76,13 +105,13 @@ Now point your browser to http://localhost:4080 and login
 Update Helm values located in [values.yaml](helm/zinc/values.yaml)
 
 Create the namespace:
-> kubectl create ns zinc
+> $ kubectl create ns zinc
 
 Install the chart:
-> helm install zinc helm/zinc -n zinc
+> $ helm install zinc helm/zinc -n zinc
 
 Zinc can be available with an ingress or port-forward:
-> kubectl -n zinc port-forward svc/zinc 4080:4080
+> $ kubectl -n zinc port-forward svc/zinc 4080:4080
 
 ## Data ingestion
 
@@ -90,7 +119,7 @@ Zinc can be available with an ingress or port-forward:
 
 curl example
 
-> curl \
+> $ curl \
   -u admin:Complexpass#123 \
   -XPUT \
   -d '{"author":"Prabhat Sharma"}' \
@@ -134,7 +163,7 @@ res = requests.put(zinc_url, headers=headers, data=json.dumps(data))
 Bulk ingestion API follows same interface as Elasticsearch API defined in [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html).
 
 
-> curl -L https://github.com/prabhatsharma/zinc/releases/download/v0.1.1/https://github.com/prabhatsharma/zinc/releases/download/v0.1.1/olympics.ndjson.gz -o olympics.ndjson.gz
+> curl -L https://github.com/prabhatsharma/zinc/releases/download/v0.1.1/olympics.ndjson.gz -o olympics.ndjson.gz
 
 > gzip -d  olympics.ndjson.gz 
 
@@ -164,6 +193,8 @@ params = {
         "start_time": "2021-06-02T14:28:31.894Z",
         "end_time": "2021-12-02T15:28:31.894Z"
     },
+    "from": 40, # use together with max_results for paginated results.
+    "max_results": 20,
     "fields": ["_all"]
 }
 
