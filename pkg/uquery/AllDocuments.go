@@ -13,7 +13,9 @@ func AllDocuments(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
 
 	query := bluge.NewBooleanQuery().AddMust(dateQuery).AddMust(allquery)
 
-	searchRequest := bluge.NewTopNSearch(20, query).SortBy(iQuery.SortFields)
+	iQuery.MaxResults = 20
+
+	searchRequest := buildRequest(iQuery, query)
 
 	return searchRequest, nil
 

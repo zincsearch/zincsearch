@@ -19,7 +19,7 @@ func WildcardQuery(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
 	wildcardQuery := bluge.NewWildcardQuery(iQuery.Query.Term).SetField(field)
 	query := bluge.NewBooleanQuery().AddMust(dateQuery).AddMust(wildcardQuery)
 
-	searchRequest := bluge.NewTopNSearch(iQuery.MaxResults, query).SortBy(iQuery.SortFields).WithStandardAggregations()
+	searchRequest := buildRequest(iQuery, query)
 
 	return searchRequest, nil
 }
