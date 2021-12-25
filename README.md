@@ -193,6 +193,8 @@ params = {
         "start_time": "2021-06-02T14:28:31.894Z",
         "end_time": "2021-12-02T15:28:31.894Z"
     },
+    "from": 40, # use together with max_results for paginated results.
+    "max_results": 20,
     "fields": ["_all"]
 }
 
