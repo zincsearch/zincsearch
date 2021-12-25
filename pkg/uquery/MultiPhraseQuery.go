@@ -18,7 +18,7 @@ func MultiPhraseQuery(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
 	multiPhraseQuery := bluge.NewMultiPhraseQuery(iQuery.Query.Terms).SetField(field)
 	query := bluge.NewBooleanQuery().AddMust(dateQuery).AddMust(multiPhraseQuery)
 
-	searchRequest := bluge.NewTopNSearch(iQuery.MaxResults, query).SortBy(iQuery.SortFields).WithStandardAggregations()
+	searchRequest := buildRequest(iQuery, query)
 
 	return searchRequest, nil
 }
