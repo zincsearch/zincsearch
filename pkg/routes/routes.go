@@ -70,9 +70,4 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
 	r.POST("/es/:target/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
 
-	// _search
-	// hey -n 200 -c 20 -m POST -H "Content-Type: application/json" -d '{"author": "kimchy", "text": "Zincsearch: cool. bonsai cool."}' http://localhost:4080/boos/_doc
-
-	// r.POST("/:target/_search", handlers.SearchIndex)
-
 }

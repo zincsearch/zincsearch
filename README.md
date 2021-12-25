@@ -48,7 +48,31 @@ Join slack channel
 
 ## Download / Installation / Run
 
-### Binaries
+### Windows 
+
+Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc/releases) page for appropriate platform.
+
+```shell
+C:\> set FIRST_ADMIN_USER=admin
+C:\> set FIRST_ADMIN_PASSWORD=Complexpass#123
+C:\> mkdir data
+C:\> zinc.exe
+```
+
+
+
+
+### MacOS - Homebrew 
+
+> $ brew tap prabhatsharma/tap
+
+> $ brew install prabhatsharma/tap/zinc
+
+> $ mkdir data
+
+> $ FIRST_ADMIN_USER=admin FIRST_ADMIN_PASSWORD=Complexpass#123 zinc 
+
+### MacOS/Linux Binaries
 Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc/releases) page for appropriate platform.
 
 Create a data folder that will store the data
@@ -57,7 +81,6 @@ Create a data folder that will store the data
 > $ FIRST_ADMIN_USER=admin FIRST_ADMIN_PASSWORD=Complexpass#123 ./zinc 
 
 Now point your browser to http://localhost:4080 and login
-
 
 ### Docker
 
@@ -71,9 +94,9 @@ Now point your browser to http://localhost:4080 and login
 
 #### Manual Install
 
-> kubectl apply -f kube-deployment.yaml
+> $ kubectl apply -f kube-deployment.yaml
 
-> kubectl -n zinc port-forward svc/z 4080:4080
+> $ kubectl -n zinc port-forward svc/z 4080:4080
 
 Now point your browser to http://localhost:4080 and login
 
@@ -82,13 +105,13 @@ Now point your browser to http://localhost:4080 and login
 Update Helm values located in [values.yaml](helm/zinc/values.yaml)
 
 Create the namespace:
-> kubectl create ns zinc
+> $ kubectl create ns zinc
 
 Install the chart:
-> helm install zinc helm/zinc -n zinc
+> $ helm install zinc helm/zinc -n zinc
 
 Zinc can be available with an ingress or port-forward:
-> kubectl -n zinc port-forward svc/zinc 4080:4080
+> $ kubectl -n zinc port-forward svc/zinc 4080:4080
 
 ## Data ingestion
 
@@ -96,7 +119,7 @@ Zinc can be available with an ingress or port-forward:
 
 curl example
 
-> curl \
+> $ curl \
   -u admin:Complexpass#123 \
   -XPUT \
   -d '{"author":"Prabhat Sharma"}' \
