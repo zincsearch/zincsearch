@@ -5,6 +5,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
+// NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
 func NewIndex(name string) (*Index, error) {
 	DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
 

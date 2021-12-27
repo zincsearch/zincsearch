@@ -1,7 +1,7 @@
-Note: Zinc and all its APIs are considered to be alpha stage at this time.
+Note: Zinc and all its APIs are considered to be alpha stage at this time. Expect breaking changes in API contracts and data format before at this stage.
 # Zinc Search Engine
 
-Zinc is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs in less than 100 MB of RAM. It uses [bluge](https://github.com/blugelabs/bluge) as the underlying indexing library.
+Zinc is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs using a fraction of the resources. It uses [bluge](https://github.com/blugelabs/bluge) as the underlying indexing library.
 
 It is very simple and easy to operate as opposed to Elasticsearch which requires a couple dozen knobs to understand and tune. 
 
@@ -58,10 +58,6 @@ C:\> set FIRST_ADMIN_PASSWORD=Complexpass#123
 C:\> mkdir data
 C:\> zinc.exe
 ```
-
-
-
-
 ### MacOS - Homebrew 
 
 > $ brew tap prabhatsharma/tap
@@ -71,6 +67,8 @@ C:\> zinc.exe
 > $ mkdir data
 
 > $ FIRST_ADMIN_USER=admin FIRST_ADMIN_PASSWORD=Complexpass#123 zinc 
+
+Now point your browser to http://localhost:4080 and login
 
 ### MacOS/Linux Binaries
 Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc/releases) page for appropriate platform.
@@ -297,6 +295,87 @@ Output
 }
 ```
 
+
+# API reference
+
+These APIs can be used to programatically interact with Zinc.
+
+All APIs must have an authorization header
+
+e.g. Header:
+
+Authorization: Basic 
+
+## PUT /api/index - Create a new index
+
+While you do not need to create indexes manually as they are created automatically when you start ingesting the data, you could create them in advance using this API. 
+
+e.g. 
+PUT http://localhost:4080/api/index
+
+Payload: { "name": "myshinynewindex" }
+
+## DELETE /api/index/:indexName - Delete an index
+
+This will delete the index and its associated metadata. Be careful using this as data is deleted unrecoverably.
+
+e.g. 
+DELETE http://localhost:4080/api/index/indextodelete
+
+## GET /api/index - List existing indexes
+
+Get the list of existing indexes
+
+e.g. 
+GET http://localhost:4080/api/index
+
+## PUT /api/:target/document - Create/Update a document and index it for searches
+
+Create/Update a document and index it for searches
+
+e.g. 
+PUT http://localhost:4080/api/myindex/document
+
+Payload: { "name": "Prabhat Sharma" }
+
+## PUT /api/:target/_doc/:id - Create/Update a document and index it for searches
+
+Create/Update a document and index it for searches
+
+e.g. 
+PUT http://localhost:4080/api/myindex/_doc/1
+
+Payload: { "name": "Prabhat Sharma is meeting friends in San Francisco" }
+
+## POST /api/:target/_search - search for documents
+
+Search for documents
+
+e.g. 
+POST http://localhost:4080/api/stackoverflow-6/_search
+
+Payload: 
+```json
+{
+    "search_type": "matchphrase",
+    "query": {
+        "term": "shell window",
+        "start_time": "2021-12-25T15:08:48.777Z",
+        "end_time": "2021-12-28T16:08:48.777Z"
+    },
+    "sort_fields": ["-@timestamp"],
+    "from": 1,
+    "max_results": 20,
+    "fields": [
+        "*"
+    ]
+}
+```
+
+combine "from" and "max_results" to allow pagination.
+
+sort_fields: list of fields to sort the results. Put a minus "-" before the field to change to descending order.
+
 search_type can have following values:
 
 1. alldocuments
@@ -309,6 +388,39 @@ search_type can have following values:
 8. matchphrase
 9. multiphrase
 10. querystring
+
+## DELETE /api/:target/_doc/:id - Delete a document
+
+This will delete the document from the index.
+
+e.g. 
+DELETE http://localhost:4080/api/myindex/_doc/1
+
+## POST /api/_bulk - Upload bulk data
+
+This will upload multiple documents in batch. It is preferred over PUT /api/:target/_doc/:id when you have multiple documents to be inserted as it is magnitude of times faster than uploading individual documents.
+
+You may want to experiment with actual number of documents that you send in a single request. An ideal number may range from 500 to 5000 documents. Log forwaders like fluentbit use this API.
+
+e.g. 
+POST /api/_bulk
+
+Payload - ndjson (newline delimited json) content
+
+e.g. ndjson contents
+
+```json
+{ "index" : { "_index" : "olympics" } } 
+{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "HAJOS, Alfred", "Country": "HUN", "Gender": "Men", "Event": "100M Freestyle", "Medal": "Gold", "Season": "summer"}
+{ "index" : { "_index" : "olympics" } } 
+{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "HERSCHMANN, Otto", "Country": "AUT", "Gender": "Men", "Event": "100M Freestyle", "Medal": "Silver", "Season": "summer"}
+{ "index" : { "_index" : "olympics" } } 
+{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "DRIVAS, Dimitrios", "Country": "GRE", "Gender": "Men", "Event": "100M Freestyle For Sailors", "Medal": "Bronze", "Season": "summer"}
+{ "index" : { "_index" : "olympics" } } 
+{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "MALOKINIS, Ioannis", "Country": "GRE", "Gender": "Men", "Event": "100M Freestyle For Sailors", "Medal": "Gold", "Season": "summer"}
+{ "index" : { "_index" : "olympics" } } 
+{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "CHASAPIS, Spiridon", "Country": "GRE", "Gender": "Men", "Event": "100M Freestyle For Sailors", "Medal": "Silver", "Season": "summer"}
+```
 
 # Who uses Zinc ?
 

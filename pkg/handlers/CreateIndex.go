@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +8,6 @@ import (
 )
 
 func CreateIndex(c *gin.Context) {
-	fmt.Println("CreateIndex")
 
 	var newIndex core.Index
 	c.BindJSON(&newIndex)

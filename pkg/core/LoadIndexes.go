@@ -15,9 +15,7 @@ var systemIndexList = []string{"_users", "_index_mapping"}
 
 func LoadZincSystemIndexes() (map[string]*Index, error) {
 	godotenv.Load()
-	// zerolog.TimeFieldFormat = ""
 	log.Print("Loading system indexes...")
-	// log.Log().Msg("Hello")
 
 	IndexList := make(map[string]*Index)
 	var err error
@@ -37,9 +35,7 @@ func LoadZincSystemIndexes() (map[string]*Index, error) {
 
 func LoadZincIndexes() (map[string]*Index, error) {
 	godotenv.Load()
-	// zerolog.TimeFieldFormat = ""
 	log.Print("Loading indexes...")
-	// log.Log().Msg("Hello")
 
 	IndexList := make(map[string]*Index)
 
