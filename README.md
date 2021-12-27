@@ -304,7 +304,7 @@ All APIs must have an authorization header
 
 e.g. Header:
 
-Authorization: Basic 
+Authorization: Basic YWRtaW46Q29tcGxleHBhc3MjMTIz
 
 ## PUT /api/index - Create a new index
 
