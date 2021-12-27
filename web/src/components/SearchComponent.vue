@@ -449,7 +449,7 @@ export default {
 
     const populateInitialData = function () {
       search_query.value = "";
-      searchData("alldocuments");
+      searchData("daterange");
     };
 
     // expose to template
