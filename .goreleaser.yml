@@ -80,6 +80,45 @@ dockers:
       - cmd
       - web
       - embed.go
+  - image_templates:
+      - hiprabhat/zinc:latest-amd64
+    use: buildx
+    skip_push: "false"
+    build_flag_templates:
+    - "--platform=linux/amd64"
+    extra_files:
+      - go.mod
+      - go.sum
+      - pkg
+      - cmd
+      - web
+      - embed.go
+  - image_templates:
+      - hiprabhat/zinc:latest-arm64
+    use: buildx
+    skip_push: "false"
+    build_flag_templates:
+    - "--platform=linux/arm64/v8"
+    extra_files:
+      - go.mod
+      - go.sum
+      - pkg
+      - cmd
+      - web
+      - embed.go
+  - image_templates:
+      - hiprabhat/zinc:latest-armv7 
+    use: buildx
+    skip_push: "false"
+    build_flag_templates:
+    - "--platform=linux/arm/v7"
+    extra_files:
+      - go.mod
+      - go.sum
+      - pkg
+      - cmd
+      - web
+      - embed.go
 docker_manifests:
 - id: zinc
 
@@ -93,6 +132,18 @@ docker_manifests:
   - hiprabhat/zinc:{{ .Version }}-amd64
   - hiprabhat/zinc:{{ .Version }}-arm64
   - hiprabhat/zinc:{{ .Version }}-armv7
+- id: zinc-latest
+
+  # Name template for the manifest.
+  # Defaults to empty.
+  name_template: hiprabhat/zinc:latest
+
+  # Image name templates to be added to this manifest.
+  # Defaults to empty.
+  image_templates:
+  - hiprabhat/zinc:latest-amd64
+  - hiprabhat/zinc:latest-arm64
+  - hiprabhat/zinc:latest-armv7
 # https://goreleaser.com/customization/homebrew/
 brews:
   - name: zinc
