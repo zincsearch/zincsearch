@@ -57,10 +57,3 @@ type Hit struct {
 type Total struct {
 	Value int `json:"value"` // Count of documents returned
 }
-
-type ElasticQueryMain struct {
-	Query ElasticQuery `json:"query"`
-}
-
-type ElasticQuery struct {
-}

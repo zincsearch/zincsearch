@@ -71,7 +71,7 @@ func (rindex *Index) GetBlugeDocument(docID string, doc *map[string]interface{})
 		if value != nil {
 			switch indexMapping[key] {
 			case "text": // found using existing index mapping
-				stringField := bluge.NewTextField(key, value.(string))
+				stringField := bluge.NewTextField(key, value.(string)).SearchTermPositions()
 				bdoc.AddField(stringField)
 			case "numeric": // found using existing index mapping
 				numericField := bluge.NewNumericField(key, value.(float64))
