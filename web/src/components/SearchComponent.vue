@@ -1,6 +1,6 @@
 <template>
   <div class="search">
-    <q-form @submit="searchData">
+    <q-form @submit="searchData('querystring')">
       <div class="row">
         <div class="col-7">
           <q-input
@@ -26,7 +26,7 @@
             label="Search"
             type="submit"
             class="search-submit-button"
-            @submit="searchData"
+            @submit="searchData('querystring')"
           >
           </q-btn>
         </div>
@@ -53,6 +53,7 @@
             </template>
           </q-select>
 
+          <!-- eslint-disable vue/no-v-model-argument -->
           <q-table
             :rows="index_fields"
             row-key="fields"
@@ -142,7 +143,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { watch, ref } from "vue";
 import axios from "../axios";
 import { date } from "quasar";
 import { useStore } from "vuex";
@@ -242,6 +243,15 @@ export default {
       selectedRelativeValue: 30,
     });
 
+    // when the datetime filter changes then update the results
+    watch(dateVal.value, () => {
+      if (search_query.value.length > 0) {
+        searchData("querystring");
+      } else {
+        searchData("alldocuments");
+      }
+    });
+
     // show 2 fields (@timestamp abd _source) by default
     const result_columns = ref([
       {
@@ -338,6 +348,110 @@ export default {
       }
     };
 
+    // filter for fields
+    const filter_method = function (rows, terms) {
+      terms = terms.toLowerCase();
+      var filtered_rows = [];
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i]["fields"].toLowerCase().includes(terms)) {
+          filtered_rows.push(rows[i]);
+        }
+      }
+
+      return filtered_rows;
+    };
+
+    // filter the values when value is being typed in index field
+    const filterFn = function (val, update) {
+      if (val === "") {
+        update(() => {
+          options.value = indexList.value;
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        options.value = indexList.value.filter(
+          (v) => v.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    };
+
+    // search the index with the query
+    const searchData = function (search_type) {
+      if (search_query.value == "") {
+        search_type = "alldocuments";
+      }
+      var timestamps = getDateConsumableDateTime();
+      var req = {
+        search_type: search_type,
+        max_results: 100,
+        sort_fields: ["-@timestamp"],
+        query: {
+          term: search_query.value,
+          start_time: timestamps.start_time.toISOString(),
+          end_time: timestamps.end_time.toISOString(),
+        },
+        fields: ["_all"],
+      };
+
+      var url =
+        store.state.API_ENDPOINT + "api/" + selectedIndex.value + "/_search";
+
+      axios
+        .post(url, req)
+        .then((res) => {
+          var results = [];
+
+          if (res.data.hits.hits) {
+            results = res.data.hits.hits;
+          } else {
+            results = [];
+          }
+
+          search_result.value = results;
+          resultCount.value =
+            "Found " +
+            res.data.hits.total.value.toLocaleString() +
+            " records in " +
+            res.data.took +
+            " milliseconds";
+        })
+        .catch((error) => {
+          if (error.response.status == 401) {
+            router.push("/login");
+          }
+        });
+    };
+
+    // fired when the user selects an index
+    // display the fields in the index that we got from the mapping
+    const selectFn = function (index) {
+      // Clear the selected fields to display
+      selectedFields.value = [];
+
+      // Clear the results
+      search_result.value = [];
+
+      // display the fields in the index that we got from the mapping
+      var field_list = [];
+      for (var k in mapping_list.value[index]) {
+        if (k != "_id") {
+          field_list.push({ fields: k });
+        }
+      }
+      index_fields.value = field_list;
+
+      // get the initial data
+      populateInitialData();
+    };
+
+    const populateInitialData = function () {
+      search_query.value = "";
+      searchData("daterange");
+    };
+
     // expose to template
     return {
       // variables
@@ -361,149 +475,10 @@ export default {
       index_fields,
       filter_query,
       getDateConsumableDateTime,
-
-      // methods
-
-      handleDateUpdate(newDate) {
-        // this.model.value.date = newDate;
-        console.log(newDate);
-      },
-
-      // filter for fields
-      filter_method(rows, terms) {
-        terms = terms.toLowerCase();
-        var filtered_rows = [];
-        for (var i = 0; i < rows.length; i++) {
-          if (rows[i]["fields"].toLowerCase().includes(terms)) {
-            filtered_rows.push(rows[i]);
-          }
-        }
-
-        return filtered_rows;
-      },
-
-      // filter the values when value is being typed in index field
-      filterFn(val, update) {
-        if (val === "") {
-          update(() => {
-            options.value = indexList.value;
-          });
-          return;
-        }
-
-        update(() => {
-          const needle = val.toLowerCase();
-          options.value = indexList.value.filter(
-            (v) => v.toLowerCase().indexOf(needle) > -1
-          );
-        });
-      },
-
-      // fired when the user selects an index
-      // display the fields in the index that we got from the mapping
-      selectFn(index) {
-        // Clear the selected fields to display
-        selectedFields.value = [];
-
-        // Clear the results
-        search_result.value = [];
-
-        // display the fields in the index that we got from the mapping
-        var field_list = [];
-        for (var k in mapping_list.value[index]) {
-          if (k != "_id") {
-            field_list.push({ fields: k });
-          }
-        }
-        index_fields.value = field_list;
-      },
-
-      // search the index with the query
-      searchData() {
-        var timestamps = getDateConsumableDateTime();
-        var req = {
-          search_type: "querystring",
-          query: {
-            term: search_query.value,
-            start_time: timestamps.start_time.toISOString(),
-            end_time: timestamps.end_time.toISOString(),
-          },
-          fields: ["_all"],
-        };
-
-        var url =
-          store.state.API_ENDPOINT + "api/" + selectedIndex.value + "/_search";
-
-        axios
-          .post(url, req)
-          .then((res) => {
-            var results = [];
-
-            if (res.data.hits.hits) {
-              results = res.data.hits.hits;
-            } else {
-              results = [];
-            }
-
-            search_result.value = results;
-            resultCount.value =
-              "Found " +
-              res.data.hits.total.value.toLocaleString() +
-              " records in " +
-              res.data.took +
-              " milliseconds";
-          })
-          .catch((error) => {
-            if (error.response.status == 401) {
-              router.push("/login");
-            }
-          });
-      },
-      calculateStartAndEndDateTime1() {
-        console.log("hello");
-        // var start_time = "";
-        // var end_time = "";
-        // var start_date = "";
-        // var end_date = "";
-        // var start_time_obj = {};
-        // var end_time_obj = {};
-        // var start_date_obj = {};
-        // var end_date_obj = {};
-
-        // if (dateVal.tab == "absolute") {
-        //   start_date = dateVal.startDate;
-        //   end_date = dateVal.endDate;
-        //   start_time = dateVal.startTime;
-        //   end_time = dateVal.endTime;
-
-        //   start_date_obj = date.parseDate(start_date, "YYYY-MM-DD");
-        //   end_date_obj = date.parseDate(end_date, "YYYY-MM-DD");
-        //   start_time_obj = date.parseDate(start_time, "HH:mm:ss.SSS");
-        //   end_time_obj = date.parseDate(end_time, "HH:mm:ss.SSS");
-
-        //   start_time_obj.setFullYear(start_date_obj.getFullYear());
-        //   start_time_obj.setMonth(start_date_obj.getMonth());
-        //   start_time_obj.setDate(start_date_obj.getDate());
-
-        //   end_time_obj.setFullYear(end_date_obj.getFullYear());
-        //   end_time_obj.setMonth(end_date_obj.getMonth());
-        //   end_time_obj.setDate(end_date_obj.getDate());
-
-        //   start_time = date.formatDate(
-        //     start_time_obj,
-        //     "YYYY-MM-DDTHH:mm:ss.SSSZ"
-        //   );
-        //   end_time = date.formatDate(end_time_obj, "YYYY-MM-DDTHH:mm:ss.SSSZ");
-        // } else {
-        //   console.log("dateVal.tab == relative");
-        //   console.log(dateVal.selectedRelativePeriod);
-        //   console.log(dateVal.selectedRelativeValue);
-        //   start_time = dateVal.startTime;
-        //   end_time = dateVal.endTime;
-
-        //   start_time_obj = date.parseDate(start_time, "HH:mm:ss.SSS");
-        // }
-      },
+      selectFn,
+      filter_method,
+      filterFn,
+      searchData,
     };
   },
   name: "SearchComponent",

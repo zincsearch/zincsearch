@@ -43,6 +43,13 @@
             </div>
             <div class="syntax-guide-text">+Medal:Gold +Year:>2000</div>
           </div>
+          <div class="syntax-section">
+            <div class="syntax-guide-sub-title">
+              Search text starting with par . e.g. Paris, Parthenon, Part,
+              Paramater
+            </div>
+            <div class="syntax-guide-text">par*</div>
+          </div>
         </div>
       </q-card>
     </q-menu>

@@ -18,7 +18,7 @@ func MatchAllQuery(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
 	fuzzyQuery := bluge.NewFuzzyQuery(iQuery.Query.Term).SetField(field)
 	query := bluge.NewBooleanQuery().AddMust(dateQuery).AddMust(fuzzyQuery)
 
-	searchRequest := bluge.NewTopNSearch(1000, query).WithStandardAggregations()
+	searchRequest := buildRequest(iQuery, query)
 
 	return searchRequest, nil
 }

@@ -8,10 +8,12 @@ import (
 
 type ZincQuery struct {
 	SearchType string         `json:"search_type"`
-	Size       int            `json:"size"`
+	MaxResults int            `json:"max_results"`
+	From       int            `json:"from"`
 	Explain    bool           `json:"explain"`
 	Highlight  QueryHighlight `json:"highlight"`
 	Query      QueryParams    `json:"query"`
+	SortFields []string       `json:"sort_fields"`
 }
 
 type QueryParams struct {
@@ -54,11 +56,4 @@ type Hit struct {
 
 type Total struct {
 	Value int `json:"value"` // Count of documents returned
-}
-
-type ElasticQueryMain struct {
-	Query ElasticQuery `json:"query"`
-}
-
-type ElasticQuery struct {
 }

@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"os"
 	"reflect"
 	"strconv"
 	"time"
@@ -10,6 +9,7 @@ import (
 	"encoding/json"
 
 	"github.com/jeremywohl/flatten"
+	"github.com/prabhatsharma/zinc/pkg/zutils"
 	"github.com/rs/zerolog/log"
 
 	"github.com/blugelabs/bluge"
@@ -71,7 +71,7 @@ func (rindex *Index) GetBlugeDocument(docID string, doc *map[string]interface{})
 		if value != nil {
 			switch indexMapping[key] {
 			case "text": // found using existing index mapping
-				stringField := bluge.NewTextField(key, value.(string))
+				stringField := bluge.NewTextField(key, value.(string)).SearchTermPositions()
 				bdoc.AddField(stringField)
 			case "numeric": // found using existing index mapping
 				numericField := bluge.NewNumericField(key, value.(float64))
@@ -129,12 +129,7 @@ func (index *Index) SetMapping(iMap map[string]string) error {
 
 func (index *Index) GetMappingFromDisk() (map[string]string, error) {
 
-	DATA_PATH := ""
-	if os.Getenv("DATA_PATH") == "" {
-		DATA_PATH = "./data"
-	} else {
-		DATA_PATH = os.Getenv("DATA_PATH")
-	}
+	DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
 
 	systemPath := DATA_PATH + "/_index_mapping"
 
