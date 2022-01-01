@@ -81,8 +81,10 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 				batch[indexName] = index.NewBatch()
 			}
 
-			if !core.IndexExists(indexName) { // If the requested indexName does not exist then create it
-				newIndex, err := core.NewIndex(indexName)
+			exists, _ := core.IndexExists(indexName)
+
+			if !exists { // If the requested indexName does not exist then create it
+				newIndex, err := core.NewIndex(indexName, "disk")
 
 				if err != nil {
 					return err
@@ -91,7 +93,7 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 				core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
 			}
 
-			bdoc, err := core.ZINC_INDEX_LIST[indexName].GetBlugeDocument(id, &doc)
+			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(id, &doc)
 
 			if err != nil {
 				return err

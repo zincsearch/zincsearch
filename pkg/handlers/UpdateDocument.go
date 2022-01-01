@@ -30,8 +30,9 @@ func UpdateDocument(c *gin.Context) {
 	}
 
 	// If the index does not exist, then create it
-	if !core.IndexExists(indexName) {
-		newIndex, err := core.NewIndex(indexName)
+	exists, _ := core.IndexExists(indexName)
+	if !exists {
+		newIndex, err := core.NewIndex(indexName, "disk") // Create a new index with disk storage as default
 
 		if err != nil {
 			log.Print(err)

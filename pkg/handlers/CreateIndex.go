@@ -12,7 +12,7 @@ func CreateIndex(c *gin.Context) {
 	var newIndex core.Index
 	c.BindJSON(&newIndex)
 
-	cIndex, err := core.NewIndex(newIndex.Name)
+	cIndex, err := core.NewIndex(newIndex.Name, newIndex.StorageType)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

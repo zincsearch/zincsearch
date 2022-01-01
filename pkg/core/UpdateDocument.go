@@ -2,7 +2,7 @@ package core
 
 func (index *Index) UpdateDocument(docID string, doc *map[string]interface{}) error {
 
-	bdoc, err := index.GetBlugeDocument(docID, doc)
+	bdoc, err := index.BuildBlugeDocumentFromJSON(docID, doc)
 
 	if err != nil {
 		return err

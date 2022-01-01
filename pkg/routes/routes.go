@@ -53,6 +53,7 @@ func SetRoutes(r *gin.Engine) {
 
 	// Document CRUD APIs. Update is same as create.
 	r.PUT("/api/:target/document", auth.ZincAuthMiddleware, handlers.UpdateDocument)
+	r.POST("/api/:target/_doc", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 	r.PUT("/api/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 	r.POST("/api/:target/_search", auth.ZincAuthMiddleware, handlers.SearchIndex)
 	r.DELETE("/api/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
