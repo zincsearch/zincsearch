@@ -20,4 +20,4 @@ __debug_bin
 
 main
 dist/
-
+cmd/zinc
