@@ -20,4 +20,5 @@ __debug_bin
 
 main
 dist/
+tmp/
 
