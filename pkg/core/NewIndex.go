@@ -11,13 +11,13 @@ func NewIndex(name string, storageType string) (*Index, error) {
 
 	var config bluge.Config
 
-	if storageType == "disk" {
+	if storageType == "s3" {
+		S3_BUCKET := zutils.GetEnv("S3_BUCKET", "zinc1")
+		config = directory.GetS3Config(S3_BUCKET, name)
+	} else { // Default storage type is disk
 		DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
 
 		config = bluge.DefaultConfig(DATA_PATH + "/" + name)
-	} else if storageType == "s3" {
-		S3_BUCKET := zutils.GetEnv("S3_BUCKET", "zinc1")
-		config = directory.GetS3Config(S3_BUCKET, name)
 	}
 
 	writer, err := bluge.OpenWriter(config)
@@ -27,8 +27,8 @@ func NewIndex(name string, storageType string) (*Index, error) {
 	}
 
 	index := &Index{
-		Name:   name,
-		Writer: writer,
+		Name:        name,
+		Writer:      writer,
 		StorageType: storageType,
 	}
 
