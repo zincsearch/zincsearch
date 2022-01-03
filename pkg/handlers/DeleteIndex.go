@@ -2,11 +2,13 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/blugelabs/bluge"
 	"github.com/gin-gonic/gin"
 	"github.com/prabhatsharma/zinc/pkg/core"
@@ -41,21 +43,8 @@ func DeleteIndex(c *gin.Context) {
 			deleteIndexMapping = true
 		}
 	} else if indexStorageType == "s3" {
-		// Load the Shared AWS Configuration (~/.aws/config)
-		cfg, err := config.LoadDefaultConfig(context.TODO())
-		if err != nil {
-			log.Print("Error loading AWS config: ", err)
-		}
-		client := s3.NewFromConfig(cfg)
 
-		S3_BUCKET := zutils.GetEnv("S3_BUCKET", "zinc1")
-
-		ctx := context.Background()
-		doi := &s3.DeleteObjectInput{
-			Bucket: &S3_BUCKET,
-			Key:    &indexName,
-		}
-		_, err = client.DeleteObject(ctx, doi)
+		err := deleteFilesForIndexFromS3(indexName)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -80,9 +69,56 @@ func DeleteIndex(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"message": "Deleted",
 				"index":   indexName,
+				"storage": indexStorageType,
 			})
 		}
+	}
+}
 
+func deleteFilesForIndexFromS3(indexName string) error {
+	// Load the Shared AWS Configuration (~/.aws/config)
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		log.Print("Error loading AWS config: ", err)
+		return err
+	}
+	client := s3.NewFromConfig(cfg)
+
+	S3_BUCKET := zutils.GetEnv("S3_BUCKET", "zinc1")
+	ctx := context.Background()
+
+	// List Objects in the bucket at prefix
+	listObjectsInput := &s3.ListObjectsV2Input{
+		Bucket: &S3_BUCKET,
+		Prefix: &indexName,
+	}
+	listObjectsOutput, err := client.ListObjectsV2(ctx, listObjectsInput)
+	if err != nil {
+		log.Print("failed to list objects: ", err.Error())
+		return err
 	}
 
+	var fileList []types.ObjectIdentifier
+
+	for _, object := range listObjectsOutput.Contents {
+		fileList = append(fileList, types.ObjectIdentifier{
+			Key: object.Key,
+		})
+		fmt.Println("Deleting: ", *object.Key)
+	}
+
+	doi := &s3.DeleteObjectsInput{
+		Bucket: &S3_BUCKET,
+		Delete: &types.Delete{
+			Objects: fileList,
+		},
+	}
+	_, err = client.DeleteObjects(ctx, doi)
+
+	if err != nil {
+		log.Print("failed to delete index: ", err.Error())
+		return err
+	}
+
+	return nil
 }

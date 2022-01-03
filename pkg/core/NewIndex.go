@@ -29,6 +29,7 @@ func NewIndex(name string, storageType string) (*Index, error) {
 	index := &Index{
 		Name:   name,
 		Writer: writer,
+		StorageType: storageType,
 	}
 
 	mapping, err := index.GetStoredMapping()
