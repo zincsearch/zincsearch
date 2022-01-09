@@ -18,15 +18,14 @@ func LoadZincSystemIndexes() (map[string]*Index, error) {
 	log.Print("Loading system indexes...")
 
 	IndexList := make(map[string]*Index)
-	var err error
-
 	for _, systemIndex := range systemIndexList {
-		IndexList[systemIndex], err = NewIndex(systemIndex)
-		IndexList[systemIndex].IndexType = "system"
+		tempIndex, err := NewIndex(systemIndex)
 		if err != nil {
-			log.Print(err.Error())
+			log.Print("Error loading system index: ", systemIndex, " : ", err.Error())
 			return nil, err
 		}
+		IndexList[systemIndex] = tempIndex
+		IndexList[systemIndex].IndexType = "system"
 		log.Print("Index loaded: " + systemIndex)
 	}
 
