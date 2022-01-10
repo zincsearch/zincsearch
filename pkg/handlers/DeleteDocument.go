@@ -12,6 +12,11 @@ func DeleteDocument(c *gin.Context) {
 	indexName := c.Param("target")
 	query_id := c.Param("id")
 
+	if _, ok := core.ZINC_INDEX_LIST[indexName]; !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "index not exist"})
+		return
+	}
+
 	// log.Printf("deleet document indexName:%[1]s, query_id:%[2]s", indexName, query_id)
 
 	bdoc := bluge.NewDocument(query_id)
