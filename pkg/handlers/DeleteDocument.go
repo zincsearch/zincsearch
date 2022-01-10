@@ -12,8 +12,8 @@ func DeleteDocument(c *gin.Context) {
 	indexName := c.Param("target")
 	query_id := c.Param("id")
 
-	if _, ok := core.ZINC_INDEX_LIST[indexName]; !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "index not exist"})
+	if !core.IndexExists(indexName) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index not exist"})
 		return
 	}
 

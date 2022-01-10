@@ -14,8 +14,8 @@ import (
 func DeleteIndex(c *gin.Context) {
 	indexName := c.Param("indexName")
 
-	if _, ok := core.ZINC_INDEX_LIST[indexName]; !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "index not exist"})
+	if !core.IndexExists(indexName) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index not exist"})
 		return
 	}
 
