@@ -7,11 +7,11 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/prabhat
       # Install AWS CLI
-      - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      - unzip awscliv2.zip
-      - ./aws/install
-      - rm awscliv2.zip
-      - rm -rf aws
+      # - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      # - unzip awscliv2.zip
+      # - ./aws/install
+      # - rm awscliv2.zip
+      # - rm -rf aws
 
       # install buildx
       - wget https://github.com/docker/buildx/releases/download/v0.7.1/buildx-v0.7.1.linux-amd64
@@ -33,6 +33,14 @@ phases:
       # - apt install snapd -y
       # - snap install snapcraft --classic
       # - docker run -v "$PWD":/build -w /build snapcore/snapcraft:stable snapcraft
+      
+      # Build vujes UI
+      - echo "Building front end..."
+      - cd web
+      - npm install
+      - npm run build
+      - cd ..
+      # Build binary and container images using goreleaser
       - echo Build started on `date`
       - GIT_TAG="$(git describe --tags --abbrev=0)"
       - curl -sL https://git.io/goreleaser | bash

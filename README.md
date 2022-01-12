@@ -92,7 +92,10 @@ Now point your browser to http://localhost:4080 and login
 
 #### Manual Install
 
-> $ kubectl apply -f kube-deployment.yaml
+Create the namespace:
+> $ kubectl create ns zinc
+
+> $ kubectl apply -f k8s/kube-deployment.yaml
 
 > $ kubectl -n zinc port-forward svc/z 4080:4080
 
