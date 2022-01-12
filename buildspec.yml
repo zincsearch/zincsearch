@@ -26,6 +26,9 @@ phases:
       - goenv global 1.17.6
 
       - export DOCKER_CLI_EXPERIMENTAL=enabled
+      - export DOCKER_BUILDKIT=1
+      # update npm
+      - npm install -g npm@latest
   build:
     commands:
       # - echo install snap
