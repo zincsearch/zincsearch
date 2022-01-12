@@ -29,6 +29,7 @@ func SetRoutes(r *gin.Engine) {
 	// meta service - healthz
 	r.GET("/healthz", v1.GetHealthz)
 	r.GET("/", v1.GUI)
+	r.GET("/version", v1.GetVersion)
 
 	front, err := zinc.GetFrontendAssets()
 	if err != nil {

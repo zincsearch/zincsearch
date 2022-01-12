@@ -27,7 +27,7 @@ func LoadZincSystemIndexes() (map[string]*Index, error) {
 		IndexList[systemIndex], err = NewIndex(systemIndex, "disk")
 		IndexList[systemIndex].IndexType = "system"
 		if err != nil {
-			log.Print(err.Error())
+			log.Print("Error occured loading index from disk: ", err.Error())
 			return nil, err
 		}
 		log.Print("Index loaded: " + systemIndex)
@@ -38,7 +38,7 @@ func LoadZincSystemIndexes() (map[string]*Index, error) {
 
 func LoadZincIndexesFromDisk() (map[string]*Index, error) {
 	godotenv.Load()
-	log.Print("Loading indexes...")
+	log.Print("Loading indexes... from disk")
 
 	IndexList := make(map[string]*Index)
 

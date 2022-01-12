@@ -66,11 +66,13 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 		if nextLineIsData {
 			nextLineIsData = false
 			var id = ""
+			mintedID := false
 
 			if val, ok := lastLineMetaData["id"]; ok {
 				id = val.(string)
 			} else {
 				id = uuid.New().String()
+				mintedID = true
 			}
 
 			indexName := lastLineMetaData["_index"].(string)
@@ -103,7 +105,11 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 
 			// Add the documen to the batch. We will persist the batch to the index
 			// when we have processed all documents in the request
-			batch[indexName].Update(bdoc.ID(), bdoc)
+			if !mintedID {
+				batch[indexName].Update(bdoc.ID(), bdoc)
+			} else {
+				batch[indexName].Insert(bdoc)
+			}
 
 		} else { // This branch will process the metadata line in the request. Each metadata line is preceded by a data line.
 

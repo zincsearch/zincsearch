@@ -8,6 +8,7 @@ import (
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 )
 
+// SearchIndex searches the index for the given http request from end user
 func SearchIndex(c *gin.Context) {
 
 	indexName := c.Param("target")

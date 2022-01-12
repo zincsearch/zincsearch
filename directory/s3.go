@@ -32,6 +32,7 @@ type S3Directory struct {
 	Client *s3.Client
 }
 
+// NewS3Directory creates a new S3Directory instance which can be used to create s3 backed indexes
 func NewS3Directory(bucket, prefix string) index.Directory {
 
 	// Load the Shared AWS Configuration (~/.aws/config)

@@ -19,6 +19,7 @@ func UpdateDocument(c *gin.Context) {
 	c.BindJSON(&doc)
 
 	docID := ""
+	mintedID := false
 
 	// If id field is present then use it, else create a new UUID and use it
 	if id, ok := doc["_id"]; ok {
@@ -27,6 +28,7 @@ func UpdateDocument(c *gin.Context) {
 		docID = query_id
 	} else {
 		docID = uuid.New().String() // Generate a new ID if ID was not provided
+		mintedID = true
 	}
 
 	// If the index does not exist, then create it
@@ -45,7 +47,7 @@ func UpdateDocument(c *gin.Context) {
 
 	// doc, _ = flatten.Flatten(doc, "", flatten.DotStyle)
 
-	err := index.UpdateDocument(docID, &doc)
+	err := index.UpdateDocument(docID, &doc, mintedID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
