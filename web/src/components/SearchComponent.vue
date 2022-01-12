@@ -16,9 +16,20 @@
             </template>
           </q-input>
         </div>
-        <div class="col-4 search-controls">
+        <div class="col-2 search-controls">
           <SyntaxGuide />
           <DateTime v-model="dateVal" />
+        </div>
+        <div class="col-2">
+          <q-input
+            v-model="max_records_to_return"
+            label="Max records to return"
+            :dense="true"
+            filled
+            type="number"
+            class="max-records-field"
+          >
+          </q-input>
         </div>
         <div class="col-1">
           <q-btn
@@ -224,6 +235,7 @@ export default {
     const indexList = ref([]);
     const options = ref([]);
     const search_query = ref("");
+    const max_records_to_return = ref(100);
     const resultCount = ref("");
     const search_result = ref([]);
     const selectedIndex = ref("");
@@ -386,7 +398,7 @@ export default {
       var timestamps = getDateConsumableDateTime();
       var req = {
         search_type: search_type,
-        max_results: 100,
+        max_results: parseInt(max_records_to_return.value),
         sort_fields: ["-@timestamp"],
         query: {
           term: search_query.value,
@@ -479,6 +491,7 @@ export default {
       filter_method,
       filterFn,
       searchData,
+      max_records_to_return
     };
   },
   name: "SearchComponent",
@@ -508,6 +521,15 @@ export default {
   margin-left: 10px;
   /* margin: 10px; */
 }
+
+.max-records-field {
+  width: 98%;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  margin-left: 10px;
+  /* margin: 10px; */
+}
+
 .index-field {
   width: 90%;
   margin-left: 10px;
@@ -566,5 +588,6 @@ export default {
 
 .search-submit-button {
   width: 100px;
+  margin-left: 30px;
 }
 </style>

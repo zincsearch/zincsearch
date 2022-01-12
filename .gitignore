@@ -20,4 +20,7 @@ __debug_bin
 
 main
 dist/
-cmd/zinc
+tmp/
+
+# bzinc binary in root
+zinc

@@ -15,15 +15,10 @@ import (
 	"github.com/blugelabs/bluge"
 )
 
-func (index *Index) GetName() string {
-	return index.Name
-}
-
-func (index *Index) GetReader() (*bluge.Reader, error) {
-	return index.Writer.Reader()
-}
-
-func (rindex *Index) GetBlugeDocument(docID string, doc *map[string]interface{}) (*bluge.Document, error) {
+// BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
+// If no mappings are found, it creates te mapping for all the encountered fields. If mapping for some fields is found but not for others
+// then it creates the mapping for the missing fields.
+func (rindex *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]interface{}) (*bluge.Document, error) {
 
 	// Pick the index mapping from the cache if it already exists
 	indexMapping := rindex.CachedMapping
@@ -127,7 +122,8 @@ func (index *Index) SetMapping(iMap map[string]string) error {
 	return nil
 }
 
-func (index *Index) GetMappingFromDisk() (map[string]string, error) {
+// GetStoredMapping returns the mappings of all the indexes from _index_mapping system index
+func (index *Index) GetStoredMapping() (map[string]string, error) {
 
 	DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
 

@@ -306,30 +306,42 @@ e.g. Header:
 
 Authorization: Basic YWRtaW46Q29tcGxleHBhc3MjMTIz
 
-## PUT /api/index - Create a new index
+## CreateIndex - Create a new index
+Endpoint - PUT /api/index 
 
-While you do not need to create indexes manually as they are created automatically when you start ingesting the data, you could create them in advance using this API. 
+While you do not need to create indexes manually as they are created automatically when you start ingesting the data, you could create them in advance using this API. S3 backed indexes must be created before they can be used.
 
 e.g. 
 PUT http://localhost:4080/api/index
 
-Payload: { "name": "myshinynewindex" }
+Payload: 
 
-## DELETE /api/index/:indexName - Delete an index
+{ "name": "myshinynewindex", "storage_type": "s3" }
+
+OR
+
+{ "name": "myshinynewindex", "storage_type": "disk" }
+
+Default storage_type is disk
+
+## DeleteIndex - Delete an index
+Endpoint - DELETE /api/index/:indexName
 
 This will delete the index and its associated metadata. Be careful using this as data is deleted unrecoverably.
 
 e.g. 
 DELETE http://localhost:4080/api/index/indextodelete
 
-## GET /api/index - List existing indexes
+## ListIndexes - List existing indexes
+Endpoint - GET /api/index
 
 Get the list of existing indexes
 
 e.g. 
 GET http://localhost:4080/api/index
 
-## PUT /api/:target/document - Create/Update a document and index it for searches
+## UpdateDocument - Create/Update a document and index it for searches
+Endpoint - PUT /api/:target/document
 
 Create/Update a document and index it for searches
 
@@ -338,7 +350,8 @@ PUT http://localhost:4080/api/myindex/document
 
 Payload: { "name": "Prabhat Sharma" }
 
-## PUT /api/:target/_doc/:id - Create/Update a document and index it for searches
+## UpdateDocumentWithId - Create/Update a document and index it for searches. Provide a doc Id
+Endpoint - PUT /api/:target/_doc/:id 
 
 Create/Update a document and index it for searches
 
@@ -347,7 +360,16 @@ PUT http://localhost:4080/api/myindex/_doc/1
 
 Payload: { "name": "Prabhat Sharma is meeting friends in San Francisco" }
 
-## POST /api/:target/_search - search for documents
+## DeleteDocument - Delete a document
+Endpoint - DELETE /api/:target/_doc/:id
+
+This will delete the document from the index.
+
+e.g. 
+DELETE http://localhost:4080/api/myindex/_doc/1
+
+## Search - search for documents
+Endpoint - POST /api/:target/_search
 
 Search for documents
 
@@ -389,14 +411,9 @@ search_type can have following values:
 9. multiphrase
 10. querystring
 
-## DELETE /api/:target/_doc/:id - Delete a document
 
-This will delete the document from the index.
-
-e.g. 
-DELETE http://localhost:4080/api/myindex/_doc/1
-
-## POST /api/_bulk - Upload bulk data
+## BulkUpdate - Upload bulk data
+Endpoint - POST /api/_bulk
 
 This will upload multiple documents in batch. It is preferred over PUT /api/:target/_doc/:id when you have multiple documents to be inserted as it is magnitude of times faster than uploading individual documents.
 
@@ -422,7 +439,7 @@ e.g. ndjson contents
 {"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "CHASAPIS, Spiridon", "Country": "GRE", "Gender": "Men", "Event": "100M Freestyle For Sailors", "Medal": "Silver", "Season": "summer"}
 ```
 
-# Who uses Zinc ?
+# Who uses Zinc (Known users)?
 
 1. [Quadrantsec](https://quadrantsec.com/)
 

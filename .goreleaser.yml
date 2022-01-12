@@ -6,9 +6,17 @@ before:
     # You may remove this if you don't use go modules.
     - go mod tidy
     # you may remove this if you don't need go generate
-    - go generate ./...
+    # - go generate ./...
+
 builds:
-  - env:
+  - 
+    id: zinc_binaries
+    ldflags:
+    - -s -w 
+    - -X github.com/prabhatsharma/zinc/pkg/meta/v1.Version={{.Version}} # https://goreleaser.com/customization/templates/
+    - "-X github.com/prabhatsharma/zinc/pkg/meta/v1.BuildDate={{.Date}}"
+    - "-X github.com/prabhatsharma/zinc/pkg/meta/v1.CommitHash={{.Commit}}"
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -42,7 +50,7 @@ changelog:
       - "^test:"
 dockers:
   - image_templates:
-      - hiprabhat/zinc:{{ .Version }}-amd64
+      - public.ecr.aws/prabhat/zinc:{{ .Version }}-amd64
     use: buildx
     skip_push: "false"
     build_flag_templates:
@@ -55,7 +63,7 @@ dockers:
       - web
       - embed.go
   - image_templates:
-      - hiprabhat/zinc:{{ .Version }}-arm64
+      - public.ecr.aws/prabhat/zinc:{{ .Version }}-arm64
     use: buildx
     skip_push: "false"
     build_flag_templates:
@@ -68,7 +76,7 @@ dockers:
       - web
       - embed.go
   - image_templates:
-      - hiprabhat/zinc:{{ .Version }}-armv7 
+      - public.ecr.aws/prabhat/zinc:{{ .Version }}-armv7 
     use: buildx
     skip_push: "false"
     build_flag_templates:
@@ -81,7 +89,7 @@ dockers:
       - web
       - embed.go
   - image_templates:
-      - hiprabhat/zinc:latest-amd64
+      - public.ecr.aws/prabhat/zinc:latest-amd64
     use: buildx
     skip_push: "false"
     build_flag_templates:
@@ -94,7 +102,7 @@ dockers:
       - web
       - embed.go
   - image_templates:
-      - hiprabhat/zinc:latest-arm64
+      - public.ecr.aws/prabhat/zinc:latest-arm64
     use: buildx
     skip_push: "false"
     build_flag_templates:
@@ -107,7 +115,7 @@ dockers:
       - web
       - embed.go
   - image_templates:
-      - hiprabhat/zinc:latest-armv7 
+      - public.ecr.aws/prabhat/zinc:latest-armv7 
     use: buildx
     skip_push: "false"
     build_flag_templates:
@@ -120,30 +128,30 @@ dockers:
       - web
       - embed.go
 docker_manifests:
-- id: zinc
+- id: zinc_docker
 
   # Name template for the manifest.
   # Defaults to empty.
-  name_template: hiprabhat/zinc:{{ .Version }}
+  name_template: public.ecr.aws/prabhat/zinc:{{ .Version }}
 
   # Image name templates to be added to this manifest.
   # Defaults to empty.
   image_templates:
-  - hiprabhat/zinc:{{ .Version }}-amd64
-  - hiprabhat/zinc:{{ .Version }}-arm64
-  - hiprabhat/zinc:{{ .Version }}-armv7
+  - public.ecr.aws/prabhat/zinc:{{ .Version }}-amd64
+  - public.ecr.aws/prabhat/zinc:{{ .Version }}-arm64
+  - public.ecr.aws/prabhat/zinc:{{ .Version }}-armv7
 - id: zinc-latest
 
   # Name template for the manifest.
   # Defaults to empty.
-  name_template: hiprabhat/zinc:latest
+  name_template: public.ecr.aws/prabhat/zinc:latest
 
   # Image name templates to be added to this manifest.
   # Defaults to empty.
   image_templates:
-  - hiprabhat/zinc:latest-amd64
-  - hiprabhat/zinc:latest-arm64
-  - hiprabhat/zinc:latest-armv7
+  - public.ecr.aws/prabhat/zinc:latest-amd64
+  - public.ecr.aws/prabhat/zinc:latest-arm64
+  - public.ecr.aws/prabhat/zinc:latest-armv7
 # https://goreleaser.com/customization/homebrew/
 brews:
   - name: zinc
@@ -166,36 +174,36 @@ brews:
       zinc. Zinc provides its own UI).
     license: "Apache-2.0"
 
-snapcrafts:
-  - id: zinc
-    name: zinc
-    summary: Zinc Search engine. A lightweight alternative to elasticsearch.
-    description: |
-      Zinc is a search engine that does full text indexing. It is a lightweight
-      alternative to elasticsearch that requires significantly less resources. It uses
-      bluge as the underlying indexing library.
+# snapcrafts:
+#   - id: zinc-snap
+#     name: zinc-snap
+#     summary: Zinc Search engine. A lightweight alternative to elasticsearch.
+#     description: |
+#       Zinc is a search engine that does full text indexing. It is a lightweight
+#       alternative to elasticsearch that requires significantly less resources. It uses
+#       bluge as the underlying indexing library.
 
-      It is very simple and easy to operate as opposed to elasticsearch which
-      requires a couple dozen knobs to understand and tune.
+#       It is very simple and easy to operate as opposed to elasticsearch which
+#       requires a couple dozen knobs to understand and tune.
 
-      It is a drop-in replacement for elasticsearch if you are just ingesting
-      data using APIs and searching using kibana (Kibana is not supported with
-      zinc. Zinc provides its own UI).
+#       It is a drop-in replacement for elasticsearch if you are just ingesting
+#       data using APIs and searching using kibana (Kibana is not supported with
+#       zinc. Zinc provides its own UI).
 
-    license: Apache-2.0
-    grade: stable
-    confinement: classic
-    base: core18
+#     license: Apache-2.0
+#     grade: stable
+#     confinement: classic
+#     base: core18
 
-    replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
+#     replacements:
+#       darwin: Darwin
+#       linux: Linux
+#       windows: Windows
+#       386: i386
+#       amd64: x86_64
 
     # Whether to publish the snap to the snapcraft store.
     # Remember you need to `snapcraft login` first.
     # Defaults to false.
-    publish: true
+    # publish: true
 
