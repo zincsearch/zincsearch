@@ -1,16 +1,36 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/prabhatsharma/zinc/pkg/auth"
+	"github.com/prabhatsharma/zinc/test"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestApiBase(t *testing.T) {
 	Convey("test zinc api", t, func() {
-		// r := test.Server()
+		r := test.Server()
 		Convey("POST /api/login", func() {
 			Convey("with username and password", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(fmt.Sprintf(`{"_id": "%s", "password": "%s"}`, test.Username, test.Password))
+				req, _ := http.NewRequest("POST", "/api/login", body)
+				w := httptest.NewRecorder()
+				r.ServeHTTP(w, req)
+				So(w.Code, ShouldEqual, http.StatusOK)
+
+				var data struct {
+					User auth.ZincUser `json:"user"`
+				}
+				err := json.Unmarshal(w.Body.Bytes(), &data)
+				So(err, ShouldBeNil)
+				So(data.User.Role, ShouldEqual, "admin")
 			})
 			Convey("with error username or password", func() {
 			})
