@@ -12,7 +12,9 @@ func DeleteDocument(c *gin.Context) {
 	indexName := c.Param("target")
 	query_id := c.Param("id")
 
-	if !core.IndexExists(indexName) {
+	indexExists, _ := core.IndexExists(indexName)
+
+	if !indexExists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "index not exist"})
 		return
 	}

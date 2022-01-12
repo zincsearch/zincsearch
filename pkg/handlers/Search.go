@@ -8,16 +8,16 @@ import (
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 )
 
+// SearchIndex searches the index for the given http request from end user
 func SearchIndex(c *gin.Context) {
 
 	indexName := c.Param("target")
+	indexExists, _ := core.IndexExists(indexName)
 
-	if !core.IndexExists(indexName) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index not exist"})
+	if !indexExists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index '" + indexName + "' does not exist"})
 		return
 	}
-
-	// fmt.Println("Got search request for index: ", indexName)
 
 	var iQuery v1.ZincQuery
 

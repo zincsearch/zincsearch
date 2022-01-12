@@ -1,8 +1,9 @@
+# syntax=docker/dockerfile:experimental
 ############################
 # STEP 1 build executable binary
 ############################
-FROM golang:alpine AS builder
-# FROM public.ecr.aws/bitnami/golang:latest as builder
+# FROM golang:alpine AS builder
+FROM --platform=$BUILDPLATFORM public.ecr.aws/docker/library/golang:latest as builder
 RUN update-ca-certificates
 # RUN apk update && apk add --no-cache git
 # Create appuser.
