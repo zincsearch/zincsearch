@@ -84,7 +84,7 @@ Now point your browser to http://localhost:4080 and login
 
 > $ mkdir data
 
-> $ docker run -v /full/path/of/data:/data -e DATA_PATH="/data" -p 4080:4080 -e FIRST_ADMIN_USER=admin -e FIRST_ADMIN_PASSWORD=Complexpass#123 --name zinc hiprabhat/zinc:0.1.3
+> $ docker run -v /full/path/of/data:/data -e DATA_PATH="/data" -p 4080:4080 -e FIRST_ADMIN_USER=admin -e FIRST_ADMIN_PASSWORD=Complexpass#123 --name zinc public.ecr.aws/prabhat/zinc:latest
 
 Now point your browser to http://localhost:4080 and login
 
