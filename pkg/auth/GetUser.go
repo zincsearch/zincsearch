@@ -22,7 +22,7 @@ func GetUser(userId string) (bool, ZincUser, error) {
 
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		log.Print("error executing search: %v", err)
+		log.Printf("error executing search: %v", err)
 	}
 
 	next, err := dmi.Next()
@@ -55,7 +55,7 @@ func GetUser(userId string) (bool, ZincUser, error) {
 			return true
 		})
 		if err != nil {
-			log.Print("error accessing stored fields: %v", err)
+			log.Printf("error accessing stored fields: %v", err)
 			return userExists, user, err
 		} else {
 			return userExists, user, nil

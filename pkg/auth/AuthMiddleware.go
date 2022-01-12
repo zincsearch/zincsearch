@@ -43,7 +43,7 @@ func VerifyCredentials(user, password string) (bool, SimpleUser) {
 
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		log.Print("error executing search: %v", err)
+		log.Printf("error executing search: %v", err)
 	}
 
 	storedSalt := ""
@@ -76,7 +76,7 @@ func VerifyCredentials(user, password string) (bool, SimpleUser) {
 			return true
 		})
 		if err != nil {
-			log.Print("error accessing stored fields: %v", err)
+			log.Printf("error accessing stored fields: %v", err)
 		}
 
 		incomingEncryptedPassword := GeneratePassword(password, storedSalt)

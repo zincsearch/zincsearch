@@ -1,7 +1,6 @@
 package test
 
 import (
-	"os"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -55,14 +54,10 @@ func Server() *gin.Engine {
 	if r == nil {
 		once.Do(func() {
 			godotenv.Load()
+			gin.SetMode(gin.ReleaseMode)
 			r = gin.New()
 			r.Use(gin.Recovery())
 			routes.SetRoutes(r)
-			// set env
-			os.Setenv("MAX_RESULTS", "10000")
-			os.Setenv("FIRST_ADMIN_USER", Username)
-			os.Setenv("FIRST_ADMIN_PASSWORD", Password)
-			os.Setenv("DATA_PATH", "./data")
 		})
 	}
 

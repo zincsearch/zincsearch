@@ -22,7 +22,7 @@ func GetAllUsersWorker() (v1.SearchResponse, error) {
 
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		log.Print("error executing search: %v", err)
+		log.Printf("error executing search: %v", err)
 	}
 
 	next, err := dmi.Next()
@@ -48,7 +48,7 @@ func GetAllUsersWorker() (v1.SearchResponse, error) {
 			return true
 		})
 		if err != nil {
-			log.Print("error accessing stored fields: %v", err)
+			log.Printf("error accessing stored fields: %v", err)
 		}
 
 		hit := v1.Hit{

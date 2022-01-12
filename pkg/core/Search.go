@@ -66,12 +66,12 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 
 	reader, err := writer.Reader()
 	if err != nil {
-		log.Print("error accessing reader: %v", err)
+		log.Printf("error accessing reader: %v", err)
 	}
 
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		log.Print("error executing search: %v", err)
+		log.Printf("error executing search: %v", err)
 	}
 
 	// highlighter := highlight.NewANSIHighlighter()
@@ -96,7 +96,7 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 			return true
 		})
 		if err != nil {
-			log.Print("error accessing stored fields: %v", err)
+			log.Printf("error accessing stored fields: %v", err)
 		}
 
 		hit := v1.Hit{
@@ -114,7 +114,7 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 		Hits = append(Hits, hit)
 	}
 	if err != nil {
-		log.Print("error iterating results: %v", err)
+		log.Printf("error iterating results: %v", err)
 	}
 
 	// fmt.Println("Got results after data load from disk in: ", time.Since(iterationStartTime))
