@@ -1,6 +1,8 @@
 .DS_Store
 node_modules
 /dist
+/yarn.lock
+
 
 /tests/e2e/videos/
 /tests/e2e/screenshots/

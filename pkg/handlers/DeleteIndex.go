@@ -14,6 +14,11 @@ import (
 func DeleteIndex(c *gin.Context) {
 	indexName := c.Param("indexName")
 
+	if !core.IndexExists(indexName) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index not exist"})
+		return
+	}
+
 	// 1. Close the index writer
 	core.ZINC_INDEX_LIST[indexName].Writer.Close()
 
@@ -28,21 +33,21 @@ func DeleteIndex(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-	} else {
-		// 4. Delete the index mapping
-		bdoc := bluge.NewDocument(indexName)
-		err = core.ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Writer.Delete(bdoc.ID())
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
-		} else {
-			c.JSON(http.StatusOK, gin.H{
-				"message": "Deleted",
-				"index":   indexName,
-			})
-		}
+		return
 	}
 
+	// 4. Delete the index mapping
+	bdoc := bluge.NewDocument(indexName)
+	err = core.ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Writer.Delete(bdoc.ID())
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Deleted",
+			"index":   indexName,
+		})
+	}
 }

@@ -12,6 +12,11 @@ func SearchIndex(c *gin.Context) {
 
 	indexName := c.Param("target")
 
+	if !core.IndexExists(indexName) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index not exist"})
+		return
+	}
+
 	// fmt.Println("Got search request for index: ", indexName)
 
 	var iQuery v1.ZincQuery
@@ -19,11 +24,6 @@ func SearchIndex(c *gin.Context) {
 	c.BindJSON(&iQuery)
 
 	index := core.ZINC_INDEX_LIST[indexName]
-	if index == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index not exist"})
-		return
-	}
-
 	res, errS := index.Search(iQuery)
 
 	if errS != nil {
