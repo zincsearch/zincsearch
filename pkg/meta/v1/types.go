@@ -6,7 +6,9 @@ import (
 	"github.com/blugelabs/bluge/search"
 )
 
+// ZincQuery is the query object for the zinc index. All search requests should send this struct
 type ZincQuery struct {
+	// SearchType is the type of search to perform. Can be match, match_phrase, query_string, etc
 	SearchType string         `json:"search_type"`
 	MaxResults int            `json:"max_results"`
 	From       int            `json:"from"`

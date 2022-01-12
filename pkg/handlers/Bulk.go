@@ -66,11 +66,13 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 		if nextLineIsData {
 			nextLineIsData = false
 			var id = ""
+			mintedID := false
 
 			if val, ok := lastLineMetaData["id"]; ok {
 				id = val.(string)
 			} else {
 				id = uuid.New().String()
+				mintedID = true
 			}
 
 			indexName := lastLineMetaData["_index"].(string)
@@ -81,8 +83,10 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 				batch[indexName] = index.NewBatch()
 			}
 
-			if !core.IndexExists(indexName) { // If the requested indexName does not exist then create it
-				newIndex, err := core.NewIndex(indexName)
+			exists, _ := core.IndexExists(indexName)
+
+			if !exists { // If the requested indexName does not exist then create it
+				newIndex, err := core.NewIndex(indexName, "disk")
 
 				if err != nil {
 					return err
@@ -91,7 +95,7 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 				core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
 			}
 
-			bdoc, err := core.ZINC_INDEX_LIST[indexName].GetBlugeDocument(id, &doc)
+			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(id, &doc)
 
 			if err != nil {
 				return err
@@ -101,7 +105,11 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 
 			// Add the documen to the batch. We will persist the batch to the index
 			// when we have processed all documents in the request
-			batch[indexName].Update(bdoc.ID(), bdoc)
+			if !mintedID {
+				batch[indexName].Update(bdoc.ID(), bdoc)
+			} else {
+				batch[indexName].Insert(bdoc)
+			}
 
 		} else { // This branch will process the metadata line in the request. Each metadata line is preceded by a data line.
 

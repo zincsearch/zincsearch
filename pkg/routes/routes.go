@@ -29,6 +29,7 @@ func SetRoutes(r *gin.Engine) {
 	// meta service - healthz
 	r.GET("/healthz", v1.GetHealthz)
 	r.GET("/", v1.GUI)
+	r.GET("/version", v1.GetVersion)
 
 	front, err := zinc.GetFrontendAssets()
 	if err != nil {
@@ -53,6 +54,7 @@ func SetRoutes(r *gin.Engine) {
 
 	// Document CRUD APIs. Update is same as create.
 	r.PUT("/api/:target/document", auth.ZincAuthMiddleware, handlers.UpdateDocument)
+	r.POST("/api/:target/_doc", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 	r.PUT("/api/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 	r.POST("/api/:target/_search", auth.ZincAuthMiddleware, handlers.SearchIndex)
 	r.DELETE("/api/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
