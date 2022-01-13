@@ -27,12 +27,13 @@ Join slack channel
 4. Compatibility with Elasticsearch APIs for ingestion of data (single record and bulk API)
 5. Out of the box authentication
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
+1. Index storage in s3 (experimental)
 
 # Roadmap items:
-1. Index storage in s3
 1. High Availability
 1. Distributed reads and writes
 1. Geosptial search
+1. Raise an issue if you are looking for something.
 
 # Screenshots
 
