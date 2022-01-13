@@ -442,6 +442,26 @@ e.g. ndjson contents
 {"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "CHASAPIS, Spiridon", "Country": "GRE", "Gender": "Men", "Event": "100M Freestyle For Sailors", "Medal": "Silver", "Season": "summer"}
 ```
 
+# S3 storage (Experimental) for index data
+
+Zinc can utilize s3 for storing index data. It still uses local disk for storing metadata. To enable storing data in an index you must do 2 things:
+
+1. Pass S3_BUCKET environment variable when zinc is starting up.
+2. Create an index before you use it with storage_type as s3.
+
+e.g. PUT http://localhost:4080/api/index
+
+Payload:
+
+{ "name": "myobjectstoreindex", "storage_type": "s3" }
+
+
+Zinc uses AWS SDK which looks for credentials through
+1. environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY 
+1. Through your aws CLI credentials stored in ~/.aws/credentials
+1. Instance metadata - IMDS
+1. IAM Roles for service Accounts in EKS
+
 # Who uses Zinc (Known users)?
 
 1. [Quadrantsec](https://quadrantsec.com/)
