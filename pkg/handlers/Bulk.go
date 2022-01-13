@@ -8,6 +8,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
+	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/index"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -119,6 +120,11 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 
 					lastLineMetaData["operation"] = k
 
+					if _, ok := v.(map[string]interface{}); !ok {
+						// return errors.New("bulk index data format error")
+						continue
+					}
+
 					if v.(map[string]interface{})["_index"] != "" { // if index is specified in metadata then it overtakes the index in the query path
 						lastLineMetaData["_index"] = v.(map[string]interface{})["_index"]
 					} else {
@@ -133,6 +139,14 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 					lastLineMetaData["_index"] = v.(map[string]interface{})["_index"]
 					lastLineMetaData["_id"] = v.(map[string]interface{})["_id"]
 
+					// delete
+					indexName := lastLineMetaData["_index"].(string)
+					bdoc := bluge.NewDocument(lastLineMetaData["_id"].(string))
+					if DoesExistInThisRequest(indexesInThisBatch, indexName) == -1 {
+						indexesInThisBatch = append(indexesInThisBatch, indexName)
+						batch[indexName] = index.NewBatch()
+					}
+					batch[indexName].Delete(bdoc.ID())
 				}
 			}
 		}
