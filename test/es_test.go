@@ -45,7 +45,6 @@ func TestApiES(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`{"name": "` + indexName + `", "storage_type": "disk"}`)
 				resp := request("PUT", "/api/index", body)
-				So(resp.Body.String(), ShouldEqual, "")
 				So(resp.Code, ShouldEqual, http.StatusOK)
 
 				// check bulk
