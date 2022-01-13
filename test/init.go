@@ -1,6 +1,9 @@
 package test
 
 import (
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -45,6 +48,15 @@ var (
     },
     "fields": ["_all"]
 }`
+	bulkData = `{"index": {"_index": "games3", "_type": "doc", "_id": "1"}}
+{"field1": "value1", "field2": "value2", "field3": "value3"}
+{"index": {"_index": "games3", "_type": "doc", "_id": "2"}}
+{"field1": "value1", "field2": "value2", "field3": "value3"}
+{"create": {"_index": "games3", "_type": "doc", "_id": "3"}}
+{"field1": "value1", "field2": "value2", "field3": "value3"}`
+	bulkDataWithDelete = `{"index": {"_index": "games3", "_type": "doc", "_id": "4"}}
+{"field1": "value1", "field2": "value2", "field3": "value3"}
+{"delete": {"_index": "games3", "_type": "doc", "_id": "1"}}`
 )
 
 var r *gin.Engine
@@ -62,4 +74,12 @@ func server() *gin.Engine {
 	}
 
 	return r
+}
+
+func request(method, api string, body io.Reader) *httptest.ResponseRecorder {
+	req, _ := http.NewRequest(method, api, body)
+	req.SetBasicAuth(username, password)
+	w := httptest.NewRecorder()
+	server().ServeHTTP(w, req)
+	return w
 }

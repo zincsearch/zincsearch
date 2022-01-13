@@ -68,7 +68,7 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 			var id = ""
 			mintedID := false
 
-			if val, ok := lastLineMetaData["id"]; ok {
+			if val, ok := lastLineMetaData["_id"]; ok {
 				id = val.(string)
 			} else {
 				id = uuid.New().String()

@@ -20,14 +20,14 @@ func TestApiStandard(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(fmt.Sprintf(`{"_id": "%s", "password": "%s"}`, username, password))
 				req, _ := http.NewRequest("POST", "/api/login", body)
-				w := httptest.NewRecorder()
-				r.ServeHTTP(w, req)
-				So(w.Code, ShouldEqual, http.StatusOK)
+				resp := httptest.NewRecorder()
+				r.ServeHTTP(resp, req)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 
 				var data struct {
 					User auth.ZincUser `json:"user"`
 				}
-				err := json.Unmarshal(w.Body.Bytes(), &data)
+				err := json.Unmarshal(resp.Body.Bytes(), &data)
 				So(err, ShouldBeNil)
 				So(data.User.Role, ShouldEqual, "admin")
 			})

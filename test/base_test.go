@@ -14,30 +14,30 @@ func TestApiBase(t *testing.T) {
 		r := server()
 		Convey("/", func() {
 			req, _ := http.NewRequest("GET", "/", nil)
-			w := httptest.NewRecorder()
-			r.ServeHTTP(w, req)
-			So(w.Code, ShouldEqual, http.StatusMovedPermanently)
+			resp := httptest.NewRecorder()
+			r.ServeHTTP(resp, req)
+			So(resp.Code, ShouldEqual, http.StatusMovedPermanently)
 		})
 		Convey("/version", func() {
 			req, _ := http.NewRequest("GET", "/version", nil)
-			w := httptest.NewRecorder()
-			r.ServeHTTP(w, req)
-			So(w.Code, ShouldEqual, http.StatusOK)
+			resp := httptest.NewRecorder()
+			r.ServeHTTP(resp, req)
+			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			data := make(map[string]interface{})
-			err := json.Unmarshal(w.Body.Bytes(), &data)
+			err := json.Unmarshal(resp.Body.Bytes(), &data)
 			So(err, ShouldBeNil)
 			_, ok := data["Version"]
 			So(ok, ShouldBeTrue)
 		})
 		Convey("/healthz", func() {
 			req, _ := http.NewRequest("GET", "/healthz", nil)
-			w := httptest.NewRecorder()
-			r.ServeHTTP(w, req)
-			So(w.Code, ShouldEqual, http.StatusOK)
+			resp := httptest.NewRecorder()
+			r.ServeHTTP(resp, req)
+			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			data := make(map[string]interface{})
-			err := json.Unmarshal(w.Body.Bytes(), &data)
+			err := json.Unmarshal(resp.Body.Bytes(), &data)
 			So(err, ShouldBeNil)
 			status, ok := data["status"]
 			So(ok, ShouldBeTrue)
@@ -45,9 +45,9 @@ func TestApiBase(t *testing.T) {
 		})
 		Convey("/ui", func() {
 			req, _ := http.NewRequest("GET", "/ui/", nil)
-			w := httptest.NewRecorder()
-			r.ServeHTTP(w, req)
-			So(w.Code, ShouldEqual, http.StatusOK)
+			resp := httptest.NewRecorder()
+			r.ServeHTTP(resp, req)
+			So(resp.Code, ShouldEqual, http.StatusOK)
 		})
 	})
 }
