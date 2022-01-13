@@ -1,4 +1,4 @@
-package base
+package test
 
 import (
 	"encoding/json"
@@ -6,13 +6,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/prabhatsharma/zinc/test"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestApiBase(t *testing.T) {
 	Convey("test base api", t, func() {
-		r := test.Server()
+		r := server()
 		Convey("/", func() {
 			req, _ := http.NewRequest("GET", "/", nil)
 			w := httptest.NewRecorder()

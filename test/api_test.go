@@ -1,4 +1,4 @@
-package api
+package test
 
 import (
 	"bytes"
@@ -9,17 +9,16 @@ import (
 	"testing"
 
 	"github.com/prabhatsharma/zinc/pkg/auth"
-	"github.com/prabhatsharma/zinc/test"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestApiBase(t *testing.T) {
+func TestApiStandard(t *testing.T) {
 	Convey("test zinc api", t, func() {
-		r := test.Server()
+		r := server()
 		Convey("POST /api/login", func() {
 			Convey("with username and password", func() {
 				body := bytes.NewBuffer(nil)
-				body.WriteString(fmt.Sprintf(`{"_id": "%s", "password": "%s"}`, test.Username, test.Password))
+				body.WriteString(fmt.Sprintf(`{"_id": "%s", "password": "%s"}`, username, password))
 				req, _ := http.NewRequest("POST", "/api/login", body)
 				w := httptest.NewRecorder()
 				r.ServeHTTP(w, req)

@@ -1,4 +1,4 @@
-package es
+package test
 
 import (
 	"testing"
@@ -6,9 +6,9 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestApiBase(t *testing.T) {
+func TestApiES(t *testing.T) {
 	Convey("test es api", t, func() {
-		// r := test.Server()
+		// r := testdata.Server()
 		Convey("POST /es/_bulk", func() {
 			Convey("bulk create documents without indexName", func() {
 			})

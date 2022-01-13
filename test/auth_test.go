@@ -1,27 +1,26 @@
-package auth
+package test
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/prabhatsharma/zinc/test"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestApiBase(t *testing.T) {
+func TestApiAuth(t *testing.T) {
 	Convey("test auth api", t, func() {
-		r := test.Server()
+		r := server()
 		Convey("check auth with auth", func() {
 			req, _ := http.NewRequest("GET", "/api/index", nil)
-			req.SetBasicAuth(test.Username, test.Password)
+			req.SetBasicAuth(username, password)
 			w := httptest.NewRecorder()
 			r.ServeHTTP(w, req)
 			So(w.Code, ShouldEqual, http.StatusOK)
 		})
 		Convey("check auth with error password", func() {
 			req, _ := http.NewRequest("GET", "/api/index", nil)
-			req.SetBasicAuth(test.Username, "xxx")
+			req.SetBasicAuth(username, "xxx")
 			w := httptest.NewRecorder()
 			r.ServeHTTP(w, req)
 			So(w.Code, ShouldEqual, http.StatusUnauthorized)

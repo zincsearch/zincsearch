@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	Username  = "admin"
-	Password  = "Complexpass#123"
-	Index     = "games3"
-	IndexData = `{
+	username  = "admin"
+	password  = "Complexpass#123"
+	index     = "games3"
+	indexData = `{
 	"Athlete": "DEMTSCHENKO, Albert",
 	"City": "Turin",
 	"Country": "RUS",
@@ -24,7 +24,7 @@ var (
 	"Sport": "Luge",
 	"Year": 2006
 }`
-	QueryDataMatch = `{
+	queryDataMatch = `{
 	"search_type": "match",
 	"query":
 	{
@@ -35,7 +35,7 @@ var (
 	"fields": ["_all"]
 }`
 
-	QueryDataQueryString = `{
+	queryDataQueryString = `{
     "search_type": "querystring",
     "query":
     {
@@ -50,7 +50,7 @@ var (
 var r *gin.Engine
 var once sync.Once
 
-func Server() *gin.Engine {
+func server() *gin.Engine {
 	if r == nil {
 		once.Do(func() {
 			godotenv.Load()
