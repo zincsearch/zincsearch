@@ -3,6 +3,7 @@ package test
 import (
 	"bytes"
 	"net/http"
+	"strings"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -10,7 +11,6 @@ import (
 
 func TestApiES(t *testing.T) {
 	Convey("test es api", t, func() {
-		// r := testdata.Server()
 		Convey("POST /es/_bulk", func() {
 			Convey("bulk documents", func() {
 				body := bytes.NewBuffer(nil)
@@ -34,10 +34,32 @@ func TestApiES(t *testing.T) {
 
 		Convey("POST /es/:target/_bulk", func() {
 			Convey("bulk create documents with not exist indexName", func() {
+				body := bytes.NewBuffer(nil)
+				data := strings.ReplaceAll(bulkData, `"_index": "games3"`, `"_index": ""`)
+				body.WriteString(data)
+				resp := request("POST", "/es/notExistIndex/_bulk", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("bulk create documents with exist indexName", func() {
+				// create index
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"name": "` + indexName + `", "storage_type": "disk"}`)
+				resp := request("PUT", "/api/index", body)
+				So(resp.Body.String(), ShouldEqual, "")
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				// check bulk
+				body.Reset()
+				data := strings.ReplaceAll(bulkData, `"_index": "games3"`, `"_index": ""`)
+				body.WriteString(data)
+				resp = request("POST", "/es/"+indexName+"/_bulk", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("bulk with error input", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"index":{}}`)
+				resp := request("POST", "/es/_bulk", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 		})
 

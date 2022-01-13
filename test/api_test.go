@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/prabhatsharma/zinc/pkg/auth"
@@ -14,14 +13,11 @@ import (
 
 func TestApiStandard(t *testing.T) {
 	Convey("test zinc api", t, func() {
-		r := server()
 		Convey("POST /api/login", func() {
 			Convey("with username and password", func() {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(fmt.Sprintf(`{"_id": "%s", "password": "%s"}`, username, password))
-				req, _ := http.NewRequest("POST", "/api/login", body)
-				resp := httptest.NewRecorder()
-				r.ServeHTTP(resp, req)
+				resp := request("POST", "/api/login", body)
 				So(resp.Code, ShouldEqual, http.StatusOK)
 
 				var data struct {

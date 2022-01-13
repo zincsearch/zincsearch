@@ -14,7 +14,7 @@ import (
 var (
 	username  = "admin"
 	password  = "Complexpass#123"
-	index     = "games3"
+	indexName = "games3"
 	indexData = `{
 	"Athlete": "DEMTSCHENKO, Albert",
 	"City": "Turin",
