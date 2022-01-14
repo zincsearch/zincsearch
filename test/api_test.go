@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/prabhatsharma/zinc/pkg/auth"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v1"
@@ -394,23 +395,126 @@ func TestApiStandard(t *testing.T) {
 				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: fuzzy", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"search_type": "fuzzy", "query": {"term": "demtschenk"}}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: term", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{
+					"search_type": "term", 
+					"query": {
+						"term": "turin", 
+						"field":"City"
+					}
+				}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: daterange", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(fmt.Sprintf(`{
+					"search_type": "daterange",
+					"query": {
+						"start_time": "%s",
+						"end_time": "%s"
+					}
+				}`,
+					time.Now().UTC().Add(time.Hour*-24).Format("2006-01-02T15:04:05Z"),
+					time.Now().UTC().Format("2006-01-02T15:04:05Z"),
+				))
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: matchall", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"search_type": "matchall", "query": {"term": "demtschenk"}}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: match", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"search_type": "match", "query": {"term": "DEMTSCHENKO"}}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: matchphrase", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"search_type": "matchphrase", "query": {"term": "DEMTSCHENKO"}}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: multiphrase", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{
+					"search_type": "multiphrase",
+					"query": {
+						"terms": [
+							["demtschenko"],
+							["albert"]
+						]
+					}
+				}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: prefix", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"search_type": "prefix", "query": {"term": "dem"}}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: querystring", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"search_type": "querystring", "query": {"term": "DEMTSCHENKO"}}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 		})
 	})
