@@ -58,7 +58,7 @@ func TestApiES(t *testing.T) {
 			Convey("bulk with error input", func() {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`{"index":{}}`)
-				resp := request("POST", "/es/_bulk", body)
+				resp := request("POST", "/es/"+indexName+"/_bulk", body)
 				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 		})

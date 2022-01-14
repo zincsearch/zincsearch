@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/prabhatsharma/zinc/pkg/auth"
@@ -139,80 +140,193 @@ func TestApiStandard(t *testing.T) {
 
 		Convey("DELETE /api/index/:indexName", func() {
 			Convey("delete index with exist indexName", func() {
+				resp := request("DELETE", "/api/index/newindex", nil)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("delete index with not exist indexName", func() {
-			})
-			Convey("delete index with error input", func() {
+				resp := request("DELETE", "/api/index/newindex", nil)
+				So(resp.Code, ShouldEqual, http.StatusBadRequest)
 			})
 		})
 
 		Convey("POST /api/_bulk", func() {
-			Convey("bulk create documents without indexName", func() {
+			Convey("bulk documents", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(bulkData)
+				resp := request("POST", "/api/_bulk", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
-			Convey("bulk create documents with indexName", func() {
+			Convey("bulk documents with delete", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(bulkDataWithDelete)
+				resp := request("POST", "/api/_bulk", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("bulk with error input", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"index":{}}`)
+				resp := request("POST", "/api/_bulk", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 		})
 
 		Convey("POST /api/:target/_bulk", func() {
 			Convey("bulk create documents with not exist indexName", func() {
+				body := bytes.NewBuffer(nil)
+				data := strings.ReplaceAll(bulkData, `"_index": "games3"`, `"_index": ""`)
+				body.WriteString(data)
+				resp := request("POST", "/api/notExistIndex/_bulk", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("bulk create documents with exist indexName", func() {
+				// create index
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"name": "` + indexName + `", "storage_type": "disk"}`)
+				resp := request("PUT", "/api/index", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				// check bulk
+				body.Reset()
+				data := strings.ReplaceAll(bulkData, `"_index": "games3"`, `"_index": ""`)
+				body.WriteString(data)
+				resp = request("POST", "/api/"+indexName+"/_bulk", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("bulk with error input", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"index":{}}`)
+				resp := request("POST", "/api/"+indexName+"/_bulk", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 		})
 
 		Convey("PUT /api/:target/document", func() {
+			_id := ""
 			Convey("create document with not exist indexName", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(indexData)
+				resp := request("PUT", "/api/notExistIndex/document", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("create document with exist indexName", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(indexData)
+				resp := request("PUT", "/api/"+indexName+"/document", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("create document with exist indexName not exist id", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(indexData)
+				resp := request("PUT", "/api/"+indexName+"/document", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := make(map[string]string)
+				err := json.Unmarshal(resp.Body.Bytes(), &data)
+				So(err, ShouldBeNil)
+				So(data["id"], ShouldNotEqual, "")
+				_id = data["id"]
 			})
-			Convey("create document with exist indexName and exist id", func() {
+			Convey("update document with exist indexName and exist id", func() {
+				body := bytes.NewBuffer(nil)
+				data := strings.Replace(indexData, "{", "{\"_id\": \""+_id+"\",", 1)
+				body.WriteString(data)
+				resp := request("PUT", "/api/"+indexName+"/document", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("create document with error input", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`data`)
+				resp := request("PUT", "/api/"+indexName+"/document", body)
+				So(resp.Code, ShouldEqual, http.StatusBadRequest)
 			})
 		})
 
 		Convey("POST /api/:target/_doc", func() {
+			_id := ""
 			Convey("create document with not exist indexName", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(indexData)
+				resp := request("POST", "/api/notExistIndex/_doc", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("create document with exist indexName", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(indexData)
+				resp := request("POST", "/api/"+indexName+"/_doc", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("create document with exist indexName not exist id", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(indexData)
+				resp := request("POST", "/api/"+indexName+"/_doc", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := make(map[string]string)
+				err := json.Unmarshal(resp.Body.Bytes(), &data)
+				So(err, ShouldBeNil)
+				So(data["id"], ShouldNotEqual, "")
+				_id = data["id"]
 			})
-			Convey("create document with exist indexName and exist id", func() {
+			Convey("update document with exist indexName and exist id", func() {
+				body := bytes.NewBuffer(nil)
+				data := strings.Replace(indexData, "{", "{\"_id\": \""+_id+"\",", 1)
+				body.WriteString(data)
+				resp := request("POST", "/api/"+indexName+"/_doc", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("create document with error input", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`data`)
+				resp := request("POST", "/api/"+indexName+"/_doc", body)
+				So(resp.Code, ShouldEqual, http.StatusBadRequest)
 			})
 		})
 
 		Convey("PUT /api/:target/_doc/:id", func() {
 			Convey("update document with not exist indexName", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(indexData)
+				resp := request("PUT", "/api/notExistIndex/_doc/1111", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("update document with exist indexName", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(indexData)
+				resp := request("PUT", "/api/"+indexName+"/_doc/1111", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
-			Convey("update document with exist indexName not exist id", func() {
+			Convey("create document with exist indexName not exist id", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(indexData)
+				resp := request("PUT", "/api/"+indexName+"/_doc/notexist", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("update document with exist indexName and exist id", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(indexData)
+				resp := request("PUT", "/api/"+indexName+"/_doc/1111", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("update document with error input", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`xxx`)
+				resp := request("PUT", "/api/"+indexName+"/_doc/1111", body)
+				So(resp.Code, ShouldEqual, http.StatusBadRequest)
 			})
 		})
 
 		Convey("DELETE /api/:target/_doc/:id", func() {
 			Convey("delete document with not exist indexName", func() {
-			})
-			Convey("delete document with exist indexName", func() {
+				resp := request("DELETE", "/api/notExistIndexDelete/_doc/1111", nil)
+				So(resp.Code, ShouldEqual, http.StatusBadRequest)
 			})
 			Convey("delete document with exist indexName not exist id", func() {
+				resp := request("DELETE", "/api/"+indexName+"/_doc/notexist", nil)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("delete document with exist indexName and exist id", func() {
-			})
-			Convey("delete document with error input", func() {
+				resp := request("DELETE", "/api/"+indexName+"/_doc/1111", nil)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 		})
 
