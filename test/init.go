@@ -43,7 +43,7 @@ var (
     "query":
     {
         "term": "+City:Turin +Silver",
-       "start_time": "2021-06-02T14:28:31.894Z",
+        "start_time": "2021-06-02T14:28:31.894Z",
         "end_time": "2021-12-30T15:28:31.894Z"
     },
     "fields": ["_all"]

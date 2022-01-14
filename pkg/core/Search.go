@@ -45,6 +45,9 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 		searchRequest, err = uquery.PrefixQuery(iQuery)
 	case "querystring":
 		searchRequest, err = uquery.QueryStringQuery(iQuery)
+	default:
+		// default use alldocuments search
+		searchRequest, err = uquery.AllDocuments(iQuery)
 	}
 
 	if err != nil {

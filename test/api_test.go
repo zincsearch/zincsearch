@@ -331,19 +331,70 @@ func TestApiStandard(t *testing.T) {
 		})
 
 		Convey("POST /api/:target/_search", func() {
+			Convey("init data for search", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(indexData)
+				resp := request("POST", "/api/"+indexName+"/_doc", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+			})
 			Convey("search document with not exist indexName", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{}`)
+				resp := request("POST", "/api/notExistSearch/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusBadRequest)
 			})
 			Convey("search document with exist indexName", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"search_type": "alldocuments"}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
 			})
 			Convey("search document with not exist term", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"search_type": "match", "query": {"term": "xxxx"}}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldEqual, 0)
 			})
 			Convey("search document with exist term", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"search_type": "match", "query": {"term": "DEMTSCHENKO"}}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: alldocuments", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"search_type": "alldocuments", "query": {}}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: wildcard", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{"search_type": "wildcard", "query": {"term": "dem*"}}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 			Convey("search document type: fuzzy", func() {
+
 			})
 			Convey("search document type: term", func() {
 			})
@@ -361,9 +412,6 @@ func TestApiStandard(t *testing.T) {
 			})
 			Convey("search document type: querystring", func() {
 			})
-			Convey("search with error input", func() {
-			})
 		})
-
 	})
 }
