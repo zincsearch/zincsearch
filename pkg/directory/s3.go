@@ -14,7 +14,7 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/index"
 	segment "github.com/blugelabs/bluge_segment_api"
-	zerolog "github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/log"
 )
 
 // GetS3Config returns a bluge config that will store index data in S3
@@ -38,7 +38,7 @@ func NewS3Directory(bucket, prefix string) index.Directory {
 	// Load the Shared AWS Configuration (~/.aws/config)
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		zerolog.Print("Error loading AWS config: ", err)
+		log.Print("Error loading AWS config: ", err)
 	}
 	client := s3.NewFromConfig(cfg)
 
@@ -62,7 +62,7 @@ func (s *S3Directory) Setup(readOnly bool) error {
 // List the ids of all the items of the specified kind
 // Items are returned in descending order by id
 func (s *S3Directory) List(kind string) ([]uint64, error) {
-	zerolog.Print("List: s3 ListObjectsV2 call made for List: s3://", s.Bucket+"/"+s.Prefix)
+	log.Print("List: s3 ListObjectsV2 call made for List: s3://", s.Bucket+"/"+s.Prefix)
 	var itemList []uint64
 
 	ctx := context.Background()
@@ -73,7 +73,7 @@ func (s *S3Directory) List(kind string) ([]uint64, error) {
 
 	val, err := s.Client.ListObjectsV2(ctx, &params)
 	if err != nil {
-		zerolog.Print("List: failed to list objects: ", err.Error())
+		log.Print("List: failed to list objects: ", err.Error())
 		return nil, err
 	}
 
@@ -87,7 +87,7 @@ func (s *S3Directory) List(kind string) ([]uint64, error) {
 
 		parsedID, err := strconv.ParseUint(stringID, 16, 64)
 		if err != nil {
-			zerolog.Print("List: failed to parse object id: ", err.Error())
+			log.Print("List: failed to parse object id: ", err.Error())
 			continue
 		}
 
@@ -114,18 +114,18 @@ func (s *S3Directory) Load(kind string, id uint64) (*segment.Data, io.Closer, er
 		Key:    &key,
 	}
 
-	zerolog.Print("Load: s3 GetObject call made. s3://", s.Bucket, "/", key)
+	log.Print("Load: s3 GetObject call made. s3://", s.Bucket, "/", key)
 
 	output, err := s.Client.GetObject(ctx, goi)
 
 	if err != nil {
-		zerolog.Print("Load: failed to get object: s3://"+s.Bucket+"/"+key, err.Error())
+		log.Print("Load: failed to get object: s3://"+s.Bucket+"/"+key, err.Error())
 		return nil, nil, err
 	}
 
 	data, err := ioutil.ReadAll(output.Body)
 	if err != nil {
-		zerolog.Print("Load: failed to read object", err.Error())
+		log.Print("Load: failed to read object", err.Error())
 		return nil, nil, err
 	}
 
@@ -139,7 +139,7 @@ func (s *S3Directory) Persist(kind string, id uint64, w index.WriterTo, closeCh 
 	var buf bytes.Buffer
 	_, err := w.WriteTo(&buf, closeCh)
 	if err != nil {
-		zerolog.Print("Persist: failed to write object to buffer: ", err.Error())
+		log.Print("Persist: failed to write object to buffer: ", err.Error())
 		return err
 	}
 
@@ -158,11 +158,11 @@ func (s *S3Directory) Persist(kind string, id uint64, w index.WriterTo, closeCh 
 	ouput, err := s.Client.PutObject(ctx, &params)
 
 	if err != nil {
-		zerolog.Print("Persist: failed to write object: ", err.Error())
+		log.Print("Persist: failed to write object: ", err.Error())
 		return err
 	}
 
-	zerolog.Print("Persist: s3 object "+s.Bucket+"/"+path+" written. Its md5 hash is: ", *ouput.ETag) // TODO: compare md5 hashes here to ensure successful write
+	log.Print("Persist: s3 object "+s.Bucket+"/"+path+" written. Its md5 hash is: ", *ouput.ETag) // TODO: compare md5 hashes here to ensure successful write
 
 	return nil
 }
@@ -176,19 +176,19 @@ func (s *S3Directory) Remove(kind string, id uint64) error {
 		Key:    &objectToDelete,
 	}
 
-	zerolog.Print("Remove: s3 DeleteObject call made s3://", s.Bucket, "/", objectToDelete)
+	log.Print("Remove: s3 DeleteObject call made s3://", s.Bucket, "/", objectToDelete)
 
 	_, err := s.Client.DeleteObject(ctx, doi)
 
 	if err != nil {
-		zerolog.Print("Remove: failed to delete object: s3://", s.Bucket, "/", objectToDelete, err.Error())
+		log.Print("Remove: failed to delete object: s3://", s.Bucket, "/", objectToDelete, err.Error())
 	}
 	return nil
 }
 
 // Stats returns total number of items and their cumulative size
 func (s *S3Directory) Stats() (numItems uint64, numBytes uint64) {
-	zerolog.Print("Stats: s3 ListObjectsV2 call made for Stats")
+	log.Print("Stats: s3 ListObjectsV2 call made for Stats")
 
 	objectCount := uint64(0)
 	sizeOfObjects := uint64(0)
@@ -199,11 +199,11 @@ func (s *S3Directory) Stats() (numItems uint64, numBytes uint64) {
 		Prefix: &s.Prefix,
 	}
 
-	zerolog.Print("Stats: s3 ListObjectsV2 call made for Stats s3://", s.Bucket+"/"+s.Prefix)
+	log.Print("Stats: s3 ListObjectsV2 call made for Stats s3://", s.Bucket+"/"+s.Prefix)
 
 	val, err := s.Client.ListObjectsV2(ctx, &params)
 	if err != nil {
-		zerolog.Print("Stats: failed to list objects: ", err.Error())
+		log.Print("Stats: failed to list objects: ", err.Error())
 		return 0, 0
 	}
 

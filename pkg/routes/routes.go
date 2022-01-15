@@ -10,7 +10,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/auth"
 	"github.com/prabhatsharma/zinc/pkg/handlers"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
-	zerolog "github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/log"
 )
 
 // SetRoutes sets up all gi HTTP API endpoints that can be called by front end
@@ -32,7 +32,7 @@ func SetRoutes(r *gin.Engine) {
 
 	front, err := zinc.GetFrontendAssets()
 	if err != nil {
-		zerolog.Err(err)
+		log.Err(err)
 	}
 
 	r.StaticFS("/ui", http.FS(front))
