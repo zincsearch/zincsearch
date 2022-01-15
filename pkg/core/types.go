@@ -7,9 +7,10 @@ import (
 // Nothing to handle in the error. If you can't load indexes then everything is broken.
 var ZINC_INDEX_LIST map[string]*Index
 
-var ZINC_SYSTEM_INDEX_LIST, _ = LoadZincSystemIndexes()
+var ZINC_SYSTEM_INDEX_LIST map[string]*Index
 
 func init() {
+	ZINC_SYSTEM_INDEX_LIST, _ = LoadZincSystemIndexes()
 	ZINC_INDEX_LIST, _ = LoadZincIndexesFromDisk()
 	s3List, _ := LoadZincIndexesFromS3()
 	// Load the indexes from disk.

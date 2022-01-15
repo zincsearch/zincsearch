@@ -27,12 +27,13 @@ Join slack channel
 4. Compatibility with Elasticsearch APIs for ingestion of data (single record and bulk API)
 5. Out of the box authentication
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
+1. Index storage in s3 (experimental)
 
 # Roadmap items:
-1. Index storage in s3
 1. High Availability
 1. Distributed reads and writes
 1. Geosptial search
+1. Raise an issue if you are looking for something.
 
 # Screenshots
 
@@ -82,9 +83,11 @@ Now point your browser to http://localhost:4080 and login
 
 ### Docker
 
+Docker images are available at https://gallery.ecr.aws/prabhat/zinc
+
 > $ mkdir data
 
-> $ docker run -v /full/path/of/data:/data -e DATA_PATH="/data" -p 4080:4080 -e FIRST_ADMIN_USER=admin -e FIRST_ADMIN_PASSWORD=Complexpass#123 --name zinc hiprabhat/zinc:0.1.3
+> $ docker run -v /full/path/of/data:/data -e DATA_PATH="/data" -p 4080:4080 -e FIRST_ADMIN_USER=admin -e FIRST_ADMIN_PASSWORD=Complexpass#123 --name zinc public.ecr.aws/prabhat/zinc:latest
 
 Now point your browser to http://localhost:4080 and login
 
@@ -92,7 +95,10 @@ Now point your browser to http://localhost:4080 and login
 
 #### Manual Install
 
-> $ kubectl apply -f kube-deployment.yaml
+Create the namespace:
+> $ kubectl create ns zinc
+
+> $ kubectl apply -f k8s/kube-deployment.yaml
 
 > $ kubectl -n zinc port-forward svc/z 4080:4080
 
@@ -438,6 +444,26 @@ e.g. ndjson contents
 { "index" : { "_index" : "olympics" } } 
 {"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "CHASAPIS, Spiridon", "Country": "GRE", "Gender": "Men", "Event": "100M Freestyle For Sailors", "Medal": "Silver", "Season": "summer"}
 ```
+
+# S3 storage (Experimental) for index data
+
+Zinc can utilize s3 for storing index data. It still uses local disk for storing metadata. To enable storing data in an index you must do 2 things:
+
+1. Pass S3_BUCKET environment variable when zinc is starting up.
+2. Create an index before you use it with storage_type as s3.
+
+e.g. PUT http://localhost:4080/api/index
+
+Payload:
+
+{ "name": "myobjectstoreindex", "storage_type": "s3" }
+
+
+Zinc uses AWS SDK which looks for credentials through
+1. environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY 
+1. Through your aws CLI credentials stored in ~/.aws/credentials
+1. Instance metadata - IMDS
+1. IAM Roles for service Accounts in EKS
 
 # Who uses Zinc (Known users)?
 

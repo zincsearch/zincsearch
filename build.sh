@@ -2,9 +2,9 @@
 
 rm zinc
 
-# cd web
-# npm run build
-# cd ..
+cd web
+npm run build
+cd ..
 
 export VERSION=`git describe --tags --always`
 export BUILD_DATE=`date -u '+%Y-%m-%d_%I:%M:%S%p-GMT'`
