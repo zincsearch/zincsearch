@@ -2,17 +2,15 @@ package core
 
 import (
 	"context"
+	"encoding/json"
 	"reflect"
 	"strconv"
 	"time"
 
-	"encoding/json"
-
+	"github.com/blugelabs/bluge"
 	"github.com/jeremywohl/flatten"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 	"github.com/rs/zerolog/log"
-
-	"github.com/blugelabs/bluge"
 )
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.

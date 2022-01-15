@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/joho/godotenv"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
-
 	"github.com/rs/zerolog/log"
 )
 

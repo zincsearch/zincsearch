@@ -6,13 +6,12 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/rs/zerolog/log"
-
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/index"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/prabhatsharma/zinc/pkg/core"
+	"github.com/rs/zerolog/log"
 )
 
 func BulkHandler(c *gin.Context) {

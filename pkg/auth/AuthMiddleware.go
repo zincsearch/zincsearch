@@ -4,10 +4,9 @@ import (
 	"context"
 
 	"github.com/blugelabs/bluge"
+	"github.com/gin-gonic/gin"
 	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/rs/zerolog/log"
-
-	"github.com/gin-gonic/gin"
 )
 
 func ZincAuthMiddleware(c *gin.Context) {
