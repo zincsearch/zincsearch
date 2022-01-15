@@ -9,15 +9,25 @@ import (
 func TestLoadIndexes(t *testing.T) {
 	Convey("test load index", t, func() {
 		Convey("load system index", func() {
-			indexes, err := LoadZincSystemIndexes()
+			// index cann't be reopen, so need close first
+			for _, index := range ZINC_SYSTEM_INDEX_LIST {
+				index.Writer.Close()
+			}
+			var err error
+			ZINC_SYSTEM_INDEX_LIST, err = LoadZincSystemIndexes()
 			So(err, ShouldBeNil)
-			So(len(indexes), ShouldEqual, 2)
-			So(indexes["_index_mapping"].Name, ShouldEqual, "_index_mapping")
+			So(len(ZINC_SYSTEM_INDEX_LIST), ShouldEqual, 2)
+			So(ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Name, ShouldEqual, "_index_mapping")
 		})
 		Convey("load user inex from disk", func() {
-			indexes, err := LoadZincIndexesFromDisk()
+			// index cann't be reopen, so need close first
+			for _, index := range ZINC_INDEX_LIST {
+				index.Writer.Close()
+			}
+			var err error
+			ZINC_INDEX_LIST, err = LoadZincIndexesFromDisk()
 			So(err, ShouldBeNil)
-			So(len(indexes), ShouldBeGreaterThanOrEqualTo, 0)
+			So(len(ZINC_INDEX_LIST), ShouldBeGreaterThanOrEqualTo, 0)
 		})
 		Convey("load user inex from s3", func() {
 			// TODO: support
