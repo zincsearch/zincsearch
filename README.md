@@ -13,7 +13,7 @@ Check the below video for a quick demo of Zinc.
 
 Join slack channel
 
-[![Slack](./screenshots/slack.png)](https://join.slack.com/t/zinc-nvh4832/shared_invite/zt-10a4jb2nl-tQUWwVQgylFEImicA7Fw6A)
+[![Slack](./screenshots/slack.png)](https://join.slack.com/t/zinc-nvh4832/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg)
 
 # Why zinc
 
