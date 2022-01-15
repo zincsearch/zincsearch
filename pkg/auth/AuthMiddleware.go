@@ -16,7 +16,6 @@ func ZincAuthMiddleware(c *gin.Context) {
 	if hasAuth {
 		result, _ := VerifyCredentials(user, password)
 		if result {
-			// log.Print("auth: success")
 			c.Next()
 		} else {
 			c.AbortWithStatusJSON(401, gin.H{

@@ -124,7 +124,7 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 		log.Printf("error iterating results: %v", err)
 	}
 
-	// fmt.Println("Got results after data load from disk in: ", time.Since(iterationStartTime))
+	// log.Println("Got results after data load from disk in: ", time.Since(iterationStartTime))
 	resp := v1.SearchResponse{
 		// Took: int(time.Since(searchStart).Milliseconds()),
 		Took:     int(dmi.Aggregations().Duration().Milliseconds()),

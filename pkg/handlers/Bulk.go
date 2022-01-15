@@ -3,7 +3,6 @@ package handlers
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"io"
 
 	"github.com/blugelabs/bluge"
@@ -162,8 +161,7 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 		// Persist the batch to the index
 		err := writer.Batch(batch[indexN])
 		if err != nil {
-			fmt.Println("Error updating batch: ", err.Error())
-			log.Print(err)
+			log.Printf("Error updating batch: %v", err)
 			return err
 		}
 	}

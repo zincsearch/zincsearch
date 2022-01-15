@@ -1,17 +1,14 @@
 package auth
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"os"
-	"time"
 )
 
 func init() {
 	firstStart, err := IsFirstStart()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	if firstStart {
 		// create default user from environment variable
@@ -26,14 +23,10 @@ func init() {
 }
 
 func IsFirstStart() (bool, error) {
-
 	userList, err := GetAllUsersWorker()
-
 	if err != nil {
 		return true, err
 	}
-
-	// Logger(userList)
 
 	if userList.Hits.Total.Value == 0 {
 		return true, nil
@@ -41,16 +34,4 @@ func IsFirstStart() (bool, error) {
 
 	return false, nil
 
-}
-
-func Logger(m interface{}) {
-
-	k1, _ := json.Marshal(m)
-
-	var k2 map[string]interface{}
-	json.Unmarshal(k1, &k2)
-	k2["time"] = time.Now()
-
-	k3, _ := json.Marshal(k2)
-	fmt.Println(string(k3))
 }

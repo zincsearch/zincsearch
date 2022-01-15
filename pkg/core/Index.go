@@ -36,7 +36,6 @@ func (rindex *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]in
 	for key, value := range flatDoc {
 		if _, ok := indexMapping[key]; !ok {
 			// Assign auto inferred type for the new key
-			// fmt.Println("Missing Existing Key in index: ", key)
 
 			// Use reflection to find the type of the value.
 			// Bluge requires the field type to be specified.
