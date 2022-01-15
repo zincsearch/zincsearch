@@ -3,10 +3,10 @@
 # Declare variables to be passed into your templates.
 
 image:
-  repository: hiprabhat/zinc
+  repository: public.ecr.aws/prabhat/zinc
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1.3"
+  tag: "latest"
 
 imagePullSecrets: []
 fullnameOverride: "zinc"

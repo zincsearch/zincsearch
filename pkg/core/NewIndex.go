@@ -2,7 +2,7 @@ package core
 
 import (
 	"github.com/blugelabs/bluge"
-	"github.com/prabhatsharma/zinc/directory"
+	"github.com/prabhatsharma/zinc/pkg/directory"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
