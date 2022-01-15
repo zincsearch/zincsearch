@@ -112,7 +112,7 @@ func (index *Index) SetMapping(iMap map[string]string) error {
 	systemIndex := ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Writer
 	err := systemIndex.Update(bdoc.ID(), bdoc)
 	if err != nil {
-		log.Print("error updating document: %v", err)
+		log.Printf("error updating document: %v", err)
 		return err
 	}
 

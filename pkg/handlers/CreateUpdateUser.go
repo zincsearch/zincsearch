@@ -1,28 +1,31 @@
 package handlers
 
 import (
-	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	auth "github.com/prabhatsharma/zinc/pkg/auth"
 )
 
 func CreateUpdateUser(c *gin.Context) {
-	fmt.Println("CreateUser")
 
 	var user auth.ZincUser
 	c.BindJSON(&user)
 
-	newUser, err := auth.CreateUser(user.ID, user.Name, user.Password, user.Role)
+	if user.ID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "user.id should be not empty"})
+		return
+	}
 
+	newUser, err := auth.CreateUser(user.ID, user.Name, user.Password, user.Role)
 	if err != nil {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"message": newUser,
 	})
 }
