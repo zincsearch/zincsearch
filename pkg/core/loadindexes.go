@@ -13,13 +13,11 @@ import (
 
 var systemIndexList = []string{"_users", "_index_mapping"}
 
-// var systemIndexList = []string{}
-
 func LoadZincSystemIndexes() (map[string]*Index, error) {
 	godotenv.Load()
 	log.Print("Loading system indexes...")
 
-	IndexList := make(map[string]*Index)
+	indexList := make(map[string]*Index)
 	for _, systemIndex := range systemIndexList {
 
 		tempIndex, err := NewIndex(systemIndex, "disk")
@@ -27,19 +25,19 @@ func LoadZincSystemIndexes() (map[string]*Index, error) {
 			log.Print("Error loading system index: ", systemIndex, " : ", err.Error())
 			return nil, err
 		}
-		IndexList[systemIndex] = tempIndex
-		IndexList[systemIndex].IndexType = "system"
+		indexList[systemIndex] = tempIndex
+		indexList[systemIndex].IndexType = "system"
 		log.Print("Index loaded: " + systemIndex)
 	}
 
-	return IndexList, nil
+	return indexList, nil
 }
 
 func LoadZincIndexesFromDisk() (map[string]*Index, error) {
 	godotenv.Load()
 	log.Print("Loading indexes... from disk")
 
-	IndexList := make(map[string]*Index)
+	indexList := make(map[string]*Index)
 
 	DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
 
@@ -58,20 +56,21 @@ func LoadZincIndexesFromDisk() (map[string]*Index, error) {
 				iNameIsSystemIndex = true
 			}
 		}
+		if iNameIsSystemIndex {
+			continue
+		}
 
-		if !iNameIsSystemIndex {
-			tempIndex, err := NewIndex(iName, "disk")
-			if err != nil {
-				log.Print("Error loading index: ", iName, " : ", err.Error()) // inform and move in to next index
-			} else {
-				IndexList[iName] = tempIndex
-				IndexList[iName].IndexType = "user"
-				log.Print("Index loaded: " + iName)
-			}
+		tempIndex, err := NewIndex(iName, "disk")
+		if err != nil {
+			log.Print("Error loading index: ", iName, " : ", err.Error()) // inform and move in to next index
+		} else {
+			indexList[iName] = tempIndex
+			indexList[iName].IndexType = "user"
+			log.Print("Index loaded: " + iName)
 		}
 	}
 
-	return IndexList, nil
+	return indexList, nil
 }
 
 func LoadZincIndexesFromS3() (map[string]*Index, error) {
