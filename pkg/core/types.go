@@ -4,7 +4,6 @@ import (
 	"github.com/blugelabs/bluge"
 )
 
-// Nothing to handle in the error. If you can't load indexes then everything is broken.
 var ZINC_INDEX_LIST map[string]*Index
 
 var ZINC_SYSTEM_INDEX_LIST map[string]*Index

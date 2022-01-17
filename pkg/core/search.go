@@ -7,6 +7,7 @@ import (
 
 	"github.com/blugelabs/bluge"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
+	"github.com/prabhatsharma/zinc/pkg/startup"
 	"github.com/prabhatsharma/zinc/pkg/uquery"
 	"github.com/rs/zerolog/log"
 )
@@ -17,7 +18,10 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 	var searchRequest bluge.SearchRequest
 
 	if iQuery.MaxResults == 0 {
-		iQuery.MaxResults = 20
+		iQuery.MaxResults = 100
+	}
+	if iQuery.MaxResults > startup.MAX_RESULTS {
+		iQuery.MaxResults = startup.MAX_RESULTS
 	}
 
 	var err error
@@ -120,7 +124,7 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 		log.Printf("error iterating results: %v", err)
 	}
 
-	// fmt.Println("Got results after data load from disk in: ", time.Since(iterationStartTime))
+	// log.Println("Got results after data load from disk in: ", time.Since(iterationStartTime))
 	resp := v1.SearchResponse{
 		// Took: int(time.Since(searchStart).Milliseconds()),
 		Took:     int(dmi.Aggregations().Duration().Milliseconds()),

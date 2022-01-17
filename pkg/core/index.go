@@ -2,17 +2,15 @@ package core
 
 import (
 	"context"
+	"encoding/json"
 	"reflect"
 	"strconv"
 	"time"
 
-	"encoding/json"
-
+	"github.com/blugelabs/bluge"
 	"github.com/jeremywohl/flatten"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 	"github.com/rs/zerolog/log"
-
-	"github.com/blugelabs/bluge"
 )
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
@@ -38,7 +36,6 @@ func (rindex *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]in
 	for key, value := range flatDoc {
 		if _, ok := indexMapping[key]; !ok {
 			// Assign auto inferred type for the new key
-			// fmt.Println("Missing Existing Key in index: ", key)
 
 			// Use reflection to find the type of the value.
 			// Bluge requires the field type to be specified.

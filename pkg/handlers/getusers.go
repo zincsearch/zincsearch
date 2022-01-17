@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	auth "github.com/prabhatsharma/zinc/pkg/auth"
+	"github.com/prabhatsharma/zinc/pkg/auth"
 )
 
 func GetUsers(c *gin.Context) {
