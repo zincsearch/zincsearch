@@ -9,13 +9,14 @@ import (
 // ZincQuery is the query object for the zinc index. All search requests should send this struct
 type ZincQuery struct {
 	// SearchType is the type of search to perform. Can be match, match_phrase, query_string, etc
-	SearchType string         `json:"search_type"`
-	MaxResults int            `json:"max_results"`
-	From       int            `json:"from"`
-	Explain    bool           `json:"explain"`
-	Highlight  QueryHighlight `json:"highlight"`
-	Query      QueryParams    `json:"query"`
-	SortFields []string       `json:"sort_fields"`
+	SearchType   string                       `json:"search_type"`
+	MaxResults   int                          `json:"max_results"`
+	From         int                          `json:"from"`
+	Explain      bool                         `json:"explain"`
+	Highlight    QueryHighlight               `json:"highlight"`
+	Query        QueryParams                  `json:"query"`
+	Aggregations map[string]AggregationParams `json:"aggs"`
+	SortFields   []string                     `json:"sort_fields"`
 }
 
 type QueryParams struct {
@@ -25,6 +26,19 @@ type QueryParams struct {
 	Field     string     `json:"field"`
 	StartTime time.Time  `json:"start_time"`
 	EndTime   time.Time  `json:"end_time"`
+}
+
+type AggregationParams struct {
+	AggType string             `json:"agg_type"`
+	Field   string             `json:"field"`
+	Sort    string             `json:"sort"`
+	Size    int                `json:"size"`
+	Ranges  []AggregationRange `json:"ranges"`
+}
+
+type AggregationRange struct {
+	From interface{} `json:"from"`
+	To   interface{} `json:"to"`
 }
 
 type QueryHighlight struct {

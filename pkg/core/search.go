@@ -26,6 +26,13 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 
 	var err error
 
+	// DEBUG aggregation
+	if len(iQuery.Aggregations) > 0 {
+		resp := v1.SearchResponse{}
+
+		return resp, nil
+	}
+
 	switch iQuery.SearchType {
 	case "alldocuments":
 		searchRequest, err = uquery.AllDocuments(iQuery)

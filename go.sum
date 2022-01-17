@@ -51,8 +51,8 @@ github.com/blevesearch/snowballstem v0.9.0/go.mod h1:PivSj3JMc8WuaFkTSRDW2SlrulN
 github.com/blevesearch/vellum v1.0.5 h1:L5dJ7hKauRVbuH7I8uqLeSK92CPPY6FfrbAmLhAug8A=
 github.com/blevesearch/vellum v1.0.5/go.mod h1:atE0EH3fvk43zzS7t1YNdNC7DbmcC3uz+eMD5xZ2OyQ=
 github.com/blugelabs/bluge v0.1.7/go.mod h1:5d7LktUkQgvbh5Bmi6tPWtvo4+6uRTm6gAwP+5z6FqQ=
-github.com/blugelabs/bluge v0.1.8 h1:80O2EhbAlNykvPGA0SgHc7/9oKi1Xh/g0uk/4/9tksE=
-github.com/blugelabs/bluge v0.1.8/go.mod h1:5d7LktUkQgvbh5Bmi6tPWtvo4+6uRTm6gAwP+5z6FqQ=
+github.com/blugelabs/bluge v0.1.9 h1:bPgXlcsWugrXNjzeoLdOnvfJpHsyODKpYaAndayl/SM=
+github.com/blugelabs/bluge v0.1.9/go.mod h1:5d7LktUkQgvbh5Bmi6tPWtvo4+6uRTm6gAwP+5z6FqQ=
 github.com/blugelabs/bluge_segment_api v0.2.0 h1:cCX1Y2y8v0LZ7+EEJ6gH7dW6TtVTW4RhG0vp3R+N2Lo=
 github.com/blugelabs/bluge_segment_api v0.2.0/go.mod h1:95XA+ZXfRj/IXADm7gZ+iTcWOJPg5jQTY1EReIzl3LA=
 github.com/blugelabs/ice v0.2.0 h1:9N/TRBqAr43emheD1ptk9mohuT6xAVq83gesgE60Qqk=
