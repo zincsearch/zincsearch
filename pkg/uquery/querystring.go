@@ -9,7 +9,7 @@ import (
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 )
 
-func QueryStringQuery(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
+func QueryStringQuery(iQuery *v1.ZincQuery) (bluge.SearchRequest, error) {
 	options := querystr.DefaultOptions()
 	options.WithDefaultAnalyzer(analyzer.NewStandardAnalyzer())
 	userQuery, err := querystr.ParseQueryString(iQuery.Query.Term, options)

@@ -59,23 +59,19 @@ func GetAllUsersWorker() (v1.SearchResponse, error) {
 			Timestamp: user.Timestamp,
 			Source:    user,
 		}
+		Hits = append(Hits, hit)
 
 		next, err = dmi.Next()
-		// results = append(results, result)
-
-		Hits = append(Hits, hit)
 	}
 
 	resp := v1.SearchResponse{
-		// Took: int(time.Since(searchStart).Milliseconds()),
-		Took:     int(dmi.Aggregations().Duration().Milliseconds()),
-		MaxScore: dmi.Aggregations().Metric("max_score"),
-		// Buckets:  dmi.Aggregations().Buckets("@timestamp"),
+		Took: int(dmi.Aggregations().Duration().Milliseconds()),
 		Hits: v1.Hits{
 			Total: v1.Total{
 				Value: int(dmi.Aggregations().Count()),
 			},
-			Hits: Hits,
+			MaxScore: dmi.Aggregations().Metric("max_score"),
+			Hits:     Hits,
 		},
 	}
 

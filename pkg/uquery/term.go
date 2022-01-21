@@ -5,7 +5,7 @@ import (
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 )
 
-func TermQuery(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
+func TermQuery(iQuery *v1.ZincQuery) (bluge.SearchRequest, error) {
 	dateQuery := bluge.NewDateRangeQuery(iQuery.Query.StartTime, iQuery.Query.EndTime).SetField("@timestamp")
 
 	var field string

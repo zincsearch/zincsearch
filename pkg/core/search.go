@@ -12,27 +12,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
+func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 	var Hits []v1.Hit
 
 	var searchRequest bluge.SearchRequest
-
-	if iQuery.MaxResults == 0 {
-		iQuery.MaxResults = 100
-	}
 	if iQuery.MaxResults > startup.MAX_RESULTS {
 		iQuery.MaxResults = startup.MAX_RESULTS
 	}
 
 	var err error
-
-	// DEBUG aggregation
-	if len(iQuery.Aggregations) > 0 {
-		resp := v1.SearchResponse{}
-
-		return resp, nil
-	}
-
 	switch iQuery.SearchType {
 	case "alldocuments":
 		searchRequest, err = uquery.AllDocuments(iQuery)
@@ -62,26 +50,25 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 	}
 
 	if err != nil {
-		resp := v1.SearchResponse{
+		return v1.SearchResponse{
 			Error: err.Error(),
-		}
-
-		return resp, err
+		}, err
 	}
 
-	// sample time range aggregation start
-	// timestampAggregation := aggregations.DateRanges(search.Field("@timestamp"))
-	// daterange1 := aggregations.NewDateRange(time.Now().Add(-time.Hour*24*30), time.Now())
-	// timestampAggregation.AddRange(daterange1)
-	// searchRequest.AddAggregation("@timestamp", timestampAggregation)
-	// sample time range aggregation end
+	// handle aggregations
+	mapping, _ := index.GetStoredMapping()
+	err = uquery.AddAggregations(searchRequest, iQuery.Aggregations, mapping)
+	if err != nil {
+		return v1.SearchResponse{
+			Error: err.Error(),
+		}, err
+	}
 
-	writer := index.Writer
-
-	reader, err := writer.Reader()
+	reader, err := index.Writer.Reader()
 	if err != nil {
 		log.Printf("error accessing reader: %v", err)
 	}
+	defer reader.Close()
 
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
@@ -90,7 +77,6 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 
 	// highlighter := highlight.NewANSIHighlighter()
 
-	// iterationStartTime := time.Now()
 	next, err := dmi.Next()
 	for err == nil && next != nil {
 		var result map[string]interface{}
@@ -121,31 +107,36 @@ func (index *Index) Search(iQuery v1.ZincQuery) (v1.SearchResponse, error) {
 			Timestamp: timestamp,
 			Source:    result,
 		}
+		Hits = append(Hits, hit)
 
 		next, err = dmi.Next()
-		// results = append(results, result)
-
-		Hits = append(Hits, hit)
 	}
 	if err != nil {
 		log.Printf("error iterating results: %v", err)
 	}
 
-	// log.Println("Got results after data load from disk in: ", time.Since(iterationStartTime))
 	resp := v1.SearchResponse{
-		// Took: int(time.Since(searchStart).Milliseconds()),
-		Took:     int(dmi.Aggregations().Duration().Milliseconds()),
-		MaxScore: dmi.Aggregations().Metric("max_score"),
-		// Buckets:  dmi.Aggregations().Buckets("@timestamp"),
+		Took: int(dmi.Aggregations().Duration().Milliseconds()),
 		Hits: v1.Hits{
 			Total: v1.Total{
 				Value: int(dmi.Aggregations().Count()),
 			},
-			Hits: Hits,
+			MaxScore: dmi.Aggregations().Metric("max_score"),
+			Hits:     Hits,
 		},
 	}
 
-	reader.Close()
+	if len(iQuery.Aggregations) > 0 {
+		resp.Aggregations, err = uquery.ParseAggregations(dmi.Aggregations())
+		if err != nil {
+			log.Printf("error parse aggregation results: %v", err)
+		}
+		if len(resp.Aggregations) > 0 {
+			delete(resp.Aggregations, "count")
+			delete(resp.Aggregations, "duration")
+			delete(resp.Aggregations, "max_score")
+		}
+	}
 
 	return resp, nil
 }

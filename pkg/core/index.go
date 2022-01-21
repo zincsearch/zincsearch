@@ -63,28 +63,29 @@ func (rindex *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]in
 		if value != nil {
 			switch indexMapping[key] {
 			case "text": // found using existing index mapping
-				stringField := bluge.NewTextField(key, value.(string)).SearchTermPositions()
+				stringField := bluge.NewTextField(key, value.(string)).SearchTermPositions().Aggregatable()
 				bdoc.AddField(stringField)
 			case "numeric": // found using existing index mapping
-				numericField := bluge.NewNumericField(key, value.(float64))
+				numericField := bluge.NewNumericField(key, value.(float64)).Aggregatable()
 				bdoc.AddField(numericField)
 			case "keyword": // found using existing index mapping
 				value := value.(bool)
-				keywordField := bluge.NewKeywordField(key, strconv.FormatBool(value))
+				keywordField := bluge.NewKeywordField(key, strconv.FormatBool(value)).Aggregatable()
 				bdoc.AddField(keywordField)
 			case "time": // found using existing index mapping
-				timeField := bluge.NewDateTimeField(key, value.(time.Time))
+				timeField := bluge.NewDateTimeField(key, value.(time.Time)).Aggregatable()
 				bdoc.AddField(timeField)
 			}
 		}
 	}
 
 	if indexMappingNeedsUpdate {
+		indexMapping["@timestamp"] = "time" // time need date_histogram aggregation
 		rindex.SetMapping(indexMapping)
 	}
 
 	docByteVal, _ := json.Marshal(*doc)
-	bdoc.AddField(bluge.NewDateTimeField("@timestamp", time.Now()).StoreValue())
+	bdoc.AddField(bluge.NewDateTimeField("@timestamp", time.Now()).StoreValue().Aggregatable())
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil)) // Add _all field that can be used for search
 
@@ -95,8 +96,6 @@ func (rindex *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]in
 // index: Name of the index ffor which the mapping needs to be saved
 // iMap: a map of the fileds that specify name and type of the field. e.g. movietitle: string
 func (index *Index) SetMapping(iMap map[string]string) error {
-
-	// Create a new bluge document
 	bdoc := bluge.NewDocument(index.Name)
 
 	for k, v := range iMap {

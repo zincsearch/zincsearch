@@ -2,8 +2,6 @@ package v1
 
 import (
 	"time"
-
-	"github.com/blugelabs/bluge/search"
 )
 
 // ZincQuery is the query object for the zinc index. All search requests should send this struct
@@ -29,16 +27,22 @@ type QueryParams struct {
 }
 
 type AggregationParams struct {
-	AggType string             `json:"agg_type"`
-	Field   string             `json:"field"`
-	Sort    string             `json:"sort"`
-	Size    int                `json:"size"`
-	Ranges  []AggregationRange `json:"ranges"`
+	AggType      string                       `json:"agg_type"`
+	Field        string                       `json:"field"`
+	Size         int                          `json:"size"`
+	Ranges       []AggregationNumberRange     `json:"ranges"`
+	DateRanges   []AggregationDateRange       `json:"date_ranges"`
+	Aggregations map[string]AggregationParams `json:"aggs"`
 }
 
-type AggregationRange struct {
-	From interface{} `json:"from"`
-	To   interface{} `json:"to"`
+type AggregationNumberRange struct {
+	From float64 `json:"from"`
+	To   float64 `json:"to"`
+}
+
+type AggregationDateRange struct {
+	From time.Time `json:"from"`
+	To   time.Time `json:"to"`
 }
 
 type QueryHighlight struct {
@@ -48,17 +52,17 @@ type QueryHighlight struct {
 
 // SearchResponse for a query
 type SearchResponse struct {
-	Took     int              `json:"took"` // Time it took to generate the response
-	TimedOut bool             `json:"timed_out"`
-	MaxScore float64          `json:"max_score"`
-	Hits     Hits             `json:"hits"`
-	Buckets  []*search.Bucket `json:"buckets"`
-	Error    string           `json:"error"`
+	Took         int                            `json:"took"` // Time it took to generate the response
+	TimedOut     bool                           `json:"timed_out"`
+	Hits         Hits                           `json:"hits"`
+	Aggregations map[string]AggregationResponse `json:"aggregations,omitempty"`
+	Error        string                         `json:"error"`
 }
 
 type Hits struct {
-	Total Total `json:"total"`
-	Hits  []Hit `json:"hits"`
+	Total    Total   `json:"total"`
+	MaxScore float64 `json:"max_score"`
+	Hits     []Hit   `json:"hits"`
 }
 
 type Hit struct {
@@ -72,4 +76,15 @@ type Hit struct {
 
 type Total struct {
 	Value int `json:"value"` // Count of documents returned
+}
+
+type AggregationResponse struct {
+	Value   interface{}         `json:"value,omitempty"`
+	Buckets []AggregationBucket `json:"buckets,omitempty"`
+}
+
+type AggregationBucket struct {
+	Key          string                         `json:"key"`
+	DocCount     uint64                         `json:"doc_count"`
+	Aggregations map[string]AggregationResponse `json:"aggregations,omitempty"`
 }
