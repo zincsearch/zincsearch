@@ -31,7 +31,7 @@ func AddAggregations(req aggregationx.SearchAggregation, aggs map[string]v1.Aggr
 			case "numeric":
 				subreq = aggregationx.NewTermsAggregation(search.Field(agg.Field), aggregationx.NumericValueSource, agg.Size)
 			default:
-				return fmt.Errorf("terms aggregation not support type [%v]", mapping[agg.Field])
+				return fmt.Errorf("terms aggregation not support type [%s:[%v]]", agg.Field, mapping[agg.Field])
 			}
 			if len(agg.Aggregations) > 0 {
 				if err := AddAggregations(subreq, agg.Aggregations, mapping); err != nil {

@@ -8,7 +8,6 @@ import (
 
 func MatchQuery(iQuery *v1.ZincQuery) (bluge.SearchRequest, error) {
 	dateQuery := bluge.NewDateRangeQuery(iQuery.Query.StartTime, iQuery.Query.EndTime).SetField("@timestamp")
-	dateQuery.SetField("@timestamp")
 
 	var field string
 	if iQuery.Query.Field != "" {

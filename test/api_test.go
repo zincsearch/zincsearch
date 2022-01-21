@@ -517,5 +517,55 @@ func TestApiStandard(t *testing.T) {
 				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			})
 		})
+
+		Convey("POST /api/:target/_search with aggregations", func() {
+			Convey("terms aggregation", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{
+					"search_type": "matchall", 
+					"aggs": {
+						"my-agg": {
+							"agg_type": "terms",
+							"field": "City"
+						}
+					}
+				}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(len(data.Aggregations), ShouldBeGreaterThanOrEqualTo, 1)
+			})
+
+			Convey("metric aggregation", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{
+					"search_type": "matchall", 
+					"aggs": {
+						"my-agg-max": {
+							"agg_type": "max",
+							"field": "Year"
+						},
+						"my-agg-min": {
+							"agg_type": "min",
+							"field": "Year"
+						},
+						"my-agg-avg": {
+							"agg_type": "avg",
+							"field": "Year"
+						}
+					}
+				}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(len(data.Aggregations), ShouldBeGreaterThanOrEqualTo, 1)
+			})
+		})
 	})
 }
