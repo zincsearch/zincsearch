@@ -3,16 +3,14 @@ package handlers
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"io"
-
-	"github.com/rs/zerolog/log"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/index"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/prabhatsharma/zinc/pkg/core"
+	"github.com/rs/zerolog/log"
 )
 
 func BulkHandler(c *gin.Context) {
@@ -163,8 +161,7 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 		// Persist the batch to the index
 		err := writer.Batch(batch[indexN])
 		if err != nil {
-			fmt.Println("Error updating batch: ", err.Error())
-			log.Print(err)
+			log.Printf("Error updating batch: %v", err)
 			return err
 		}
 	}

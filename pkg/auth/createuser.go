@@ -1,12 +1,12 @@
 package auth
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/blugelabs/bluge"
 	"github.com/google/uuid"
 	"github.com/prabhatsharma/zinc/pkg/core"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/argon2"
 )
 
@@ -57,7 +57,7 @@ func CreateUser(userId, name, plaintextPassword, role string) (*ZincUser, error)
 
 	err = usersIndexWriter.Update(bdoc.ID(), bdoc)
 	if err != nil {
-		fmt.Println("error updating document:", err)
+		log.Printf("error updating document: %v", err)
 		return nil, err
 	}
 

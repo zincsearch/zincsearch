@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -111,7 +110,7 @@ func deleteFilesForIndexFromS3(indexName string) error {
 		fileList = append(fileList, types.ObjectIdentifier{
 			Key: object.Key,
 		})
-		fmt.Println("Deleting: ", *object.Key)
+		log.Print("Deleting: ", *object.Key)
 	}
 
 	doi := &s3.DeleteObjectsInput{

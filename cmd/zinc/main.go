@@ -3,17 +3,16 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	zerolog "github.com/rs/zerolog/log"
-
 	"github.com/prabhatsharma/zinc/pkg/routes"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		zerolog.Print("Error loading .env file")
+		log.Print("Error loading .env file")
 	}
 
 	r := gin.New()

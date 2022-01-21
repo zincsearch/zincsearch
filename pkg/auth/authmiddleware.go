@@ -4,10 +4,9 @@ import (
 	"context"
 
 	"github.com/blugelabs/bluge"
+	"github.com/gin-gonic/gin"
 	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/rs/zerolog/log"
-
-	"github.com/gin-gonic/gin"
 )
 
 func ZincAuthMiddleware(c *gin.Context) {
@@ -17,7 +16,6 @@ func ZincAuthMiddleware(c *gin.Context) {
 	if hasAuth {
 		result, _ := VerifyCredentials(user, password)
 		if result {
-			// log.Print("auth: success")
 			c.Next()
 		} else {
 			c.AbortWithStatusJSON(401, gin.H{
