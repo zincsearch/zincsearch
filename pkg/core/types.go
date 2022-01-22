@@ -32,7 +32,7 @@ type Mappings struct {
 }
 
 type Properties struct {
-	Type     string `json:"type"`     // field type: text, keyword, numeric, bool, time
-	Analyzer string `json:"analyzer"` // TODO: The analyzer which should be used for the text field, both at index-time and at search-time
-	Index    bool   `json:"index"`    // TODO: Should the field be searchable? Accepts true (default) or false.
+	Type string `json:"type"` // field type: text, keyword, numeric, bool, time
+	// Analyzer string `json:"analyzer"` // TODO: The analyzer which should be used for the text field, both at index-time and at search-time
+	// Index    bool   `json:"index"`    // TODO: Should the field be searchable? Accepts true (default) or false.
 }

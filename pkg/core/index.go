@@ -84,7 +84,11 @@ func (rindex *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]in
 				keywordField := bluge.NewKeywordField(key, strconv.FormatBool(value)).Aggregatable()
 				bdoc.AddField(keywordField)
 			case "time":
-				timeField := bluge.NewDateTimeField(key, value.(time.Time)).Aggregatable()
+				tim, err := time.Parse(time.RFC3339, value.(string))
+				if err != nil {
+					return nil, err
+				}
+				timeField := bluge.NewDateTimeField(key, tim).Aggregatable()
 				bdoc.AddField(timeField)
 			}
 		}
@@ -131,18 +135,16 @@ func (index *Index) SetMapping(iMap map[string]string) error {
 
 // GetStoredMapping returns the mappings of all the indexes from _index_mapping system index
 func (index *Index) GetStoredMapping() (map[string]string, error) {
-
 	DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
-
 	systemPath := DATA_PATH + "/_index_mapping"
 
 	config := bluge.DefaultConfig(systemPath)
-
 	reader, err := bluge.OpenReader(config)
 	if err != nil {
 		return nil, nil //probably no system index available
 		// log.Fatalf("GetIndexMapping: unable to open reader: %v", err)
 	}
+	defer reader.Close()
 
 	// search for the index mapping _index_mapping index
 	query := bluge.NewTermQuery(index.Name).SetField("_id")
@@ -154,29 +156,21 @@ func (index *Index) GetStoredMapping() (map[string]string, error) {
 	}
 
 	next, err := dmi.Next()
-
 	if err != nil {
 		return nil, err
 	}
 
 	if next != nil {
 		result := make(map[string]string)
-
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
-
 			result[field] = string(value)
 			return true
 		})
 		if err != nil {
 			return nil, err
 		}
-
 		return result, nil
-
 	}
 
-	reader.Close()
-
 	return nil, nil
-
 }

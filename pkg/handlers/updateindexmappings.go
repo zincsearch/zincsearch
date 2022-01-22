@@ -8,7 +8,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
-func UpdateIndexMapping(c *gin.Context) {
+func UpdateIndexMappings(c *gin.Context) {
 	indexName := c.Param("target")
 	if indexName == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "index.name should be not empty"})

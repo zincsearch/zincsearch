@@ -57,8 +57,8 @@ func SetRoutes(r *gin.Engine) {
 	r.PUT("/api/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 	r.POST("/api/:target/_search", auth.ZincAuthMiddleware, handlers.SearchIndex)
 	r.DELETE("/api/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
-	r.GET("/api/:target/_mapping", auth.ZincAuthMiddleware, handlers.GetIndexMapping)
-	r.PUT("/api/:target/_mapping", auth.ZincAuthMiddleware, handlers.UpdateIndexMapping)
+	r.GET("/api/:target/_mappings", auth.ZincAuthMiddleware, handlers.GetIndexMappings)
+	r.PUT("/api/:target/_mappings", auth.ZincAuthMiddleware, handlers.UpdateIndexMappings)
 
 	// elastic compatible APIs
 	// Deprecated - /es/*  will be removed from zinc in future releases and replaced with /api/*
@@ -67,6 +67,7 @@ func SetRoutes(r *gin.Engine) {
 
 	// Index - https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
 
+	r.PUT("/es/:target/_mappings", auth.ZincAuthMiddleware, handlers.UpdateIndexMappings)
 	r.PUT("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 
 	r.DELETE("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)

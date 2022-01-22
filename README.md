@@ -347,6 +347,43 @@ Get the list of existing indexes
 e.g. 
 GET http://localhost:4080/api/index
 
+## UpdateMappings - Create/Update an index mappings
+Endpoint - PUT /api/:target/_mappings
+
+Create/Update a index mappings
+
+e.g.
+
+PUT http://localhost:4080/api/:target/_mappings
+
+Payload: 
+
+```json
+{
+	"mappings": {
+		"properties": {
+			"name": {
+				"type": "text"
+			},
+			"author": {
+				"type": "keyword"
+			},
+			"price": {
+				"type": "numeric"
+			},
+			"published": {
+				"type": "bool"
+			},
+			"create_at": {
+				"type": "time"
+			}
+		}
+	}
+}
+```
+
+mappings also can defines when create index.
+
 ## UpdateDocument - Create/Update a document and index it for searches
 Endpoint - PUT /api/:target/document
 
