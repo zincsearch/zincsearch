@@ -42,10 +42,7 @@ func NewIndex(name string, storageType string) (*Index, error) {
 	return index, nil
 }
 
-func IndexExists(index string) (bool, string) {
-	if _, ok := ZINC_INDEX_LIST[index]; ok {
-		return true, ZINC_INDEX_LIST[index].StorageType
-	}
-
-	return false, ""
+func IndexExists(indexName string) (*Index, bool) {
+	index, ok := ZINC_INDEX_LIST[indexName]
+	return index, ok
 }

@@ -6,10 +6,7 @@ import (
 )
 
 func DeleteUser(c *gin.Context) {
-
-	userID := c.Param("userID")
-
 	c.JSON(200, gin.H{
-		"deleted": auth.DeleteUser(userID),
+		"deleted": auth.DeleteUser(c.Param("userID")),
 	})
 }

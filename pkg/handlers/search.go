@@ -13,9 +13,9 @@ import (
 // SearchIndex searches the index for the given http request from end user
 func SearchIndex(c *gin.Context) {
 	indexName := c.Param("target")
-	indexExists, _ := core.IndexExists(indexName)
-	if !indexExists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index '" + indexName + "' does not exist"})
+	index, exists := core.IndexExists(indexName)
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index '" + indexName + "' does not exists"})
 		return
 	}
 
@@ -26,7 +26,6 @@ func SearchIndex(c *gin.Context) {
 		return
 	}
 
-	index := core.ZINC_INDEX_LIST[indexName]
 	res, err := index.Search(&iQuery)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -7,13 +7,11 @@ import (
 
 func GetUsers(c *gin.Context) {
 	res, err := auth.GetAllUsersWorker()
-
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
-
 	c.JSON(200, res)
 }

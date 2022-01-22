@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"strconv"
 	"time"
@@ -50,29 +51,39 @@ func (rindex *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]in
 				case "float64":
 					indexMapping[key] = "numeric"
 				case "bool":
-					indexMapping[key] = "keyword"
+					indexMapping[key] = "bool"
 				case "time.Time":
 					indexMapping[key] = "time"
 				}
 
 				indexMappingNeedsUpdate = true
 			}
-
 		}
 
 		if value != nil {
 			switch indexMapping[key] {
-			case "text": // found using existing index mapping
+			case "text":
 				stringField := bluge.NewTextField(key, value.(string)).SearchTermPositions().Aggregatable()
 				bdoc.AddField(stringField)
-			case "numeric": // found using existing index mapping
+			case "numeric":
 				numericField := bluge.NewNumericField(key, value.(float64)).Aggregatable()
 				bdoc.AddField(numericField)
-			case "keyword": // found using existing index mapping
+			case "keyword":
+				// compatible verion <= v0.1.4
+				var keywordField *bluge.TermField
+				if v, ok := value.(bool); ok {
+					keywordField = bluge.NewKeywordField(key, strconv.FormatBool(v)).Aggregatable()
+				} else if v, ok := value.(string); ok {
+					keywordField = bluge.NewKeywordField(key, v).Aggregatable()
+				} else {
+					return nil, fmt.Errorf("keyword type only support text")
+				}
+				bdoc.AddField(keywordField)
+			case "bool": // found using existing index mapping
 				value := value.(bool)
 				keywordField := bluge.NewKeywordField(key, strconv.FormatBool(value)).Aggregatable()
 				bdoc.AddField(keywordField)
-			case "time": // found using existing index mapping
+			case "time":
 				timeField := bluge.NewDateTimeField(key, value.(time.Time)).Aggregatable()
 				bdoc.AddField(timeField)
 			}
