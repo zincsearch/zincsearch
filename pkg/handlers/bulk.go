@@ -83,13 +83,12 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 				batch[indexName] = index.NewBatch()
 			}
 
-			_, exists := core.IndexExists(indexName)
+			_, exists := core.GetIndex(indexName)
 			if !exists { // If the requested indexName does not exist then create it
 				newIndex, err := core.NewIndex(indexName, "disk")
 				if err != nil {
 					return err
 				}
-
 				core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
 			}
 

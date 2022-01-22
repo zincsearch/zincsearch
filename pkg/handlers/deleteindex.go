@@ -10,9 +10,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/blugelabs/bluge"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
+
 	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
-	"github.com/rs/zerolog/log"
 )
 
 // DeleteIndex deletes a zinc index and its associated data. Be careful using thus as you ca't undo this action.
@@ -20,7 +21,7 @@ func DeleteIndex(c *gin.Context) {
 	indexName := c.Param("indexName")
 
 	// 0. Check if index exists and Get the index storage type - disk, s3 or memory
-	index, exists := core.IndexExists(indexName)
+	index, exists := core.GetIndex(indexName)
 	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + "does not exists"})
 		return

@@ -119,7 +119,7 @@ func TestApiStandard(t *testing.T) {
 				body.WriteString(fmt.Sprintf(`{"name":"%s","storage_type":"disk"}`, "newindex"))
 				resp := request("PUT", "/api/index", body)
 				So(resp.Code, ShouldEqual, http.StatusOK)
-				So(resp.Body.String(), ShouldEqual, `{"result":"Index: newindex created","storage_type":"disk"}`)
+				So(resp.Body.String(), ShouldEqual, `{"message":"index newindex created","storage_type":"disk"}`)
 			})
 			Convey("create index with error input", func() {
 				body := bytes.NewBuffer(nil)

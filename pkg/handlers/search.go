@@ -13,7 +13,7 @@ import (
 // SearchIndex searches the index for the given http request from end user
 func SearchIndex(c *gin.Context) {
 	indexName := c.Param("target")
-	index, exists := core.IndexExists(indexName)
+	index, exists := core.GetIndex(indexName)
 	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "index '" + indexName + "' does not exists"})
 		return
