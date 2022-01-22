@@ -61,7 +61,7 @@ func FormatMapping(mappings *Mappings) (map[string]string, error) {
 		case "date", "datetime":
 			ptype = "time"
 		default:
-			return nil, fmt.Errorf("mappings unsupport type: %s", prop.Type)
+			return nil, fmt.Errorf("mappings unsupport type: [%s] for field [%s]", prop.Type, field)
 		}
 		newMappings[field] = ptype
 	}
