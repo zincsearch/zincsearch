@@ -119,7 +119,7 @@ func TestApiStandard(t *testing.T) {
 				body.WriteString(fmt.Sprintf(`{"name":"%s","storage_type":"disk"}`, "newindex"))
 				resp := request("PUT", "/api/index", body)
 				So(resp.Code, ShouldEqual, http.StatusOK)
-				So(resp.Body.String(), ShouldEqual, `{"result":"Index: newindex created","storage_type":"disk"}`)
+				So(resp.Body.String(), ShouldEqual, `{"message":"index newindex created","storage_type":"disk"}`)
 			})
 			Convey("create index with error input", func() {
 				body := bytes.NewBuffer(nil)
@@ -515,6 +515,56 @@ func TestApiStandard(t *testing.T) {
 				err := json.Unmarshal(resp.Body.Bytes(), data)
 				So(err, ShouldBeNil)
 				So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
+			})
+		})
+
+		Convey("POST /api/:target/_search with aggregations", func() {
+			Convey("terms aggregation", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{
+					"search_type": "matchall", 
+					"aggs": {
+						"my-agg": {
+							"agg_type": "terms",
+							"field": "City"
+						}
+					}
+				}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(len(data.Aggregations), ShouldBeGreaterThanOrEqualTo, 1)
+			})
+
+			Convey("metric aggregation", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{
+					"search_type": "matchall", 
+					"aggs": {
+						"my-agg-max": {
+							"agg_type": "max",
+							"field": "Year"
+						},
+						"my-agg-min": {
+							"agg_type": "min",
+							"field": "Year"
+						},
+						"my-agg-avg": {
+							"agg_type": "avg",
+							"field": "Year"
+						}
+					}
+				}`)
+				resp := request("POST", "/api/"+indexName+"/_search", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := new(meta.SearchResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), data)
+				So(err, ShouldBeNil)
+				So(len(data.Aggregations), ShouldBeGreaterThanOrEqualTo, 1)
 			})
 		})
 	})

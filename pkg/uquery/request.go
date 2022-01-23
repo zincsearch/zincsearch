@@ -6,7 +6,7 @@ import (
 )
 
 // buildRequest combines the ZincQuery with the bluge Query to create a SearchRequest
-func buildRequest(iQuery v1.ZincQuery, query bluge.Query) bluge.SearchRequest {
+func buildRequest(iQuery *v1.ZincQuery, query bluge.Query) bluge.SearchRequest {
 	return bluge.NewTopNSearch(iQuery.MaxResults, query).
 		SetFrom(iQuery.From).
 		SortBy(iQuery.SortFields).

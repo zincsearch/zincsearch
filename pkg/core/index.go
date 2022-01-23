@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"strconv"
 	"time"
@@ -50,41 +51,56 @@ func (rindex *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]in
 				case "float64":
 					indexMapping[key] = "numeric"
 				case "bool":
-					indexMapping[key] = "keyword"
+					indexMapping[key] = "bool"
 				case "time.Time":
 					indexMapping[key] = "time"
 				}
 
 				indexMappingNeedsUpdate = true
 			}
-
 		}
 
 		if value != nil {
 			switch indexMapping[key] {
-			case "text": // found using existing index mapping
-				stringField := bluge.NewTextField(key, value.(string)).SearchTermPositions()
+			case "text":
+				stringField := bluge.NewTextField(key, value.(string)).SearchTermPositions().Aggregatable()
 				bdoc.AddField(stringField)
-			case "numeric": // found using existing index mapping
-				numericField := bluge.NewNumericField(key, value.(float64))
+			case "numeric":
+				numericField := bluge.NewNumericField(key, value.(float64)).Aggregatable()
 				bdoc.AddField(numericField)
-			case "keyword": // found using existing index mapping
-				value := value.(bool)
-				keywordField := bluge.NewKeywordField(key, strconv.FormatBool(value))
+			case "keyword":
+				// compatible verion <= v0.1.4
+				var keywordField *bluge.TermField
+				if v, ok := value.(bool); ok {
+					keywordField = bluge.NewKeywordField(key, strconv.FormatBool(v)).Aggregatable()
+				} else if v, ok := value.(string); ok {
+					keywordField = bluge.NewKeywordField(key, v).Aggregatable()
+				} else {
+					return nil, fmt.Errorf("keyword type only support text")
+				}
 				bdoc.AddField(keywordField)
-			case "time": // found using existing index mapping
-				timeField := bluge.NewDateTimeField(key, value.(time.Time))
+			case "bool": // found using existing index mapping
+				value := value.(bool)
+				keywordField := bluge.NewKeywordField(key, strconv.FormatBool(value)).Aggregatable()
+				bdoc.AddField(keywordField)
+			case "time":
+				tim, err := time.Parse(time.RFC3339, value.(string))
+				if err != nil {
+					return nil, err
+				}
+				timeField := bluge.NewDateTimeField(key, tim).Aggregatable()
 				bdoc.AddField(timeField)
 			}
 		}
 	}
 
 	if indexMappingNeedsUpdate {
+		indexMapping["@timestamp"] = "time" // time need date_histogram aggregation
 		rindex.SetMapping(indexMapping)
 	}
 
 	docByteVal, _ := json.Marshal(*doc)
-	bdoc.AddField(bluge.NewDateTimeField("@timestamp", time.Now()).StoreValue())
+	bdoc.AddField(bluge.NewDateTimeField("@timestamp", time.Now()).StoreValue().Aggregatable())
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil)) // Add _all field that can be used for search
 
@@ -95,8 +111,6 @@ func (rindex *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]in
 // index: Name of the index ffor which the mapping needs to be saved
 // iMap: a map of the fileds that specify name and type of the field. e.g. movietitle: string
 func (index *Index) SetMapping(iMap map[string]string) error {
-
-	// Create a new bluge document
 	bdoc := bluge.NewDocument(index.Name)
 
 	for k, v := range iMap {
@@ -121,18 +135,16 @@ func (index *Index) SetMapping(iMap map[string]string) error {
 
 // GetStoredMapping returns the mappings of all the indexes from _index_mapping system index
 func (index *Index) GetStoredMapping() (map[string]string, error) {
-
 	DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
-
 	systemPath := DATA_PATH + "/_index_mapping"
 
 	config := bluge.DefaultConfig(systemPath)
-
 	reader, err := bluge.OpenReader(config)
 	if err != nil {
 		return nil, nil //probably no system index available
 		// log.Fatalf("GetIndexMapping: unable to open reader: %v", err)
 	}
+	defer reader.Close()
 
 	// search for the index mapping _index_mapping index
 	query := bluge.NewTermQuery(index.Name).SetField("_id")
@@ -144,29 +156,21 @@ func (index *Index) GetStoredMapping() (map[string]string, error) {
 	}
 
 	next, err := dmi.Next()
-
 	if err != nil {
 		return nil, err
 	}
 
 	if next != nil {
 		result := make(map[string]string)
-
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
-
 			result[field] = string(value)
 			return true
 		})
 		if err != nil {
 			return nil, err
 		}
-
 		return result, nil
-
 	}
 
-	reader.Close()
-
 	return nil, nil
-
 }

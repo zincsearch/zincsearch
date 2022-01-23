@@ -6,9 +6,7 @@ import (
 )
 
 func ValidateCredentials(c *gin.Context) {
-
 	var user auth.ZincUser
-
 	c.BindJSON(&user)
 
 	validationResult, loggedInUser := auth.VerifyCredentials(user.ID, user.Password)

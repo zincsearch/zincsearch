@@ -5,8 +5,7 @@ import (
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 )
 
-func WildcardQuery(iQuery v1.ZincQuery) (bluge.SearchRequest, error) {
-	// requestedIndex := startup.INDEX_WRITER_LIST[indexName]
+func WildcardQuery(iQuery *v1.ZincQuery) (bluge.SearchRequest, error) {
 	dateQuery := bluge.NewDateRangeQuery(iQuery.Query.StartTime, iQuery.Query.EndTime).SetField("@timestamp")
 
 	var field string

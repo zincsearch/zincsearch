@@ -9,8 +9,9 @@ import (
 	"github.com/blugelabs/bluge/index"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/rs/zerolog/log"
+
+	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
 func BulkHandler(c *gin.Context) {
@@ -82,20 +83,16 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 				batch[indexName] = index.NewBatch()
 			}
 
-			exists, _ := core.IndexExists(indexName)
-
+			_, exists := core.GetIndex(indexName)
 			if !exists { // If the requested indexName does not exist then create it
 				newIndex, err := core.NewIndex(indexName, "disk")
-
 				if err != nil {
 					return err
 				}
-
 				core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
 			}
 
 			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(id, &doc)
-
 			if err != nil {
 				return err
 			}
@@ -155,9 +152,7 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 	}
 
 	for _, indexN := range indexesInThisBatch {
-
 		writer := core.ZINC_INDEX_LIST[indexN].Writer
-
 		// Persist the batch to the index
 		err := writer.Batch(batch[indexN])
 		if err != nil {

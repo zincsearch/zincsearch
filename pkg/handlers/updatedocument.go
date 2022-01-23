@@ -10,12 +10,10 @@ import (
 )
 
 func UpdateDocument(c *gin.Context) {
-
 	indexName := c.Param("target")
 	query_id := c.Param("id") // ID for the document to be updated provided in URL path
 
 	var doc map[string]interface{}
-
 	c.BindJSON(&doc)
 
 	docID := ""
@@ -31,27 +29,23 @@ func UpdateDocument(c *gin.Context) {
 		mintedID = true
 	}
 
+	var err error
 	// If the index does not exist, then create it
-	exists, _ := core.IndexExists(indexName)
+	index, exists := core.GetIndex(indexName)
 	if !exists {
-		newIndex, err := core.NewIndex(indexName, "disk") // Create a new index with disk storage as default
-
+		index, err = core.NewIndex(indexName, "disk") // Create a new index with disk storage as default
 		if err != nil {
 			log.Print(err)
 			c.JSON(http.StatusInternalServerError, err)
+			return
 		}
-		core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
+		core.ZINC_INDEX_LIST[indexName] = index // Load the index in memory
 	}
 
-	index := core.ZINC_INDEX_LIST[indexName]
-
 	// doc, _ = flatten.Flatten(doc, "", flatten.DotStyle)
-
-	err := index.UpdateDocument(docID, &doc, mintedID)
-
+	err = index.UpdateDocument(docID, &doc, mintedID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-
 	} else {
 		c.JSON(http.StatusOK, gin.H{"id": docID})
 	}

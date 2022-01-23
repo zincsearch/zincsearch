@@ -4,33 +4,33 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
-func CreateIndex(c *gin.Context) {
-	var newIndex core.Index
-	c.BindJSON(&newIndex)
-
-	if newIndex.Name == "" {
+func UpdateIndexMappings(c *gin.Context) {
+	indexName := c.Param("target")
+	if indexName == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "index.name should be not empty"})
 		return
 	}
 
+	var newIndex core.Index
+	c.BindJSON(&newIndex)
 	mappings, err := core.FormatMapping(&newIndex.Mappings)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	var ok bool
-	var index *core.Index
-	if index, ok = core.GetIndex(newIndex.Name); !ok {
-		index, err = core.NewIndex(newIndex.Name, newIndex.StorageType)
+	index, exists := core.GetIndex(indexName)
+	if !exists {
+		index, err = core.NewIndex(indexName, newIndex.StorageType)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		core.ZINC_INDEX_LIST[newIndex.Name] = index
+		core.ZINC_INDEX_LIST[indexName] = index
 	}
 
 	// update mapping
@@ -38,8 +38,5 @@ func CreateIndex(c *gin.Context) {
 		index.SetMapping(mappings)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":      "index " + newIndex.Name + " created",
-		"storage_type": newIndex.StorageType,
-	})
+	c.JSON(http.StatusOK, gin.H{"message": "ok"})
 }

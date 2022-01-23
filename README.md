@@ -27,7 +27,8 @@ Join slack channel
 4. Compatibility with Elasticsearch APIs for ingestion of data (single record and bulk API)
 5. Out of the box authentication
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
-1. Index storage in s3 (experimental)
+7. Index storage in s3 (experimental)
+8. aggregation support
 
 # Roadmap items:
 1. High Availability
@@ -346,6 +347,43 @@ Get the list of existing indexes
 e.g. 
 GET http://localhost:4080/api/index
 
+## UpdateMappings - Create/Update an index mappings
+Endpoint - PUT /api/:target/_mappings
+
+Create/Update a index mappings
+
+e.g.
+
+PUT http://localhost:4080/api/:target/_mappings
+
+Payload: 
+
+```json
+{
+	"mappings": {
+		"properties": {
+			"name": {
+				"type": "text"
+			},
+			"author": {
+				"type": "keyword"
+			},
+			"price": {
+				"type": "numeric"
+			},
+			"published": {
+				"type": "bool"
+			},
+			"create_at": {
+				"type": "time"
+			}
+		}
+	}
+}
+```
+
+mappings also can defines when create index.
+
 ## UpdateDocument - Create/Update a document and index it for searches
 Endpoint - PUT /api/:target/document
 
@@ -416,6 +454,43 @@ search_type can have following values:
 8. matchphrase
 9. multiphrase
 10. querystring
+
+
+### Search - aggregation
+Endpoint - POST /api/:target/_search
+
+Search for documents with aggregations
+
+e.g. 
+POST http://localhost:4080/api/stackoverflow-6/_search
+
+Payload: 
+```json
+{
+    "search_type": "matchall",
+    "query": {
+        "term": "query condition",
+    },
+    "aggs": {
+      "my-aggs-term": {
+        "agg_type": "terms",
+        "field": "name",
+        "size": 10
+      }
+    }
+}
+```
+
+aggregation can filter data with query.
+
+aggregation support:
+  * Bucketing
+      * Terms
+      * Numeric Range
+      * Date Range
+  * Metrics
+      * Min/Max/Count/Sum
+      * Avg/Weighted Avg
 
 
 ## BulkUpdate - Upload bulk data
