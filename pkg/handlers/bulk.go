@@ -65,13 +65,14 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 		// Docs at https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
 		if nextLineIsData {
 			nextLineIsData = false
-			var id = ""
+			var docID = ""
 			mintedID := false
 
 			if val, ok := lastLineMetaData["_id"]; ok {
-				id = val.(string)
-			} else {
-				id = uuid.New().String()
+				docID = val.(string)
+			}
+			if docID == "" {
+				docID = uuid.New().String()
 				mintedID = true
 			}
 
@@ -92,7 +93,7 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 				core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
 			}
 
-			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(id, &doc)
+			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(docID, &doc)
 			if err != nil {
 				return err
 			}

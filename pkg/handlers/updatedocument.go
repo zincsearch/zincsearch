@@ -24,7 +24,8 @@ func UpdateDocument(c *gin.Context) {
 		docID = id.(string)
 	} else if query_id != "" {
 		docID = query_id
-	} else {
+	}
+	if docID == "" {
 		docID = uuid.New().String() // Generate a new ID if ID was not provided
 		mintedID = true
 	}
