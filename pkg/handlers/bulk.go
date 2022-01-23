@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"io"
+	"net/http"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/index"
@@ -16,27 +17,20 @@ import (
 
 func BulkHandler(c *gin.Context) {
 	target := c.Param("target")
-
 	body := c.Request.Body
 
-	err := BulkHandlerWorker(target, &body)
-
+	err := BulkHandlerWorker(target, body)
 	if err != nil {
-		c.JSON(200, gin.H{
-			"message": err,
-		})
-
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
-
-	c.JSON(200, gin.H{
-		"message": "bulk data inserted",
-	})
+	c.JSON(http.StatusOK, gin.H{"message": "bulk data inserted"})
 }
 
-func BulkHandlerWorker(target string, body *io.ReadCloser) error {
+func BulkHandlerWorker(target string, body io.ReadCloser) error {
 	// Prepare to read the entire raw text of the body
-	scanner := bufio.NewScanner(*body)
+	scanner := bufio.NewScanner(body)
+	defer body.Close()
 
 	// Set 1 MB max per line. docs at - https://pkg.go.dev/bufio#pkg-constants
 	// This is the max size of a line in a file that we will process
