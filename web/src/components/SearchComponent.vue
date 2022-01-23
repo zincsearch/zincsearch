@@ -253,6 +253,7 @@ export default {
 
       selectedRelativePeriod: "Minutes",
       selectedRelativeValue: 30,
+      selectedFullTime: ref(false),
     });
 
     // when the datetime filter changes then update the results
@@ -407,6 +408,10 @@ export default {
         },
         fields: ["_all"],
       };
+      if (dateVal.value.selectedFullTime) {
+        req.query.start_time = null;
+        req.query.end_time = null;
+      }
 
       var url =
         store.state.API_ENDPOINT + "api/" + selectedIndex.value + "/_search";
@@ -491,7 +496,7 @@ export default {
       filter_method,
       filterFn,
       searchData,
-      max_records_to_return
+      max_records_to_return,
     };
   },
   name: "SearchComponent",

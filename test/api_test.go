@@ -129,6 +129,44 @@ func TestApiStandard(t *testing.T) {
 			})
 		})
 
+		Convey("PUT /api/:target/_mappings", func() {
+			Convey("update mappings for index", func() {
+				body := bytes.NewBuffer(nil)
+				body.WriteString(`{
+					"mappings": {
+						"properties":{
+							"Athlete": {"type": "text"},
+							"City": {"type": "keyword"},
+							"Country": {"type": "keyword"},
+							"Discipline": {"type": "text"},
+							"Event": {"type": "keyword"},
+							"Gender": {"type": "keyword"},
+							"Medal": {"type": "keyword"},
+							"Season": {"type": "keyword"},
+							"Sport": {"type": "keyword"},
+							"Year": {"type": "numeric"},
+							"Date": {"type": "time"}
+						}
+					}
+				}`)
+				resp := request("PUT", "/api/"+indexName+"/_mappings", body)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+				So(resp.Body.String(), ShouldEqual, `{"message":"ok"}`)
+			})
+		})
+
+		Convey("GET /api/:target/_mappings", func() {
+			Convey("get mappings from index", func() {
+				resp := request("GET", "/api/"+indexName+"/_mappings", nil)
+				So(resp.Code, ShouldEqual, http.StatusOK)
+
+				data := make(map[string]interface{})
+				err := json.Unmarshal(resp.Body.Bytes(), &data)
+				So(err, ShouldBeNil)
+				So(data["mappings"], ShouldNotBeNil)
+			})
+		})
+
 		Convey("GET /api/index", func() {
 			resp := request("GET", "/api/index", nil)
 			So(resp.Code, ShouldEqual, http.StatusOK)
@@ -410,7 +448,7 @@ func TestApiStandard(t *testing.T) {
 				body.WriteString(`{
 					"search_type": "term", 
 					"query": {
-						"term": "turin", 
+						"term": "Turin", 
 						"field":"City"
 					}
 				}`)

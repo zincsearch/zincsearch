@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"io"
+	"net/http"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/index"
@@ -16,27 +17,20 @@ import (
 
 func BulkHandler(c *gin.Context) {
 	target := c.Param("target")
-
 	body := c.Request.Body
 
-	err := BulkHandlerWorker(target, &body)
-
+	err := BulkHandlerWorker(target, body)
 	if err != nil {
-		c.JSON(200, gin.H{
-			"message": err,
-		})
-
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
-
-	c.JSON(200, gin.H{
-		"message": "bulk data inserted",
-	})
+	c.JSON(http.StatusOK, gin.H{"message": "bulk data inserted"})
 }
 
-func BulkHandlerWorker(target string, body *io.ReadCloser) error {
+func BulkHandlerWorker(target string, body io.ReadCloser) error {
 	// Prepare to read the entire raw text of the body
-	scanner := bufio.NewScanner(*body)
+	scanner := bufio.NewScanner(body)
+	defer body.Close()
 
 	// Set 1 MB max per line. docs at - https://pkg.go.dev/bufio#pkg-constants
 	// This is the max size of a line in a file that we will process
@@ -65,13 +59,14 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 		// Docs at https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
 		if nextLineIsData {
 			nextLineIsData = false
-			var id = ""
+			var docID = ""
 			mintedID := false
 
-			if val, ok := lastLineMetaData["_id"]; ok {
-				id = val.(string)
-			} else {
-				id = uuid.New().String()
+			if val, ok := lastLineMetaData["_id"]; ok && val != nil {
+				docID = val.(string)
+			}
+			if docID == "" {
+				docID = uuid.New().String()
 				mintedID = true
 			}
 
@@ -92,7 +87,7 @@ func BulkHandlerWorker(target string, body *io.ReadCloser) error {
 				core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
 			}
 
-			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(id, &doc)
+			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(docID, &doc)
 			if err != nil {
 				return err
 			}

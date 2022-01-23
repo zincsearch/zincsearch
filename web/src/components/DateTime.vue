@@ -390,6 +390,13 @@
                   ></q-select>
                 </td>
               </tr>
+              <tr>
+                <td class="relative-period-name">FullTime</td>
+                <td colspan="3" class="custom-relative">
+                  <q-toggle v-model="message.selectedFullTime" color="green" />
+                </td>
+                <td colspan="3"></td>
+              </tr>
             </tbody>
           </table>
         </q-tab-panel>
@@ -544,6 +551,7 @@ export default {
       default: () => ({
         selectedRelativePeriod: "Days",
         selectedRelativeValue: 1,
+        selectedFullTime: false,
         startDate: "",
         endDate: "",
         startTime: "",
@@ -553,6 +561,9 @@ export default {
   },
   computed: {
     displayValue() {
+      if (this.message.selectedFullTime) {
+        return "FullTime";
+      }
       if (this.message.tab === "relative") {
         return `${this.message.selectedRelativeValue} ${this.message.selectedRelativePeriod}`;
       } else {
