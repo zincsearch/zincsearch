@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"runtime"
-	"runtime/debug"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/index"
@@ -118,8 +116,6 @@ func BulkHandlerWorker(target string, body io.ReadCloser) error {
 					batch[indexN].Reset()
 				}
 				documentsInBatch = 0
-				runtime.GC()
-				debug.FreeOSMemory()
 			}
 
 		} else { // This branch will process the metadata line in the request. Each metadata line is preceded by a data line.
