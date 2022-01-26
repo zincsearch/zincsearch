@@ -32,6 +32,9 @@ func BulkHandlerWorker(target string, body io.ReadCloser) error {
 	scanner := bufio.NewScanner(body)
 	defer body.Close()
 
+	// force set batchSize
+	batchSize := 1000
+
 	// Set 1 MB max per line. docs at - https://pkg.go.dev/bufio#pkg-constants
 	// This is the max size of a line in a file that we will process
 	const maxCapacityPerLine = 1024 * 1024
@@ -100,6 +103,19 @@ func BulkHandlerWorker(target string, body io.ReadCloser) error {
 				batch[indexName].Update(bdoc.ID(), bdoc)
 			} else {
 				batch[indexName].Insert(bdoc)
+			}
+
+			if documentsInBatch >= batchSize {
+				for _, indexN := range indexesInThisBatch {
+					// Persist the batch to the index
+					err := core.ZINC_INDEX_LIST[indexN].Writer.Batch(batch[indexN])
+					if err != nil {
+						log.Printf("Error updating batch: %v", err)
+						return err
+					}
+					batch[indexN].Reset()
+				}
+				documentsInBatch = 0
 			}
 
 		} else { // This branch will process the metadata line in the request. Each metadata line is preceded by a data line.
