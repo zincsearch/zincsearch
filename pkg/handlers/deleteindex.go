@@ -23,7 +23,7 @@ func DeleteIndex(c *gin.Context) {
 	// 0. Check if index exists and Get the index storage type - disk, s3 or memory
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + "does not exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + " does not exists"})
 		return
 	}
 
