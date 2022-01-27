@@ -13,8 +13,10 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/jeremywohl/flatten v1.0.1
 	github.com/joho/godotenv v1.4.0
-	github.com/penglongli/gin-metrics v0.1.9
+	github.com/prometheus/client_golang v1.12.0 // indirect
 	github.com/rs/zerolog v1.26.1
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/smartystreets/goconvey v1.7.2
+	github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
 )
