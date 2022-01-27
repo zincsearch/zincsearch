@@ -6,14 +6,15 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
+
 	"github.com/prabhatsharma/zinc"
 	"github.com/prabhatsharma/zinc/pkg/auth"
 	"github.com/prabhatsharma/zinc/pkg/handlers"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
-	"github.com/rs/zerolog/log"
 )
 
-// SetRoutes sets up all gi HTTP API endpoints that can be called by front end
+// SetRoutes sets up all gin HTTP API endpoints that can be called by front end
 func SetRoutes(r *gin.Engine) {
 
 	r.Use(cors.New(cors.Config{
@@ -25,10 +26,10 @@ func SetRoutes(r *gin.Engine) {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	// meta service - healthz
-	r.GET("/healthz", v1.GetHealthz)
 	r.GET("/", v1.GUI)
 	r.GET("/version", v1.GetVersion)
+	// meta service - healthz
+	r.GET("/healthz", v1.GetHealthz)
 
 	front, err := zinc.GetFrontendAssets()
 	if err != nil {
@@ -80,7 +81,6 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/es/:target/_update/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 
 	// Bulk update/insert
-
 	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
 	r.POST("/es/:target/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
 

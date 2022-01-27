@@ -19,7 +19,8 @@ func main() {
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.
 	r.Use(gin.Recovery())
 
-	routes.SetRoutes(r) // Set up all API routes.
+	routes.SetPrometheus(r) // Set up Prometheus.
+	routes.SetRoutes(r)     // Set up all API routes.
 
 	// Run the server
 
