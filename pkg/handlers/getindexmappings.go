@@ -23,14 +23,13 @@ func GetIndexMappings(c *gin.Context) {
 	}
 
 	// format mapping
-	properties := make(map[string]core.Properties)
+	properties := make(map[string]core.Properties, len(mappings))
 	for field, pType := range mappings {
+		if field == "_id" || field == "@timestamp" {
+			continue
+		}
 		properties[field] = core.Properties{Type: pType}
 	}
-
-	// delete internal field from mappings
-	delete(properties, "_id")
-	delete(properties, "@timestamp")
 
 	c.JSON(http.StatusOK, gin.H{"mappings": gin.H{"properties": properties}})
 }
