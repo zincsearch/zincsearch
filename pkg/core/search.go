@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/blugelabs/bluge"
@@ -18,6 +17,20 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 	var searchRequest bluge.SearchRequest
 	if iQuery.MaxResults > startup.MAX_RESULTS {
 		iQuery.MaxResults = startup.MAX_RESULTS
+	}
+
+	sourceCtl := &v1.Source{Enable: true}
+	switch iQuery.Source.(type) {
+	case bool:
+		sourceCtl.Enable = iQuery.Source.(bool)
+	case []interface{}:
+		v := iQuery.Source.([]interface{})
+		sourceCtl.Fields = make(map[string]bool, len(v))
+		for _, field := range v {
+			if fv, ok := field.(string); ok {
+				sourceCtl.Fields[fv] = true
+			}
+		}
 	}
 
 	var err error
@@ -84,7 +97,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 		var timestamp time.Time
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
 			if field == "_source" {
-				json.Unmarshal(value, &result)
+				result = uquery.HandleSource(sourceCtl, value)
 				return true
 			} else if field == "_id" {
 				id = string(value)
