@@ -15,7 +15,7 @@ func SearchIndex(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index '" + indexName + "' does not exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + " does not exists"})
 		return
 	}
 
