@@ -94,6 +94,17 @@
 
     <q-page-container>
       <router-view></router-view>
+      <q-page-sticky position="bottom-right" :offset="[30, 80]">
+        <div class="feedback">
+          <q-btn
+            color="green"
+            label="Feedback"
+            class="feedback-button"
+            @click="showFeedback"
+          />
+        </div>
+        <!-- <q-btn fab icon="add" color="accent" /> -->
+      </q-page-sticky>
     </q-page-container>
   </q-layout>
 </template>
@@ -102,6 +113,7 @@
 import { ref } from "vue";
 import { mapState } from "vuex";
 import { useStore } from "vuex";
+import { useQuasar } from "quasar";
 import router from "./router";
 // import HelloWorld from "./components/HelloWorld.vue";
 
@@ -120,6 +132,7 @@ export default {
   setup() {
     // const user = ref({});
     const store = useStore();
+    const $q = useQuasar();
 
     if (window.location.origin != "http://localhost:8080") {
       store.dispatch("endpoint", window.location.origin + "/");
@@ -146,6 +159,25 @@ export default {
       role,
       // user,
 
+      showFeedback() {
+        $q.dialog({
+          title: "",
+          message:
+            '<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeYvo97TMoJ6qWZKXLndQbimxcP0sCdHBrUOeg8D785rHVv1g/viewform?embedded=true" width="840" height="1822" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>',
+          html: true,
+          fullWidth: true,
+        })
+          .onOk(() => {
+            // console.log('OK')
+          })
+          .onCancel(() => {
+            // console.log('Cancel')
+          })
+          .onDismiss(() => {
+            // console.log('I am triggered on both OK and Cancel')
+          });
+      },
+
       signout() {
         store.dispatch("logout");
         localStorage.setItem("_id", "");
@@ -158,3 +190,15 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.feedback {
+  /* transform: rotate(-90deg); */
+  margin-right: 0%;
+  position: relative;
+}
+
+.feedback-button {
+  border-radius: 50px;
+}
+</style>
