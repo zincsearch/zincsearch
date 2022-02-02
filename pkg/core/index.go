@@ -95,7 +95,6 @@ func (rindex *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]in
 	}
 
 	if indexMappingNeedsUpdate {
-		indexMapping["@timestamp"] = "time" // time need date_histogram aggregation
 		rindex.SetMapping(indexMapping)
 	}
 
@@ -112,6 +111,9 @@ func (rindex *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]in
 // iMap: a map of the fileds that specify name and type of the field. e.g. movietitle: string
 func (index *Index) SetMapping(iMap map[string]string) error {
 	bdoc := bluge.NewDocument(index.Name)
+
+	// @timestamp need date_range/date_histogram aggregation, and mappings used for type check in aggregation
+	iMap["@timestamp"] = "time"
 
 	for k, v := range iMap {
 		bdoc.AddField(bluge.NewTextField(k, v).StoreValue())

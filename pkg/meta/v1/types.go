@@ -15,6 +15,7 @@ type ZincQuery struct {
 	Query        QueryParams                  `json:"query"`
 	Aggregations map[string]AggregationParams `json:"aggs"`
 	SortFields   []string                     `json:"sort_fields"`
+	Source       interface{}                  `json:"_source"`
 }
 
 type QueryParams struct {
@@ -48,6 +49,11 @@ type AggregationDateRange struct {
 type QueryHighlight struct {
 	Fields []string `json:"fields"`
 	Style  string   `json:"style"`
+}
+
+type Source struct {
+	Enable bool            // enable _source returns, default is true
+	Fields map[string]bool // what fields can returns
 }
 
 // SearchResponse for a query
