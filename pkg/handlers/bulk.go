@@ -19,15 +19,16 @@ func BulkHandler(c *gin.Context) {
 	target := c.Param("target")
 	body := c.Request.Body
 
-	err := BulkHandlerWorker(target, body)
+	documentsProcessed, err := BulkHandlerWorker(target, body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "bulk data inserted"})
+	c.JSON(http.StatusOK, gin.H{"message": "bulk data inserted", "record_count": documentsProcessed})
 }
 
-func BulkHandlerWorker(target string, body io.ReadCloser) error {
+func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
+	documentsProcessed := 0
 	// Prepare to read the entire raw text of the body
 	scanner := bufio.NewScanner(body)
 	defer body.Close()
@@ -85,14 +86,14 @@ func BulkHandlerWorker(target string, body io.ReadCloser) error {
 			if !exists { // If the requested indexName does not exist then create it
 				newIndex, err := core.NewIndex(indexName, "disk")
 				if err != nil {
-					return err
+					return documentsProcessed, err
 				}
 				core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
 			}
 
 			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(docID, &doc)
 			if err != nil {
-				return err
+				return documentsProcessed, err
 			}
 
 			documentsInBatch++
@@ -111,12 +112,13 @@ func BulkHandlerWorker(target string, body io.ReadCloser) error {
 					err := core.ZINC_INDEX_LIST[indexN].Writer.Batch(batch[indexN])
 					if err != nil {
 						log.Printf("Error updating batch: %v", err)
-						return err
+						return documentsProcessed, err
 					}
 					batch[indexN].Reset()
 				}
 				documentsInBatch = 0
 			}
+			documentsProcessed++
 
 		} else { // This branch will process the metadata line in the request. Each metadata line is preceded by a data line.
 
@@ -159,7 +161,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return err
+		return documentsProcessed, err
 	}
 
 	for _, indexN := range indexesInThisBatch {
@@ -168,11 +170,11 @@ func BulkHandlerWorker(target string, body io.ReadCloser) error {
 		err := writer.Batch(batch[indexN])
 		if err != nil {
 			log.Printf("Error updating batch: %v", err)
-			return err
+			return documentsProcessed, err
 		}
 	}
 
-	return nil
+	return documentsProcessed, nil
 
 }
 

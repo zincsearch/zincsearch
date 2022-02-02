@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: z
-  namespace: zinc
+  namespace: zinc-arm
 spec:
   clusterIP: None
   selector:
@@ -19,7 +19,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: zinc
-  namespace: zinc
+  namespace: zinc-arm
   labels:
     name: zinc
 spec:
@@ -43,7 +43,7 @@ spec:
       # terminationGracePeriodSeconds: 0
       containers:
         - name: zinc
-          image: public.ecr.aws/prabhat/zinc:latest
+          image: public.ecr.aws/prabhat/zinc:0.1.5-arm64
           env:
             - name: FIRST_ADMIN_USER
               value: admin
@@ -66,6 +66,8 @@ spec:
           volumeMounts:
           - name: data
             mountPath: /go/bin/data
+      nodeSelector:
+        kubernetes.io/arch: arm64
   volumeClaimTemplates:
   - metadata:
       name: data

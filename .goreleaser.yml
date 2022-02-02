@@ -54,6 +54,9 @@ dockers:
     use: buildx
     skip_push: "false"
     build_flag_templates:
+    - "--build-arg=VERSION={{.Version}}"
+    - "--build-arg=COMMIT_HASH={{.FullCommit}}"
+    - "--build-arg=BUILD_DATE={{.Date}}"
     - "--platform=linux/amd64"
     extra_files:
       - go.mod
@@ -67,6 +70,9 @@ dockers:
     use: buildx
     skip_push: "false"
     build_flag_templates:
+    - "--build-arg=VERSION={{.Version}}"
+    - "--build-arg=COMMIT_HASH={{.FullCommit}}"
+    - "--build-arg=BUILD_DATE={{.Date}}"
     - "--platform=linux/arm64/v8"
     extra_files:
       - go.mod
@@ -80,6 +86,9 @@ dockers:
     use: buildx
     skip_push: "false"
     build_flag_templates:
+    - "--build-arg=VERSION={{.Version}}"
+    - "--build-arg=COMMIT_HASH={{.FullCommit}}"
+    - "--build-arg=BUILD_DATE={{.Date}}"
     - "--platform=linux/arm/v7"
     extra_files:
       - go.mod
@@ -93,6 +102,9 @@ dockers:
     use: buildx
     skip_push: "false"
     build_flag_templates:
+    - "--build-arg=VERSION={{.Version}}"
+    - "--build-arg=COMMIT_HASH={{.FullCommit}}"
+    - "--build-arg=BUILD_DATE={{.Date}}"
     - "--platform=linux/amd64"
     extra_files:
       - go.mod
@@ -106,6 +118,9 @@ dockers:
     use: buildx
     skip_push: "false"
     build_flag_templates:
+    - "--build-arg=VERSION={{.Version}}"
+    - "--build-arg=COMMIT_HASH={{.FullCommit}}"
+    - "--build-arg=BUILD_DATE={{.Date}}"
     - "--platform=linux/arm64/v8"
     extra_files:
       - go.mod
@@ -119,6 +134,9 @@ dockers:
     use: buildx
     skip_push: "false"
     build_flag_templates:
+    - "--build-arg=VERSION={{.Version}}"
+    - "--build-arg=COMMIT_HASH={{.FullCommit}}"
+    - "--build-arg=BUILD_DATE={{.Date}}"
     - "--platform=linux/arm/v7"
     extra_files:
       - go.mod

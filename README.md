@@ -1,4 +1,4 @@
-Note: Zinc and all its APIs are considered to be alpha stage at this time. Expect breaking changes in API contracts and data format before at this stage.
+Note: Zinc and all its APIs are considered to be alpha stage at this time. Expect breaking changes in API contracts and data format at this stage.
 # Zinc Search Engine
 
 Zinc is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs using a fraction of the resources. It uses [bluge](https://github.com/blugelabs/bluge) as the underlying indexing library.
@@ -84,11 +84,22 @@ Now point your browser to http://localhost:4080 and login
 
 ### Docker
 
+------------------------
+**Optional - Only if you have AWS CLI installed.**
+
+If you have AWS CLI installed amd get login error then run below command:
+
+> aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+
+------------------------
+
 Docker images are available at https://gallery.ecr.aws/prabhat/zinc
 
 > $ mkdir data
 
 > $ docker run -v /full/path/of/data:/data -e DATA_PATH="/data" -p 4080:4080 -e FIRST_ADMIN_USER=admin -e FIRST_ADMIN_PASSWORD=Complexpass#123 --name zinc public.ecr.aws/prabhat/zinc:latest
+
+
 
 Now point your browser to http://localhost:4080 and login
 

@@ -1,5 +1,6 @@
 data
-
+miniodata
+.minio.sys
 # Binaries for programs and plugins
 *.exe
 *.exe~

@@ -16,6 +16,12 @@ func init() {
 	for k, v := range s3List {
 		ZINC_INDEX_LIST[k] = v
 	}
+
+	minioList, _ := LoadZincIndexesFromMinIO()
+	// Load the indexes from disk.
+	for k, v := range minioList {
+		ZINC_INDEX_LIST[k] = v
+	}
 }
 
 type Index struct {

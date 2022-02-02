@@ -27,27 +27,27 @@ var (
 	"Sport": "Luge",
 	"Year": 2006
 }`
-	queryDataMatch = `{
-	"search_type": "match",
-	"query":
-	{
-		"term": "DEMTSCHENKO",
-		"start_time": "2021-06-02T14:28:31.894Z",
-		"end_time": "2021-12-30T15:28:31.894Z"
-	},
-	"fields": ["_all"]
-}`
+	// 	queryDataMatch = `{
+	// 	"search_type": "match",
+	// 	"query":
+	// 	{
+	// 		"term": "DEMTSCHENKO",
+	// 		"start_time": "2021-06-02T14:28:31.894Z",
+	// 		"end_time": "2021-12-30T15:28:31.894Z"
+	// 	},
+	// 	"fields": ["_all"]
+	// }`
 
-	queryDataQueryString = `{
-    "search_type": "querystring",
-    "query":
-    {
-        "term": "+City:Turin +Silver",
-        "start_time": "2021-06-02T14:28:31.894Z",
-        "end_time": "2021-12-30T15:28:31.894Z"
-    },
-    "fields": ["_all"]
-}`
+	// 	queryDataQueryString = `{
+	//     "search_type": "querystring",
+	//     "query":
+	//     {
+	//         "term": "+City:Turin +Silver",
+	//         "start_time": "2021-06-02T14:28:31.894Z",
+	//         "end_time": "2021-12-30T15:28:31.894Z"
+	//     },
+	//     "fields": ["_all"]
+	// }`
 	bulkData = `{"index": {"_index": "games3", "_type": "doc", "_id": "1"}}
 {"field1": "value1", "field2": "value2", "field3": "value3"}
 {"index": {"_index": "games3", "_type": "doc", "_id": "2"}}

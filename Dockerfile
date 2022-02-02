@@ -4,6 +4,12 @@
 ############################
 # FROM golang:alpine AS builder
 FROM --platform=$BUILDPLATFORM public.ecr.aws/docker/library/golang:latest as builder
+ARG VERSION
+ARG COMMIT_HASH
+ARG BUILD_DATE
+ARG TARGETOS
+ARG TARGETARCH
+
 RUN update-ca-certificates
 # RUN apk update && apk add --no-cache git
 # Create appuser.
@@ -34,7 +40,11 @@ RUN go get -d -v
 #       -s : Omit the symbol table and debug information.
 #       Omit the symbol table and debug information will reduce the binary size.
 # RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o zinc cmd/zinc/main.go
-RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o zinc cmd/zinc/main.go
+ENV VERSION=$VERSION
+ENV COMMIT_HASH=$COMMIT_HASH
+ENV BUILD_DATE=$BUILD_DATE
+
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w -X github.com/prabhatsharma/zinc/pkg/meta/v1.Version=${VERSION} -X github.com/prabhatsharma/zinc/pkg/meta/v1.CommitHash=${COMMIT_HASH} -X github.com/prabhatsharma/zinc/pkg/meta/v1.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
 ############################
 # STEP 2 build a small image
 ############################

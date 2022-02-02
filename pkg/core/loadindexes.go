@@ -7,6 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/joho/godotenv"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 	"github.com/rs/zerolog/log"
 )
@@ -114,6 +116,66 @@ func LoadZincIndexesFromS3() (map[string]*Index, error) {
 			IndexList[iName].IndexType = "user"
 			IndexList[iName].StorageType = "s3"
 			log.Print("Index loaded: " + iName)
+		}
+
+	}
+
+	return IndexList, nil
+}
+
+func LoadZincIndexesFromMinIO() (map[string]*Index, error) {
+	godotenv.Load()
+
+	log.Print("Loading indexes from minio...")
+
+	endpoint := zutils.GetEnv("ZINC_MINIO_ENDPOINT", "")
+	accessKeyID := zutils.GetEnv("ZINC_MINIO_ACCESS_KEY_ID", "")
+	secretAccessKey := zutils.GetEnv("ZINC_MINIO_SECRET_ACCESS_KEY", "")
+	MINIO_BUCKET := zutils.GetEnv("ZINC_MINIO_BUCKET", "")
+
+	if MINIO_BUCKET == "" {
+		return nil, nil
+	}
+
+	opts := &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+		Secure: false,
+	}
+
+	// Initialize minio client object.
+	minioClient, err := minio.New(endpoint, opts)
+	if err != nil {
+		log.Print(err)
+	}
+
+	IndexList := make(map[string]*Index)
+
+	// doneCh := make(chan struct{})
+
+	optsList := minio.ListObjectsOptions{
+		Recursive: false,
+	}
+
+	val := minioClient.ListObjects(context.TODO(), MINIO_BUCKET, optsList)
+
+	if err != nil {
+		log.Print("failed to list indexes in minio: ", err.Error())
+		return nil, err
+	}
+
+	for iName := range val {
+		indexName := iName.Key[:len(iName.Key)-1]
+		// indexName := iName.Key
+
+		tempIndex, err := NewIndex(indexName, "minio")
+
+		if err != nil {
+			log.Print("failed to load index "+iName.Key+" in minio: ", err.Error())
+		} else {
+			IndexList[indexName] = tempIndex
+			IndexList[indexName].IndexType = "user"
+			IndexList[indexName].StorageType = "minio"
+			log.Print("Index loaded: " + indexName)
 		}
 
 	}

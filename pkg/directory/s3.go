@@ -62,7 +62,7 @@ func (s *S3Directory) Setup(readOnly bool) error {
 // List the ids of all the items of the specified kind
 // Items are returned in descending order by id
 func (s *S3Directory) List(kind string) ([]uint64, error) {
-	log.Print("List: s3 ListObjectsV2 call made for List: s3://", s.Bucket+"/"+s.Prefix)
+	log.Print("List: s3 ListObjectsV2 call made for: s3://", s.Bucket+"/"+s.Prefix)
 	var itemList []uint64
 
 	ctx := context.Background()

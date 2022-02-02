@@ -17,7 +17,7 @@ func BenchmarkBulk(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		err = handlers.BulkHandlerWorker(target, f)
+		_, err = handlers.BulkHandlerWorker(target, f)
 		if err != nil {
 			b.Error(err)
 		}

@@ -10,10 +10,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/blugelabs/bluge"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
-
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/rs/zerolog/log"
 )
 
 // DeleteIndex deletes a zinc index and its associated data. Be careful using thus as you ca't undo this action.
@@ -52,6 +53,14 @@ func DeleteIndex(c *gin.Context) {
 		} else {
 			deleteIndexMapping = true
 		}
+	} else if index.StorageType == "minio" {
+		err := deleteFilesForIndexFromMinIO(index.Name)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			log.Print("failed to delete index: ", err.Error())
+		} else {
+			deleteIndexMapping = true
+		}
 	}
 
 	if deleteIndexMapping {
@@ -71,6 +80,41 @@ func DeleteIndex(c *gin.Context) {
 			})
 		}
 	}
+}
+
+func deleteFilesForIndexFromMinIO(indexName string) error {
+	endpoint := zutils.GetEnv("ZINC_MINIO_ENDPOINT", "")
+	accessKeyID := zutils.GetEnv("ZINC_MINIO_ACCESS_KEY_ID", "")
+	secretAccessKey := zutils.GetEnv("ZINC_MINIO_SECRET_ACCESS_KEY", "")
+	minioBucket := zutils.GetEnv("ZINC_MINIO_BUCKET", "")
+
+	opts := minio.Options{
+		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+		Secure: false,
+	}
+
+	// Initialize minio client object.
+	minioClient, err := minio.New(endpoint, &opts)
+	if err != nil {
+		log.Print(err)
+	}
+
+	listOpts := minio.ListObjectsOptions{
+		Recursive: true,
+		Prefix:    indexName,
+	}
+
+	objects := minioClient.ListObjects(context.TODO(), minioBucket, listOpts)
+
+	for object := range objects {
+		log.Print("Deleting: ", object.Key)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func deleteFilesForIndexFromS3(indexName string) error {
