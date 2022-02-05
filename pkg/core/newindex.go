@@ -59,6 +59,8 @@ func FormatMapping(mappings *Mappings) (map[string]string, error) {
 		switch ptype {
 		case "text", "keyword", "numeric", "bool", "time":
 			continue // ptype can be used as is
+		case "integer", "double", "long":
+			ptype = "numeric"
 		case "boolean":
 			ptype = "bool"
 		case "date", "datetime":
