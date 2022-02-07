@@ -31,9 +31,8 @@ type Total struct {
 }
 
 type AggregationResponse struct {
-	Value        interface{}                  `json:"value,omitempty"`
-	Buckets      []AggregationBucket          `json:"buckets,omitempty"`
-	NamedBuckets map[string]AggregationBucket `json:"buckets,omitempty"`
+	Value   interface{} `json:"value,omitempty"`
+	Buckets interface{} `json:"buckets,omitempty"` // slice or map
 }
 
 type AggregationBucket struct {

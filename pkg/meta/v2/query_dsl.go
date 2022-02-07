@@ -14,31 +14,31 @@ type ZincQuery struct {
 }
 
 type Query struct {
-	Bool              *BoolQuery              `json:"bool"`                // .
-	Boosting          *BoostingQuery          `json:"boosting"`            // TODO: not implemented
-	Match             map[string]interface{}  `json:"match"`               // field: query, field: {query: value, operator: "and|or"}
-	MatchBoolPrefix   map[string]interface{}  `json:"match_bool_prefix"`   // field: query, field: {query: value, operator: "and|or"}
-	MatchPhrase       map[string]interface{}  `json:"match_phrase"`        // field: query, field: {query: value, operator: "and|or"}
-	MatchPhrasePrefix map[string]interface{}  `json:"match_phrase_prefix"` // field: query, field: {query: value, operator: "and|or"}
-	MatchAll          interface{}             `json:"match_all"`           // just set or null
-	MatchNone         interface{}             `json:"match_none"`          // just set or null
-	MultiMatch        *MultiMatchQuery        `json:"multi_match"`         // .
-	CombinedFields    *CombinedFieldsQuery    `json:"combined_fields"`     // TODO: not implemented
-	QueryString       *QueryStringQuery       `json:"query_string"`        // .
-	SimpleQueryString *SimpleQueryStringQuery `json:"simple_query_string"` // .
-	Exists            *ExistsQuery            `json:"exists"`              // .
-	Ids               *IdsQuery               `json:"ids"`                 // .
-	Fuzzy             map[string]interface{}  `json:"fuzzy"`               // field: query, field: {query: value, operator: "and|or"}
-	Prefix            map[string]interface{}  `json:"prefix"`              // field: query, field: {query: value, operator: "and|or"}
-	Range             *RangeQuery             `json:"range"`               // .
-	Term              map[string]interface{}  `json:"term"`                // field: query, field: {query: value, operator: "and|or"}
-	Terms             *TermsQuery             `json:"terms"`               // .
-	TermsSet          *TermsSetQuery          `json:"terms_set"`           // TODO: not implemented
-	Wildcard          map[string]interface{}  `json:"wildcard"`            // field: query, field: {query: value, operator: "and|or"}
-	GeoBoundingBox    interface{}             `json:"geo_bounding_box"`    // TODO: not implemented
-	GeoDistance       interface{}             `json:"geo_distance"`        // TODO: not implemented
-	GeoPolygon        interface{}             `json:"geo_polygon"`         // TODO: not implemented
-	GeoShape          interface{}             `json:"geo_shape"`           // TODO: not implemented
+	Bool              *BoolQuery                `json:"bool"`                // .
+	Boosting          *BoostingQuery            `json:"boosting"`            // TODO: not implemented
+	Match             map[string]interface{}    `json:"match"`               // simple, MatchQuery
+	MatchBoolPrefix   map[string]interface{}    `json:"match_bool_prefix"`   // simple, MatchBoolPrefixQuery
+	MatchPhrase       map[string]interface{}    `json:"match_phrase"`        // simple, MatchPhraseQuery
+	MatchPhrasePrefix map[string]interface{}    `json:"match_phrase_prefix"` // simple, MatchPhrasePrefixQuery
+	MatchAll          interface{}               `json:"match_all"`           // just set or null
+	MatchNone         interface{}               `json:"match_none"`          // just set or null
+	MultiMatch        *MultiMatchQuery          `json:"multi_match"`         // .
+	CombinedFields    *CombinedFieldsQuery      `json:"combined_fields"`     // TODO: not implemented
+	QueryString       *QueryStringQuery         `json:"query_string"`        // .
+	SimpleQueryString *SimpleQueryStringQuery   `json:"simple_query_string"` // .
+	Exists            *ExistsQuery              `json:"exists"`              // .
+	Ids               *IdsQuery                 `json:"ids"`                 // .
+	Range             map[string]*RangeQuery    `json:"range"`               // .
+	Fuzzy             map[string]interface{}    `json:"fuzzy"`               // simple, FuzzyQuery
+	Prefix            map[string]interface{}    `json:"prefix"`              // simple, PrefixQuery
+	Wildcard          map[string]interface{}    `json:"wildcard"`            // simple, WildcardQuery
+	Term              map[string]interface{}    `json:"term"`                // simple, TermQuery
+	Terms             map[string]interface{}    `json:"terms"`               // .
+	TermsSet          map[string]*TermsSetQuery `json:"terms_set"`           // TODO: not implemented
+	GeoBoundingBox    interface{}               `json:"geo_bounding_box"`    // TODO: not implemented
+	GeoDistance       interface{}               `json:"geo_distance"`        // TODO: not implemented
+	GeoPolygon        interface{}               `json:"geo_polygon"`         // TODO: not implemented
+	GeoShape          interface{}               `json:"geo_shape"`           // TODO: not implemented
 }
 
 type BoolQuery struct {
@@ -56,44 +56,120 @@ type BoostingQuery struct {
 }
 
 type MatchQuery struct {
-	Query          string `json:"query"`
-	Analyzer       string `json:"analyzer"`
-	Operator       string `json:"operator"`         // or(default), and
-	Fuzziness      string `json:"fuzziness"`        // auto(default), 1,2,3,n
-	ZeroTermsQuery string `json:"zero_terms_query"` // none(default), all
+	Query    string `json:"query"`
+	Analyzer string `json:"analyzer"`
+	Operator string `json:"operator"` // or(default), and
 }
 
-type MatchBoolPrefixQuery struct{}
+type MatchBoolPrefixQuery struct {
+	Query    string `json:"query"`
+	Analyzer string `json:"analyzer"`
+}
 
-type MatchPhraseQuery struct{}
+type MatchPhraseQuery struct {
+	Query    string `json:"query"`
+	Analyzer string `json:"analyzer"`
+}
 
-type MatchPhrasePrefix struct{}
+type MatchPhrasePrefix struct {
+	Query    string `json:"query"`
+	Analyzer string `json:"analyzer"`
+}
 
-type MultiMatchQuery struct{}
+type MultiMatchQuery struct {
+	Query    string   `json:"query"`
+	Analyzer string   `json:"analyzer"`
+	Fields   []string `json:"fields"`
+	Type     string   `json:"type"` // best_fields(default), most_fields, cross_fields, phrase, phrase_prefix, bool_prefix
+}
 
-type CombinedFieldsQuery struct{}
+type CombinedFieldsQuery struct {
+	Query              string   `json:"query"`
+	Analyzer           string   `json:"analyzer"`
+	Fields             []string `json:"fields"`
+	Operator           string   `json:"operator"` // or(default), and
+	MinimumShouldMatch int64    `json:"minimum_should_match"`
+}
 
-type QueryStringQuery struct{}
+type QueryStringQuery struct {
+	Query           string   `json:"query"`
+	Analyzer        string   `json:"analyzer"`
+	Fields          []string `json:"fields"`
+	DefaultField    string   `json:"default_field"`
+	DefaultOperator string   `json:"default_operator"` // or(default), and
+	Boost           float64  `json:"boost"`
+}
 
-type SimpleQueryStringQuery struct{}
+type SimpleQueryStringQuery struct {
+	Query           string   `json:"query"`
+	Analyzer        string   `json:"analyzer"`
+	Fields          []string `json:"fields"`
+	DefaultOperator string   `json:"default_operator"` // or(default), and
+	Boost           float64  `json:"boost"`
+	AllFields       bool     `json:"all_fields"`
+}
 
-type ExistsQuery struct{}
+// ExistsQuery
+// {"exists":{"field":"field_name"}}
+type ExistsQuery struct {
+	Field string `json:"field"`
+}
 
-type IdsQuery struct{}
+// IdsQuery
+// {"ids":{"values":["1","2","3"]}}
+type IdsQuery struct {
+	Values []string `json:"values"`
+}
 
-type FuzzyQuery struct{}
+// RangeQuery
+// {"range":{"field":{"gte":10,"lte":20}}}
+type RangeQuery struct {
+	GT       interface{} `json:"gt"`        // null, float64
+	GTE      interface{} `json:"gte"`       // null, float64
+	LT       interface{} `json:"lt"`        // null, float64
+	LTE      interface{} `json:"lte"`       // null, float64
+	Format   string      `json:"format"`    // Date format used to convert date values in the query.
+	TimeZone string      `json:"time_zone"` // used to convert date values in the query to UTC.
+	Boost    float64     `json:"boost"`
+}
 
-type PrefixQuery struct{}
+// FuzzyQuery
+// {"fuzzy":{"field":"value"}}
+// {"fuzzy":{"field":{"value":"value","fuzziness":"auto"}}}
+type FuzzyQuery struct {
+	Value     string      `json:"value"`
+	Fuzziness interface{} `json:"fuzziness"` // auto, 1,2,3,n
+}
 
-type RangeQuery struct{}
+// PrefixQuery
+// {"prefix":{"field":"value"}}
+// {"prefix":{"field":{"value":"value","boost":1.0}}}
+type PrefixQuery struct {
+	Value string `json:"value"` // You can speed up prefix queries using the index_prefixes mapping parameter.
+}
 
-type TermQuery struct{}
+// WildcardQuery
+// {"wildcard": {"field": "*query*"}}
+// {"wildcard": {"field": {"value": "*query*", "boost": 1.0}}}
+type WildcardQuery struct {
+	Value string  `json:"value"`
+	Boost float64 `json:"boost"`
+}
 
-type TermsQuery struct{}
+// TermQuery
+// {"term":{"field": "value"}}
+// {"term":{"field": {"value": "value", "boost": 1.0}}}
+type TermQuery struct {
+	Value interface{} `json:"value"`
+	Boost float64     `json:"boost"`
+}
 
+// TermsQuery
+// {"terms": {"field": ["value1", "value2"], "boost": 1.0}}
+type TermsQuery map[string]interface{}
+
+// TermsSetQuery ...
 type TermsSetQuery struct{}
-
-type WildcardQuery struct{}
 
 type Aggregations struct {
 	Avg           AggregationMetric         `json:"avg"`
