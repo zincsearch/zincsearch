@@ -41,7 +41,7 @@ func LoadZincIndexesFromDisk() (map[string]*Index, error) {
 
 	indexList := make(map[string]*Index)
 
-	DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
+	DATA_PATH := zutils.GetEnv("ZINC_DATA_PATH", "./data")
 
 	files, err := os.ReadDir(DATA_PATH)
 	if err != nil {
@@ -87,7 +87,7 @@ func LoadZincIndexesFromS3() (map[string]*Index, error) {
 
 	IndexList := make(map[string]*Index)
 
-	S3_BUCKET := zutils.GetEnv("S3_BUCKET", "")
+	S3_BUCKET := zutils.GetEnv("ZINC_S3_BUCKET", "")
 	delimiter := "/"
 
 	ctx := context.Background()

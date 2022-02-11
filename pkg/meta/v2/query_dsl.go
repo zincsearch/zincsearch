@@ -1,12 +1,14 @@
 package v2
 
+// ZincQuery is the query object for the zinc index. compatible ES Query DSL
 type ZincQuery struct {
-	Query          Query                   `json:"query"`
+	Query          map[string]interface{}  `json:"query"`
 	Aggregations   map[string]Aggregations `json:"aggs"`
 	Highlight      Highlight               `json:"highlight"`
 	Fields         []interface{}           `json:"fields"`  // ["field1", "field2.*", {"field": "fieldName", "format": "epoch_millis"}]
 	Source         interface{}             `json:"_source"` // true, false, ["field1", "field2.*"]
 	Sort           interface{}             `json:"sort"`    // "_sorce", ["Year","-Year", {"Year", "desc"}]
+	Explain        bool                    `json:"explain"`
 	From           int64                   `json:"from"`
 	Size           int64                   `json:"size"`
 	Timeout        int64                   `json:"timeout"`
@@ -20,9 +22,9 @@ type Query struct {
 	MatchBoolPrefix   map[string]interface{}    `json:"match_bool_prefix"`   // simple, MatchBoolPrefixQuery
 	MatchPhrase       map[string]interface{}    `json:"match_phrase"`        // simple, MatchPhraseQuery
 	MatchPhrasePrefix map[string]interface{}    `json:"match_phrase_prefix"` // simple, MatchPhrasePrefixQuery
+	MultiMatch        *MultiMatchQuery          `json:"multi_match"`         // .
 	MatchAll          interface{}               `json:"match_all"`           // just set or null
 	MatchNone         interface{}               `json:"match_none"`          // just set or null
-	MultiMatch        *MultiMatchQuery          `json:"multi_match"`         // .
 	CombinedFields    *CombinedFieldsQuery      `json:"combined_fields"`     // TODO: not implemented
 	QueryString       *QueryStringQuery         `json:"query_string"`        // .
 	SimpleQueryString *SimpleQueryStringQuery   `json:"simple_query_string"` // .
@@ -105,8 +107,8 @@ type SimpleQueryStringQuery struct {
 	Analyzer        string   `json:"analyzer"`
 	Fields          []string `json:"fields"`
 	DefaultOperator string   `json:"default_operator"` // or(default), and
-	Boost           float64  `json:"boost"`
 	AllFields       bool     `json:"all_fields"`
+	Boost           float64  `json:"boost"`
 }
 
 // ExistsQuery
@@ -137,15 +139,18 @@ type RangeQuery struct {
 // {"fuzzy":{"field":"value"}}
 // {"fuzzy":{"field":{"value":"value","fuzziness":"auto"}}}
 type FuzzyQuery struct {
-	Value     string      `json:"value"`
-	Fuzziness interface{} `json:"fuzziness"` // auto, 1,2,3,n
+	Value        string      `json:"value"`
+	Fuzziness    interface{} `json:"fuzziness"` // auto, 1,2,3,n
+	PrefixLength float64     `json:"prefix_length"`
+	Boost        float64     `json:"boost"`
 }
 
 // PrefixQuery
 // {"prefix":{"field":"value"}}
 // {"prefix":{"field":{"value":"value","boost":1.0}}}
 type PrefixQuery struct {
-	Value string `json:"value"` // You can speed up prefix queries using the index_prefixes mapping parameter.
+	Value string  `json:"value"` // You can speed up prefix queries using the index_prefixes mapping parameter.
+	Boost float64 `json:"boost"`
 }
 
 // WildcardQuery

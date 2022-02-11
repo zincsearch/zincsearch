@@ -12,8 +12,8 @@ func init() {
 	}
 	if firstStart {
 		// create default user from environment variable
-		adminUser := os.Getenv("FIRST_ADMIN_USER")
-		adminPassword := os.Getenv("FIRST_ADMIN_PASSWORD")
+		adminUser := os.Getenv("ZINC_FIRST_ADMIN_USER")
+		adminPassword := os.Getenv("ZINC_FIRST_ADMIN_PASSWORD")
 
 		if adminUser == "" || adminPassword == "" {
 			log.Fatal("FIRST_ADMIN_USER and FIRST_ADMIN_PASSWORD must be set on first start. You should also change the credentials after first login.")

@@ -13,6 +13,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
+	"github.com/prabhatsharma/zinc/pkg/startup"
 )
 
 func BulkHandler(c *gin.Context) {
@@ -34,7 +35,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 	defer body.Close()
 
 	// force set batchSize
-	batchSize := 1000
+	batchSize := startup.BATCH_SIZE
 
 	// Set 1 MB max per line. docs at - https://pkg.go.dev/bufio#pkg-constants
 	// This is the max size of a line in a file that we will process

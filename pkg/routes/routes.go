@@ -11,6 +11,7 @@ import (
 	"github.com/prabhatsharma/zinc"
 	"github.com/prabhatsharma/zinc/pkg/auth"
 	"github.com/prabhatsharma/zinc/pkg/handlers"
+	handlersV2 "github.com/prabhatsharma/zinc/pkg/handlers/v2"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 )
 
@@ -68,6 +69,7 @@ func SetRoutes(r *gin.Engine) {
 
 	// Index - https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
 
+	r.POST("/es/:target/_search", auth.ZincAuthMiddleware, handlersV2.SearchIndex)
 	r.PUT("/es/:target/_mappings", auth.ZincAuthMiddleware, handlers.UpdateIndexMappings)
 	r.PUT("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 
