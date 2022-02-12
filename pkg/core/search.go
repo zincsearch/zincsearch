@@ -5,18 +5,19 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
+	"github.com/rs/zerolog/log"
+
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 	"github.com/prabhatsharma/zinc/pkg/startup"
 	"github.com/prabhatsharma/zinc/pkg/uquery"
-	"github.com/rs/zerolog/log"
 )
 
 func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 	var Hits []v1.Hit
 
 	var searchRequest bluge.SearchRequest
-	if iQuery.MaxResults > startup.MAX_RESULTS {
-		iQuery.MaxResults = startup.MAX_RESULTS
+	if iQuery.MaxResults > startup.LoadMaxResults() {
+		iQuery.MaxResults = startup.LoadMaxResults()
 	}
 
 	sourceCtl := &v1.Source{Enable: true}
