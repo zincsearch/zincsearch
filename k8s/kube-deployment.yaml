@@ -49,7 +49,7 @@ spec:
               value: admin
             - name: FIRST_ADMIN_PASSWORD
               value: Complexpass#123
-            - name: DATA_PATH
+            - name: ZINC_DATA_PATH
               value: /go/bin/data
           # command: ["/bin/bash", "-c", "while true; do sleep 1; done"]
           imagePullPolicy: IfNotPresent

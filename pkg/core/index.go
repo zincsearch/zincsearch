@@ -137,8 +137,8 @@ func (index *Index) SetMapping(iMap map[string]string) error {
 
 // GetStoredMapping returns the mappings of all the indexes from _index_mapping system index
 func (index *Index) GetStoredMapping() (map[string]string, error) {
-	DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
-	systemPath := DATA_PATH + "/_index_mapping"
+	dataPath := zutils.GetEnv("ZINC_DATA_PATH", "./data")
+	systemPath := dataPath + "/_index_mapping"
 
 	config := bluge.DefaultConfig(systemPath)
 	reader, err := bluge.OpenReader(config)

@@ -37,8 +37,8 @@ func DeleteIndex(c *gin.Context) {
 	// 3. Physically delete the index
 	deleteIndexMapping := false
 	if index.StorageType == "disk" {
-		DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
-		err := os.RemoveAll(DATA_PATH + "/" + index.Name)
+		dataPath := zutils.GetEnv("ZINC_DATA_PATH", "./data")
+		err := os.RemoveAll(dataPath + "/" + index.Name)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -126,12 +126,12 @@ func deleteFilesForIndexFromS3(indexName string) error {
 	}
 	client := s3.NewFromConfig(cfg)
 
-	S3_BUCKET := zutils.GetEnv("S3_BUCKET", "")
+	s3bucket := zutils.GetEnv("ZINC_S3_BUCKET", "")
 	ctx := context.Background()
 
 	// List Objects in the bucket at prefix
 	listObjectsInput := &s3.ListObjectsV2Input{
-		Bucket: &S3_BUCKET,
+		Bucket: &s3bucket,
 		Prefix: &indexName,
 	}
 	listObjectsOutput, err := client.ListObjectsV2(ctx, listObjectsInput)
@@ -150,7 +150,7 @@ func deleteFilesForIndexFromS3(indexName string) error {
 	}
 
 	doi := &s3.DeleteObjectsInput{
-		Bucket: &S3_BUCKET,
+		Bucket: &s3bucket,
 		Delete: &types.Delete{
 			Objects: fileList,
 		},
