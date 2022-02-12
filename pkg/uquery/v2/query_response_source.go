@@ -2,9 +2,11 @@ package v2
 
 import (
 	"encoding/json"
+
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
-func HandleSource(source *Source, data []byte) map[string]interface{} {
+func HandleSource(source *meta.Source, data []byte) map[string]interface{} {
 	ret := make(map[string]interface{})
 	// return empty
 	if !source.Enable {

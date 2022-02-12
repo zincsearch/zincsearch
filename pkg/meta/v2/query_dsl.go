@@ -9,9 +9,9 @@ type ZincQuery struct {
 	Source         interface{}             `json:"_source"` // true, false, ["field1", "field2.*"]
 	Sort           interface{}             `json:"sort"`    // "_sorce", ["Year","-Year", {"Year", "desc"}]
 	Explain        bool                    `json:"explain"`
-	From           int64                   `json:"from"`
-	Size           int64                   `json:"size"`
-	Timeout        int64                   `json:"timeout"`
+	From           int                     `json:"from"`
+	Size           int                     `json:"size"`
+	Timeout        int                     `json:"timeout"`
 	TrackTotalHits bool                    `json:"track_total_hits"`
 }
 
@@ -48,7 +48,7 @@ type BoolQuery struct {
 	Must               interface{} `json:"must"`                 // query, [query1, query2]
 	MustNot            interface{} `json:"must_not"`             // query, [query1, query2]
 	Filter             interface{} `json:"filter"`               // query, [query1, query2]
-	MinimumShouldMatch int64       `json:"minimum_should_match"` // only for should
+	MinimumShouldMatch float64     `json:"minimum_should_match"` // only for should
 }
 
 type BoostingQuery struct {
@@ -58,9 +58,12 @@ type BoostingQuery struct {
 }
 
 type MatchQuery struct {
-	Query    string `json:"query"`
-	Analyzer string `json:"analyzer"`
-	Operator string `json:"operator"` // or(default), and
+	Query        string      `json:"query"`
+	Analyzer     string      `json:"analyzer"`
+	Operator     string      `json:"operator"`  // or(default), and
+	Fuzziness    interface{} `json:"fuzziness"` // auto, 1,2,3,n
+	PrefixLength float64     `json:"prefix_length"`
+	Boost        float64     `json:"boost"`
 }
 
 type MatchBoolPrefixQuery struct {
@@ -69,20 +72,24 @@ type MatchBoolPrefixQuery struct {
 }
 
 type MatchPhraseQuery struct {
-	Query    string `json:"query"`
-	Analyzer string `json:"analyzer"`
+	Query    string  `json:"query"`
+	Analyzer string  `json:"analyzer"`
+	Boost    float64 `json:"boost"`
 }
 
-type MatchPhrasePrefix struct {
-	Query    string `json:"query"`
-	Analyzer string `json:"analyzer"`
+type MatchPhrasePrefixQuery struct {
+	Query    string  `json:"query"`
+	Analyzer string  `json:"analyzer"`
+	Boost    float64 `json:"boost"`
 }
 
 type MultiMatchQuery struct {
-	Query    string   `json:"query"`
-	Analyzer string   `json:"analyzer"`
-	Fields   []string `json:"fields"`
-	Type     string   `json:"type"` // best_fields(default), most_fields, cross_fields, phrase, phrase_prefix, bool_prefix
+	Query              string   `json:"query"`
+	Analyzer           string   `json:"analyzer"`
+	Fields             []string `json:"fields"`
+	Type               string   `json:"type"`     // best_fields(default), most_fields, cross_fields, phrase, phrase_prefix, bool_prefix
+	Operator           string   `json:"operator"` // or(default), and
+	MinimumShouldMatch float64  `json:"minimum_should_match"`
 }
 
 type CombinedFieldsQuery struct {
@@ -90,7 +97,7 @@ type CombinedFieldsQuery struct {
 	Analyzer           string   `json:"analyzer"`
 	Fields             []string `json:"fields"`
 	Operator           string   `json:"operator"` // or(default), and
-	MinimumShouldMatch int64    `json:"minimum_should_match"`
+	MinimumShouldMatch float64  `json:"minimum_should_match"`
 }
 
 type QueryStringQuery struct {

@@ -1,14 +1,13 @@
 package v2
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
-	v2 "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 // SearchIndex searches the index for the given http request from end user
@@ -20,10 +19,11 @@ func SearchIndex(c *gin.Context) {
 		return
 	}
 
-	query := new(v2.ZincQuery)
+	query := new(meta.ZincQuery)
 	err := c.BindJSON(query)
 	if err != nil {
 		log.Printf("handlers.SearchIndex: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
@@ -34,8 +34,7 @@ func SearchIndex(c *gin.Context) {
 	}
 	if err != nil {
 		switch v := err.(type) {
-		case *v2.Error:
-			fmt.Println("v2.Error")
+		case *meta.Error:
 			c.JSON(http.StatusBadRequest, v)
 		default:
 			c.JSON(http.StatusBadRequest, gin.H{"error": v})
