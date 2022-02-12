@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/blugelabs/bluge"
@@ -10,6 +9,7 @@ import (
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	uquery "github.com/prabhatsharma/zinc/pkg/uquery/v2"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/source"
 )
 
 func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error) {
@@ -51,7 +51,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 		var timestamp time.Time
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
 			if field == "_source" {
-				json.Unmarshal(value, &result)
+				result = source.Response(query.Source, value)
 				return true
 			} else if field == "_id" {
 				id = string(value)

@@ -1,4 +1,4 @@
-package parser
+package query
 
 import (
 	"fmt"
@@ -13,15 +13,15 @@ func Query(query map[string]interface{}) (bluge.Query, error) {
 	var subq bluge.Query
 	var cmd string
 	var err error
-	for k, v := range query {
+	for k, t := range query {
 		if subq != nil && cmd != "" {
 			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[%s] malformed query, excepted [END_OBJECT] but found [FIELD_NAME] %s", cmd, k))
 		}
 		k := strings.ToLower(k)
 		cmd = k
-		v, ok := v.(map[string]interface{})
+		v, ok := t.(map[string]interface{})
 		if !ok {
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[%s] query doesn't support value type %T", k, v))
+			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[%s] query doesn't support value type %T", k, t))
 		}
 		switch k {
 		case "bool":

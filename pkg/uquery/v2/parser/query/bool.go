@@ -1,4 +1,4 @@
-package parser
+package query
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ func BoolQuery(query map[string]interface{}) (bluge.Query, error) {
 					}
 				}
 			default:
-				return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[bool] unsupported %s children type %T", k, v))
+				return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s doesn't support values of type: %T", k, v))
 			}
 		case "must":
 			switch v := v.(type) {
@@ -50,7 +50,7 @@ func BoolQuery(query map[string]interface{}) (bluge.Query, error) {
 					}
 				}
 			default:
-				return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[bool] unsupported %s children type %T", k, v))
+				return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s doesn't support values of type: %T", k, v))
 			}
 		case "must_not":
 			switch v := v.(type) {
@@ -69,7 +69,7 @@ func BoolQuery(query map[string]interface{}) (bluge.Query, error) {
 					}
 				}
 			default:
-				return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[bool] unsupported %s children type %T", k, v))
+				return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s doesn't support values of type: %T", k, v))
 			}
 		case "filter":
 			filterQuery := bluge.NewBooleanQuery().SetBoost(0)
@@ -89,13 +89,13 @@ func BoolQuery(query map[string]interface{}) (bluge.Query, error) {
 					}
 				}
 			default:
-				return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[bool] unsupported %s children type %T", k, v))
+				return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s doesn't support values of type: %T", k, v))
 			}
 			boolQuery.AddMust(filterQuery)
 		case "minimum_should_match":
 			boolQuery.SetMinShould(int(v.(float64)))
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[bool] unsupported query type [%s]", k))
+			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[bool] unknown field [%s]", k))
 		}
 	}
 

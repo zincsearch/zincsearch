@@ -7,21 +7,22 @@ import (
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/startup"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/query"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/source"
 )
 
 // ParseQueryDSL parse query DSL and return searchRequest
 func ParseQueryDSL(q *meta.ZincQuery) (bluge.SearchRequest, error) {
 	// parse size
-	if q.Size > startup.MAX_RESULTS {
-		q.Size = startup.MAX_RESULTS
-	}
 	if q.Size == 0 {
 		q.Size = 10
 	}
+	if q.Size > startup.MAX_RESULTS {
+		q.Size = startup.MAX_RESULTS
+	}
 
 	// parse query
-	query, err := parser.Query(q.Query)
+	query, err := query.Query(q.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +50,11 @@ func ParseQueryDSL(q *meta.ZincQuery) (bluge.SearchRequest, error) {
 	// parse fields
 
 	// parse source
+	if q.Source != nil {
+		if q.Source, err = source.Request(q.Source); err != nil {
+			return nil, err
+		}
+	}
 
 	// parse sort
 
