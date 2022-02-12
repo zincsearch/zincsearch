@@ -2,6 +2,7 @@ package query
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis/analyzer"
@@ -23,6 +24,7 @@ func MatchBoolPrefixQuery(query map[string]interface{}) (bluge.Query, error) {
 			value.Query = v
 		case map[string]interface{}:
 			for k, v := range v {
+				k := strings.ToLower(k)
 				switch k {
 				case "query":
 					value.Query = v.(string)

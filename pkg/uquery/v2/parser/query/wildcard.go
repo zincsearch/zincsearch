@@ -2,6 +2,7 @@ package query
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/blugelabs/bluge"
 
@@ -23,17 +24,18 @@ func WildcardQuery(query map[string]interface{}) (bluge.Query, error) {
 			value.Value = v
 		case map[string]interface{}:
 			for k, v := range v {
+				k := strings.ToLower(k)
 				switch k {
 				case "value":
 					value.Value = v.(string)
 				case "boost":
 					value.Boost = v.(float64)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[wildcard] unsupported children %s", k))
+					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[wildcard] unknown field [%s]", k))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[wildcard] unsupported query type %s", k))
+			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[wildcard] %s doesn't support values of type: %T", k, v))
 		}
 	}
 

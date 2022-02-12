@@ -2,6 +2,7 @@ package query
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis/analyzer"
@@ -13,6 +14,7 @@ import (
 func QueryStringQuery(query map[string]interface{}) (bluge.Query, error) {
 	value := new(meta.QueryStringQuery)
 	for k, v := range query {
+		k := strings.ToLower(k)
 		switch k {
 		case "query":
 			value.Query = v.(string)

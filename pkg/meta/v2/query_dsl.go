@@ -142,6 +142,14 @@ type RangeQuery struct {
 	Boost    float64     `json:"boost"`
 }
 
+// RegexpQuery
+// {"regexp":{"field":{"value":"[0-9]*"}}}
+type RegexpQuery struct {
+	Value string  `json:"value"`
+	Flags string  `json:"flags"`
+	Boost float64 `json:"boost"`
+}
+
 // FuzzyQuery
 // {"fuzzy":{"field":"value"}}
 // {"fuzzy":{"field":{"value":"value","fuzziness":"auto"}}}
@@ -172,8 +180,9 @@ type WildcardQuery struct {
 // {"term":{"field": "value"}}
 // {"term":{"field": {"value": "value", "boost": 1.0}}}
 type TermQuery struct {
-	Value interface{} `json:"value"`
-	Boost float64     `json:"boost"`
+	Value           string  `json:"value"`
+	Boost           float64 `json:"boost"`
+	CaseInsensitive bool    `json:"case_insensitive"`
 }
 
 // TermsQuery

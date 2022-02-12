@@ -13,6 +13,7 @@ import (
 func MultiMatchQuery(query map[string]interface{}) (bluge.Query, error) {
 	value := new(meta.MultiMatchQuery)
 	for k, v := range query {
+		k := strings.ToLower(k)
 		switch k {
 		case "query":
 			value.Query = v.(string)

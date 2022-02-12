@@ -2,6 +2,7 @@ package query
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/blugelabs/bluge"
 
@@ -23,6 +24,7 @@ func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
 			value.Value = v
 		case map[string]interface{}:
 			for k, v := range v {
+				k := strings.ToLower(k)
 				switch k {
 				case "value":
 					value.Value = v.(string)
