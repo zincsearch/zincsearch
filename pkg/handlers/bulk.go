@@ -35,7 +35,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 	defer body.Close()
 
 	// force set batchSize
-	batchSize := startup.BATCH_SIZE
+	batchSize := startup.LoadBatchSize()
 
 	// Set 1 MB max per line. docs at - https://pkg.go.dev/bufio#pkg-constants
 	// This is the max size of a line in a file that we will process

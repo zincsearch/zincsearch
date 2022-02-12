@@ -17,8 +17,8 @@ func ParseQueryDSL(q *meta.ZincQuery) (bluge.SearchRequest, error) {
 	if q.Size == 0 {
 		q.Size = 10
 	}
-	if q.Size > startup.MAX_RESULTS {
-		q.Size = startup.MAX_RESULTS
+	if q.Size > startup.LoadMaxResults() {
+		q.Size = startup.LoadMaxResults()
 	}
 
 	// parse query
