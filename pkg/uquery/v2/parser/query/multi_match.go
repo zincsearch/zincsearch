@@ -31,7 +31,7 @@ func MultiMatchQuery(query map[string]interface{}) (bluge.Query, error) {
 		case "minimum_should_match":
 			value.MinimumShouldMatch = v.(float64)
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[multi_match] unsupported children %s", k))
+			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[multi_match] unknown field [%s]", k))
 		}
 	}
 
@@ -55,7 +55,7 @@ func MultiMatchQuery(query map[string]interface{}) (bluge.Query, error) {
 		case "AND":
 			operator = bluge.MatchQueryOperatorAnd
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[multi_match] unsupported operator %s", op))
+			return nil, meta.NewError(meta.ErrorTypeIllegalArgumentException, fmt.Sprintf("[multi_match] unknown operator %s", op))
 		}
 	}
 

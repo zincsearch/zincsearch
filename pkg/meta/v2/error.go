@@ -3,10 +3,10 @@ package v2
 import "fmt"
 
 const (
-	ErrorTypeParsingException       = "parsing_exception"
-	ErrorTypeXContentParseException = "x_content_parse_exception"
-	ErrorTypeValidationException    = "validation_exception"
-	ErrorTypeNotImplemented         = "not_implemented"
+	ErrorTypeParsingException         = "parsing_exception"
+	ErrorTypeXContentParseException   = "x_content_parse_exception"
+	ErrorTypeIllegalArgumentException = "illegal_argument_exception"
+	ErrorTypeNotImplemented           = "not_implemented"
 )
 
 type Error struct {

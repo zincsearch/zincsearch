@@ -32,11 +32,11 @@ func MatchPhraseQuery(query map[string]interface{}) (bluge.Query, error) {
 				case "boost":
 					value.Boost = v.(float64)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match_phrase] unsupported children %s", k))
+					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match_phrase] unknown field [%s]", k))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match_phrase] unsupported query type %s", k))
+			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[match_phrase] %s doesn't support values of type: %T", k, v))
 		}
 	}
 

@@ -39,11 +39,11 @@ func MatchQuery(query map[string]interface{}) (bluge.Query, error) {
 				case "boost":
 					value.Boost = v.(float64)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match] unsupported children %s", k))
+					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match] unknown field [%s]", k))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match] unsupported query type %s", k))
+			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[match] %s doesn't support values of type: %T", k, v))
 		}
 	}
 
@@ -64,7 +64,7 @@ func MatchQuery(query map[string]interface{}) (bluge.Query, error) {
 		case "AND":
 			subq.SetOperator(bluge.MatchQueryOperatorAnd)
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match] unsupported operator %s", op))
+			return nil, meta.NewError(meta.ErrorTypeIllegalArgumentException, fmt.Sprintf("[match] unknown operator %s", op))
 		}
 	}
 	if value.Fuzziness != nil {

@@ -29,11 +29,11 @@ func MatchBoolPrefixQuery(query map[string]interface{}) (bluge.Query, error) {
 				case "analyzer":
 					value.Analyzer = v.(string)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match_bool_prefix] unsupported children %s", k))
+					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match_bool_prefix] unknown field [%s]", k))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match_bool_prefix] unsupported query type %s", k))
+			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[match_bool_prefix] %s doesn't support values of type: %T", k, v))
 		}
 	}
 
