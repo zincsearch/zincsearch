@@ -83,6 +83,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 	}
 
 	resp.Took = int(dmi.Aggregations().Duration().Milliseconds())
+	resp.Shards = meta.Shards{Total: 1, Successful: 1}
 	resp.Hits = meta.Hits{
 		Total: meta.Total{
 			Value: int(dmi.Aggregations().Count()),

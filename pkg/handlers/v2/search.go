@@ -28,11 +28,11 @@ func SearchIndex(c *gin.Context) {
 	}
 
 	resp, err := index.SearchV2(query)
-	if resp != nil {
-		c.JSON(http.StatusBadRequest, resp)
-		return
-	}
 	if err != nil {
+		if resp != nil {
+			c.JSON(http.StatusBadRequest, resp)
+			return
+		}
 		switch v := err.(type) {
 		case *meta.Error:
 			c.JSON(http.StatusBadRequest, v)

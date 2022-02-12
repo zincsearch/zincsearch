@@ -6,9 +6,17 @@ import "time"
 type SearchResponse struct {
 	Took         int                            `json:"took"` // Time it took to generate the response
 	TimedOut     bool                           `json:"timed_out"`
+	Shards       Shards                         `json:"_shards"`
 	Hits         Hits                           `json:"hits"`
 	Aggregations map[string]AggregationResponse `json:"aggregations,omitempty"`
 	Error        string                         `json:"error"`
+}
+
+type Shards struct {
+	Total      int `json:"total"`
+	Successful int `json:"successful"`
+	Skipped    int `json:"skipped"`
+	Failed     int `json:"failed"`
 }
 
 type Hits struct {
