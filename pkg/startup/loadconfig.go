@@ -7,20 +7,40 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var MAX_RESULTS = LoadMaxResults()
+const (
+	DEFAULT_BATCH_SIZE  = 1000
+	DEFAULT_MAX_RESULTS = 10000
+)
 
-func LoadMaxResults() int {
+var batchSize = DEFAULT_BATCH_SIZE
+var maxResults = DEFAULT_MAX_RESULTS
+
+func init() {
 	godotenv.Load()
-	MAX_RESULTS_STRING := os.Getenv("MAX_RESULTS")
 
-	if MAX_RESULTS_STRING != "" {
-		MAX_RESULTS, err := strconv.Atoi(MAX_RESULTS_STRING)
-		if err != nil {
-			return 10000
-		} else {
-			return MAX_RESULTS
+	var vs string
+	var vi int
+	var err error
+	vs = os.Getenv("ZINC_BATCH_SIZE")
+	if vs != "" {
+		if vi, err = strconv.Atoi(vs); err == nil {
+			batchSize = vi
 		}
 	}
 
-	return 10000
+	vs = os.Getenv("ZINC_MAX_RESULTS")
+	if vs != "" {
+		if vi, err = strconv.Atoi(vs); err == nil {
+			maxResults = vi
+		}
+	}
+
+}
+
+func LoadBatchSize() int {
+	return batchSize
+}
+
+func LoadMaxResults() int {
+	return maxResults
 }
