@@ -8,12 +8,14 @@ import (
 )
 
 const (
-	DEFAULT_BATCH_SIZE  = 1000
-	DEFAULT_MAX_RESULTS = 10000
+	DEFAULT_BATCH_SIZE             = 1000
+	DEFAULT_MAX_RESULTS            = 10000
+	DEFAULT_AGGREGATION_TERMS_SIZE = 100
 )
 
 var batchSize = DEFAULT_BATCH_SIZE
 var maxResults = DEFAULT_MAX_RESULTS
+var aggregationTermsSize = DEFAULT_AGGREGATION_TERMS_SIZE
 
 func init() {
 	godotenv.Load()
@@ -35,6 +37,13 @@ func init() {
 		}
 	}
 
+	vs = os.Getenv("ZINC_AGGREGATION_TERMS_SIZE")
+	if vs != "" {
+		if vi, err = strconv.Atoi(vs); err == nil {
+			aggregationTermsSize = vi
+		}
+	}
+
 }
 
 func LoadBatchSize() int {
@@ -43,4 +52,8 @@ func LoadBatchSize() int {
 
 func LoadMaxResults() int {
 	return maxResults
+}
+
+func LoadAggregationTermsSize() int {
+	return aggregationTermsSize
 }

@@ -8,6 +8,7 @@ import (
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/startup"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/aggregation"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/fields"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/query"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/sort"
@@ -15,7 +16,7 @@ import (
 )
 
 // ParseQueryDSL parse query DSL and return searchRequest
-func ParseQueryDSL(q *meta.ZincQuery) (bluge.SearchRequest, error) {
+func ParseQueryDSL(q *meta.ZincQuery, mappings map[string]string) (bluge.SearchRequest, error) {
 	// parse size
 	if q.Size == 0 {
 		q.Size = 10
@@ -34,8 +35,7 @@ func ParseQueryDSL(q *meta.ZincQuery) (bluge.SearchRequest, error) {
 	}
 
 	// parse highlight
-
-	// parse aggregations
+	// TODO: highlight
 
 	// create search request
 	request := bluge.NewTopNSearch(q.Size, query).WithStandardAggregations()
@@ -48,6 +48,13 @@ func ParseQueryDSL(q *meta.ZincQuery) (bluge.SearchRequest, error) {
 	// parse explain
 	if q.Explain {
 		request.ExplainScores()
+	}
+
+	// parse aggregations
+	if q.Aggregations != nil {
+		if err := aggregation.Request(request, q.Aggregations, mappings); err != nil {
+			return nil, err
+		}
 	}
 
 	// parse fields
@@ -74,6 +81,7 @@ func ParseQueryDSL(q *meta.ZincQuery) (bluge.SearchRequest, error) {
 		}
 	}
 
+	// pagenation
 	// TODO: search after PIT support
 
 	return request, nil

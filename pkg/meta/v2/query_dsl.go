@@ -193,11 +193,11 @@ type TermsQuery map[string]interface{}
 type TermsSetQuery struct{}
 
 type Aggregations struct {
-	Avg           AggregationMetric         `json:"avg"`
-	Max           AggregationMetric         `json:"max"`
-	Min           AggregationMetric         `json:"min"`
-	Sum           AggregationMetric         `json:"sum"`
-	Count         AggregationMetric         `json:"count"`
+	Avg           *AggregationMetric        `json:"avg"`
+	Max           *AggregationMetric        `json:"max"`
+	Min           *AggregationMetric        `json:"min"`
+	Sum           *AggregationMetric        `json:"sum"`
+	Count         *AggregationMetric        `json:"count"`
 	Terms         *AggregationsTerms        `json:"terms"`
 	Range         *AggregationRange         `json:"range"`
 	DateRange     *AggregationDateRange     `json:"date_range"`
@@ -213,7 +213,7 @@ type AggregationMetric struct {
 
 type AggregationsTerms struct {
 	Field string            `json:"field"`
-	Size  int64             `json:"size"`
+	Size  int               `json:"size"`
 	Order map[string]string `json:"order"` // { "_count": "asc" }
 }
 

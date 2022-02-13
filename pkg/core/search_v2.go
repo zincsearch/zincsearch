@@ -14,7 +14,8 @@ import (
 )
 
 func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error) {
-	searchRequest, err := uquery.ParseQueryDSL(query)
+	mappings, _ := index.GetStoredMapping()
+	searchRequest, err := uquery.ParseQueryDSL(query, mappings)
 	if err != nil {
 		return nil, err
 	}
@@ -96,6 +97,10 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 		},
 		MaxScore: dmi.Aggregations().Metric("max_score"),
 		Hits:     Hits,
+	}
+
+	if err := uquery.FormatResponse(resp, query, dmi.Aggregations()); err != nil {
+		log.Printf("index.SearchV2: error format response: %v", err)
 	}
 
 	return resp, nil
