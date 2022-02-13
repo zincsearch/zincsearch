@@ -60,10 +60,8 @@ func ParseQueryDSL(q *meta.ZincQuery) (bluge.SearchRequest, error) {
 	}
 
 	// parse source
-	if q.Source != nil {
-		if q.Source, err = source.Request(q.Source); err != nil {
-			return nil, err
-		}
+	if q.Source, err = source.Request(q.Source); err != nil {
+		return nil, err
 	}
 
 	// parse sort

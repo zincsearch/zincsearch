@@ -9,6 +9,10 @@ import (
 
 func Request(v interface{}) (*meta.Source, error) {
 	source := &meta.Source{Enable: true}
+	if v == nil {
+		return source, nil
+	}
+
 	switch v := v.(type) {
 	case bool:
 		source.Enable = v
