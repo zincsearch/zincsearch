@@ -5,9 +5,9 @@ type ZincQuery struct {
 	Query          map[string]interface{}  `json:"query"`
 	Aggregations   map[string]Aggregations `json:"aggs"`
 	Highlight      Highlight               `json:"highlight"`
-	Fields         []interface{}           `json:"fields"`  // ["field1", "field2.*", {"field": "fieldName", "format": "epoch_millis"}]
+	Fields         interface{}             `json:"fields"`  // ["field1", "field2.*", {"field": "fieldName", "format": "epoch_millis"}]
 	Source         interface{}             `json:"_source"` // true, false, ["field1", "field2.*"]
-	Sort           interface{}             `json:"sort"`    // "_sorce", ["Year","-Year", {"Year", "desc"}]
+	Sort           interface{}             `json:"sort"`    // "_sorce", ["+Year","-Year", {"Year": "desc"}, "Date": {"order": "asc"", "format": "yyyy-MM-dd"}}"}]
 	Explain        bool                    `json:"explain"`
 	From           int                     `json:"from"`
 	Size           int                     `json:"size"`
@@ -283,11 +283,6 @@ type Field struct {
 }
 
 type Source struct {
-	Enable bool            // enable _source returns, default is true
-	Fields map[string]bool // what fields can returns
-}
-
-type Sort struct {
-	Field string
-	Order string // asc, desc
+	Enable bool     // enable _source returns, default is true
+	Fields []string // what fields can returns
 }

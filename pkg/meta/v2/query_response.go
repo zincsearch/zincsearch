@@ -31,7 +31,8 @@ type Hit struct {
 	ID        string      `json:"_id"`
 	Score     float64     `json:"_score"`
 	Timestamp time.Time   `json:"@timestamp"`
-	Source    interface{} `json:"_source"`
+	Source    interface{} `json:"_source,omitempty"`
+	Fields    interface{} `json:"fields,omitempty"`
 }
 
 type Total struct {

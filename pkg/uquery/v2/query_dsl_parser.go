@@ -4,10 +4,13 @@ import (
 	"fmt"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/search"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/startup"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/fields"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/query"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/sort"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/source"
 )
 
@@ -48,6 +51,13 @@ func ParseQueryDSL(q *meta.ZincQuery) (bluge.SearchRequest, error) {
 	}
 
 	// parse fields
+	if q.Fields != nil {
+		if v, ok := q.Fields.([]interface{}); ok {
+			if q.Fields, err = fields.Request(v); err != nil {
+				return nil, err
+			}
+		}
+	}
 
 	// parse source
 	if q.Source != nil {
@@ -57,9 +67,16 @@ func ParseQueryDSL(q *meta.ZincQuery) (bluge.SearchRequest, error) {
 	}
 
 	// parse sort
+	if q.Sort != nil {
+		if q.Sort, err = sort.Request(q.Sort); err != nil {
+			return nil, err
+		}
+		if q.Sort != nil {
+			request.SortByCustom(q.Sort.(search.SortOrder))
+		}
+	}
 
-	// parse track_total_hits
-	// TODO support track_total_hits
+	// TODO: search after PIT support
 
 	return request, nil
 }

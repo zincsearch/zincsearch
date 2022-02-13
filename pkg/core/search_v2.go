@@ -9,6 +9,7 @@ import (
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	uquery "github.com/prabhatsharma/zinc/pkg/uquery/v2"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/fields"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/source"
 )
 
@@ -46,12 +47,16 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 	var Hits []meta.Hit
 	next, err := dmi.Next()
 	for err == nil && next != nil {
-		var result map[string]interface{}
 		var id string
 		var timestamp time.Time
+		var sourceData map[string]interface{}
+		var fieldsData map[string]interface{}
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
 			if field == "_source" {
-				result = source.Response(query.Source, value)
+				sourceData = source.Response(query.Source.(*meta.Source), value)
+				if query.Fields != nil {
+					fieldsData = fields.Response(query.Fields.([]*meta.Field), value)
+				}
 				return true
 			} else if field == "_id" {
 				id = string(value)
@@ -72,7 +77,8 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 			ID:        id,
 			Score:     next.Score,
 			Timestamp: timestamp,
-			Source:    result,
+			Source:    sourceData,
+			Fields:    fieldsData,
 		}
 		Hits = append(Hits, hit)
 

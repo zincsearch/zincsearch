@@ -2,20 +2,21 @@ package source
 
 import (
 	"encoding/json"
+	"strings"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
-func Request(s interface{}) (*meta.Source, error) {
+func Request(v interface{}) (*meta.Source, error) {
 	source := &meta.Source{Enable: true}
-	switch v := s.(type) {
+	switch v := v.(type) {
 	case bool:
 		source.Enable = v
 	case []interface{}:
-		source.Fields = make(map[string]bool, len(v))
+		source.Fields = make([]string, 0, len(v))
 		for _, field := range v {
-			if fv, ok := field.(string); ok {
-				source.Fields[fv] = true
+			if v, ok := field.(string); ok {
+				source.Fields = append(source.Fields, v)
 			} else {
 				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[_source] value should be boolean or []string")
 			}
@@ -27,18 +28,13 @@ func Request(s interface{}) (*meta.Source, error) {
 	return source, nil
 }
 
-func Response(s interface{}, data []byte) map[string]interface{} {
-	source, ok := s.(*meta.Source)
-	if !ok {
-		source = &meta.Source{Enable: true}
+func Response(source *meta.Source, data []byte) map[string]interface{} {
+	// return empty
+	if !source.Enable {
+		return nil
 	}
 
 	ret := make(map[string]interface{})
-	// return empty
-	if !source.Enable {
-		return ret
-	}
-
 	err := json.Unmarshal(data, &ret)
 	if err != nil {
 		return nil
@@ -49,14 +45,23 @@ func Response(s interface{}, data []byte) map[string]interface{} {
 		return ret
 	}
 
-	// TODO: wildcard support
-	// delete field not in source.Fields
-	for field := range ret {
-		if _, ok := source.Fields[field]; ok {
-			continue
+	wildcard := false
+	rets := make(map[string]interface{})
+	for _, field := range source.Fields {
+		wildcard = false
+		if strings.HasSuffix(field, "*") {
+			wildcard = true
 		}
-		delete(ret, field)
+		if _, ok := ret[field]; ok {
+			rets[field] = ret[field]
+		} else if wildcard {
+			for k, v := range ret {
+				if strings.HasPrefix(k, field[:len(field)-1]) {
+					rets[k] = v
+				}
+			}
+		}
 	}
 
-	return ret
+	return rets
 }
