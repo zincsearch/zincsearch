@@ -26,13 +26,13 @@ type Hits struct {
 }
 
 type Hit struct {
-	Index     string      `json:"_index"`
-	Type      string      `json:"_type"`
-	ID        string      `json:"_id"`
-	Score     float64     `json:"_score"`
-	Timestamp time.Time   `json:"@timestamp"`
-	Source    interface{} `json:"_source,omitempty"`
-	Fields    interface{} `json:"fields,omitempty"`
+	Index     string                 `json:"_index"`
+	Type      string                 `json:"_type"`
+	ID        string                 `json:"_id"`
+	Score     float64                `json:"_score"`
+	Timestamp time.Time              `json:"@timestamp"`
+	Source    map[string]interface{} `json:"_source,omitempty"`
+	Fields    map[string]interface{} `json:"fields,omitempty"`
 }
 
 type Total struct {
