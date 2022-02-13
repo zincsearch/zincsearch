@@ -21,7 +21,6 @@ func NewIndex(name string, storageType string) (*Index, error) {
 		config = directory.GetMinIOConfig(MINIO_BUCKET, name)
 	} else { // Default storage type is disk
 		ZINC_DATA_PATH := zutils.GetEnv("ZINC_DATA_PATH", "./data")
-
 		config = bluge.DefaultConfig(ZINC_DATA_PATH + "/" + name)
 	}
 

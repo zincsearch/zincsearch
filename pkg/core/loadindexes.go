@@ -42,8 +42,8 @@ func LoadZincIndexesFromDisk() (map[string]*Index, error) {
 	indexList := make(map[string]*Index)
 
 	ZINC_DATA_PATH := zutils.GetEnv("ZINC_DATA_PATH", "./data")
-
 	files, err := os.ReadDir(ZINC_DATA_PATH)
+
 	if err != nil {
 		log.Print("Error reading data directory: ", err.Error())
 		log.Fatal().Msg("Error reading data directory: " + err.Error())
