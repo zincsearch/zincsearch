@@ -14,15 +14,15 @@ import (
 func NewIndex(name string, storageType string) (*Index, error) {
 	var config bluge.Config
 	if storageType == "s3" {
-		S3_BUCKET := zutils.GetEnv("S3_BUCKET", "")
-		config = directory.GetS3Config(S3_BUCKET, name)
+		ZINC_S3_BUCKET := zutils.GetEnv("ZINC_S3_BUCKET", "")
+		config = directory.GetS3Config(ZINC_S3_BUCKET, name)
 	} else if storageType == "minio" {
 		MINIO_BUCKET := zutils.GetEnv("ZINC_MINIO_BUCKET", "")
 		config = directory.GetMinIOConfig(MINIO_BUCKET, name)
 	} else { // Default storage type is disk
-		DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
+		ZINC_DATA_PATH := zutils.GetEnv("ZINC_DATA_PATH", "./data")
 
-		config = bluge.DefaultConfig(DATA_PATH + "/" + name)
+		config = bluge.DefaultConfig(ZINC_DATA_PATH + "/" + name)
 	}
 
 	writer, err := bluge.OpenWriter(config)
@@ -58,7 +58,7 @@ func FormatMapping(mappings *Mappings) (map[string]string, error) {
 		ptype := strings.ToLower(prop.Type)
 		switch ptype {
 		case "text", "keyword", "numeric", "bool", "time":
-			continue // ptype can be used as is
+		// ptype can be used as is. no need to do anything
 		case "boolean":
 			ptype = "bool"
 		case "date", "datetime":

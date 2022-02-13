@@ -55,8 +55,8 @@ Join slack channel
 Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc/releases) page for appropriate platform.
 
 ```shell
-C:\> set FIRST_ADMIN_USER=admin
-C:\> set FIRST_ADMIN_PASSWORD=Complexpass#123
+C:\> set ZINC_FIRST_ADMIN_USER=admin
+C:\> set ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
 C:\> mkdir data
 C:\> zinc.exe
 ```
@@ -68,7 +68,7 @@ C:\> zinc.exe
 
 > $ mkdir data
 
-> $ FIRST_ADMIN_USER=admin FIRST_ADMIN_PASSWORD=Complexpass#123 zinc 
+> $ ZINC_FIRST_ADMIN_USER=admin ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123 zinc 
 
 Now point your browser to http://localhost:4080 and login
 
@@ -78,7 +78,7 @@ Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc
 Create a data folder that will store the data
 > $ mkdir data
 
-> $ FIRST_ADMIN_USER=admin FIRST_ADMIN_PASSWORD=Complexpass#123 ./zinc 
+> $ ZINC_FIRST_ADMIN_USER=admin ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123 ./zinc 
 
 Now point your browser to http://localhost:4080 and login
 
@@ -97,7 +97,7 @@ Docker images are available at https://gallery.ecr.aws/prabhat/zinc
 
 > $ mkdir data
 
-> $ docker run -v /full/path/of/data:/data -e DATA_PATH="/data" -p 4080:4080 -e FIRST_ADMIN_USER=admin -e FIRST_ADMIN_PASSWORD=Complexpass#123 --name zinc public.ecr.aws/prabhat/zinc:latest
+> $ docker run -v /full/path/of/data:/data -e ZINC_DATA_PATH="/data" -p 4080:4080 -e ZINC_FIRST_ADMIN_USER=admin -e ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123 --name zinc public.ecr.aws/prabhat/zinc:latest
 
 
 

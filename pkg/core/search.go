@@ -15,8 +15,8 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 	var Hits []v1.Hit
 
 	var searchRequest bluge.SearchRequest
-	if iQuery.MaxResults > startup.MAX_RESULTS {
-		iQuery.MaxResults = startup.MAX_RESULTS
+	if iQuery.MaxResults > startup.ZINC_MAX_RESULTS {
+		iQuery.MaxResults = startup.ZINC_MAX_RESULTS
 	}
 
 	sourceCtl := &v1.Source{Enable: true}

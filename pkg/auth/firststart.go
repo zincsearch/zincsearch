@@ -3,6 +3,8 @@ package auth
 import (
 	"log"
 	"os"
+
+	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
 func init() {
@@ -12,13 +14,14 @@ func init() {
 	}
 	if firstStart {
 		// create default user from environment variable
-		adminUser := os.Getenv("FIRST_ADMIN_USER")
-		adminPassword := os.Getenv("FIRST_ADMIN_PASSWORD")
+		adminUser := os.Getenv("ZINC_FIRST_ADMIN_USER")
+		adminPassword := os.Getenv("ZINC_FIRST_ADMIN_PASSWORD")
 
 		if adminUser == "" || adminPassword == "" {
-			log.Fatal("FIRST_ADMIN_USER and FIRST_ADMIN_PASSWORD must be set on first start. You should also change the credentials after first login.")
+			log.Fatal("ZINC_FIRST_ADMIN_USER and ZINC_FIRST_ADMIN_PASSWORD must be set on first start. You should also change the credentials after first login.")
 		}
 		CreateUser(adminUser, "", adminPassword, "admin")
+		core.CreateInstanceID()
 	}
 }
 

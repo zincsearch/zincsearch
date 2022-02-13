@@ -45,14 +45,14 @@ spec:
         - name: zinc
           image: public.ecr.aws/prabhat/zinc:latest
           env:
-            - name: FIRST_ADMIN_USER
+            - name: ZINC_FIRST_ADMIN_USER
               value: admin
-            - name: FIRST_ADMIN_PASSWORD
+            - name: ZINC_FIRST_ADMIN_PASSWORD
               value: Complexpass#123
-            - name: DATA_PATH
+            - name: ZINC_DATA_PATH
               value: /go/bin/data
           # command: ["/bin/bash", "-c", "while true; do sleep 1; done"]
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           resources:
             limits:
               cpu: 1024m

@@ -1,4 +1,5 @@
 data
+data1
 miniodata
 .minio.sys
 # Binaries for programs and plugins
@@ -23,5 +24,3 @@ main
 dist/
 tmp/
 
-# bzinc binary in root
-zinc

@@ -13,7 +13,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var systemIndexList = []string{"_users", "_index_mapping"}
+var systemIndexList = []string{"_users", "_index_mapping", "_metadata"}
 
 func LoadZincSystemIndexes() (map[string]*Index, error) {
 	godotenv.Load()
@@ -41,9 +41,9 @@ func LoadZincIndexesFromDisk() (map[string]*Index, error) {
 
 	indexList := make(map[string]*Index)
 
-	DATA_PATH := zutils.GetEnv("DATA_PATH", "./data")
+	ZINC_DATA_PATH := zutils.GetEnv("ZINC_DATA_PATH", "./data")
 
-	files, err := os.ReadDir(DATA_PATH)
+	files, err := os.ReadDir(ZINC_DATA_PATH)
 	if err != nil {
 		log.Print("Error reading data directory: ", err.Error())
 		log.Fatal().Msg("Error reading data directory: " + err.Error())
@@ -87,12 +87,12 @@ func LoadZincIndexesFromS3() (map[string]*Index, error) {
 
 	IndexList := make(map[string]*Index)
 
-	S3_BUCKET := zutils.GetEnv("S3_BUCKET", "")
+	ZINC_S3_BUCKET := zutils.GetEnv("ZINC_S3_BUCKET", "")
 	delimiter := "/"
 
 	ctx := context.Background()
 	params := s3.ListObjectsV2Input{
-		Bucket:    &S3_BUCKET,
+		Bucket:    &ZINC_S3_BUCKET,
 		Delimiter: &delimiter,
 	}
 

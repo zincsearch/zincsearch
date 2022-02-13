@@ -30,6 +30,7 @@ type Index struct {
 	CachedMapping map[string]string `json:"mapping"`
 	IndexType     string            `json:"index_type"`   // "system" or "user"
 	StorageType   string            `json:"storage_type"` // disk, memory, s3
+	Size          uint64            `json:"size"`         // cached size of the index
 	Mappings      Mappings          `json:"mappings"`
 }
 
