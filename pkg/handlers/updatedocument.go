@@ -5,8 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/rs/zerolog/log"
+
+	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
 func UpdateDocument(c *gin.Context) {

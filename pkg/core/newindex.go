@@ -7,26 +7,27 @@ import (
 	"github.com/blugelabs/bluge"
 
 	"github.com/prabhatsharma/zinc/pkg/directory"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
 // NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
 func NewIndex(name string, storageType string) (*Index, error) {
+	var dataPath string
 	var config bluge.Config
-	if storageType == "s3" {
-		S3_BUCKET := zutils.GetEnv("ZINC_S3_BUCKET", "")
-		config = directory.GetS3Config(S3_BUCKET, name)
-	} else if storageType == "minio" {
-		MINIO_BUCKET := zutils.GetEnv("ZINC_MINIO_BUCKET", "")
-		config = directory.GetMinIOConfig(MINIO_BUCKET, name)
-	} else { // Default storage type is disk
-		DATA_PATH := zutils.GetEnv("ZINC_DATA_PATH", "./data")
-
-		config = bluge.DefaultConfig(DATA_PATH + "/" + name)
+	switch storageType {
+	case "s3":
+		dataPath = zutils.GetEnv("ZINC_S3_BUCKET", "")
+		config = directory.GetS3Config(dataPath, name)
+	case "minio":
+		dataPath = zutils.GetEnv("ZINC_MINIO_BUCKET", "")
+		config = directory.GetMinIOConfig(dataPath, name)
+	default:
+		dataPath = zutils.GetEnv("ZINC_DATA_PATH", "./data")
+		config = bluge.DefaultConfig(dataPath + "/" + name)
 	}
 
 	writer, err := bluge.OpenWriter(config)
-
 	if err != nil {
 		return nil, err
 	}
@@ -36,13 +37,12 @@ func NewIndex(name string, storageType string) (*Index, error) {
 		Writer:      writer,
 		StorageType: storageType,
 	}
-
-	mapping, err := index.GetStoredMapping()
+	mappings, err := index.GetStoredMappings()
 	if err != nil {
 		return nil, err
 	}
 
-	index.CachedMapping = mapping
+	index.CachedMappings = mappings
 
 	return index, nil
 }
@@ -52,24 +52,27 @@ func GetIndex(indexName string) (*Index, bool) {
 	return index, ok
 }
 
-func FormatMapping(mappings *Mappings) (map[string]string, error) {
-	newMappings := make(map[string]string)
-	for field, prop := range mappings.Properties {
-		ptype := strings.ToLower(prop.Type)
-		switch ptype {
+func FormatMappings(mappings meta.Mappings) (*meta.Mappings, error) {
+	// copy a mappings
+	newmappings := new(meta.Mappings)
+	zutils.StructToStruct(mappings, newmappings)
+
+	// format mappings
+	for field, prop := range newmappings.Properties {
+		prop.Type = strings.ToLower(prop.Type)
+		switch prop.Type {
 		case "text", "keyword", "numeric", "bool", "time":
 			continue // ptype can be used as is
 		case "integer", "double", "long":
-			ptype = "numeric"
+			prop.Type = "numeric"
 		case "boolean":
-			ptype = "bool"
+			prop.Type = "bool"
 		case "date", "datetime":
-			ptype = "time"
+			prop.Type = "time"
 		default:
-			return nil, fmt.Errorf("mappings unsupport type: [%s] for field [%s]", prop.Type, field)
+			return nil, fmt.Errorf("[mappings] doesn't type: [%s] for field [%s]", prop.Type, field)
 		}
-		newMappings[field] = ptype
 	}
 
-	return newMappings, nil
+	return newmappings, nil
 }

@@ -11,7 +11,7 @@ func CreateUpdateUser(c *gin.Context) {
 	var user auth.ZincUser
 	c.BindJSON(&user)
 	if user.ID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "user.id should be not empty"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user.id should be not empty"})
 		return
 	}
 

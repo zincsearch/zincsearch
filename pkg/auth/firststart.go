@@ -1,14 +1,15 @@
 package auth
 
 import (
-	"log"
 	"os"
+
+	"github.com/rs/zerolog/log"
 )
 
 func init() {
 	firstStart, err := IsFirstStart()
 	if err != nil {
-		log.Println(err)
+		log.Print(err)
 	}
 	if firstStart {
 		// create default user from environment variable
@@ -16,7 +17,7 @@ func init() {
 		adminPassword := os.Getenv("ZINC_FIRST_ADMIN_PASSWORD")
 
 		if adminUser == "" || adminPassword == "" {
-			log.Fatal("FIRST_ADMIN_USER and FIRST_ADMIN_PASSWORD must be set on first start. You should also change the credentials after first login.")
+			log.Fatal().Msg("ZINC_FIRST_ADMIN_USER and ZINC_FIRST_ADMIN_PASSWORD must be set on first start. You should also change the credentials after first login.")
 		}
 		CreateUser(adminUser, "", adminPassword, "admin")
 	}

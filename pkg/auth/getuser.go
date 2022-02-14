@@ -4,8 +4,9 @@ import (
 	"context"
 
 	"github.com/blugelabs/bluge"
-	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/rs/zerolog/log"
+
+	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
 func GetUser(userId string) (bool, ZincUser, error) {
@@ -13,13 +14,9 @@ func GetUser(userId string) (bool, ZincUser, error) {
 	var user ZincUser
 
 	query := bluge.NewTermQuery(userId)
-
 	searchRequest := bluge.NewTopNSearch(1, query)
-
 	usersIndex := core.ZINC_SYSTEM_INDEX_LIST["_users"]
-
 	reader, _ := usersIndex.Writer.Reader()
-
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
 		log.Printf("error executing search: %v", err)
@@ -28,30 +25,25 @@ func GetUser(userId string) (bool, ZincUser, error) {
 	next, err := dmi.Next()
 	for err == nil && next != nil {
 		userExists = true
-
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			if field == "_id" {
+			switch field {
+			case "_id":
 				user.ID = string(value)
-				return true
-			} else if field == "name" {
+			case "name":
 				user.Name = string(value)
-				return true
-			} else if field == "salt" {
+			case "salt":
 				user.Salt = string(value)
-				return true
-			} else if field == "password" {
+			case "password":
 				user.Password = string(value)
-				return true
-			} else if field == "role" {
+			case "role":
 				user.Role = string(value)
-				return true
-			} else if field == "created_at" {
+			case "created_at":
 				user.CreatedAt, _ = bluge.DecodeDateTime(value)
-				return true
-			} else if field == "@timestamp" {
+			case "@timestamp":
 				user.Timestamp, _ = bluge.DecodeDateTime(value)
-				return true
+			default:
 			}
+
 			return true
 		})
 		if err != nil {
@@ -62,9 +54,7 @@ func GetUser(userId string) (bool, ZincUser, error) {
 		}
 
 		// next, err = dmi.Next()
-
 	}
 
 	return false, user, nil
-
 }

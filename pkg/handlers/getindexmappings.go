@@ -16,20 +16,18 @@ func GetIndexMappings(c *gin.Context) {
 		return
 	}
 
-	mappings, err := index.GetStoredMapping()
+	mappings, err := index.GetStoredMappings()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// format mapping
-	properties := make(map[string]core.Properties, len(mappings))
-	for field, pType := range mappings {
+	// format mappings
+	for field := range mappings.Properties {
 		if field == "_id" || field == "@timestamp" {
-			continue
+			delete(mappings.Properties, field)
 		}
-		properties[field] = core.Properties{Type: pType}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"mappings": gin.H{"properties": properties}})
+	c.JSON(http.StatusOK, mappings)
 }

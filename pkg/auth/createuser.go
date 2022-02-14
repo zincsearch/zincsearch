@@ -5,17 +5,15 @@ import (
 
 	"github.com/blugelabs/bluge"
 	"github.com/google/uuid"
-	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/argon2"
+
+	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
 func CreateUser(userId, name, plaintextPassword, role string) (*ZincUser, error) {
-
 	var newUser *ZincUser
-
 	userExists, existingUser, err := GetUser(userId)
-
 	if err != nil {
 		return nil, err
 	}
@@ -43,18 +41,15 @@ func CreateUser(userId, name, plaintextPassword, role string) (*ZincUser, error)
 	}
 
 	bdoc := bluge.NewDocument(newUser.ID)
-
 	bdoc.AddField(bluge.NewTextField("name", newUser.Name).StoreValue())
 	bdoc.AddField(bluge.NewStoredOnlyField("password", []byte(newUser.Password)).StoreValue())
 	bdoc.AddField(bluge.NewStoredOnlyField("salt", []byte(newUser.Salt)).StoreValue())
 	bdoc.AddField(bluge.NewStoredOnlyField("role", []byte(newUser.Role)).StoreValue().Aggregatable())
 	bdoc.AddField(bluge.NewDateTimeField("created_at", newUser.CreatedAt).StoreValue().Aggregatable())
 	bdoc.AddField(bluge.NewDateTimeField("updated_at", newUser.Timestamp).StoreValue().Aggregatable())
-
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
 
 	usersIndexWriter := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer
-
 	err = usersIndexWriter.Update(bdoc.ID(), bdoc)
 	if err != nil {
 		log.Printf("error updating document: %v", err)

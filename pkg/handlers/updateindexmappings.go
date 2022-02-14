@@ -11,15 +11,15 @@ import (
 func UpdateIndexMappings(c *gin.Context) {
 	indexName := c.Param("target")
 	if indexName == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "index.name should be not empty"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index.name should be not empty"})
 		return
 	}
 
 	var newIndex core.Index
 	c.BindJSON(&newIndex)
-	mappings, err := core.FormatMapping(&newIndex.Mappings)
+	mappings, err := core.FormatMappings(*newIndex.Mappings)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -33,9 +33,9 @@ func UpdateIndexMappings(c *gin.Context) {
 		core.ZINC_INDEX_LIST[indexName] = index
 	}
 
-	// update mapping
-	if len(mappings) > 0 {
-		index.SetMapping(mappings)
+	// update mappings
+	if len(mappings.Properties) > 0 {
+		index.SetMappings(mappings)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "ok"})

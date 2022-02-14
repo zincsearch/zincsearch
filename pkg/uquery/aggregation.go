@@ -7,9 +7,10 @@ import (
 	"github.com/blugelabs/bluge/search/aggregations"
 	"github.com/prabhatsharma/zinc/pkg/aggregationx"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
-func AddAggregations(req aggregationx.SearchAggregation, aggs map[string]v1.AggregationParams, mapping map[string]string) error {
+func AddAggregations(req aggregationx.SearchAggregation, aggs map[string]v1.AggregationParams, mapping *meta.Mappings) error {
 	if len(aggs) == 0 {
 		return nil // not need aggregation
 	}
@@ -25,13 +26,13 @@ func AddAggregations(req aggregationx.SearchAggregation, aggs map[string]v1.Aggr
 		switch agg.AggType {
 		case "term", "terms":
 			var subreq *aggregationx.TermsAggregation
-			switch mapping[agg.Field] {
+			switch mapping.Properties[agg.Field].Type {
 			case "text", "keyword":
 				subreq = aggregationx.NewTermsAggregation(search.Field(agg.Field), aggregationx.TextValueSource, agg.Size)
 			case "numeric":
 				subreq = aggregationx.NewTermsAggregation(search.Field(agg.Field), aggregationx.NumericValueSource, agg.Size)
 			default:
-				return fmt.Errorf("terms aggregation not support type [%s:[%v]]", agg.Field, mapping[agg.Field])
+				return fmt.Errorf("terms aggregation not support type [%s:[%v]]", agg.Field, mapping.Properties[agg.Field].Type)
 			}
 			if len(agg.Aggregations) > 0 {
 				if err := AddAggregations(subreq, agg.Aggregations, mapping); err != nil {
@@ -44,7 +45,7 @@ func AddAggregations(req aggregationx.SearchAggregation, aggs map[string]v1.Aggr
 				return fmt.Errorf("range aggregation needs ranges")
 			}
 			var subreq *aggregations.RangeAggregation
-			switch mapping[agg.Field] {
+			switch mapping.Properties[agg.Field].Type {
 			case "numeric":
 				subreq = aggregations.Ranges(search.Field(agg.Field))
 				for _, v := range agg.Ranges {
@@ -59,7 +60,7 @@ func AddAggregations(req aggregationx.SearchAggregation, aggs map[string]v1.Aggr
 				return fmt.Errorf("date_range aggregation needs date_ranges")
 			}
 			var subreq *aggregations.DateRangeAggregation
-			switch mapping[agg.Field] {
+			switch mapping.Properties[agg.Field].Type {
 			case "time":
 				subreq = aggregations.DateRanges(search.Field(agg.Field))
 				// time format: 2022-01-21T09:22:50.604Z

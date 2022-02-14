@@ -4,7 +4,7 @@ package v2
 type ZincQuery struct {
 	Query          map[string]interface{}  `json:"query"`
 	Aggregations   map[string]Aggregations `json:"aggs"`
-	Highlight      Highlight               `json:"highlight"`
+	Highlight      *Highlight              `json:"highlight"`
 	Fields         interface{}             `json:"fields"`  // ["field1", "field2.*", {"field": "fieldName", "format": "epoch_millis"}]
 	Source         interface{}             `json:"_source"` // true, false, ["field1", "field2.*"]
 	Sort           interface{}             `json:"sort"`    // "_sorce", ["+Year","-Year", {"Year": "desc"}, "Date": {"order": "asc"", "format": "yyyy-MM-dd"}}"}]

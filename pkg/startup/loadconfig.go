@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/joho/godotenv"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -18,11 +19,14 @@ var maxResults = DEFAULT_MAX_RESULTS
 var aggregationTermsSize = DEFAULT_AGGREGATION_TERMS_SIZE
 
 func init() {
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		log.Print("Error loading .env file")
+	}
 
 	var vs string
 	var vi int
-	var err error
+	// var err error
 	vs = os.Getenv("ZINC_BATCH_SIZE")
 	if vs != "" {
 		if vi, err = strconv.Atoi(vs); err == nil {

@@ -13,12 +13,12 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/startup"
 )
 
-func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregations, mappings map[string]string) error {
+func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregations, mappings *meta.Mappings) error {
 	if len(aggs) == 0 {
 		return nil // not need aggregation
 	}
 	if mappings == nil {
-		return nil // mapping is empty, return
+		return nil // mapping is empty
 	}
 
 	var err error
@@ -40,7 +40,7 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 				agg.Terms.Size = startup.LoadAggregationTermsSize()
 			}
 			var subreq *aggregationx.TermsAggregation
-			switch mappings[agg.Terms.Field] {
+			switch mappings.Properties[agg.Terms.Field].Type {
 			case "text", "keyword":
 				subreq = aggregationx.NewTermsAggregation(search.Field(agg.Terms.Field), aggregationx.TextValueSource, agg.Terms.Size)
 			case "numeric":
@@ -48,7 +48,7 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 			default:
 				return meta.NewError(
 					meta.ErrorTypeParsingException,
-					fmt.Sprintf("[terms] aggregation doesn't support values of type: [%s:[%v]]", agg.Terms.Field, mappings[agg.Terms.Field]),
+					fmt.Sprintf("[terms] aggregation doesn't support values of type: [%s:[%v]]", agg.Terms.Field, mappings.Properties[agg.Terms.Field].Type),
 				)
 			}
 			if len(agg.Aggregations) > 0 {
@@ -62,7 +62,7 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 				return meta.NewError(meta.ErrorTypeParsingException, "[range] aggregation needs ranges")
 			}
 			var subreq *aggregations.RangeAggregation
-			switch mappings[agg.Range.Field] {
+			switch mappings.Properties[agg.Range.Field].Type {
 			case "numeric":
 				subreq = aggregations.Ranges(search.Field(agg.Range.Field))
 				for _, v := range agg.Range.Ranges {
@@ -85,7 +85,7 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 			if agg.DateRange.TimeZone != "" {
 				timeZone = time.FixedZone(agg.DateRange.TimeZone, 0)
 			}
-			switch mappings[agg.DateRange.Field] {
+			switch mappings.Properties[agg.DateRange.Field].Type {
 			case "time":
 				subreq = aggregations.DateRanges(search.Field(agg.DateRange.Field))
 				for _, v := range agg.DateRange.Ranges {

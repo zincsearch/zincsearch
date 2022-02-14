@@ -5,10 +5,11 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
+	"github.com/rs/zerolog/log"
+
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 	"github.com/prabhatsharma/zinc/pkg/startup"
 	"github.com/prabhatsharma/zinc/pkg/uquery"
-	"github.com/rs/zerolog/log"
 )
 
 func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
@@ -69,8 +70,8 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 	}
 
 	// handle aggregations
-	mapping, _ := index.GetStoredMapping()
-	err = uquery.AddAggregations(searchRequest, iQuery.Aggregations, mapping)
+	mappings, _ := index.GetStoredMappings()
+	err = uquery.AddAggregations(searchRequest, iQuery.Aggregations, mappings)
 	if err != nil {
 		return v1.SearchResponse{
 			Error: err.Error(),
@@ -96,16 +97,16 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 		var id string
 		var timestamp time.Time
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			if field == "_source" {
-				result = uquery.HandleSource(sourceCtl, value)
-				return true
-			} else if field == "_id" {
+			switch field {
+			case "_id":
 				id = string(value)
-				return true
-			} else if field == "@timestamp" {
+			case "@timestamp":
 				timestamp, _ = bluge.DecodeDateTime(value)
-				return true
+			case "_source":
+				result = uquery.HandleSource(sourceCtl, value)
+			default:
 			}
+
 			return true
 		})
 		if err != nil {

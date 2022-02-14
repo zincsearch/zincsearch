@@ -5,9 +5,10 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
+	"github.com/rs/zerolog/log"
+
 	"github.com/prabhatsharma/zinc/pkg/core"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
-	"github.com/rs/zerolog/log"
 )
 
 func GetAllUsersWorker() (v1.SearchResponse, error) {
@@ -15,11 +16,8 @@ func GetAllUsersWorker() (v1.SearchResponse, error) {
 	var Hits []v1.Hit
 
 	query := bluge.NewMatchAllQuery()
-
 	searchRequest := bluge.NewTopNSearch(1000, query).WithStandardAggregations()
-
 	reader, _ := usersIndex.Writer.Reader()
-
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
 		log.Printf("error executing search: %v", err)
@@ -29,22 +27,20 @@ func GetAllUsersWorker() (v1.SearchResponse, error) {
 	for err == nil && next != nil {
 		var user SimpleUser
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			if field == "_id" {
+			switch field {
+			case "_id":
 				user.ID = string(value)
-				return true
-			} else if field == "name" {
+			case "name":
 				user.Name = string(value)
-				return true
-			} else if field == "role" {
+			case "role":
 				user.Role = string(value)
-				return true
-			} else if field == "created_at" {
+			case "created_at":
 				user.CreatedAt, _ = bluge.DecodeDateTime(value)
-				return true
-			} else if field == "@timestamp" {
+			case "@timestamp":
 				user.Timestamp, _ = bluge.DecodeDateTime(value)
-				return true
+			default:
 			}
+
 			return true
 		})
 		if err != nil {

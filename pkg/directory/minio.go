@@ -15,8 +15,9 @@ import (
 	segment "github.com/blugelabs/bluge_segment_api"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
 	"github.com/rs/zerolog/log"
+
+	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
 // GetMinIOConfig returns a bluge config that will store index data in MinIO

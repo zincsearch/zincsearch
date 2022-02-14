@@ -16,7 +16,7 @@ import (
 )
 
 // ParseQueryDSL parse query DSL and return searchRequest
-func ParseQueryDSL(q *meta.ZincQuery, mappings map[string]string) (bluge.SearchRequest, error) {
+func ParseQueryDSL(q *meta.ZincQuery, mappings *meta.Mappings) (bluge.SearchRequest, error) {
 	// parse size
 	if q.Size == 0 {
 		q.Size = 10
@@ -34,11 +34,14 @@ func ParseQueryDSL(q *meta.ZincQuery, mappings map[string]string) (bluge.SearchR
 		return nil, meta.NewError(meta.ErrorTypeNotImplemented, fmt.Sprintf("[%s] query doesn't support", q.Query))
 	}
 
-	// parse highlight
-	// TODO: highlight
-
 	// create search request
 	request := bluge.NewTopNSearch(q.Size, query).WithStandardAggregations()
+
+	// parse highlight
+	// TODO: highlight
+	if q.Highlight != nil {
+		request.IncludeLocations()
+	}
 
 	// parse from
 	if q.From > 0 {

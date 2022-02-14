@@ -5,14 +5,14 @@ import (
 
 	"github.com/blugelabs/bluge"
 	"github.com/gin-gonic/gin"
-	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/rs/zerolog/log"
+
+	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
 func ZincAuthMiddleware(c *gin.Context) {
 	// Get the Basic Authentication credentials
 	user, password, hasAuth := c.Request.BasicAuth()
-
 	if hasAuth {
 		result, _ := VerifyCredentials(user, password)
 		if result {
@@ -32,13 +32,10 @@ func ZincAuthMiddleware(c *gin.Context) {
 }
 
 func VerifyCredentials(user, password string) (bool, SimpleUser) {
-
 	var sUser SimpleUser
 	reader, _ := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer.Reader()
 	termQuery := bluge.NewTermQuery(user).SetField("_id")
-
 	searchRequest := bluge.NewTopNSearch(1000, termQuery)
-
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
 		log.Printf("error executing search: %v", err)
@@ -48,27 +45,20 @@ func VerifyCredentials(user, password string) (bool, SimpleUser) {
 	storedPassword := ""
 
 	next, err := dmi.Next()
-
 	for err == nil && next != nil {
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
-
-			if field == "salt" {
+			switch field {
+			case "salt":
 				storedSalt = string(value)
-			}
-			if field == "_id" {
-				sUser.ID = string(value)
-			}
-
-			if field == "password" {
+			case "password":
 				storedPassword = string(value)
-			}
-
-			if field == "name" {
-				sUser.Name = string(value)
-			}
-
-			if field == "role" {
+			case "role":
 				sUser.Role = string(value)
+			case "name":
+				sUser.Name = string(value)
+			case "_id":
+				sUser.ID = string(value)
+			default:
 			}
 
 			return true
@@ -78,7 +68,6 @@ func VerifyCredentials(user, password string) (bool, SimpleUser) {
 		}
 
 		incomingEncryptedPassword := GeneratePassword(password, storedSalt)
-
 		if incomingEncryptedPassword == storedPassword {
 			return true, sUser
 		}

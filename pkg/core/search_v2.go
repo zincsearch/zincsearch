@@ -2,9 +2,11 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/search/highlight"
 	"github.com/rs/zerolog/log"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
@@ -14,7 +16,7 @@ import (
 )
 
 func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error) {
-	mappings, _ := index.GetStoredMapping()
+	mappings, _ := index.GetStoredMappings()
 	searchRequest, err := uquery.ParseQueryDSL(query, mappings)
 	if err != nil {
 		return nil, err
@@ -45,6 +47,8 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 		return nil, err
 	}
 
+	higher := highlight.NewHTMLHighlighter()
+
 	var Hits []meta.Hit
 	next, err := dmi.Next()
 	for err == nil && next != nil {
@@ -53,19 +57,27 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 		var sourceData map[string]interface{}
 		var fieldsData map[string]interface{}
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			if field == "_source" {
+			switch field {
+			case "_id":
+				id = string(value)
+			case "@timestamp":
+				timestamp, _ = bluge.DecodeDateTime(value)
+			case "_source":
 				sourceData = source.Response(query.Source.(*meta.Source), value)
 				if query.Fields != nil {
 					fieldsData = fields.Response(query.Fields.([]*meta.Field), value)
 				}
-				return true
-			} else if field == "_id" {
-				id = string(value)
-				return true
-			} else if field == "@timestamp" {
-				timestamp, _ = bluge.DecodeDateTime(value)
-				return true
+			default:
+				// highlight
+				if field == "Athlete" {
+					fmt.Println("location", next.Locations)
+					if v, ok := next.Locations["Athlete"]; ok {
+						str := higher.BestFragment(v, value)
+						fmt.Println(str)
+					}
+				}
 			}
+
 			return true
 		})
 		if err != nil {

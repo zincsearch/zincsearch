@@ -12,13 +12,13 @@ func CreateIndex(c *gin.Context) {
 	c.BindJSON(&newIndex)
 
 	if newIndex.Name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "index.name should be not empty"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index.name should be not empty"})
 		return
 	}
 
-	mappings, err := core.FormatMapping(&newIndex.Mappings)
+	mappings, err := core.FormatMappings(*newIndex.Mappings)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -33,9 +33,9 @@ func CreateIndex(c *gin.Context) {
 		core.ZINC_INDEX_LIST[newIndex.Name] = index
 	}
 
-	// update mapping
-	if len(mappings) > 0 {
-		index.SetMapping(mappings)
+	// update mappings
+	if len(mappings.Properties) > 0 {
+		index.SetMappings(mappings)
 	}
 
 	c.JSON(http.StatusOK, gin.H{

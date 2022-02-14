@@ -2,8 +2,9 @@ package auth
 
 import (
 	"github.com/blugelabs/bluge"
-	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/rs/zerolog/log"
+
+	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
 func DeleteUser(userId string) bool {
