@@ -35,9 +35,11 @@ func CreateIndex(c *gin.Context) {
 		core.ZINC_INDEX_LIST[newIndex.Name] = index
 
 		// use template
-		template, _ := core.UseTemplate(newIndex.Name)
-		if template != nil && mappings == nil {
-			mappings = template.Mappings
+		if mappings == nil {
+			template, _ := core.UseTemplate(newIndex.Name)
+			if template != nil && template.Template.Mappings != nil && len(template.Template.Mappings.Properties) > 0 {
+				mappings = template.Template.Mappings
+			}
 		}
 	}
 

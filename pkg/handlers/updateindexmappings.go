@@ -35,8 +35,8 @@ func UpdateIndexMappings(c *gin.Context) {
 
 		// use template
 		template, _ := core.UseTemplate(indexName)
-		if template != nil && mappings == nil {
-			mappings = template.Mappings
+		if template != nil && template.Template.Mappings != nil && len(template.Template.Mappings.Properties) > 0 {
+			mappings = template.Template.Mappings
 		}
 	}
 

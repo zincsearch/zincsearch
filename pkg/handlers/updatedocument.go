@@ -45,8 +45,8 @@ func UpdateDocument(c *gin.Context) {
 
 		// use template
 		template, _ := core.UseTemplate(indexName)
-		if template != nil && template.Mappings != nil && len(template.Mappings.Properties) > 0 {
-			index.SetMappings(template.Mappings)
+		if template != nil && template.Template.Mappings != nil && len(template.Template.Mappings.Properties) > 0 {
+			index.SetMappings(template.Template.Mappings)
 		}
 	}
 

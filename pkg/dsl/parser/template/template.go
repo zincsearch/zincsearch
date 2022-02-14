@@ -18,8 +18,8 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 		return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] index_patterns should be defined")
 	}
 
-	if data["mappings"] == nil {
-		return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] mappings should be defined")
+	if data["template"] == nil {
+		return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] template should be defined")
 
 	}
 
@@ -46,28 +46,36 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 			if !ok {
 				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] template value should be an object")
 			}
-			index, err := index.Request(v)
-			if err != nil {
-				return nil, err
+			for k, v := range v {
+				k = strings.ToLower(k)
+				switch k {
+				case "settings":
+					index, err := index.Request(map[string]interface{}{"settings": v})
+					if err != nil {
+						return nil, err
+					}
+					if index != nil {
+						template.Template.Settings = index.Settings
+					}
+				case "mappings":
+					v, ok := v.(map[string]interface{})
+					if !ok {
+						return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] mappings value should be an object")
+					}
+					mappings, err := mappings.Request(v)
+					if err != nil {
+						return nil, err
+					}
+					if mappings != nil {
+						template.Template.Mappings = mappings
+					}
+				default:
+					return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[template] template unknown option [%s]", k))
+				}
 			}
-			template.Template = index
-		case "mappings":
-			v, ok := v.(map[string]interface{})
-			if !ok {
-				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] mappings value should be an object")
-			}
-			mappings, err := mappings.Request(v)
-			if err != nil {
-				return nil, err
-			}
-			template.Mappings = mappings
 		default:
 			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[template] unknown option [%s]", k))
 		}
-	}
-
-	if template.Template == nil {
-		template.Template = meta.NewIndex()
 	}
 
 	return template, nil

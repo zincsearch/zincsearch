@@ -11,13 +11,12 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/prabhatsharma/zinc/pkg/dsl/meta"
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 )
 
 // ListTemplates returns all templates
-func ListTemplates() (*v1.SearchResponse, error) {
+func ListTemplates() ([]IndexTemplate, error) {
 	query := bluge.NewMatchAllQuery()
-	searchRequest := bluge.NewTopNSearch(1000, query).WithStandardAggregations()
+	searchRequest := bluge.NewTopNSearch(1000, query).SortBy([]string{"name"})
 	reader, _ := ZINC_SYSTEM_INDEX_LIST["_index_template"].Writer.Reader()
 	defer reader.Close()
 
@@ -26,62 +25,33 @@ func ListTemplates() (*v1.SearchResponse, error) {
 		return nil, fmt.Errorf("core.ListTemplates: error executing search: %v", err)
 	}
 
-	var Hits []v1.Hit
+	var templates []IndexTemplate
 	next, err := dmi.Next()
 	for err == nil && next != nil {
-		var id string
-		var timestamp time.Time
-		tpl := new(IndexTemplate)
+		var name string
+		tpl := new(meta.Template)
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
 			switch field {
-			case "_id":
-				id = string(value)
 			case "name":
-				tpl.Name = string(value)
-			case "priority":
-				priority, _ := bluge.DecodeNumericFloat64(value)
-				tpl.Priority = int(priority)
-			case "index_prefix":
-				tpl.IndexPrefix = string(value)
-			case "@timestamp":
-				timestamp, _ = bluge.DecodeDateTime(value)
-			default:
-				if strings.HasPrefix(field, "index_pattern_") {
-					tpl.IndexPatterns = append(tpl.IndexPatterns, string(value))
-				}
+				name = string(value)
+			case "_source":
+				json.Unmarshal(value, tpl)
 			}
-
 			return true
 		})
 		if err != nil {
 			log.Printf("core.ListTemplates: error accessing stored fields: %v", err)
 		}
 
-		hit := v1.Hit{
-			Index:     tpl.Name,
-			Type:      tpl.Name,
-			ID:        id,
-			Score:     next.Score,
-			Timestamp: timestamp,
-			Source:    tpl,
-		}
-		Hits = append(Hits, hit)
+		templates = append(templates, IndexTemplate{
+			Name:          name,
+			IndexTemplate: tpl,
+		})
 
 		next, err = dmi.Next()
 	}
 
-	resp := &v1.SearchResponse{
-		Took: int(dmi.Aggregations().Duration().Milliseconds()),
-		Hits: v1.Hits{
-			Total: v1.Total{
-				Value: int(dmi.Aggregations().Count()),
-			},
-			MaxScore: dmi.Aggregations().Metric("max_score"),
-			Hits:     Hits,
-		},
-	}
-
-	return resp, nil
+	return templates, nil
 }
 
 // NewTemplate create a template and store in local
@@ -175,7 +145,7 @@ func DeleteTemplate(name string) error {
 // UseTemplate use a specific template for new index
 func UseTemplate(indexName string) (*meta.Template, error) {
 	query := bluge.NewTermQuery(string(indexName[0:1])).SetField("index_prefix")
-	searchRequest := bluge.NewTopNSearch(1000, query).SortBy([]string{"-priority"}).WithStandardAggregations()
+	searchRequest := bluge.NewTopNSearch(1000, query).SortBy([]string{"-priority"})
 	reader, _ := ZINC_SYSTEM_INDEX_LIST["_index_template"].Writer.Reader()
 	defer reader.Close()
 

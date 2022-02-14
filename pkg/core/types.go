@@ -35,8 +35,6 @@ type Index struct {
 }
 
 type IndexTemplate struct {
-	Name          string   `json:"name"`
-	Priority      int      `json:"priority"`
-	IndexPatterns []string `json:"index_patterns"`
-	IndexPrefix   string   `json:"-"`
+	Name          string         `json:"name"`
+	IndexTemplate *meta.Template `json:"index_template"`
 }
