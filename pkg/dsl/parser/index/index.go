@@ -13,9 +13,7 @@ func Request(data map[string]interface{}) (*meta.Index, error) {
 		return nil, nil
 	}
 
-	index := new(meta.Index)
-	index.Settings.NumberOfReplicas = 1
-	index.Settings.NumberOfShards = 3
+	index := meta.NewIndex()
 	for k, v := range data {
 		k = strings.ToLower(k)
 		switch k {

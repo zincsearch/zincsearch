@@ -38,5 +38,5 @@ type IndexTemplate struct {
 	Name          string   `json:"name"`
 	Priority      int      `json:"priority"`
 	IndexPatterns []string `json:"index_patterns"`
-	IndexPrefix   string   `json:"index_prefix"`
+	IndexPrefix   string   `json:"-"`
 }

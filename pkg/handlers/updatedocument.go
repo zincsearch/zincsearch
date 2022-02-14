@@ -41,7 +41,13 @@ func UpdateDocument(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, err)
 			return
 		}
-		core.ZINC_INDEX_LIST[indexName] = index // Load the index in memory
+		core.ZINC_INDEX_LIST[indexName] = index
+
+		// use template
+		template, _ := core.UseTemplate(indexName)
+		if template != nil && template.Mappings != nil && len(template.Mappings.Properties) > 0 {
+			index.SetMappings(template.Mappings)
+		}
 	}
 
 	// doc, _ = flatten.Flatten(doc, "", flatten.DotStyle)

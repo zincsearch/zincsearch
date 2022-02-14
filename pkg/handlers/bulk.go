@@ -90,6 +90,12 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 					return documentsProcessed, err
 				}
 				core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
+
+				// use template
+				template, _ := core.UseTemplate(indexName)
+				if template != nil && template.Mappings != nil && len(template.Mappings.Properties) > 0 {
+					newIndex.SetMappings(template.Mappings)
+				}
 			}
 
 			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(docID, &doc)

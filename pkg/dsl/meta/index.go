@@ -2,8 +2,8 @@ package meta
 
 type Index struct {
 	Settings IndexSettings  `json:"settings"`
-	Analysis *IndexAnalysis `json:"analysis"`
-	Mappings *Mappings      `json:"mappings"`
+	Analysis *IndexAnalysis `json:"analysis,omitempty"`
+	Mappings *Mappings      `json:"mappings,omitempty"`
 }
 
 type IndexSettings struct {
@@ -12,4 +12,13 @@ type IndexSettings struct {
 }
 
 type IndexAnalysis struct {
+}
+
+func NewIndex() *Index {
+	return &Index{
+		Settings: IndexSettings{
+			NumberOfReplicas: 1,
+			NumberOfShards:   3,
+		},
+	}
 }

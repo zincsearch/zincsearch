@@ -32,6 +32,12 @@ func UpdateIndexMappings(c *gin.Context) {
 			return
 		}
 		core.ZINC_INDEX_LIST[indexName] = index
+
+		// use template
+		template, _ := core.UseTemplate(indexName)
+		if template != nil && mappings == nil {
+			mappings = template.Mappings
+		}
 	}
 
 	// update mappings

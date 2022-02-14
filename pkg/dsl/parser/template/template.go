@@ -66,5 +66,9 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 		}
 	}
 
+	if template.Template == nil {
+		template.Template = meta.NewIndex()
+	}
+
 	return template, nil
 }
