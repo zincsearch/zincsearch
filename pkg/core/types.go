@@ -7,12 +7,12 @@ import (
 )
 
 type Index struct {
-	Name           string         `json:"name"`
-	IndexType      string         `json:"index_type"`   // "system" or "user"
-	StorageType    string         `json:"storage_type"` // disk, memory, s3
-	Mappings       *meta.Mappings `json:"mappings"`
-	CachedMappings *meta.Mappings `json:"-"`
-	Writer         *bluge.Writer  `json:"-"`
+	Name           string                 `json:"name"`
+	IndexType      string                 `json:"index_type"`   // "system" or "user"
+	StorageType    string                 `json:"storage_type"` // disk, memory, s3
+	Mappings       map[string]interface{} `json:"mappings"`
+	CachedMappings *meta.Mappings         `json:"-"`
+	Writer         *bluge.Writer          `json:"-"`
 }
 
 var ZINC_INDEX_LIST map[string]*Index

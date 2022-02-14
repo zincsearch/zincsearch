@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/blugelabs/bluge"
@@ -56,6 +55,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 		var timestamp time.Time
 		var sourceData map[string]interface{}
 		var fieldsData map[string]interface{}
+		var highlightData map[string]interface{}
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
 			switch field {
 			case "_id":
@@ -69,11 +69,16 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 				}
 			default:
 				// highlight
-				if field == "Athlete" {
-					fmt.Println("location", next.Locations)
-					if v, ok := next.Locations["Athlete"]; ok {
-						str := higher.BestFragment(v, value)
-						fmt.Println(str)
+				if query.Highlight != nil && query.Highlight.Fields != nil {
+					if highlightData == nil {
+						highlightData = make(map[string]interface{})
+					}
+					// TODO support highlight options
+					if options, ok := query.Highlight.Fields[field]; ok {
+						if v, ok := next.Locations[field]; ok {
+							options.NumberOfFragments = 1 // TODO support multiple fragments
+							highlightData[field] = higher.BestFragments(v, value, options.NumberOfFragments)
+						}
 					}
 				}
 			}
@@ -92,6 +97,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 			Timestamp: timestamp,
 			Source:    sourceData,
 			Fields:    fieldsData,
+			Highlight: highlightData,
 		}
 		Hits = append(Hits, hit)
 

@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/mappings"
 )
 
 func UpdateIndexMappings(c *gin.Context) {
@@ -17,7 +18,7 @@ func UpdateIndexMappings(c *gin.Context) {
 
 	var newIndex core.Index
 	c.BindJSON(&newIndex)
-	mappings, err := core.FormatMappings(*newIndex.Mappings)
+	mappings, err := mappings.Request(newIndex.Mappings)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -34,7 +35,7 @@ func UpdateIndexMappings(c *gin.Context) {
 	}
 
 	// update mappings
-	if len(mappings.Properties) > 0 {
+	if mappings != nil && len(mappings.Properties) > 0 {
 		index.SetMappings(mappings)
 	}
 

@@ -34,63 +34,73 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 	flatDoc, _ := flatten.Flatten(*doc, "", flatten.DotStyle)
 	// Iterate through each field and add it to the bluge document
 	for key, value := range flatDoc {
-		if _, ok := mappings.Properties[key]; !ok {
-			// Assign auto inferred type for the new key
+		if value == nil {
+			continue
+		}
 
+		if _, ok := mappings.Properties[key]; !ok {
 			// Use reflection to find the type of the value.
 			// Bluge requires the field type to be specified.
+			v := reflect.ValueOf(value)
 
-			if value != nil { // value could be just {} in the json data or e.g. "rules": null or "creationTimestamp": null, etc.
-				v := reflect.ValueOf(value)
-
-				// try to find the type of the value and use it to define default mapping
-				switch v.Type().String() {
-				case "string":
-					mappings.Properties[key] = meta.Property{Type: "text"}
-				case "float64":
-					mappings.Properties[key] = meta.Property{Type: "numeric"}
-				case "bool":
-					mappings.Properties[key] = meta.Property{Type: "bool"}
-				case "time.Time":
-					mappings.Properties[key] = meta.Property{Type: "time"}
-				}
-
-				mappingsNeedsUpdate = true
+			// try to find the type of the value and use it to define default mapping
+			switch v.Type().String() {
+			case "string":
+				mappings.Properties[key] = meta.NewProperty("text")
+			case "float64":
+				mappings.Properties[key] = meta.NewProperty("numeric")
+			case "bool":
+				mappings.Properties[key] = meta.NewProperty("bool")
+			case "time.Time":
+				mappings.Properties[key] = meta.NewProperty("time")
 			}
+
+			mappingsNeedsUpdate = true
 		}
 
-		if value != nil {
-			switch mappings.Properties[key].Type {
-			case "text":
-				stringField := bluge.NewTextField(key, value.(string)).SearchTermPositions().Aggregatable().StoreValue().HighlightMatches()
-				bdoc.AddField(stringField)
-			case "numeric":
-				numericField := bluge.NewNumericField(key, value.(float64)).Aggregatable()
-				bdoc.AddField(numericField)
-			case "keyword":
-				// compatible verion <= v0.1.4
-				var keywordField *bluge.TermField
-				if v, ok := value.(bool); ok {
-					keywordField = bluge.NewKeywordField(key, strconv.FormatBool(v)).Aggregatable()
-				} else if v, ok := value.(string); ok {
-					keywordField = bluge.NewKeywordField(key, v).Aggregatable()
-				} else {
-					return nil, fmt.Errorf("keyword type only support text")
-				}
-				bdoc.AddField(keywordField)
-			case "bool": // found using existing index mapping
-				value := value.(bool)
-				keywordField := bluge.NewKeywordField(key, strconv.FormatBool(value)).Aggregatable()
-				bdoc.AddField(keywordField)
-			case "time":
-				tim, err := time.Parse(time.RFC3339, value.(string))
-				if err != nil {
-					return nil, err
-				}
-				timeField := bluge.NewDateTimeField(key, tim).Aggregatable()
-				bdoc.AddField(timeField)
-			}
+		if !mappings.Properties[key].Index {
+			continue // not index, skip
 		}
+
+		var field *bluge.TermField
+		switch mappings.Properties[key].Type {
+		case "text":
+			field = bluge.NewTextField(key, value.(string)).SearchTermPositions()
+		case "numeric":
+			field = bluge.NewNumericField(key, value.(float64))
+		case "keyword":
+			// compatible verion <= v0.1.4
+			if v, ok := value.(bool); ok {
+				field = bluge.NewKeywordField(key, strconv.FormatBool(v))
+			} else if v, ok := value.(string); ok {
+				field = bluge.NewKeywordField(key, v).Aggregatable()
+			} else {
+				return nil, fmt.Errorf("keyword type only support text")
+			}
+		case "bool": // found using existing index mapping
+			value := value.(bool)
+			field = bluge.NewKeywordField(key, strconv.FormatBool(value))
+		case "time":
+			tim, err := time.Parse(time.RFC3339, value.(string))
+			if err != nil {
+				return nil, err
+			}
+			field = bluge.NewDateTimeField(key, tim)
+		}
+
+		if mappings.Properties[key].Store {
+			field.StoreValue()
+		}
+		if mappings.Properties[key].Sortable {
+			field.StoreValue()
+		}
+		if mappings.Properties[key].Aggregatable {
+			field.Aggregatable()
+		}
+		if mappings.Properties[key].Highlightable {
+			field.HighlightMatches()
+		}
+		bdoc.AddField(field)
 	}
 
 	if mappingsNeedsUpdate {
@@ -110,7 +120,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 // iMap: a map of the fileds that specify name and type of the field. e.g. movietitle: string
 func (index *Index) SetMappings(mappings *meta.Mappings) error {
 	// @timestamp need date_range/date_histogram aggregation, and mappings used for type check in aggregation
-	mappings.Properties["@timestamp"] = meta.Property{Type: "time"}
+	mappings.Properties["@timestamp"] = meta.NewProperty("time")
 
 	bdoc := bluge.NewDocument(index.Name)
 	for k, prop := range mappings.Properties {
@@ -137,8 +147,8 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 
 // GetStoredMappings returns the mappings of all the indexes from _index_mapping system index
 func (index *Index) GetStoredMappings() (*meta.Mappings, error) {
-	DATA_PATH := zutils.GetEnv("ZINC_DATA_PATH", "./data")
-	systemPath := DATA_PATH + "/_index_mapping"
+	dataPath := zutils.GetEnv("ZINC_DATA_PATH", "./data")
+	systemPath := dataPath + "/_index_mapping"
 
 	config := bluge.DefaultConfig(systemPath)
 	reader, err := bluge.OpenReader(config)
@@ -184,8 +194,12 @@ func (index *Index) GetStoredMappings() (*meta.Mappings, error) {
 	if len(oldMappings) > 0 && len(mappings.Properties) == 0 {
 		mappings.Properties = make(map[string]meta.Property, len(oldMappings))
 		for k, v := range oldMappings {
-			mappings.Properties[k] = meta.Property{Type: v}
+			mappings.Properties[k] = meta.NewProperty(v)
 		}
+	}
+
+	if len(mappings.Properties) == 0 {
+		mappings.Properties = make(map[string]meta.Property)
 	}
 
 	return mappings, nil

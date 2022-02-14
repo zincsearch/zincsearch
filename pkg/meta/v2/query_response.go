@@ -33,6 +33,7 @@ type Hit struct {
 	Timestamp time.Time              `json:"@timestamp"`
 	Source    map[string]interface{} `json:"_source,omitempty"`
 	Fields    map[string]interface{} `json:"fields,omitempty"`
+	Highlight map[string]interface{} `json:"highlight,omitempty"`
 }
 
 type Total struct {

@@ -38,8 +38,8 @@ func DeleteIndex(c *gin.Context) {
 	// 3. Physically delete the index
 	deleteIndexMapping := false
 	if index.StorageType == "disk" {
-		DATA_PATH := zutils.GetEnv("ZINC_DATA_PATH", "./data")
-		err := os.RemoveAll(DATA_PATH + "/" + index.Name)
+		dataPath := zutils.GetEnv("ZINC_DATA_PATH", "./data")
+		err := os.RemoveAll(dataPath + "/" + index.Name)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

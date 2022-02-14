@@ -13,7 +13,7 @@
             "env": {
                 "FIRST_ADMIN_USER": "admin",
                 "FIRST_ADMIN_PASSWORD": "Complexpass#123",
-                "DATA_PATH": "../../data",
+                "ZINC_DATA_PATH": "../../data",
                 "ZINC_MINIO_ENDPOINT": "localhost:9000",
                 "ZINC_MINIO_BUCKET": "zincbucket",
                 "ZINC_MINIO_ACCESS_KEY_ID": "minioadmin",
