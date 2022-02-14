@@ -9,7 +9,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
-func GetUser(userId string) (bool, ZincUser, error) {
+func GetUser(userId string) (ZincUser, bool, error) {
 	userExists := false
 	var user ZincUser
 
@@ -19,42 +19,41 @@ func GetUser(userId string) (bool, ZincUser, error) {
 	reader, _ := usersIndex.Writer.Reader()
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		log.Printf("error executing search: %v", err)
+		log.Printf("auth.GetUser: error executing search: %v", err)
+		return user, userExists, err
 	}
 
 	next, err := dmi.Next()
-	for err == nil && next != nil {
-		userExists = true
-		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			switch field {
-			case "_id":
-				user.ID = string(value)
-			case "name":
-				user.Name = string(value)
-			case "salt":
-				user.Salt = string(value)
-			case "password":
-				user.Password = string(value)
-			case "role":
-				user.Role = string(value)
-			case "created_at":
-				user.CreatedAt, _ = bluge.DecodeDateTime(value)
-			case "@timestamp":
-				user.Timestamp, _ = bluge.DecodeDateTime(value)
-			default:
-			}
-
-			return true
-		})
-		if err != nil {
-			log.Printf("error accessing stored fields: %v", err)
-			return userExists, user, err
-		} else {
-			return userExists, user, nil
+	if err != nil {
+		log.Printf("auth.GetUser: error accessing search: %v", err)
+		return user, userExists, err
+	}
+	userExists = true
+	err = next.VisitStoredFields(func(field string, value []byte) bool {
+		switch field {
+		case "_id":
+			user.ID = string(value)
+		case "name":
+			user.Name = string(value)
+		case "salt":
+			user.Salt = string(value)
+		case "password":
+			user.Password = string(value)
+		case "role":
+			user.Role = string(value)
+		case "created_at":
+			user.CreatedAt, _ = bluge.DecodeDateTime(value)
+		case "@timestamp":
+			user.Timestamp, _ = bluge.DecodeDateTime(value)
+		default:
 		}
 
-		// next, err = dmi.Next()
+		return true
+	})
+	if err != nil {
+		log.Printf("auth.GetUser: error accessing stored fields: %v", err)
+		return user, userExists, err
 	}
 
-	return false, user, nil
+	return user, userExists, nil
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/jeremywohl/flatten"
 	"github.com/rs/zerolog/log"
 
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/prabhatsharma/zinc/pkg/dsl/meta"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
@@ -92,7 +92,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 			field.StoreValue()
 		}
 		if mappings.Properties[key].Sortable {
-			field.StoreValue()
+			field.Sortable()
 		}
 		if mappings.Properties[key].Aggregatable {
 			field.Aggregatable()
@@ -108,7 +108,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 	}
 
 	docByteVal, _ := json.Marshal(*doc)
-	bdoc.AddField(bluge.NewDateTimeField("@timestamp", time.Now()).StoreValue().Aggregatable())
+	bdoc.AddField(bluge.NewDateTimeField("@timestamp", time.Now()).StoreValue().Sortable().Aggregatable())
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil)) // Add _all field that can be used for search
 

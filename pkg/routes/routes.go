@@ -63,25 +63,22 @@ func SetRoutes(r *gin.Engine) {
 	r.PUT("/api/:target/_mappings", auth.ZincAuthMiddleware, handlers.UpdateIndexMappings)
 
 	// elastic compatible APIs
-	// Deprecated - /es/*  will be removed from zinc in future releases and replaced with /api/*
-	// Document APIs - https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html
-	// Single document APIs
+	r.POST("/es/:target/_search", auth.ZincAuthMiddleware, handlersV2.SearchIndex)
 
-	// Index - https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
+	r.GET("/es/_index_template", auth.ZincAuthMiddleware, handlersV2.ListIndexTemplate)
+	r.PUT("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.UpdateIndexTemplate)
+	r.GET("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.GetIndexTemplate)
+	r.DELETE("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.DeleteIndexTemplate)
 
-	// TODO: Add auth.ZincAuthMiddleware
-	r.POST("/es/:target/_search", handlersV2.SearchIndex)
+	r.GET("/es/:target/_mappings", auth.ZincAuthMiddleware, handlers.GetIndexMappings)
 	r.PUT("/es/:target/_mappings", auth.ZincAuthMiddleware, handlers.UpdateIndexMappings)
-	r.PUT("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
-
-	r.DELETE("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
 
 	r.POST("/es/:target/_doc", auth.ZincAuthMiddleware, handlers.UpdateDocument)
+	r.PUT("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 	r.PUT("/es/:target/_create/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 	r.POST("/es/:target/_create/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
-
-	// Update
 	r.POST("/es/:target/_update/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
+	r.DELETE("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
 
 	// Bulk update/insert
 	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)

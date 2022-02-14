@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/prabhatsharma/zinc/pkg/dsl/meta"
 )
 
 // SearchIndex searches the index for the given http request from end user
@@ -23,7 +23,7 @@ func SearchIndex(c *gin.Context) {
 	err := c.BindJSON(query)
 	if err != nil {
 		log.Printf("handlers.SearchIndex: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -37,7 +37,7 @@ func SearchIndex(c *gin.Context) {
 		case *meta.Error:
 			c.JSON(http.StatusBadRequest, v)
 		default:
-			c.JSON(http.StatusBadRequest, gin.H{"error": v})
+			c.JSON(http.StatusBadRequest, gin.H{"error": v.Error()})
 		}
 		return
 	}

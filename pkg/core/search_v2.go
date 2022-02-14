@@ -8,15 +8,15 @@ import (
 	"github.com/blugelabs/bluge/search/highlight"
 	"github.com/rs/zerolog/log"
 
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	uquery "github.com/prabhatsharma/zinc/pkg/uquery/v2"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/fields"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/parser/source"
+	"github.com/prabhatsharma/zinc/pkg/dsl/meta"
+	"github.com/prabhatsharma/zinc/pkg/dsl/parser"
+	"github.com/prabhatsharma/zinc/pkg/dsl/parser/fields"
+	"github.com/prabhatsharma/zinc/pkg/dsl/parser/source"
 )
 
 func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error) {
 	mappings, _ := index.GetStoredMappings()
-	searchRequest, err := uquery.ParseQueryDSL(query, mappings)
+	searchRequest, err := parser.ParseQuery(query, mappings)
 	if err != nil {
 		return nil, err
 	}
@@ -87,6 +87,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 		})
 		if err != nil {
 			log.Printf("index.SearchV2: error accessing stored fields: %v", err)
+			continue
 		}
 
 		hit := meta.Hit{
@@ -117,7 +118,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 		Hits:     Hits,
 	}
 
-	if err := uquery.FormatResponse(resp, query, dmi.Aggregations()); err != nil {
+	if err := parser.FormatResponse(resp, query, dmi.Aggregations()); err != nil {
 		log.Printf("index.SearchV2: error format response: %v", err)
 	}
 

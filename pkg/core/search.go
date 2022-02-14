@@ -12,9 +12,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/uquery"
 )
 
-func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
-	var Hits []v1.Hit
-
+func (index *Index) Search(iQuery *v1.ZincQuery) (*v1.SearchResponse, error) {
 	var searchRequest bluge.SearchRequest
 	if iQuery.MaxResults > startup.LoadMaxResults() {
 		iQuery.MaxResults = startup.LoadMaxResults()
@@ -64,7 +62,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 	}
 
 	if err != nil {
-		return v1.SearchResponse{
+		return &v1.SearchResponse{
 			Error: err.Error(),
 		}, err
 	}
@@ -73,7 +71,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 	mappings, _ := index.GetStoredMappings()
 	err = uquery.AddAggregations(searchRequest, iQuery.Aggregations, mappings)
 	if err != nil {
-		return v1.SearchResponse{
+		return &v1.SearchResponse{
 			Error: err.Error(),
 		}, err
 	}
@@ -89,7 +87,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 		log.Printf("error executing search: %v", err)
 	}
 
-	// highlighter := highlight.NewANSIHighlighter()
+	var Hits []v1.Hit
 
 	next, err := dmi.Next()
 	for err == nil && next != nil {
@@ -129,7 +127,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 		log.Printf("error iterating results: %v", err)
 	}
 
-	resp := v1.SearchResponse{
+	resp := &v1.SearchResponse{
 		Took: int(dmi.Aggregations().Duration().Milliseconds()),
 		Hits: v1.Hits{
 			Total: v1.Total{

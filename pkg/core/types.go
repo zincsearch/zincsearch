@@ -3,17 +3,8 @@ package core
 import (
 	"github.com/blugelabs/bluge"
 
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/prabhatsharma/zinc/pkg/dsl/meta"
 )
-
-type Index struct {
-	Name           string                 `json:"name"`
-	IndexType      string                 `json:"index_type"`   // "system" or "user"
-	StorageType    string                 `json:"storage_type"` // disk, memory, s3
-	Mappings       map[string]interface{} `json:"mappings"`
-	CachedMappings *meta.Mappings         `json:"-"`
-	Writer         *bluge.Writer          `json:"-"`
-}
 
 var ZINC_INDEX_LIST map[string]*Index
 var ZINC_SYSTEM_INDEX_LIST map[string]*Index
@@ -32,4 +23,20 @@ func init() {
 	for k, v := range minioList {
 		ZINC_INDEX_LIST[k] = v
 	}
+}
+
+type Index struct {
+	Name           string                 `json:"name"`
+	IndexType      string                 `json:"index_type"`   // "system" or "user"
+	StorageType    string                 `json:"storage_type"` // disk, memory, s3
+	Mappings       map[string]interface{} `json:"mappings"`
+	CachedMappings *meta.Mappings         `json:"-"`
+	Writer         *bluge.Writer          `json:"-"`
+}
+
+type IndexTemplate struct {
+	Name          string   `json:"name"`
+	Priority      int      `json:"priority"`
+	IndexPatterns []string `json:"index_patterns"`
+	IndexPrefix   string   `json:"index_prefix"`
 }

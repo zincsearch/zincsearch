@@ -13,7 +13,7 @@ import (
 
 func CreateUser(userId, name, plaintextPassword, role string) (*ZincUser, error) {
 	var newUser *ZincUser
-	userExists, existingUser, err := GetUser(userId)
+	existingUser, userExists, err := GetUser(userId)
 	if err != nil {
 		return nil, err
 	}

@@ -11,9 +11,8 @@ import (
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 )
 
-func GetAllUsersWorker() (v1.SearchResponse, error) {
+func GetAllUsersWorker() (*v1.SearchResponse, error) {
 	usersIndex := core.ZINC_SYSTEM_INDEX_LIST["_users"]
-	var Hits []v1.Hit
 
 	query := bluge.NewMatchAllQuery()
 	searchRequest := bluge.NewTopNSearch(1000, query).WithStandardAggregations()
@@ -23,6 +22,7 @@ func GetAllUsersWorker() (v1.SearchResponse, error) {
 		log.Printf("error executing search: %v", err)
 	}
 
+	var Hits []v1.Hit
 	next, err := dmi.Next()
 	for err == nil && next != nil {
 		var user SimpleUser
@@ -60,7 +60,7 @@ func GetAllUsersWorker() (v1.SearchResponse, error) {
 		next, err = dmi.Next()
 	}
 
-	resp := v1.SearchResponse{
+	resp := &v1.SearchResponse{
 		Took: int(dmi.Aggregations().Duration().Milliseconds()),
 		Hits: v1.Hits{
 			Total: v1.Total{

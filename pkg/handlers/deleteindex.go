@@ -70,9 +70,7 @@ func DeleteIndex(c *gin.Context) {
 		err := core.ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Writer.Delete(bdoc.ID())
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		} else {
 			c.JSON(http.StatusOK, gin.H{
 				"message": "Deleted",

@@ -22,7 +22,7 @@ func BulkHandler(c *gin.Context) {
 
 	documentsProcessed, err := BulkHandlerWorker(target, body)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"error": "bulk data inserted", "record_count": documentsProcessed})
