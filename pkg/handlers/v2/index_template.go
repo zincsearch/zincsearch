@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/prabhatsharma/zinc/pkg/core"
-	"github.com/prabhatsharma/zinc/pkg/dsl/parser/template"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/template"
 )
 
 func ListIndexTemplate(c *gin.Context) {

@@ -3,7 +3,7 @@ package core
 import (
 	"github.com/blugelabs/bluge"
 
-	"github.com/prabhatsharma/zinc/pkg/dsl/meta"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 var ZINC_INDEX_LIST map[string]*Index

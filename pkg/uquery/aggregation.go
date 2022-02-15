@@ -7,8 +7,8 @@ import (
 	"github.com/blugelabs/bluge/search/aggregations"
 
 	"github.com/prabhatsharma/zinc/pkg/aggregationx"
-	"github.com/prabhatsharma/zinc/pkg/dsl/meta"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 func AddAggregations(req aggregationx.SearchAggregation, aggs map[string]v1.AggregationParams, mapping *meta.Mappings) error {

@@ -12,7 +12,7 @@ import (
 	"github.com/jeremywohl/flatten"
 	"github.com/rs/zerolog/log"
 
-	"github.com/prabhatsharma/zinc/pkg/dsl/meta"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 

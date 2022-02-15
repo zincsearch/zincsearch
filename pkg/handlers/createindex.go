@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
-	"github.com/prabhatsharma/zinc/pkg/dsl/parser/mappings"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/mappings"
 )
 
 func CreateIndex(c *gin.Context) {

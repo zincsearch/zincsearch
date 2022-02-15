@@ -75,7 +75,7 @@ func TestApiStandard(t *testing.T) {
 				So(resp.Code, ShouldEqual, http.StatusOK)
 
 				// check updated
-				_, userNew, _ := auth.GetUser(username)
+				userNew, _, _ := auth.GetUser(username)
 				So(userNew.Name, ShouldEqual, fmt.Sprintf("%s-updated", username))
 			})
 			Convey("create user with error input", func() {

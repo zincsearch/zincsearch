@@ -8,10 +8,10 @@ import (
 	"github.com/blugelabs/bluge/search/highlight"
 	"github.com/rs/zerolog/log"
 
-	"github.com/prabhatsharma/zinc/pkg/dsl/meta"
-	"github.com/prabhatsharma/zinc/pkg/dsl/parser"
-	"github.com/prabhatsharma/zinc/pkg/dsl/parser/fields"
-	"github.com/prabhatsharma/zinc/pkg/dsl/parser/source"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	parser "github.com/prabhatsharma/zinc/pkg/uquery/v2"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/fields"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/source"
 )
 
 func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error) {

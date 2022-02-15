@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
-	"github.com/prabhatsharma/zinc/pkg/dsl/meta"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 // SearchIndex searches the index for the given http request from end user

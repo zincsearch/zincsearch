@@ -10,7 +10,7 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/rs/zerolog/log"
 
-	"github.com/prabhatsharma/zinc/pkg/dsl/meta"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 // ListTemplates returns all templates
