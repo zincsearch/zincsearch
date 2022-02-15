@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
@@ -41,7 +42,7 @@ func Request(v []interface{}) ([]*meta.Field, error) {
 	return fields, nil
 }
 
-func Response(fields []*meta.Field, data []byte) map[string]interface{} {
+func Response(fields []*meta.Field, data []byte, mappings *meta.Mappings) map[string]interface{} {
 	// return empty
 	if len(fields) == 0 {
 		return nil
@@ -55,25 +56,39 @@ func Response(fields []*meta.Field, data []byte) map[string]interface{} {
 
 	var field string
 	wildcard := false
-	rets := make(map[string]interface{})
+	results := make(map[string]interface{})
 	for _, v := range fields {
 		wildcard = false
 		field = v.Field
 		if strings.HasSuffix(field, "*") {
 			wildcard = true
 		}
-		if _, ok := ret[field]; ok {
-			rets[field] = []interface{}{ret[field]}
+		if rv, ok := ret[field]; ok {
+			if mappings.Properties[field].Type == "time" && v.Format != "" {
+				if t, err := time.Parse(mappings.Properties[field].Format, rv.(string)); err == nil {
+					results[field] = []interface{}{t.Format(v.Format)}
+				} else {
+					results[field] = []interface{}{rv}
+				}
+			} else {
+				results[field] = []interface{}{rv}
+			}
 		} else if wildcard {
-			for k, v := range ret {
-				if strings.HasPrefix(k, field[:len(field)-1]) {
-					rets[k] = []interface{}{v}
+			for rk, rv := range ret {
+				if strings.HasPrefix(rk, field[:len(field)-1]) {
+					if mappings.Properties[rk].Type == "time" && v.Format != "" {
+						if t, err := time.Parse(mappings.Properties[rk].Format, rv.(string)); err == nil {
+							results[rk] = []interface{}{t.Format(v.Format)}
+						} else {
+							results[rk] = []interface{}{rv}
+						}
+					} else {
+						results[rk] = []interface{}{rv}
+					}
 				}
 			}
 		}
 	}
 
-	// TODO: field format
-
-	return rets
+	return results
 }

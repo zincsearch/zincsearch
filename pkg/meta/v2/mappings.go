@@ -5,7 +5,7 @@ type Mappings struct {
 }
 
 type Property struct {
-	Type           string `json:"type"` // text, keyword, date_time, numeric, boolean, geo_point
+	Type           string `json:"type"` // text, keyword, time, numeric, boolean, geo_point
 	Analyzer       string `json:"analyzer"`
 	SearchAnalyzer string `json:"search_analyzer"`
 	Format         string `json:"format"` // date format yyyy-MM-dd HH:mm:ss || yyyy-MM-dd || epoch_millis

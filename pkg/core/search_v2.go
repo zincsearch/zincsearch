@@ -56,7 +56,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 		}
 	}
 
-	var Hits []meta.Hit
+	Hits := make([]meta.Hit, 0)
 	next, err := dmi.Next()
 	for err == nil && next != nil {
 		var id string
@@ -76,7 +76,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 			case "_source":
 				sourceData = source.Response(query.Source.(*meta.Source), value)
 				if query.Fields != nil {
-					fieldsData = fields.Response(query.Fields.([]*meta.Field), value)
+					fieldsData = fields.Response(query.Fields.([]*meta.Field), value, mappings)
 				}
 			default:
 				// highlight

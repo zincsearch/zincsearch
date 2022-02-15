@@ -10,6 +10,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/aggregationx"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/startup"
+	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
 func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregations, mappings *meta.Mappings) error {
@@ -82,7 +83,10 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 				format = agg.DateRange.Format
 			}
 			if agg.DateRange.TimeZone != "" {
-				timeZone = time.FixedZone(agg.DateRange.TimeZone, 0)
+				timeZone, err = zutils.ParseTimeZone(agg.DateRange.TimeZone)
+				if err != nil {
+					return meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[date_range] time_zone parse err %v", err))
+				}
 			}
 			switch mappings.Properties[agg.DateRange.Field].Type {
 			case "time":

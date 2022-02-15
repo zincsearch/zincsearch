@@ -9,7 +9,7 @@ import (
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
-func BoolQuery(query map[string]interface{}) (bluge.Query, error) {
+func BoolQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
 	boolQuery := bluge.NewBooleanQuery()
 	for k, v := range query {
 		k := strings.ToLower(k)
@@ -17,14 +17,14 @@ func BoolQuery(query map[string]interface{}) (bluge.Query, error) {
 		case "should":
 			switch v := v.(type) {
 			case map[string]interface{}:
-				if subq, err := Query(v); err != nil {
+				if subq, err := Query(v, mappings); err != nil {
 					return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[should] failed to parse field").Cause(err)
 				} else {
 					boolQuery.AddShould(subq)
 				}
 			case []interface{}:
 				for _, vv := range v {
-					if subq, err := Query(vv.(map[string]interface{})); err != nil {
+					if subq, err := Query(vv.(map[string]interface{}), mappings); err != nil {
 						return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[should] failed to parse field").Cause(err)
 					} else {
 						boolQuery.AddShould(subq)
@@ -36,14 +36,14 @@ func BoolQuery(query map[string]interface{}) (bluge.Query, error) {
 		case "must":
 			switch v := v.(type) {
 			case map[string]interface{}:
-				if subq, err := Query(v); err != nil {
+				if subq, err := Query(v, mappings); err != nil {
 					return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[must] failed to parse field").Cause(err)
 				} else {
 					boolQuery.AddMust(subq)
 				}
 			case []interface{}:
 				for _, vv := range v {
-					if subq, err := Query(vv.(map[string]interface{})); err != nil {
+					if subq, err := Query(vv.(map[string]interface{}), mappings); err != nil {
 						return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[must] failed to parse field").Cause(err)
 					} else {
 						boolQuery.AddMust(subq)
@@ -55,14 +55,14 @@ func BoolQuery(query map[string]interface{}) (bluge.Query, error) {
 		case "must_not":
 			switch v := v.(type) {
 			case map[string]interface{}:
-				if subq, err := Query(v); err != nil {
+				if subq, err := Query(v, mappings); err != nil {
 					return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[must_not] failed to parse field").Cause(err)
 				} else {
 					boolQuery.AddMustNot(subq)
 				}
 			case []interface{}:
 				for _, vv := range v {
-					if subq, err := Query(vv.(map[string]interface{})); err != nil {
+					if subq, err := Query(vv.(map[string]interface{}), mappings); err != nil {
 						return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[must_not] failed to parse field").Cause(err)
 					} else {
 						boolQuery.AddMustNot(subq)
@@ -75,14 +75,14 @@ func BoolQuery(query map[string]interface{}) (bluge.Query, error) {
 			filterQuery := bluge.NewBooleanQuery().SetBoost(0)
 			switch v := v.(type) {
 			case map[string]interface{}:
-				if subq, err := Query(v); err != nil {
+				if subq, err := Query(v, mappings); err != nil {
 					return nil, meta.NewError(meta.ErrorTypeParsingException, "[filter] failed to parse field").Cause(err)
 				} else {
 					filterQuery.AddMust(subq)
 				}
 			case []interface{}:
 				for _, vv := range v {
-					if subq, err := Query(vv.(map[string]interface{})); err != nil {
+					if subq, err := Query(vv.(map[string]interface{}), mappings); err != nil {
 						return nil, meta.NewError(meta.ErrorTypeParsingException, "[filter] failed to parse field").Cause(err)
 					} else {
 						filterQuery.AddMust(subq)

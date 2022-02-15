@@ -9,7 +9,7 @@ import (
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
-func Query(query map[string]interface{}) (bluge.Query, error) {
+func Query(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
 	var subq bluge.Query
 	var cmd string
 	var err error
@@ -25,7 +25,7 @@ func Query(query map[string]interface{}) (bluge.Query, error) {
 		}
 		switch k {
 		case "bool":
-			if subq, err = BoolQuery(v); err != nil {
+			if subq, err = BoolQuery(v, mappings); err != nil {
 				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[bool] failed to parse field").Cause(err)
 			}
 		case "boosting":
@@ -81,7 +81,7 @@ func Query(query map[string]interface{}) (bluge.Query, error) {
 				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[ids] failed to parse field").Cause(err)
 			}
 		case "range":
-			if subq, err = RangeQuery(v); err != nil {
+			if subq, err = RangeQuery(v, mappings); err != nil {
 				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[range] failed to parse field").Cause(err)
 			}
 		case "regexp":

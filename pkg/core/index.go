@@ -72,7 +72,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 			if v, ok := value.(bool); ok {
 				field = bluge.NewKeywordField(key, strconv.FormatBool(v))
 			} else if v, ok := value.(string); ok {
-				field = bluge.NewKeywordField(key, v).Aggregatable()
+				field = bluge.NewKeywordField(key, v)
 			} else {
 				return nil, fmt.Errorf("keyword type only support text")
 			}
@@ -80,7 +80,11 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 			value := value.(bool)
 			field = bluge.NewKeywordField(key, strconv.FormatBool(value))
 		case "time":
-			tim, err := time.Parse(time.RFC3339, value.(string))
+			format := time.RFC3339
+			if mappings.Properties[key].Format != "" {
+				format = mappings.Properties[key].Format
+			}
+			tim, err := time.Parse(format, value.(string))
 			if err != nil {
 				return nil, err
 			}

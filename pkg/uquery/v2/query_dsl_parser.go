@@ -27,7 +27,7 @@ func ParseQueryDSL(q *meta.ZincQuery, mappings *meta.Mappings) (bluge.SearchRequ
 	}
 
 	// parse query
-	query, err := query.Query(q.Query)
+	query, err := query.Query(q.Query, mappings)
 	if err != nil {
 		return nil, err
 	}
