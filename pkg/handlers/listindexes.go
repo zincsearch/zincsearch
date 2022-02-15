@@ -10,12 +10,15 @@ import (
 func ListIndexes(c *gin.Context) {
 	var indexListMap = make(map[string]*SimpleIndex)
 	for name, value := range core.ZINC_INDEX_LIST {
-		mappings := make(map[string]string, len(value.CachedMappings.Properties))
-		for field, prop := range value.CachedMappings.Properties {
-			if field == "_id" || field == "@timestamp" {
-				continue
+		mappings := make(map[string]string)
+		if value.CachedMappings != nil {
+			mappings = make(map[string]string, len(value.CachedMappings.Properties))
+			for field, prop := range value.CachedMappings.Properties {
+				if field == "_id" || field == "@timestamp" {
+					continue
+				}
+				mappings[field] = prop.Type
 			}
-			mappings[field] = prop.Type
 		}
 		indexListMap[name] = &SimpleIndex{
 			Name:     name,
@@ -27,5 +30,5 @@ func ListIndexes(c *gin.Context) {
 
 type SimpleIndex struct {
 	Name     string            `json:"name"`
-	Mappings map[string]string `json:"mapping"`
+	Mappings map[string]string `json:"mappings"`
 }

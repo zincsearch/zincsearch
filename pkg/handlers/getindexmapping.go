@@ -8,7 +8,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
-func GetIndexMappings(c *gin.Context) {
+func GetIndexMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
@@ -16,7 +16,7 @@ func GetIndexMappings(c *gin.Context) {
 		return
 	}
 
-	mappings, err := index.GetStoredMappings()
+	mappings, err := index.GetStoredMapping()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -29,5 +29,5 @@ func GetIndexMappings(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, mappings)
+	c.JSON(http.StatusOK, gin.H{index.Name: gin.H{"mappings": mappings}})
 }

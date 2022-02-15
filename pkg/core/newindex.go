@@ -33,7 +33,7 @@ func NewIndex(name string, storageType string) (*Index, error) {
 		Writer:      writer,
 		StorageType: storageType,
 	}
-	mappings, err := index.GetStoredMappings()
+	mappings, err := index.GetStoredMapping()
 	if err != nil {
 		return nil, err
 	}

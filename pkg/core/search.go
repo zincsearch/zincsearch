@@ -68,7 +68,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (*v1.SearchResponse, error) {
 	}
 
 	// handle aggregations
-	mappings, _ := index.GetStoredMappings()
+	mappings, _ := index.GetStoredMapping()
 	err = uquery.AddAggregations(searchRequest, iQuery.Aggregations, mappings)
 	if err != nil {
 		return &v1.SearchResponse{

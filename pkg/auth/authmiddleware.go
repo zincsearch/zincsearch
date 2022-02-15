@@ -18,7 +18,7 @@ func ZincAuthMiddleware(c *gin.Context) {
 		if _, ok := VerifyCredentials(user, password); ok {
 			c.Next()
 		} else {
-			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"auth": "Invalid credentials"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "Invalid credentials"})
 			return
 		}
 	} else {

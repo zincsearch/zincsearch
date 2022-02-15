@@ -13,7 +13,6 @@ import (
 	"github.com/rs/zerolog/log"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
@@ -145,17 +144,15 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 	return nil
 }
 
-// GetStoredMappings returns the mappings of all the indexes from _index_mapping system index
-func (index *Index) GetStoredMappings() (*meta.Mappings, error) {
-	dataPath := zutils.GetEnv("ZINC_DATA_PATH", "./data")
-	systemPath := dataPath + "/_index_mapping"
-
-	config := bluge.DefaultConfig(systemPath)
-	reader, err := bluge.OpenReader(config)
-	if err != nil {
-		log.Error().Str("index", index.Name).Msgf("GetIndexMapping: unable to open reader: %v", err)
-		return nil, nil
+// GetStoredMapping returns the mappings of all the indexes from _index_mapping system index
+func (index *Index) GetStoredMapping() (*meta.Mappings, error) {
+	for _, indexName := range systemIndexList {
+		if index.Name == indexName {
+			return nil, nil
+		}
 	}
+
+	reader, _ := ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Writer.Reader()
 	defer reader.Close()
 
 	// search for the index mapping _index_mapping index

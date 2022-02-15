@@ -15,8 +15,7 @@ func GetUser(userId string) (ZincUser, bool, error) {
 
 	query := bluge.NewTermQuery(userId)
 	searchRequest := bluge.NewTopNSearch(1, query)
-	usersIndex := core.ZINC_SYSTEM_INDEX_LIST["_users"]
-	reader, _ := usersIndex.Writer.Reader()
+	reader, _ := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer.Reader()
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
 		log.Printf("auth.GetUser: error executing search: %v", err)
@@ -24,35 +23,35 @@ func GetUser(userId string) (ZincUser, bool, error) {
 	}
 
 	next, err := dmi.Next()
-	if err != nil {
-		log.Printf("auth.GetUser: error accessing search: %v", err)
-		return user, userExists, err
-	}
-	userExists = true
-	err = next.VisitStoredFields(func(field string, value []byte) bool {
-		switch field {
-		case "_id":
-			user.ID = string(value)
-		case "name":
-			user.Name = string(value)
-		case "salt":
-			user.Salt = string(value)
-		case "password":
-			user.Password = string(value)
-		case "role":
-			user.Role = string(value)
-		case "created_at":
-			user.CreatedAt, _ = bluge.DecodeDateTime(value)
-		case "@timestamp":
-			user.Timestamp, _ = bluge.DecodeDateTime(value)
-		default:
-		}
+	for err == nil && next != nil {
+		userExists = true
+		err = next.VisitStoredFields(func(field string, value []byte) bool {
+			switch field {
+			case "_id":
+				user.ID = string(value)
+			case "name":
+				user.Name = string(value)
+			case "salt":
+				user.Salt = string(value)
+			case "password":
+				user.Password = string(value)
+			case "role":
+				user.Role = string(value)
+			case "created_at":
+				user.CreatedAt, _ = bluge.DecodeDateTime(value)
+			case "@timestamp":
+				user.Timestamp, _ = bluge.DecodeDateTime(value)
+			default:
+			}
 
-		return true
-	})
-	if err != nil {
-		log.Printf("auth.GetUser: error accessing stored fields: %v", err)
-		return user, userExists, err
+			return true
+		})
+		if err != nil {
+			log.Printf("auth.GetUser: error accessing stored fields: %v", err)
+			return user, userExists, err
+		} else {
+			return user, userExists, nil
+		}
 	}
 
 	return user, userExists, nil

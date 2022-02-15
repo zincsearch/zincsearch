@@ -9,7 +9,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/mappings"
 )
 
-func UpdateIndexMappings(c *gin.Context) {
+func UpdateIndexMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	if indexName == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "index.name should be not empty"})

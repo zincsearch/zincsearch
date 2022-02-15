@@ -13,7 +13,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
-var systemIndexList = []string{"_users", "_index_mapping", "_index_template"}
+var systemIndexList = []string{"_index_mapping", "_index_template", "_users"}
 
 func LoadZincSystemIndexes() (map[string]*Index, error) {
 	log.Print("Loading system indexes...")
