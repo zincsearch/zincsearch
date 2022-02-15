@@ -16,7 +16,7 @@ import (
 
 func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error) {
 	mappings, _ := index.GetStoredMapping()
-	searchRequest, err := parser.ParseQuery(query, mappings)
+	searchRequest, err := parser.ParseQueryDSL(query, mappings)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,15 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 		return nil, err
 	}
 
-	higher := highlight.NewHTMLHighlighter()
+	// highlight
+	var highlighter *highlight.SimpleHighlighter
+	if query.Highlight != nil {
+		if len(query.Highlight.PreTags) > 0 && len(query.Highlight.PostTags) > 0 {
+			highlighter = highlight.NewHTMLHighlighterTags(query.Highlight.PreTags[0], query.Highlight.PostTags[0])
+		} else {
+			highlighter = highlight.NewHTMLHighlighter()
+		}
+	}
 
 	var Hits []meta.Hit
 	next, err := dmi.Next()
@@ -56,6 +64,9 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 		var sourceData map[string]interface{}
 		var fieldsData map[string]interface{}
 		var highlightData map[string]interface{}
+		if query.Highlight != nil {
+			highlightData = make(map[string]interface{})
+		}
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
 			switch field {
 			case "_id":
@@ -70,14 +81,14 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 			default:
 				// highlight
 				if query.Highlight != nil && query.Highlight.Fields != nil {
-					if highlightData == nil {
-						highlightData = make(map[string]interface{})
-					}
-					// TODO support highlight options
 					if options, ok := query.Highlight.Fields[field]; ok {
 						if v, ok := next.Locations[field]; ok {
-							options.NumberOfFragments = 1 // TODO support multiple fragments
-							highlightData[field] = higher.BestFragments(v, value, options.NumberOfFragments)
+							if len(options.PreTags) > 0 && len(options.PostTags) > 0 {
+								highlighter := highlight.NewHTMLHighlighterTags(options.PreTags[0], options.PostTags[0])
+								highlightData[field] = highlighter.BestFragments(v, value, options.NumberOfFragments)
+							} else {
+								highlightData[field] = highlighter.BestFragments(v, value, options.NumberOfFragments)
+							}
 						}
 					}
 				}

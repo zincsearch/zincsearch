@@ -10,13 +10,14 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/startup"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/aggregation"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/fields"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/highlight"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/query"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/sort"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/source"
 )
 
-// ParseQuery parse query DSL and return searchRequest
-func ParseQuery(q *meta.ZincQuery, mappings *meta.Mappings) (bluge.SearchRequest, error) {
+// ParseQueryDSL parse query DSL and return searchRequest
+func ParseQueryDSL(q *meta.ZincQuery, mappings *meta.Mappings) (bluge.SearchRequest, error) {
 	// parse size
 	if q.Size == 0 {
 		q.Size = 10
@@ -38,8 +39,8 @@ func ParseQuery(q *meta.ZincQuery, mappings *meta.Mappings) (bluge.SearchRequest
 	request := bluge.NewTopNSearch(q.Size, query).WithStandardAggregations()
 
 	// parse highlight
-	// TODO: highlight
 	if q.Highlight != nil {
+		highlight.Request(q.Highlight)
 		request.IncludeLocations()
 	}
 

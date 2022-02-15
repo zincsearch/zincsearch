@@ -29,8 +29,5 @@ func TestLoadIndexes(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(len(ZINC_INDEX_LIST), ShouldBeGreaterThanOrEqualTo, 0)
 		})
-		Convey("load user inex from s3", func() {
-			// TODO: support
-		})
 	})
 }

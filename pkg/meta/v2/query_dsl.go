@@ -270,11 +270,11 @@ type AggregationDateHistogram struct {
 }
 
 type Highlight struct {
-	NumberOfFragments int                  `json:"number_of_fragments"`
-	FragmentSize      int                  `json:"fragment_size"`
-	PreTags           []string             `json:"pre_tags"`
-	PostTags          []string             `json:"post_tags"`
-	Fields            map[string]Highlight `json:"fields"`
+	NumberOfFragments int                   `json:"number_of_fragments"`
+	FragmentSize      int                   `json:"fragment_size"`
+	PreTags           []string              `json:"pre_tags"`
+	PostTags          []string              `json:"post_tags"`
+	Fields            map[string]*Highlight `json:"fields"`
 }
 
 type Field struct {
