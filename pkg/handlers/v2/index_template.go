@@ -9,7 +9,8 @@ import (
 )
 
 func ListIndexTemplate(c *gin.Context) {
-	templates, err := core.ListTemplates()
+	pattern := c.Query("pattern")
+	templates, err := core.ListTemplates(pattern)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

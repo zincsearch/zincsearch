@@ -14,8 +14,13 @@ import (
 )
 
 // ListTemplates returns all templates
-func ListTemplates() ([]IndexTemplate, error) {
-	query := bluge.NewMatchAllQuery()
+func ListTemplates(pattern string) ([]IndexTemplate, error) {
+	var query bluge.Query
+	if pattern != "" {
+		query = bluge.NewBooleanQuery().AddMust(bluge.NewTermQuery(pattern).SetField("index_pattern"))
+	} else {
+		query = bluge.NewMatchAllQuery()
+	}
 	searchRequest := bluge.NewTopNSearch(1000, query).SortBy([]string{"name"})
 	reader, _ := ZINC_SYSTEM_INDEX_LIST["_index_template"].Writer.Reader()
 	defer reader.Close()
@@ -25,7 +30,7 @@ func ListTemplates() ([]IndexTemplate, error) {
 		return nil, fmt.Errorf("core.ListTemplates: error executing search: %v", err)
 	}
 
-	var templates []IndexTemplate
+	templates := make([]IndexTemplate, 0)
 	next, err := dmi.Next()
 	for err == nil && next != nil {
 		var name string
@@ -36,6 +41,7 @@ func ListTemplates() ([]IndexTemplate, error) {
 				name = string(value)
 			case "_source":
 				json.Unmarshal(value, tpl)
+			default:
 			}
 			return true
 		})
@@ -56,18 +62,42 @@ func ListTemplates() ([]IndexTemplate, error) {
 
 // NewTemplate create a template and store in local
 func NewTemplate(name string, template *meta.Template) error {
+	if name == "" || template == nil {
+		return nil
+	}
+
 	update := false
 	_, tplExists, _ := LoadTemplate(name)
 	if tplExists {
 		update = true
 	}
 
+	// check pattern is exists
+	for _, pattern := range template.IndexPatterns {
+		results, _ := ListTemplates(pattern)
+		for _, result := range results {
+			if update && result.Name == name {
+				continue
+			}
+			if result.IndexTemplate.Priority == template.Priority {
+				return fmt.Errorf("index template [%s] has index patterns %s "+
+					"matching patterns from existing templates [%s] with patterns (%s => %s) "+
+					"that have the same priority [%d], multiple index templates may not match during index creation, "+
+					"please use a different priority",
+					name, template.IndexPatterns,
+					result.Name,
+					result.Name, result.IndexTemplate.IndexPatterns,
+					template.Priority,
+				)
+			}
+		}
+	}
+
 	bdoc := bluge.NewDocument(name)
 	bdoc.AddField(bluge.NewKeywordField("name", name).StoreValue().Sortable())
 	bdoc.AddField(bluge.NewNumericField("priority", float64(template.Priority)).StoreValue().Sortable().Aggregatable())
 	for i := 0; i < len(template.IndexPatterns); i++ {
-		name := fmt.Sprintf("index_pattern_%d", i)
-		bdoc.AddField(bluge.NewKeywordField(name, template.IndexPatterns[i]).StoreValue())
+		bdoc.AddField(bluge.NewKeywordField("index_pattern", template.IndexPatterns[i]).StoreValue())
 		bdoc.AddField(bluge.NewKeywordField("index_prefix", string(template.IndexPatterns[i][0:1])).StoreValue())
 	}
 
