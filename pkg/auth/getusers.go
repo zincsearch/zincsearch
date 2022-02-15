@@ -34,6 +34,10 @@ func GetAllUsersWorker() (*v1.SearchResponse, error) {
 				user.Name = string(value)
 			case "role":
 				user.Role = string(value)
+			case "salt":
+				user.Salt = string(value)
+			case "password":
+				user.Password = string(value)
 			case "created_at":
 				user.CreatedAt, _ = bluge.DecodeDateTime(value)
 			case "@timestamp":
@@ -78,6 +82,8 @@ type SimpleUser struct {
 	ID        string    `json:"_id"` // this will be email
 	Name      string    `json:"name"`
 	Role      string    `json:"role"`
+	Salt      string    `json:"-"`
+	Password  string    `json:"-"`
 	CreatedAt time.Time `json:"created_at"`
 	Timestamp time.Time `json:"@timestamp"`
 }

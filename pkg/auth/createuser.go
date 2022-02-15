@@ -56,18 +56,27 @@ func CreateUser(userId, name, plaintextPassword, role string) (*ZincUser, error)
 		return nil, err
 	}
 
+	// cache user
+	ZINC_CACHED_USERS[newUser.ID] = SimpleUser{
+		ID:       newUser.ID,
+		Name:     newUser.Name,
+		Role:     newUser.Role,
+		Salt:     newUser.Salt,
+		Password: newUser.Password,
+	}
+
 	return newUser, nil
 }
 
 func GeneratePassword(password, salt string) string {
 	params := &Argon2Params{
-		Memory:      64 * 1024,
+		Memory:      2 * 1024,
 		Iterations:  3,
 		Parallelism: 2,
 		SaltLength:  128,
 		KeyLength:   32,
-		Time:        2,
-		Threads:     4,
+		Time:        1,
+		Threads:     1,
 	}
 
 	hash := argon2.IDKey([]byte(password), []byte(salt), params.Time, params.Memory, params.Threads, params.KeyLength)

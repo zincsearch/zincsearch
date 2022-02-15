@@ -17,5 +17,8 @@ func DeleteUser(userId string) bool {
 		return false
 	}
 
+	// delete cache
+	delete(ZINC_CACHED_USERS, userId)
+
 	return true
 }
