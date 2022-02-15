@@ -30,6 +30,7 @@ type QueryParams struct {
 type AggregationParams struct {
 	AggType      string                       `json:"agg_type"`
 	Field        string                       `json:"field"`
+	WeightField  string                       `json:"weight_field"` // Field name to be used for setting weight for primary field for weighted average aggregation
 	Size         int                          `json:"size"`
 	Ranges       []AggregationNumberRange     `json:"ranges"`
 	DateRanges   []AggregationDateRange       `json:"date_ranges"`

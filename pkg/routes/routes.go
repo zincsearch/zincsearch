@@ -10,6 +10,7 @@ import (
 
 	"github.com/prabhatsharma/zinc"
 	"github.com/prabhatsharma/zinc/pkg/auth"
+	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/prabhatsharma/zinc/pkg/handlers"
 	handlersV2 "github.com/prabhatsharma/zinc/pkg/handlers/v2"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
@@ -84,4 +85,8 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
 	r.POST("/es/:target/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
 
+	core.TelemetryInstance()
+	event_data := make(map[string]interface{})
+	core.TelemetryEvent("server_start", event_data)
+	core.TelemetryCron()
 }

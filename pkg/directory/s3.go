@@ -190,18 +190,31 @@ func (s *S3Directory) Remove(kind string, id uint64) error {
 func (s *S3Directory) Stats() (numItems uint64, numBytes uint64) {
 	log.Print("Stats: s3 ListObjectsV2 call made for Stats")
 
+	objectCount, sizeOfObjects := GetS3PrefixSize(s.Bucket, s.Prefix)
+
+	return objectCount, sizeOfObjects
+}
+
+// Stats returns total number of items and their cumulative size
+func GetS3PrefixSize(bucket, prefix string) (numItems uint64, numBytes uint64) {
+
 	objectCount := uint64(0)
 	sizeOfObjects := uint64(0)
 
 	ctx := context.Background()
 	params := s3.ListObjectsV2Input{
-		Bucket: &s.Bucket,
-		Prefix: &s.Prefix,
+		Bucket: &bucket,
+		Prefix: &prefix,
 	}
 
-	log.Print("Stats: s3 ListObjectsV2 call made for Stats s3://", s.Bucket+"/"+s.Prefix)
+	// Load the Shared AWS Configuration (~/.aws/config)
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		log.Print("Error loading AWS config: ", err)
+	}
+	client := s3.NewFromConfig(cfg)
 
-	val, err := s.Client.ListObjectsV2(ctx, &params)
+	val, err := client.ListObjectsV2(ctx, &params)
 	if err != nil {
 		log.Print("Stats: failed to list objects: ", err.Error())
 		return 0, 0

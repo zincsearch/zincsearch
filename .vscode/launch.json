@@ -11,8 +11,8 @@
             "mode": "auto",
             "program": "cmd/zinc/main.go",
             "env": {
-                "FIRST_ADMIN_USER": "admin",
-                "FIRST_ADMIN_PASSWORD": "Complexpass#123",
+                "ZINC_FIRST_ADMIN_USER": "admin",
+                "ZINC_FIRST_ADMIN_PASSWORD": "Complexpass#123",
                 "ZINC_DATA_PATH": "../../data",
                 "ZINC_MINIO_ENDPOINT": "localhost:9000",
                 "ZINC_MINIO_BUCKET": "zincbucket",

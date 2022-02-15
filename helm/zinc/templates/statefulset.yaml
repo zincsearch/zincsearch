@@ -23,17 +23,17 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: FIRST_ADMIN_USER
+            - name: ZINC_FIRST_ADMIN_USER
               valueFrom:
                 secretKeyRef:
                   key: "username"
                   name: {{ include "zinc.fullname" . }}
-            - name: FIRST_ADMIN_PASSWORD
+            - name: ZINC_FIRST_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: "password"
                   name: {{ include "zinc.fullname" . }}
-            - name: DATA_PATH
+            - name: ZINC_DATA_PATH
               value: /go/bin/data
           # command: ["/bin/bash", "-c", "while true; do sleep 1; done"]
           resources:

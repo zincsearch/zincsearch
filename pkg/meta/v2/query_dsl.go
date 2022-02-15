@@ -194,6 +194,7 @@ type TermsSetQuery struct{}
 
 type Aggregations struct {
 	Avg           *AggregationMetric        `json:"avg"`
+	WeightedAvg   *AggregationMetric        `json:"weighted_avg"`
 	Max           *AggregationMetric        `json:"max"`
 	Min           *AggregationMetric        `json:"min"`
 	Sum           *AggregationMetric        `json:"sum"`
@@ -208,7 +209,8 @@ type Aggregations struct {
 }
 
 type AggregationMetric struct {
-	Field string `json:"field"`
+	Field       string `json:"field"`
+	WeightField string `json:"weight_field"` // Field name to be used for setting weight for primary field for weighted average aggregation
 }
 
 type AggregationsTerms struct {

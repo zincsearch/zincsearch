@@ -78,12 +78,14 @@ func AddAggregations(req aggregationx.SearchAggregation, aggs map[string]v1.Aggr
 			req.AddAggregation(name, aggregations.Min(search.Field(agg.Field)))
 		case "avg":
 			req.AddAggregation(name, aggregations.Avg(search.Field(agg.Field)))
+		case "weighted_avg":
+			req.AddAggregation(name, aggregations.WeightedAvg(search.Field(agg.Field), search.Field(agg.WeightField)))
 		case "sum":
 			req.AddAggregation(name, aggregations.Sum(search.Field(agg.Field)))
 		case "count":
 			req.AddAggregation(name, aggregations.CountMatches())
 		default:
-			return fmt.Errorf("aggregation not support %v", agg.AggType)
+			return fmt.Errorf("aggregation not supported %v", agg.AggType)
 		}
 	}
 
