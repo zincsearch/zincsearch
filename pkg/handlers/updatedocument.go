@@ -5,8 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/rs/zerolog/log"
+
+	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
 func UpdateDocument(c *gin.Context) {
@@ -40,7 +41,13 @@ func UpdateDocument(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, err)
 			return
 		}
-		core.ZINC_INDEX_LIST[indexName] = index // Load the index in memory
+		core.ZINC_INDEX_LIST[indexName] = index
+
+		// use template
+		template, _ := core.UseTemplate(indexName)
+		if template != nil && template.Template.Mappings != nil && len(template.Template.Mappings.Properties) > 0 {
+			index.SetMappings(template.Template.Mappings)
+		}
 	}
 
 	// doc, _ = flatten.Flatten(doc, "", flatten.DotStyle)

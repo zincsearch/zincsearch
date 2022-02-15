@@ -12,9 +12,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/uquery"
 )
 
-func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
-	var Hits []v1.Hit
-
+func (index *Index) Search(iQuery *v1.ZincQuery) (*v1.SearchResponse, error) {
 	var searchRequest bluge.SearchRequest
 	if iQuery.MaxResults > startup.LoadMaxResults() {
 		iQuery.MaxResults = startup.LoadMaxResults()
@@ -64,16 +62,16 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 	}
 
 	if err != nil {
-		return v1.SearchResponse{
+		return &v1.SearchResponse{
 			Error: err.Error(),
 		}, err
 	}
 
 	// handle aggregations
-	mapping, _ := index.GetStoredMapping()
-	err = uquery.AddAggregations(searchRequest, iQuery.Aggregations, mapping)
+	mappings, _ := index.GetStoredMapping()
+	err = uquery.AddAggregations(searchRequest, iQuery.Aggregations, mappings)
 	if err != nil {
-		return v1.SearchResponse{
+		return &v1.SearchResponse{
 			Error: err.Error(),
 		}, err
 	}
@@ -89,7 +87,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 		log.Printf("error executing search: %v", err)
 	}
 
-	// highlighter := highlight.NewANSIHighlighter()
+	var Hits []v1.Hit
 
 	next, err := dmi.Next()
 	for err == nil && next != nil {
@@ -97,16 +95,16 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 		var id string
 		var timestamp time.Time
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			if field == "_source" {
-				result = uquery.HandleSource(sourceCtl, value)
-				return true
-			} else if field == "_id" {
+			switch field {
+			case "_id":
 				id = string(value)
-				return true
-			} else if field == "@timestamp" {
+			case "@timestamp":
 				timestamp, _ = bluge.DecodeDateTime(value)
-				return true
+			case "_source":
+				result = uquery.HandleSource(sourceCtl, value)
+			default:
 			}
+
 			return true
 		})
 		if err != nil {
@@ -129,7 +127,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (v1.SearchResponse, error) {
 		log.Printf("error iterating results: %v", err)
 	}
 
-	resp := v1.SearchResponse{
+	resp := &v1.SearchResponse{
 		Took: int(dmi.Aggregations().Duration().Milliseconds()),
 		Hits: v1.Hits{
 			Total: v1.Total{

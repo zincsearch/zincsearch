@@ -16,4 +16,7 @@ func TestNewIndex(t *testing.T) {
 	Convey("test new index storage s3", t, func() {
 		// TODO: support
 	})
+	Convey("test new index storage minio", t, func() {
+		// TODO: support
+	})
 }

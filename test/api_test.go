@@ -75,7 +75,7 @@ func TestApiStandard(t *testing.T) {
 				So(resp.Code, ShouldEqual, http.StatusOK)
 
 				// check updated
-				_, userNew, _ := auth.GetUser(username)
+				userNew, _, _ := auth.GetUser(username)
 				So(userNew.Name, ShouldEqual, fmt.Sprintf("%s-updated", username))
 			})
 			Convey("create user with error input", func() {
@@ -93,7 +93,7 @@ func TestApiStandard(t *testing.T) {
 				So(resp.Code, ShouldEqual, http.StatusOK)
 
 				// check user exist
-				exist, _, _ := auth.GetUser(username)
+				_, exist, _ := auth.GetUser(username)
 				So(exist, ShouldBeFalse)
 			})
 			Convey("delete user with not exist userid", func() {
@@ -129,7 +129,7 @@ func TestApiStandard(t *testing.T) {
 			})
 		})
 
-		Convey("PUT /api/:target/_mappings", func() {
+		Convey("PUT /api/:target/_mapping", func() {
 			Convey("update mappings for index", func() {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`{
@@ -149,21 +149,24 @@ func TestApiStandard(t *testing.T) {
 						}
 					}
 				}`)
-				resp := request("PUT", "/api/"+indexName+"/_mappings", body)
+				resp := request("PUT", "/api/"+indexName+"/_mapping", body)
 				So(resp.Code, ShouldEqual, http.StatusOK)
 				So(resp.Body.String(), ShouldEqual, `{"message":"ok"}`)
 			})
 		})
 
-		Convey("GET /api/:target/_mappings", func() {
+		Convey("GET /api/:target/_mapping", func() {
 			Convey("get mappings from index", func() {
-				resp := request("GET", "/api/"+indexName+"/_mappings", nil)
+				resp := request("GET", "/api/"+indexName+"/_mapping", nil)
 				So(resp.Code, ShouldEqual, http.StatusOK)
 
 				data := make(map[string]interface{})
 				err := json.Unmarshal(resp.Body.Bytes(), &data)
 				So(err, ShouldBeNil)
-				So(data["mappings"], ShouldNotBeNil)
+				So(data[indexName], ShouldNotBeNil)
+				v, ok := data[indexName].(map[string]interface{})
+				So(ok, ShouldBeTrue)
+				So(v["mappings"], ShouldNotBeNil)
 			})
 		})
 

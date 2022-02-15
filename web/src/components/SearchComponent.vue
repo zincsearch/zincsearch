@@ -298,7 +298,7 @@ export default {
 
         for (var index in data) {
           indexList.value.push(data[index].name);
-          mapping_list.value[data[index].name] = data[index].mapping;
+          mapping_list.value[data[index].name] = data[index].mappings;
         }
       } catch (error) {
         console.log(error);

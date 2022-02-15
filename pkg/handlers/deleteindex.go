@@ -12,9 +12,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/rs/zerolog/log"
+
 	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
-	"github.com/rs/zerolog/log"
 )
 
 // DeleteIndex deletes a zinc index and its associated data. Be careful using thus as you ca't undo this action.
@@ -69,9 +70,7 @@ func DeleteIndex(c *gin.Context) {
 		err := core.ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Writer.Delete(bdoc.ID())
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		} else {
 			c.JSON(http.StatusOK, gin.H{
 				"message": "Deleted",

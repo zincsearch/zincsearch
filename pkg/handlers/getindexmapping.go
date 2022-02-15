@@ -8,7 +8,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
-func GetIndexMappings(c *gin.Context) {
+func GetIndexMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
@@ -22,14 +22,12 @@ func GetIndexMappings(c *gin.Context) {
 		return
 	}
 
-	// format mapping
-	properties := make(map[string]core.Properties, len(mappings))
-	for field, pType := range mappings {
+	// format mappings
+	for field := range mappings.Properties {
 		if field == "_id" || field == "@timestamp" {
-			continue
+			delete(mappings.Properties, field)
 		}
-		properties[field] = core.Properties{Type: pType}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"mappings": gin.H{"properties": properties}})
+	c.JSON(http.StatusOK, gin.H{index.Name: gin.H{"mappings": mappings}})
 }

@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/prabhatsharma/zinc/pkg/core"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/mappings"
 )
 
 func CreateIndex(c *gin.Context) {
@@ -12,13 +14,13 @@ func CreateIndex(c *gin.Context) {
 	c.BindJSON(&newIndex)
 
 	if newIndex.Name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "index.name should be not empty"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index.name should be not empty"})
 		return
 	}
 
-	mappings, err := core.FormatMapping(&newIndex.Mappings)
+	mappings, err := mappings.Request(newIndex.Mappings)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -31,11 +33,19 @@ func CreateIndex(c *gin.Context) {
 			return
 		}
 		core.ZINC_INDEX_LIST[newIndex.Name] = index
+
+		// use template
+		if mappings == nil {
+			template, _ := core.UseTemplate(newIndex.Name)
+			if template != nil && template.Template.Mappings != nil && len(template.Template.Mappings.Properties) > 0 {
+				mappings = template.Template.Mappings
+			}
+		}
 	}
 
-	// update mapping
-	if len(mappings) > 0 {
-		index.SetMapping(mappings)
+	// update mappings
+	if mappings != nil && len(mappings.Properties) > 0 {
+		index.SetMappings(mappings)
 	}
 
 	c.JSON(http.StatusOK, gin.H{

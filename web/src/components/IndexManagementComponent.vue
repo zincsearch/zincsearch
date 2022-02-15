@@ -48,10 +48,10 @@ export default {
       for (var index in indexStruct.value) {
         indexList.value.push({ index: indexStruct.value[index].name });
         var mappingArray = [];
-        for (var field in indexStruct.value[index].mapping) {
+        for (var field in indexStruct.value[index].mappings) {
           mappingArray.push({
             field: field,
-            type: indexStruct.value[index].mapping[field],
+            type: indexStruct.value[index].mappings[field],
           });
         }
         mappingStruct.value[index] = mappingArray;
