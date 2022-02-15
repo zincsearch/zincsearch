@@ -27,7 +27,7 @@ Join slack channel
 4. Compatibility with Elasticsearch APIs for ingestion of data (single record and bulk API)
 5. Out of the box authentication
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
-7. Index storage in s3 (experimental)
+7. Index storage in s3 and minio (experimental)
 8. aggregation support
 
 # Roadmap items:
@@ -50,115 +50,30 @@ Join slack channel
 
 ## Download / Installation / Run
 
-### Windows 
+Check installation [installation docs](https://docs.zincsearch.io/04_installation/)
 
-Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc/releases) page for appropriate platform.
-
-```shell
-C:\> set ZINC_FIRST_ADMIN_USER=admin
-C:\> set ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
-C:\> mkdir data
-C:\> zinc.exe
-```
-### MacOS - Homebrew 
-
-> $ brew tap prabhatsharma/tap
-
-> $ brew install prabhatsharma/tap/zinc
-
-> $ mkdir data
-
-> $ ZINC_FIRST_ADMIN_USER=admin ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123 zinc 
-
-Now point your browser to http://localhost:4080 and login
-
-### MacOS/Linux Binaries
-Binaries can be downloaded from [releases](https://github.com/prabhatsharma/zinc/releases) page for appropriate platform.
-
-Create a data folder that will store the data
-> $ mkdir data
-
-> $ ZINC_FIRST_ADMIN_USER=admin ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123 ./zinc 
-
-Now point your browser to http://localhost:4080 and login
-
-### Docker
-
-------------------------
-**Optional - Only if you have AWS CLI installed.**
-
-If you have AWS CLI installed amd get login error then run below command:
-
-> aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
-
-------------------------
-
-Docker images are available at https://gallery.ecr.aws/prabhat/zinc
-
-> $ mkdir data
-
-> $ docker run -v /full/path/of/data:/data -e ZINC_DATA_PATH="/data" -p 4080:4080 -e ZINC_FIRST_ADMIN_USER=admin -e ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123 --name zinc public.ecr.aws/prabhat/zinc:latest
-
-
-
-Now point your browser to http://localhost:4080 and login
-
-### Kubernetes
-
-#### Manual Install
-
-Create the namespace:
-> $ kubectl create ns zinc
-
-> $ kubectl apply -f k8s/kube-deployment.yaml
-
-> $ kubectl -n zinc port-forward svc/z 4080:4080
-
-Now point your browser to http://localhost:4080 and login
-
-#### Helm
-
-Update Helm values located in [values.yaml](helm/zinc/values.yaml)
-
-Create the namespace:
-> $ kubectl create ns zinc
-
-Install the chart:
-> $ helm install zinc helm/zinc -n zinc
-
-Zinc can be available with an ingress or port-forward:
-> $ kubectl -n zinc port-forward svc/zinc 4080:4080
 
 ## Data ingestion
 
 ### Single record
 
-```shell
-curl \
-  -u admin:Complexpass#123 \
-  -XPUT \
-  -d '{"author":"Prabhat Sharma"}' \
-  http://localhost:4080/api/myshinynewindex/document
-```
+Check [single record ingestion docs](https://docs.zincsearch.io/ingestion/single-record/)
 
 ### Bulk ingestion
 
-Bulk ingestion API follows same interface as Elasticsearch API defined in [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html).
+Check [bulk ingestion docs](https://docs.zincsearch.io/ingestion/bulk-ingestion/#bulk-ingestion)
 
+### Fluent bit
 
-Here is a sample of how to use it:
+Check [fluet-bit ingestion docs](https://docs.zincsearch.io/ingestion/fluent-bit/)
 
-```shell
-curl -L https://github.com/prabhatsharma/zinc/releases/download/v0.1.1/olympics.ndjson.gz -o olympics.ndjson.gz
-gzip -d  olympics.ndjson.gz 
-curl http://localhost:4080/api/_bulk -i -u admin:Complexpass#123  --data-binary "@olympics.ndjson"
-```
+### Syslog-ng
 
-Data ingestion can also be done using APIs and log forwarders like fluent-bit and syslog-ng. Check [docs](https://docs.zincsearch.io/ingestion/bulk-ingestion/#bulk-ingestion) for details.
+Check [syslog-ng ingestion docs](https://docs.zincsearch.io/ingestion/syslog-ng/)
 
 ## API Reference
 
-Check [docs](https://docs.zincsearch.io/API%20Reference/)
+Check [Zinc API docs](https://docs.zincsearch.io/API%20Reference/)
 
 
 # Who uses Zinc (Known users)?
