@@ -24,3 +24,5 @@ main
 dist/
 tmp/
 
+# bzinc binary in root
+zinc

@@ -16,7 +16,7 @@ func TestLoadIndexes(t *testing.T) {
 			var err error
 			ZINC_SYSTEM_INDEX_LIST, err = LoadZincSystemIndexes()
 			So(err, ShouldBeNil)
-			So(len(ZINC_SYSTEM_INDEX_LIST), ShouldEqual, 2)
+			So(len(ZINC_SYSTEM_INDEX_LIST), ShouldEqual, 3)
 			So(ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Name, ShouldEqual, "_index_mapping")
 		})
 		Convey("load user inex from disk", func() {
@@ -28,9 +28,6 @@ func TestLoadIndexes(t *testing.T) {
 			ZINC_INDEX_LIST, err = LoadZincIndexesFromDisk()
 			So(err, ShouldBeNil)
 			So(len(ZINC_INDEX_LIST), ShouldBeGreaterThanOrEqualTo, 0)
-		})
-		Convey("load user inex from s3", func() {
-			// TODO: support
 		})
 	})
 }

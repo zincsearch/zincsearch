@@ -22,7 +22,7 @@ func BulkHandler(c *gin.Context) {
 
 	documentsProcessed, err := BulkHandlerWorker(target, body)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "bulk data inserted", "record_count": documentsProcessed})
@@ -90,6 +90,12 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 					return documentsProcessed, err
 				}
 				core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
+
+				// use template
+				template, _ := core.UseTemplate(indexName)
+				if template != nil && template.Template.Mappings != nil {
+					newIndex.SetMappings(template.Template.Mappings)
+				}
 			}
 
 			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(docID, &doc)
