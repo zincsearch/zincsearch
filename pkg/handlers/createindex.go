@@ -37,7 +37,7 @@ func CreateIndex(c *gin.Context) {
 		// use template
 		if mappings == nil {
 			template, _ := core.UseTemplate(newIndex.Name)
-			if template != nil && template.Template.Mappings != nil && len(template.Template.Mappings.Properties) > 0 {
+			if template != nil && template.Template.Mappings != nil {
 				mappings = template.Template.Mappings
 			}
 		}

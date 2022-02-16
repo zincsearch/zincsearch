@@ -13,7 +13,7 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
-var systemIndexList = []string{"_index_mapping", "_index_template", "_users"}
+var systemIndexList = []string{"_index_mapping", "_index_template", "_metadata", "_users"}
 
 func LoadZincSystemIndexes() (map[string]*Index, error) {
 	log.Print("Loading system indexes...")
@@ -71,13 +71,17 @@ func LoadZincIndexesFromDisk() (map[string]*Index, error) {
 func LoadZincIndexesFromS3() (map[string]*Index, error) {
 	log.Print("Loading indexes from s3...")
 
+	dataPath := zutils.GetEnv("ZINC_S3_BUCKET", "")
+	if dataPath == "" {
+		return nil, nil
+	}
+
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		log.Print("Error loading AWS config: ", err)
 	}
 	client := s3.NewFromConfig(cfg)
 	IndexList := make(map[string]*Index)
-	dataPath := zutils.GetEnv("ZINC_S3_BUCKET", "")
 	delimiter := "/"
 	ctx := context.Background()
 	params := s3.ListObjectsV2Input{
@@ -114,8 +118,8 @@ func LoadZincIndexesFromMinIO() (map[string]*Index, error) {
 	endpoint := zutils.GetEnv("ZINC_MINIO_ENDPOINT", "")
 	accessKeyID := zutils.GetEnv("ZINC_MINIO_ACCESS_KEY_ID", "")
 	secretAccessKey := zutils.GetEnv("ZINC_MINIO_SECRET_ACCESS_KEY", "")
-	MINIO_BUCKET := zutils.GetEnv("ZINC_MINIO_BUCKET", "")
-	if MINIO_BUCKET == "" {
+	dataPath := zutils.GetEnv("ZINC_MINIO_BUCKET", "")
+	if dataPath == "" {
 		return nil, nil
 	}
 
@@ -134,7 +138,8 @@ func LoadZincIndexesFromMinIO() (map[string]*Index, error) {
 	optsList := minio.ListObjectsOptions{
 		Recursive: false,
 	}
-	val := minioClient.ListObjects(context.TODO(), MINIO_BUCKET, optsList)
+
+	val := minioClient.ListObjects(context.TODO(), dataPath, optsList)
 	if err != nil {
 		log.Print("failed to list indexes in minio: ", err.Error())
 		return nil, err

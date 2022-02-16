@@ -93,7 +93,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 
 				// use template
 				template, _ := core.UseTemplate(indexName)
-				if template != nil && template.Template.Mappings != nil && len(template.Template.Mappings.Properties) > 0 {
+				if template != nil && template.Template.Mappings != nil {
 					newIndex.SetMappings(template.Template.Mappings)
 				}
 			}

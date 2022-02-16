@@ -14,7 +14,6 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/jeremywohl/flatten v1.0.1
 	github.com/joho/godotenv v1.4.0
-	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/minio/minio-go/v7 v7.0.21
 	github.com/prometheus/client_golang v1.12.0 // indirect
 	github.com/robfig/cron/v3 v3.0.0

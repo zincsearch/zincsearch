@@ -122,6 +122,10 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 // index: Name of the index ffor which the mapping needs to be saved
 // iMap: a map of the fileds that specify name and type of the field. e.g. movietitle: string
 func (index *Index) SetMappings(mappings *meta.Mappings) error {
+	if mappings == nil || len(mappings.Properties) == 0 {
+		return nil
+	}
+
 	// @timestamp need date_range/date_histogram aggregation, and mappings used for type check in aggregation
 	mappings.Properties["@timestamp"] = meta.NewProperty("time")
 
