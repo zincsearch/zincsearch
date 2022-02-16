@@ -11,7 +11,7 @@
           icon="menu"
         />
 
-        <q-toolbar-title> Zinc Search </q-toolbar-title>
+        <q-toolbar-title>Zinc Search</q-toolbar-title>
 
         <!-- <div>Quasar v{{ $q.version }}</div> -->
         <q-btn-dropdown outline rounded icon-right="manage_accounts">
@@ -20,7 +20,7 @@
               {{ loggedInUserName }}
               <!-- <q-avatar size="40px">
                 {{ loggedInUserName }}
-              </q-avatar> -->
+              </q-avatar>-->
             </div>
           </template>
 
@@ -31,10 +31,10 @@
               <q-avatar icon="exit_to_app" color="red" text-color="white" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>Sign Out </q-item-label>
+              <q-item-label>Sign Out</q-item-label>
               <!-- <q-item-label style="font-size: 0.9rem">{{
                 loggedInUser
-              }}</q-item-label> -->
+              }}</q-item-label>-->
             </q-item-section>
           </q-item>
         </q-btn-dropdown>
@@ -135,7 +135,12 @@ export default {
     const $q = useQuasar();
 
     if (window.location.origin != "http://localhost:8080") {
-      store.dispatch("endpoint", window.location.origin + "/");
+      store.dispatch(
+        "endpoint",
+        window.location.origin +
+          window.location.pathname.split("/").slice(0, -2).join("/") +
+          "/"
+      );
     }
 
     const _id = localStorage.getItem("_id");

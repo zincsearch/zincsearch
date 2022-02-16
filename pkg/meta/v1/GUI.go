@@ -12,5 +12,6 @@ func GUI(c *gin.Context) {
 	// 	"zinc": "Modern, Simpler, Lighter, Faster Search server. ",
 	// })
 
-	c.Redirect(http.StatusMovedPermanently, "/ui/")
+	c.Status(http.StatusFound)
+	c.Writer.Header().Set("Location", "./ui/")
 }
