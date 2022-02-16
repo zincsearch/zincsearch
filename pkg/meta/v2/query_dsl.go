@@ -180,9 +180,9 @@ type WildcardQuery struct {
 // {"term":{"field": "value"}}
 // {"term":{"field": {"value": "value", "boost": 1.0}}}
 type TermQuery struct {
-	Value           string  `json:"value"`
-	Boost           float64 `json:"boost"`
-	CaseInsensitive bool    `json:"case_insensitive"`
+	Value           interface{} `json:"value"`
+	Boost           float64     `json:"boost"`
+	CaseInsensitive bool        `json:"case_insensitive"`
 }
 
 // TermsQuery
