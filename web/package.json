@@ -10,7 +10,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
+    "@quasar/extras": "^1.12.4",
     "axios": "^0.22.0",
     "core-js": "^3.6.5",
     "lodash": "^4.17.21",
