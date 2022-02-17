@@ -28,15 +28,25 @@ func SetRoutes(r *gin.Engine) {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	r.Use(func(c *gin.Context) {
-		log.Info().Str("method", c.Request.Method).Msg(c.Request.RequestURI)
-		c.Writer.Header().Set("zinc", v1.Version)
-		c.Next()
-	})
+	// debug accesslog
+	if gin.Mode() == gin.DebugMode {
+		r.Use(func(c *gin.Context) {
+			timeStart := time.Now()
+			c.Writer.Header().Set("Zinc", v1.Version)
+
+			c.Next()
+
+			took := time.Since(timeStart) / time.Millisecond
+			log.Info().
+				Str("method", c.Request.Method).
+				Int("code", c.Writer.Status()).
+				Int("took", int(took)).
+				Msg(c.Request.RequestURI)
+		})
+	}
 
 	r.GET("/", v1.GUI)
 	r.GET("/version", v1.GetVersion)
-	// meta service - healthz
 	r.GET("/healthz", v1.GetHealthz)
 
 	front, err := zinc.GetFrontendAssets()
@@ -69,42 +79,21 @@ func SetRoutes(r *gin.Engine) {
 	r.GET("/api/:target/_mapping", auth.ZincAuthMiddleware, handlers.GetIndexMapping)
 	r.PUT("/api/:target/_mapping", auth.ZincAuthMiddleware, handlers.UpdateIndexMapping)
 
-	// elastic filebeat
+	/**
+	 * elastic compatible APIs
+	 */
+
 	r.GET("/es/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"name":         "NA",
-			"cluster_name": "NA",
-			"cluster_uuid": "NA",
-			"version": gin.H{
-				"number":                              "0.1.1-zinc",
-				"build_flavor":                        "default",
-				"build_type":                          "NA",
-				"build_hash":                          "NA",
-				"build_date":                          "2021-12-12T20:18:09.722761972Z",
-				"build_snapshot":                      false,
-				"lucene_version":                      "NA",
-				"minimum_wire_compatibility_version":  "NA",
-				"minimum_index_compatibility_version": "NA",
-			},
-			"tagline": "You Know, for Search",
-		})
+		c.JSON(http.StatusOK, v1.NewESInfo())
 	})
 	r.GET("/es/_license", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"license": gin.H{
-				"status": "active",
-			},
-		})
+		c.JSON(http.StatusOK, v1.NewESLicense())
 	})
 	r.GET("/es/_xpack", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"build":    gin.H{},
-			"features": gin.H{},
-			"license":  gin.H{"status": "active"},
-		})
+		c.JSON(http.StatusOK, v1.NewESXPack())
 	})
 
-	// elastic compatible APIs
+	r.POST("/es/_search", auth.ZincAuthMiddleware, handlersV2.SearchIndex)
 	r.POST("/es/:target/_search", auth.ZincAuthMiddleware, handlersV2.SearchIndex)
 
 	r.GET("/es/_index_template", auth.ZincAuthMiddleware, handlersV2.ListIndexTemplate)
@@ -124,8 +113,8 @@ func SetRoutes(r *gin.Engine) {
 	r.DELETE("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
 
 	// Bulk update/insert
-	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
-	r.POST("/es/:target/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
+	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.ESBulkHandler)
+	r.POST("/es/:target/_bulk", auth.ZincAuthMiddleware, handlers.ESBulkHandler)
 
 	core.TelemetryInstance()
 	event_data := make(map[string]interface{})

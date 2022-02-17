@@ -19,10 +19,20 @@ import (
 
 func BulkHandler(c *gin.Context) {
 	target := c.Param("target")
-	body := c.Request.Body
+
+	ret, err := BulkHandlerWorker(target, c.Request.Body)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "bulk data inserted", "record_count": ret.Count})
+}
+
+func ESBulkHandler(c *gin.Context) {
+	target := c.Param("target")
 
 	startTime := time.Now()
-	ret, err := BulkHandlerWorker(target, body)
+	ret, err := BulkHandlerWorker(target, c.Request.Body)
 	ret.Took = int(time.Since(startTime) / time.Millisecond)
 	if err != nil {
 		ret.Error = err.Error()
