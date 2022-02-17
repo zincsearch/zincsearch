@@ -37,10 +37,6 @@ func SearchIndex(c *gin.Context) {
 	}
 
 	if err != nil {
-		if resp != nil {
-			c.JSON(http.StatusBadRequest, resp)
-			return
-		}
 		switch v := err.(type) {
 		case *meta.Error:
 			c.JSON(http.StatusBadRequest, v)
