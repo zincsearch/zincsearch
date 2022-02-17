@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
-    "axios": "^0.22.0",
+    "axios": "^0.25.0",
     "core-js": "^3.6.5",
     "lodash": "^4.17.21",
     "minimist": "^1.2.5",
