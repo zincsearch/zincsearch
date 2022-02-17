@@ -20,7 +20,7 @@
     "postcss": "^8.4.6",
     "quasar": "^2.0.0",
     "register-service-worker": "^1.7.1",
-    "vue": "^3.0.0",
+    "vue": "^3.2.28",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
   },
