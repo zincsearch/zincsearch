@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/template"
 )
@@ -58,7 +59,7 @@ func GetIndexTemplate(c *gin.Context) {
 		return
 	}
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "template " + name + " does not exists"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "template " + name + " does not exists"})
 		return
 	}
 

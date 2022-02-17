@@ -142,7 +142,7 @@ func LoadTemplate(name string) (*meta.Template, bool, error) {
 		return nil, false, fmt.Errorf("template: error accessing stored fields: %v", err)
 	}
 	if next == nil {
-		return nil, false, fmt.Errorf("template: %s not found", name)
+		return nil, false, nil
 	}
 	err = next.VisitStoredFields(func(field string, value []byte) bool {
 		switch field {

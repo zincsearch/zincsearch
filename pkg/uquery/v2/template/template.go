@@ -14,13 +14,8 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 		return nil, nil
 	}
 
-	if data["index_patterns"] == nil {
-		return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] index_patterns should be defined")
-	}
-
 	if data["template"] == nil {
 		return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] template should be defined")
-
 	}
 
 	template := new(meta.Template)
@@ -42,40 +37,50 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 			}
 			template.Priority = int(priority)
 		case "template":
-			v, ok := v.(map[string]interface{})
-			if !ok {
-				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] template value should be an object")
-			}
-			for k, v := range v {
-				k = strings.ToLower(k)
-				switch k {
-				case "settings":
-					index, err := index.Request(map[string]interface{}{"settings": v})
-					if err != nil {
-						return nil, err
+			switch v := v.(type) {
+			case string:
+				// compatible {"priority":150,"template":"filebeat-7.16.3-*"}
+				template.IndexPatterns = append(template.IndexPatterns, v)
+			case map[string]interface{}:
+				for k, v := range v {
+					k = strings.ToLower(k)
+					switch k {
+					case "settings":
+						index, err := index.Request(map[string]interface{}{"settings": v})
+						if err != nil {
+							return nil, err
+						}
+						if index != nil {
+							template.Template.Settings = index.Settings
+						}
+					case "mappings":
+						v, ok := v.(map[string]interface{})
+						if !ok {
+							return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] mappings value should be an object")
+						}
+						mappings, err := mappings.Request(v)
+						if err != nil {
+							return nil, err
+						}
+						if mappings != nil {
+							template.Template.Mappings = mappings
+						}
+					case "alias":
+						// TODO: implement
+					default:
+						return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[template] template unknown option [%s]", k))
 					}
-					if index != nil {
-						template.Template.Settings = index.Settings
-					}
-				case "mappings":
-					v, ok := v.(map[string]interface{})
-					if !ok {
-						return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] mappings value should be an object")
-					}
-					mappings, err := mappings.Request(v)
-					if err != nil {
-						return nil, err
-					}
-					if mappings != nil {
-						template.Template.Mappings = mappings
-					}
-				default:
-					return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[template] template unknown option [%s]", k))
 				}
+			default:
+				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] template value should be an object")
 			}
 		default:
 			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[template] unknown option [%s]", k))
 		}
+	}
+
+	if len(template.IndexPatterns) == 0 {
+		return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] index_patterns should be defined")
 	}
 
 	return template, nil
