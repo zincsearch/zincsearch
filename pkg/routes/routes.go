@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -28,21 +29,9 @@ func SetRoutes(r *gin.Engine) {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	// debug accesslog
+	// debug for accesslog
 	if gin.Mode() == gin.DebugMode {
-		r.Use(func(c *gin.Context) {
-			timeStart := time.Now()
-			c.Writer.Header().Set("Zinc", v1.Version)
-
-			c.Next()
-
-			took := time.Since(timeStart) / time.Millisecond
-			log.Info().
-				Str("method", c.Request.Method).
-				Int("code", c.Writer.Status()).
-				Int("took", int(took)).
-				Msg(c.Request.RequestURI)
-		})
+		AccessLog(r)
 	}
 
 	r.GET("/", v1.GUI)
@@ -54,7 +43,21 @@ func SetRoutes(r *gin.Engine) {
 		log.Err(err)
 	}
 
-	r.StaticFS("/ui", http.FS(front))
+	r.StaticFS("/ui/", http.FS(front))
+	r.NoRoute(func(c *gin.Context) {
+		log.Error().
+			Str("method", c.Request.Method).
+			Int("code", 404).
+			Int("took", 0).
+			Msg(c.Request.RequestURI)
+
+		if strings.HasPrefix(c.Request.RequestURI, "/ui/") {
+			path := strings.TrimPrefix(c.Request.RequestURI, "/ui/")
+			locationPath := strings.Repeat("../", strings.Count(path, "/"))
+			c.Status(http.StatusFound)
+			c.Writer.Header().Set("Location", "./"+locationPath)
+		}
+	})
 
 	r.POST("/api/login", handlers.ValidateCredentials)
 
