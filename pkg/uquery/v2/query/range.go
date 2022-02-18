@@ -113,6 +113,11 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 
 	var err error
 	format := time.RFC3339
+	if prop, ok := mappings.Properties[field]; ok {
+		if prop.Format != "" {
+			format = prop.Format
+		}
+	}
 	if value.Format != "" {
 		format = value.Format
 	}

@@ -80,10 +80,15 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 			}
 			var subreq *aggregations.DateRangeAggregation
 			format := time.RFC3339
-			timeZone := time.UTC
+			if prop, ok := mappings.Properties[agg.DateRange.Field]; ok {
+				if prop.Format != "" {
+					format = prop.Format
+				}
+			}
 			if agg.DateRange.Format != "" {
 				format = agg.DateRange.Format
 			}
+			timeZone := time.UTC
 			if agg.DateRange.TimeZone != "" {
 				timeZone, err = zutils.ParseTimeZone(agg.DateRange.TimeZone)
 				if err != nil {
