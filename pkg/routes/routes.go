@@ -119,8 +119,7 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.ESBulkHandler)
 	r.POST("/es/:target/_bulk", auth.ZincAuthMiddleware, handlers.ESBulkHandler)
 
-	core.TelemetryInstance()
-	event_data := make(map[string]interface{})
-	core.TelemetryEvent("server_start", event_data)
-	core.TelemetryCron()
+	core.Telemetry.Instance()
+	core.Telemetry.Event("server_start", nil)
+	core.Telemetry.Cron()
 }
