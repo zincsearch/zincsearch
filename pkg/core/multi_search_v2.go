@@ -1,0 +1,59 @@
+package core
+
+import (
+	"context"
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/blugelabs/bluge"
+	"github.com/rs/zerolog/log"
+
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	parser "github.com/prabhatsharma/zinc/pkg/uquery/v2"
+)
+
+func MultiSearchV2(indexName string, query *meta.ZincQuery) (*meta.SearchResponse, error) {
+	var mappings *meta.Mappings
+	var readers []*bluge.Reader
+	for name, value := range ZINC_INDEX_LIST {
+		if indexName == "" || (indexName != "" && strings.HasPrefix(name, indexName[:len(indexName)-1])) {
+			reader, _ := value.Writer.Reader()
+			readers = append(readers, reader)
+			if mappings == nil {
+				mappings, _ = value.GetStoredMapping()
+			}
+		}
+	}
+
+	if len(readers) == 0 {
+		return nil, fmt.Errorf("core.MultiSearchV2: error accessing reader: no index found")
+	}
+
+	searchRequest, err := parser.ParseQueryDSL(query, mappings)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := context.Background()
+	var cancel context.CancelFunc
+	if query.Timeout > 0 {
+		ctx, cancel = context.WithTimeout(context.Background(), time.Duration(query.Timeout)*time.Second)
+		defer cancel()
+	}
+
+	dmi, err := bluge.MultiSearch(ctx, searchRequest, readers...)
+	if err != nil {
+		log.Printf("core.MultiSearchV2: error executing search: %v", err)
+		if err == context.DeadlineExceeded {
+			return &meta.SearchResponse{
+				TimedOut: true,
+				Error:    err.Error(),
+				Hits:     meta.Hits{Hits: []meta.Hit{}},
+			}, nil
+		}
+		return nil, err
+	}
+
+	return searchV2(dmi, query, mappings)
+}

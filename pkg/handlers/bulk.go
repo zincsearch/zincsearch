@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/index"
@@ -18,18 +19,30 @@ import (
 
 func BulkHandler(c *gin.Context) {
 	target := c.Param("target")
-	body := c.Request.Body
 
-	documentsProcessed, err := BulkHandlerWorker(target, body)
+	ret, err := BulkHandlerWorker(target, c.Request.Body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "bulk data inserted", "record_count": documentsProcessed})
+	c.JSON(http.StatusOK, gin.H{"message": "bulk data inserted", "record_count": ret.Count})
 }
 
-func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
-	documentsProcessed := 0
+func ESBulkHandler(c *gin.Context) {
+	target := c.Param("target")
+
+	startTime := time.Now()
+	ret, err := BulkHandlerWorker(target, c.Request.Body)
+	ret.Took = int(time.Since(startTime) / time.Millisecond)
+	if err != nil {
+		ret.Error = err.Error()
+	}
+	c.JSON(http.StatusOK, ret)
+}
+
+func BulkHandlerWorker(target string, body io.ReadCloser) (*BulkResponse, error) {
+	bulkRes := &BulkResponse{Items: []map[string]*BulkResponseItem{}}
+
 	// Prepare to read the entire raw text of the body
 	scanner := bufio.NewScanner(body)
 	defer body.Close()
@@ -48,13 +61,10 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 
 	batch := make(map[string]*index.Batch)
 	var indexesInThisBatch []string
-
-	documentsInBatch := 0
+	var documentsInBatch int
 
 	for scanner.Scan() { // Read each line
-
 		var doc map[string]interface{}
-
 		err := json.Unmarshal(scanner.Bytes(), &doc) // Read each line as JSON and store it in doc
 		if err != nil {
 			log.Print(err)
@@ -67,6 +77,8 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 			var docID = ""
 			mintedID := false
 
+			bulkRes.Count++
+
 			if val, ok := lastLineMetaData["_id"]; ok && val != nil {
 				docID = val.(string)
 			}
@@ -76,6 +88,22 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 			}
 
 			indexName := lastLineMetaData["_index"].(string)
+			operation := lastLineMetaData["operation"].(string)
+			switch operation {
+			case "index":
+				bulkRes.Items = append(bulkRes.Items, map[string]*BulkResponseItem{
+					"index": NewBulkResponseItem(bulkRes.Count, indexName, docID, "created", nil),
+				})
+			case "create":
+				bulkRes.Items = append(bulkRes.Items, map[string]*BulkResponseItem{
+					"index": NewBulkResponseItem(bulkRes.Count, indexName, docID, "created", nil),
+				})
+			case "update":
+				bulkRes.Items = append(bulkRes.Items, map[string]*BulkResponseItem{
+					"index": NewBulkResponseItem(bulkRes.Count, indexName, docID, "updated", nil),
+				})
+			default:
+			}
 
 			// Since this is a bulk request, we need to check if we already created a new batch for this index. We need to create 1 batch per index.
 			if DoesExistInThisRequest(indexesInThisBatch, indexName) == -1 { // Add the list of indexes to the batch if it's not already there
@@ -87,7 +115,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 			if !exists { // If the requested indexName does not exist then create it
 				newIndex, err := core.NewIndex(indexName, "disk")
 				if err != nil {
-					return documentsProcessed, err
+					return bulkRes, err
 				}
 				core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
 
@@ -100,7 +128,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 
 			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(docID, &doc)
 			if err != nil {
-				return documentsProcessed, err
+				return bulkRes, err
 			}
 
 			documentsInBatch++
@@ -119,13 +147,12 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 					err := core.ZINC_INDEX_LIST[indexN].Writer.Batch(batch[indexN])
 					if err != nil {
 						log.Printf("Error updating batch: %v", err)
-						return documentsProcessed, err
+						return bulkRes, err
 					}
 					batch[indexN].Reset()
 				}
 				documentsInBatch = 0
 			}
-			documentsProcessed++
 
 		} else { // This branch will process the metadata line in the request. Each metadata line is preceded by a data line.
 
@@ -162,13 +189,18 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 						batch[indexName] = index.NewBatch()
 					}
 					batch[indexName].Delete(bdoc.ID())
+
+					bulkRes.Count++
+					bulkRes.Items = append(bulkRes.Items, map[string]*BulkResponseItem{
+						"delete": NewBulkResponseItem(bulkRes.Count, indexName, bdoc.ID().Field(), "deleted", nil),
+					})
 				}
 			}
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		return documentsProcessed, err
+		return bulkRes, err
 	}
 
 	for _, indexN := range indexesInThisBatch {
@@ -177,11 +209,11 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (int, error) {
 		err := writer.Batch(batch[indexN])
 		if err != nil {
 			log.Printf("Error updating batch: %v", err)
-			return documentsProcessed, err
+			return bulkRes, err
 		}
 	}
 
-	return documentsProcessed, nil
+	return bulkRes, nil
 
 }
 
@@ -194,4 +226,48 @@ func DoesExistInThisRequest(slice []string, val string) int {
 		}
 	}
 	return -1
+}
+
+func NewBulkResponseItem(seqNo int, index, id, result string, err error) *BulkResponseItem {
+	return &BulkResponseItem{
+		Index:   index,
+		Type:    index,
+		ID:      id,
+		Version: 1,
+		Result:  result,
+		Shards: BulkResponseItemShard{
+			Total:      1,
+			Successful: 1,
+			Failed:     0,
+		},
+		Status: 200,
+		SeqNo:  seqNo,
+		Error:  err,
+	}
+}
+
+type BulkResponse struct {
+	Took   int                            `json:"took"`
+	Errors bool                           `json:"errors"`
+	Error  string                         `json:"error,omitempty"`
+	Count  int                            `json:"count"`
+	Items  []map[string]*BulkResponseItem `json:"items"`
+}
+
+type BulkResponseItem struct {
+	Index   string                `json:"_index"`
+	Type    string                `json:"_type"`
+	ID      string                `json:"_id"`
+	Version int64                 `json:"_version"`
+	Result  string                `json:"result"`
+	Shards  BulkResponseItemShard `json:"_shards"`
+	Status  int                   `json:"status"`
+	SeqNo   int                   `json:"seq_no"`
+	Error   error                 `json:"error,omitempty"`
+}
+
+type BulkResponseItemShard struct {
+	Total      int `json:"total"`
+	Successful int `json:"successful"`
+	Failed     int `json:"failed"`
 }

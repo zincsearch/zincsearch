@@ -16,7 +16,7 @@ func TestApiBase(t *testing.T) {
 			req, _ := http.NewRequest("GET", "/", nil)
 			resp := httptest.NewRecorder()
 			r.ServeHTTP(resp, req)
-			So(resp.Code, ShouldEqual, http.StatusMovedPermanently)
+			So(resp.Code, ShouldEqual, http.StatusFound)
 		})
 		Convey("/version", func() {
 			req, _ := http.NewRequest("GET", "/version", nil)

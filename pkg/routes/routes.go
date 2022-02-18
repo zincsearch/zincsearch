@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -28,9 +29,13 @@ func SetRoutes(r *gin.Engine) {
 		MaxAge:           12 * time.Hour,
 	}))
 
+	// debug for accesslog
+	if gin.Mode() == gin.DebugMode {
+		AccessLog(r)
+	}
+
 	r.GET("/", v1.GUI)
 	r.GET("/version", v1.GetVersion)
-	// meta service - healthz
 	r.GET("/healthz", v1.GetHealthz)
 
 	front, err := zinc.GetFrontendAssets()
@@ -38,7 +43,21 @@ func SetRoutes(r *gin.Engine) {
 		log.Err(err)
 	}
 
-	r.StaticFS("/ui", http.FS(front))
+	r.StaticFS("/ui/", http.FS(front))
+	r.NoRoute(func(c *gin.Context) {
+		log.Error().
+			Str("method", c.Request.Method).
+			Int("code", 404).
+			Int("took", 0).
+			Msg(c.Request.RequestURI)
+
+		if strings.HasPrefix(c.Request.RequestURI, "/ui/") {
+			path := strings.TrimPrefix(c.Request.RequestURI, "/ui/")
+			locationPath := strings.Repeat("../", strings.Count(path, "/"))
+			c.Status(http.StatusFound)
+			c.Writer.Header().Set("Location", "./"+locationPath)
+		}
+	})
 
 	r.POST("/api/login", handlers.ValidateCredentials)
 
@@ -63,12 +82,27 @@ func SetRoutes(r *gin.Engine) {
 	r.GET("/api/:target/_mapping", auth.ZincAuthMiddleware, handlers.GetIndexMapping)
 	r.PUT("/api/:target/_mapping", auth.ZincAuthMiddleware, handlers.UpdateIndexMapping)
 
-	// elastic compatible APIs
+	/**
+	 * elastic compatible APIs
+	 */
+
+	r.GET("/es/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, v1.NewESInfo())
+	})
+	r.GET("/es/_license", func(c *gin.Context) {
+		c.JSON(http.StatusOK, v1.NewESLicense())
+	})
+	r.GET("/es/_xpack", func(c *gin.Context) {
+		c.JSON(http.StatusOK, v1.NewESXPack())
+	})
+
+	r.POST("/es/_search", auth.ZincAuthMiddleware, handlersV2.SearchIndex)
 	r.POST("/es/:target/_search", auth.ZincAuthMiddleware, handlersV2.SearchIndex)
 
 	r.GET("/es/_index_template", auth.ZincAuthMiddleware, handlersV2.ListIndexTemplate)
 	r.PUT("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.UpdateIndexTemplate)
 	r.GET("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.GetIndexTemplate)
+	r.HEAD("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.GetIndexTemplate)
 	r.DELETE("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.DeleteIndexTemplate)
 
 	r.GET("/es/:target/_mapping", auth.ZincAuthMiddleware, handlers.GetIndexMapping)
@@ -82,8 +116,8 @@ func SetRoutes(r *gin.Engine) {
 	r.DELETE("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
 
 	// Bulk update/insert
-	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
-	r.POST("/es/:target/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
+	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.ESBulkHandler)
+	r.POST("/es/:target/_bulk", auth.ZincAuthMiddleware, handlers.ESBulkHandler)
 
 	core.TelemetryInstance()
 	event_data := make(map[string]interface{})

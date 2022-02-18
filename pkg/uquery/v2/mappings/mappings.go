@@ -50,7 +50,8 @@ func Request(data map[string]interface{}) (*meta.Mappings, error) {
 			case "highlightable":
 				newProp.Highlightable = v.(bool)
 			default:
-				return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] unknown option [%s]", field, k))
+				// ignore unknown options
+				// return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] unknown option [%s]", field, k))
 			}
 		}
 		switch newProp.Type {
@@ -62,6 +63,8 @@ func Request(data map[string]interface{}) (*meta.Mappings, error) {
 			newProp.Type = "bool"
 		case "date", "datetime":
 			newProp.Type = "time"
+		case "flattened", "object", "match_only_text":
+			// ignore
 		default:
 			return nil, fmt.Errorf("[mappings] properties [%s] doesn't support type [%s]", newProp.Type, field)
 		}

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/search"
 	"github.com/blugelabs/bluge/search/highlight"
 	"github.com/rs/zerolog/log"
 
@@ -28,22 +29,32 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 	}
 	defer reader.Close()
 
-	resp := new(meta.SearchResponse)
 	ctx := context.Background()
 	var cancel context.CancelFunc
 	if query.Timeout > 0 {
 		ctx, cancel = context.WithTimeout(context.Background(), time.Duration(query.Timeout)*time.Second)
 		defer cancel()
 	}
+
 	dmi, err := reader.Search(ctx, searchRequest)
 	if err != nil {
 		log.Printf("index.SearchV2: error executing search: %v", err)
 		if err == context.DeadlineExceeded {
-			resp.TimedOut = true
-			resp.Error = err.Error()
-			return resp, err
+			return &meta.SearchResponse{
+				TimedOut: true,
+				Error:    err.Error(),
+				Hits:     meta.Hits{Hits: []meta.Hit{}},
+			}, nil
 		}
 		return nil, err
+	}
+
+	return searchV2(dmi, query, mappings)
+}
+
+func searchV2(dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings *meta.Mappings) (*meta.SearchResponse, error) {
+	resp := &meta.SearchResponse{
+		Hits: meta.Hits{Hits: []meta.Hit{}},
 	}
 
 	// highlight
@@ -60,6 +71,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 	next, err := dmi.Next()
 	for err == nil && next != nil {
 		var id string
+		var indexName string
 		var timestamp time.Time
 		var sourceData map[string]interface{}
 		var fieldsData map[string]interface{}
@@ -71,6 +83,8 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 			switch field {
 			case "_id":
 				id = string(value)
+			case "_index":
+				indexName = string(value)
 			case "@timestamp":
 				timestamp, _ = bluge.DecodeDateTime(value)
 			case "_source":
@@ -97,13 +111,13 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 			return true
 		})
 		if err != nil {
-			log.Printf("index.SearchV2: error accessing stored fields: %v", err)
+			log.Printf("core.SearchV2: error accessing stored fields: %v", err)
 			continue
 		}
 
 		hit := meta.Hit{
-			Index:     index.Name,
-			Type:      index.Name,
+			Index:     indexName,
+			Type:      indexName,
 			ID:        id,
 			Score:     next.Score,
 			Timestamp: timestamp,
@@ -116,7 +130,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 		next, err = dmi.Next()
 	}
 	if err != nil {
-		log.Printf("index.SearchV2: error iterating results: %v", err)
+		log.Printf("core.SearchV2: error iterating results: %v", err)
 	}
 
 	resp.Took = int(dmi.Aggregations().Duration().Milliseconds())
@@ -130,7 +144,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 	}
 
 	if err := parser.FormatResponse(resp, query, dmi.Aggregations()); err != nil {
-		log.Printf("index.SearchV2: error format response: %v", err)
+		log.Printf("core.SearchV2: error format response: %v", err)
 	}
 
 	return resp, nil

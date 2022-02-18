@@ -2,6 +2,7 @@ package v2
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -13,26 +14,29 @@ import (
 // SearchIndex searches the index for the given http request from end user
 func SearchIndex(c *gin.Context) {
 	indexName := c.Param("target")
-	index, exists := core.GetIndex(indexName)
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + " does not exists"})
-		return
-	}
 
 	query := new(meta.ZincQuery)
 	err := c.BindJSON(query)
 	if err != nil {
-		log.Printf("handlers.SearchIndex: %v", err)
+		log.Printf("handlers.v2.SearchIndex: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	resp, err := index.SearchV2(query)
-	if err != nil {
-		if resp != nil {
-			c.JSON(http.StatusBadRequest, resp)
+	var resp *meta.SearchResponse
+	if indexName == "" || strings.HasSuffix(indexName, "*") {
+		resp, err = core.MultiSearchV2(indexName, query)
+	} else {
+		index, exists := core.GetIndex(indexName)
+		if !exists {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + " does not exists"})
 			return
 		}
+
+		resp, err = index.SearchV2(query)
+	}
+
+	if err != nil {
 		switch v := err.(type) {
 		case *meta.Error:
 			c.JSON(http.StatusBadRequest, v)

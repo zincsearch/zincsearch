@@ -30,7 +30,8 @@ func Request(data map[string]interface{}) (*meta.Index, error) {
 				case "number_of_shards":
 					index.Settings.NumberOfShards = int(v.(float64))
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[index] settings unknown option [%s]", k))
+					// ignore unknown settings
+					// return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[index] settings unknown option [%s]", k))
 				}
 			}
 		case "mappings":
