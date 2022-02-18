@@ -25,9 +25,9 @@ var Telemetry = newTelemetry()
 
 type telemetry struct {
 	instanceID   string
+	events       chan analytics.Track
 	baseInfo     map[string]interface{}
 	baseInfoOnce sync.Once
-	events       chan analytics.Track
 }
 
 func newTelemetry() *telemetry {
