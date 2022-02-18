@@ -3,205 +3,176 @@ package core
 import (
 	"context"
 	"math"
-	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
+	"time"
 
 	"github.com/blugelabs/bluge"
 	"github.com/google/uuid"
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"gopkg.in/segmentio/analytics-go.v3"
+
+	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
+	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
-func CreateInstanceID() string {
+// Telemetry instance
+var Telemetry = new(telemetry)
 
-	metaIndex := ZINC_SYSTEM_INDEX_LIST["_metadata"]
-
-	instance_id := uuid.New().String()
-
-	data := map[string]interface{}{
-		"_id":   "instance_id",
-		"Value": instance_id,
-	}
-
-	doc, _ := metaIndex.BuildBlugeDocumentFromJSON("instance_id", &data)
-
-	doc.AddField(bluge.NewTextField("Value", instance_id).StoreValue())
-
-	ZINC_SYSTEM_INDEX_LIST["_metadata"].Writer.Update(doc.ID(), doc)
-
-	m, _ := mem.VirtualMemory()
-	cpu_count, _ := cpu.Counts(true)
-
-	if zutils.GetEnv("ZINC_TELEMETRY", "enabled") == "disabled" {
-		return instance_id
-	}
-
-	v1.SEGMENT_CLIENT.Enqueue(analytics.Identify{
-		UserId: instance_id,
-		Traits: analytics.NewTraits().
-			Set("os", runtime.GOOS).
-			Set("arch", runtime.GOARCH).
-			Set("zinc_version", v1.Version).
-			Set("cpu_count", cpu_count).
-			Set("memory", m.Total),
-	})
-
-	return instance_id
+type telemetry struct {
+	instanceID   string
+	baseInfo     map[string]interface{}
+	baseInfoOnce sync.Once
 }
 
-func GetInstanceID() string {
-
-	metaIndex := ZINC_SYSTEM_INDEX_LIST["_metadata"]
-
-	query := bluge.NewTermQuery("instance_id").SetField("_id")
-	// query := bluge.NewTermQuery("instance_id")
-
-	searchRequest := bluge.NewTopNSearch(1, query)
-
-	reader, _ := metaIndex.Writer.Reader()
-
-	dmi, err := reader.Search(context.Background(), searchRequest)
-	if err != nil {
-		log.Printf("error executing search: %v", err)
+func (t *telemetry) createInstanceID() string {
+	instanceID := uuid.New().String()
+	data := map[string]interface{}{
+		"_id":   "instance_id",
+		"value": instanceID,
 	}
 
-	instance_id := ""
+	metaIndex := ZINC_SYSTEM_INDEX_LIST["_metadata"]
+	doc, _ := metaIndex.BuildBlugeDocumentFromJSON("instance_id", &data)
+	doc.AddField(bluge.NewTextField("value", instanceID).StoreValue())
+	metaIndex.Writer.Update(doc.ID(), doc)
+
+	return instanceID
+}
+
+func (t *telemetry) getInstanceID() string {
+	if t.instanceID != "" {
+		return t.instanceID
+	}
+
+	query := bluge.NewTermQuery("instance_id").SetField("_id")
+	searchRequest := bluge.NewTopNSearch(1, query)
+	reader, _ := ZINC_SYSTEM_INDEX_LIST["_metadata"].Writer.Reader()
+	dmi, err := reader.Search(context.Background(), searchRequest)
+	if err != nil {
+		log.Printf("core.Telemetry.GetInstanceID: error executing search: %v", err)
+	}
 
 	next, err := dmi.Next()
-	for err == nil && next != nil {
+	if err == nil && next != nil {
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			if field == "Value" {
-				instance_id = string(value)
-				return true
+			if field == "value" {
+				t.instanceID = string(value)
 			}
 			return true
 		})
 		if err != nil {
-			log.Printf("error accessing stored fields: %v", err)
+			log.Printf("core.Telemetry.GetInstanceID: error accessing stored fields: %v", err)
 		}
-
-		next, err = dmi.Next()
 	}
 
-	if instance_id == "" {
-		instance_id = CreateInstanceID()
+	if t.instanceID == "" {
+		t.instanceID = t.createInstanceID()
 	}
 
-	return instance_id
+	return t.instanceID
 }
 
-func TelemetryInstance() {
+func (t *telemetry) getBaseInfo() {
+	t.baseInfoOnce.Do(func() {
+		m, _ := mem.VirtualMemory()
+		cpu_count, _ := cpu.Counts(true)
+		zone, _ := time.Now().Local().Zone()
+
+		t.baseInfo = map[string]interface{}{
+			"os":           runtime.GOOS,
+			"arch":         runtime.GOARCH,
+			"zinc_version": v1.Version,
+			"time_zone":    zone,
+			"cpu_count":    cpu_count,
+			"total_memory": m.Total / 1024 / 1024,
+		}
+	})
+}
+
+func (t *telemetry) Instance() {
+	if zutils.GetEnv("ZINC_TELEMETRY", "enabled") == "disabled" {
+		return
+	}
+
+	traits := analytics.NewTraits().
+		Set("index_count", len(ZINC_INDEX_LIST)).
+		Set("total_index_size_mb", t.TotalIndexSize())
+
+	t.getBaseInfo()
+	for k, v := range t.baseInfo {
+		traits.Set(k, v)
+	}
+
+	v1.SEGMENT_CLIENT.Enqueue(analytics.Identify{
+		UserId: t.getInstanceID(),
+		Traits: traits,
+	})
+}
+
+func (t *telemetry) Event(event string, data map[string]interface{}) {
 	if zutils.GetEnv("ZINC_TELEMETRY", "enabled") == "disabled" {
 		return
 	}
 
 	m, _ := mem.VirtualMemory()
-	cpu_count, _ := cpu.Counts(true)
-
-	v1.SEGMENT_CLIENT.Enqueue(analytics.Identify{
-		UserId: GetInstanceID(),
-		Traits: analytics.NewTraits().
-			Set("index_count", len(ZINC_INDEX_LIST)).
-			Set("total_index_size_mb", TotalIndexSize()).
-			Set("os", runtime.GOOS).
-			Set("arch", runtime.GOARCH).
-			Set("zinc_version", v1.Version).
-			Set("cpu_count", cpu_count).
-			Set("total_memory", m.Total/1024/1024),
-	})
-}
-
-func TelemetryEvent(event string, data map[string]interface{}) {
-
-	m, _ := mem.VirtualMemory()
-	cpu_count, _ := cpu.Counts(true)
-
 	props := analytics.NewProperties().
 		Set("index_count", len(ZINC_INDEX_LIST)).
-		Set("total_index_size_mb", TotalIndexSize()).
-		Set("os", runtime.GOOS).
-		Set("arch", runtime.GOARCH).
-		Set("zinc_version", v1.Version).
-		Set("cpu_count", cpu_count).
-		Set("total_memory", m.Total/1024/1024).
+		Set("total_index_size_mb", t.TotalIndexSize()).
 		Set("memory_used_percent", m.UsedPercent)
+
+	t.getBaseInfo()
+	for k, v := range t.baseInfo {
+		props.Set(k, v)
+	}
 
 	for k, v := range data {
 		props.Set(k, v)
 	}
 
-	if zutils.GetEnv("ZINC_TELEMETRY", "enabled") == "disabled" {
-		return
-	}
-
 	v1.SEGMENT_CLIENT.Enqueue(analytics.Track{
-		UserId:     GetInstanceID(),
+		UserId:     t.getInstanceID(),
 		Event:      event,
 		Properties: props,
 	})
 }
 
-func DirSize(path string) (float64, error) {
-	var size int64
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			size += info.Size()
-		}
-		return err
-	})
-	sizeMB := float64(size) / 1024.0 / 1024.0
-
-	return sizeMB, err
-}
-
-func TotalIndexSize() float64 {
+func (t *telemetry) TotalIndexSize() float64 {
 	TotalIndexSize := 0.0
 	for k := range ZINC_INDEX_LIST {
-		path := zutils.GetEnv("ZINC_DATA_PATH", "./data")
-		indexLocation := filepath.Join(path, k)
-		size, _ := DirSize(indexLocation)
-		TotalIndexSize += size
+		TotalIndexSize += t.GetIndexSize(k)
 	}
-
 	return math.Round(TotalIndexSize)
 }
 
-func GetIndexSize(indexName string) float64 {
-
+func (t *telemetry) GetIndexSize(indexName string) float64 {
 	size := 0.0
-
 	indexType := ZINC_INDEX_LIST[indexName].IndexType
 
-	if indexType == "s3" {
+	switch indexType {
+	case "s3":
 		return size // TODO: implement later
-	} else if indexType == "minio" {
+	case "minio":
 		return size // TODO: implement later
-	} else if indexType == "disk" {
+	default:
 		path := zutils.GetEnv("ZINC_DATA_PATH", "./data")
 		indexLocation := filepath.Join(path, indexName)
-		size, _ = DirSize(indexLocation)
+		size, _ = zutils.DirSize(indexLocation)
 		return math.Round(size)
 	}
-
-	return size
 }
 
-func TelemetryCron() {
+func (t *telemetry) HeartBeat() {
+	t.Event("heartbeat", nil)
+}
+
+func (t *telemetry) Cron() {
 	c := cron.New()
 
-	c.AddFunc("@every 30m", HeartBeat)
+	c.AddFunc("@every 30m", t.HeartBeat)
 	c.Start()
-}
-
-func HeartBeat() {
-	TelemetryEvent("heartbeat", map[string]interface{}{})
 }

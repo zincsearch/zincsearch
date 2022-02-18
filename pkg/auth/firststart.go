@@ -4,8 +4,6 @@ import (
 	"os"
 
 	"github.com/rs/zerolog/log"
-
-	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
 var ZINC_CACHED_USERS map[string]SimpleUser
@@ -27,7 +25,6 @@ func init() {
 			log.Fatal().Msg("ZINC_FIRST_ADMIN_USER and ZINC_FIRST_ADMIN_PASSWORD must be set on first start. You should also change the credentials after first login.")
 		}
 		CreateUser(adminUser, "", adminPassword, "admin")
-		core.CreateInstanceID()
 	}
 }
 
