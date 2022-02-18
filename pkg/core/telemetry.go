@@ -21,12 +21,23 @@ import (
 )
 
 // Telemetry instance
-var Telemetry = new(telemetry)
+var Telemetry = newTelemetry()
 
 type telemetry struct {
 	instanceID   string
 	baseInfo     map[string]interface{}
 	baseInfoOnce sync.Once
+	events       chan analytics.Track
+}
+
+func newTelemetry() *telemetry {
+	t := new(telemetry)
+	t.events = make(chan analytics.Track, 100)
+	t.initBaseInfo()
+
+	go t.runEvents()
+
+	return t
 }
 
 func (t *telemetry) createInstanceID() string {
@@ -77,7 +88,7 @@ func (t *telemetry) getInstanceID() string {
 	return t.instanceID
 }
 
-func (t *telemetry) getBaseInfo() {
+func (t *telemetry) initBaseInfo() {
 	t.baseInfoOnce.Do(func() {
 		m, _ := mem.VirtualMemory()
 		cpu_count, _ := cpu.Counts(true)
@@ -103,7 +114,6 @@ func (t *telemetry) Instance() {
 		Set("index_count", len(ZINC_INDEX_LIST)).
 		Set("total_index_size_mb", t.TotalIndexSize())
 
-	t.getBaseInfo()
 	for k, v := range t.baseInfo {
 		traits.Set(k, v)
 	}
@@ -125,7 +135,6 @@ func (t *telemetry) Event(event string, data map[string]interface{}) {
 		Set("total_index_size_mb", t.TotalIndexSize()).
 		Set("memory_used_percent", m.UsedPercent)
 
-	t.getBaseInfo()
 	for k, v := range t.baseInfo {
 		props.Set(k, v)
 	}
@@ -134,11 +143,17 @@ func (t *telemetry) Event(event string, data map[string]interface{}) {
 		props.Set(k, v)
 	}
 
-	v1.SEGMENT_CLIENT.Enqueue(analytics.Track{
+	t.events <- analytics.Track{
 		UserId:     t.getInstanceID(),
 		Event:      event,
 		Properties: props,
-	})
+	}
+}
+
+func (t *telemetry) runEvents() {
+	for event := range t.events {
+		v1.SEGMENT_CLIENT.Enqueue(event)
+	}
 }
 
 func (t *telemetry) TotalIndexSize() float64 {
