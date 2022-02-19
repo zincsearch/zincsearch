@@ -52,7 +52,7 @@ spec:
             - name: ZINC_DATA_PATH
               value: /go/bin/data
           # command: ["/bin/bash", "-c", "while true; do sleep 1; done"]
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           resources:
             limits:
               cpu: 1024m
