@@ -28,7 +28,7 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 		case agg.Avg != nil:
 			req.AddAggregation(name, aggregations.Avg(search.Field(agg.Avg.Field)))
 		case agg.WeightedAvg != nil:
-			req.AddAggregation(name, aggregations.WeightedAvg(search.Field(agg.WeightedAvg.Field), search.Field(agg.WeightedAvg.Field)))
+			req.AddAggregation(name, aggregations.WeightedAvg(search.Field(agg.WeightedAvg.Field), search.Field(agg.WeightedAvg.WeightField)))
 		case agg.Max != nil:
 			req.AddAggregation(name, aggregations.Max(search.Field(agg.Max.Field)))
 		case agg.Min != nil:
