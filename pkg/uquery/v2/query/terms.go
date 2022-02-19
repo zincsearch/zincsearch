@@ -2,6 +2,7 @@ package query
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/blugelabs/bluge"
@@ -17,6 +18,7 @@ func TermsQuery(query map[string]interface{}) (bluge.Query, error) {
 	field := ""
 	values := []string{}
 	valueInts := []float64{}
+	valueBools := []bool{}
 	boost := -1.0
 	for k, v := range query {
 		if strings.ToLower(k) == "boost" {
@@ -30,6 +32,8 @@ func TermsQuery(query map[string]interface{}) (bluge.Query, error) {
 			values = v
 		case []float64:
 			valueInts = v
+		case []bool:
+			valueBools = v
 		case []interface{}:
 			for _, vv := range v {
 				switch vvv := vv.(type) {
@@ -37,6 +41,8 @@ func TermsQuery(query map[string]interface{}) (bluge.Query, error) {
 					values = append(values, vvv)
 				case float64:
 					valueInts = append(valueInts, vvv)
+				case bool:
+					valueBools = append(valueBools, vvv)
 				default:
 					return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", vv))
 				}
@@ -52,6 +58,9 @@ func TermsQuery(query map[string]interface{}) (bluge.Query, error) {
 	}
 	for _, term := range valueInts {
 		subq.AddShould(bluge.NewNumericRangeInclusiveQuery(term, term, true, true).SetField(field))
+	}
+	for _, term := range valueBools {
+		subq.AddShould(bluge.NewTermQuery(strconv.FormatBool(term)).SetField(field))
 	}
 	if boost >= 0 {
 		subq.SetBoost(boost)
