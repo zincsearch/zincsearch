@@ -19,8 +19,8 @@ type Property struct {
 func NewProperty(typ string) Property {
 	return Property{
 		Type:           typ,
-		Analyzer:       "standard",
-		SearchAnalyzer: "standard",
+		Analyzer:       "",
+		SearchAnalyzer: "",
 		Format:         "",
 		Index:          true,
 		Store:          false,
