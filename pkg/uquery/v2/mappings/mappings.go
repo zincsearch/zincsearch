@@ -2,6 +2,7 @@ package mappings
 
 import (
 	"fmt"
+	"strings"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
@@ -28,11 +29,36 @@ func Request(data map[string]interface{}) (*meta.Mappings, error) {
 		if !ok {
 			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be an object", field))
 		}
-		newProp := meta.NewProperty("text")
+		propType, ok := prop["type"]
+		if !ok {
+			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be exists", "type"))
+		}
+		propTypeStr, ok := propType.(string)
+		if !ok {
+			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be an string", "type"))
+		}
+
+		var newProp meta.Property
+		propTypeStr = strings.ToLower(propTypeStr)
+		switch propTypeStr {
+		case "text", "keyword", "numeric", "bool", "time":
+			newProp = meta.NewProperty(propTypeStr)
+		case "integer", "double", "long":
+			newProp = meta.NewProperty("numeric")
+		case "boolean":
+			newProp = meta.NewProperty("bool")
+		case "date", "datetime":
+			newProp = meta.NewProperty("time")
+		case "flattened", "object", "match_only_text":
+			// ignore
+		default:
+			return nil, fmt.Errorf("[mappings] properties [%s] doesn't support type [%s]", field, propTypeStr)
+		}
+
 		for k, v := range prop {
 			switch k {
 			case "type":
-				newProp.Type = v.(string)
+				// handled
 			case "analyzer":
 				newProp.Analyzer = v.(string)
 			case "search_analyzer":
@@ -54,21 +80,10 @@ func Request(data map[string]interface{}) (*meta.Mappings, error) {
 				// return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] unknown option [%s]", field, k))
 			}
 		}
-		switch newProp.Type {
-		case "text", "keyword", "numeric", "bool", "time":
-			// continue
-		case "integer", "double", "long":
-			newProp.Type = "numeric"
-		case "boolean":
-			newProp.Type = "bool"
-		case "date", "datetime":
-			newProp.Type = "time"
-		case "flattened", "object", "match_only_text":
-			// ignore
-		default:
-			return nil, fmt.Errorf("[mappings] properties [%s] doesn't support type [%s]", newProp.Type, field)
+
+		if newProp.Type != "" {
+			mappings.Properties[field] = newProp
 		}
-		mappings.Properties[field] = newProp
 	}
 
 	return mappings, nil
