@@ -2,6 +2,7 @@ package query
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/blugelabs/bluge"
@@ -24,6 +25,8 @@ func TermQuery(query map[string]interface{}) (bluge.Query, error) {
 			value.Value = v
 		case float64:
 			value.Value = v
+		case bool:
+			value.Value = v
 		case map[string]interface{}:
 			for k, v := range v {
 				k := strings.ToLower(k)
@@ -33,6 +36,8 @@ func TermQuery(query map[string]interface{}) (bluge.Query, error) {
 					case string:
 						value.Value = vv
 					case float64:
+						value.Value = vv
+					case bool:
 						value.Value = vv
 					default:
 						return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", v))
@@ -61,6 +66,12 @@ func TermQuery(query map[string]interface{}) (bluge.Query, error) {
 		return subq, nil
 	case float64:
 		subq := bluge.NewNumericRangeInclusiveQuery(value.Value.(float64), value.Value.(float64), true, true).SetField(field)
+		if value.Boost >= 0 {
+			subq.SetBoost(value.Boost)
+		}
+		return subq, nil
+	case bool:
+		subq := bluge.NewTermQuery(strconv.FormatBool(value.Value.(bool))).SetField(field)
 		if value.Boost >= 0 {
 			subq.SetBoost(value.Boost)
 		}

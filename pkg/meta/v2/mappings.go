@@ -17,10 +17,10 @@ type Property struct {
 }
 
 func NewProperty(typ string) Property {
-	return Property{
+	p := Property{
 		Type:           typ,
-		Analyzer:       "standard",
-		SearchAnalyzer: "standard",
+		Analyzer:       "",
+		SearchAnalyzer: "",
 		Format:         "",
 		Index:          true,
 		Store:          false,
@@ -28,4 +28,10 @@ func NewProperty(typ string) Property {
 		Aggregatable:   true,
 		Highlightable:  false,
 	}
+	if typ == "text" {
+		p.Sortable = false
+		p.Aggregatable = false
+	}
+
+	return p
 }
