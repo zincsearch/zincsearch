@@ -1,9 +1,9 @@
 package v2
 
 type Analyzer struct {
-	CharFilter  *CharFilter  `json:"char_filter"`
-	Tokenizer   *Tokenizer   `json:"tokenizer"`
-	TokenFilter *TokenFilter `json:"token_filter"`
+	CharFilter  []string `json:"char_filter,omitempty"`
+	Tokenizer   string   `json:"tokenizer,omitempty"`
+	TokenFilter []string `json:"token_filter,omitempty"`
 }
 
 type CharFilter struct {

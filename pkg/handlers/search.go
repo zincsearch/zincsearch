@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
@@ -21,9 +20,8 @@ func SearchIndex(c *gin.Context) {
 	}
 
 	var iQuery v1.ZincQuery
-	err := c.BindJSON(&iQuery)
-	if err != nil {
-		log.Printf("handlers.SearchIndex: %v", err)
+	if err := c.BindJSON(&iQuery); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

@@ -17,8 +17,7 @@ func SearchIndex(c *gin.Context) {
 	indexName := c.Param("target")
 
 	query := new(meta.ZincQuery)
-	err := c.BindJSON(query)
-	if err != nil {
+	if err := c.BindJSON(query); err != nil {
 		log.Printf("handlers.v2.SearchIndex: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -27,6 +26,7 @@ func SearchIndex(c *gin.Context) {
 	storageType := "disk"
 	indexSize := 0.0
 
+	var err error
 	var resp *meta.SearchResponse
 	if indexName == "" || strings.HasSuffix(indexName, "*") {
 		resp, err = core.MultiSearchV2(indexName, query)

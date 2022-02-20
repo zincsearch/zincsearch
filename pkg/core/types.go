@@ -27,9 +27,9 @@ func init() {
 		log.Error().Msgf("Error loading user index: %s", err.Error())
 	}
 
-	// compatibility with old code < v0.1.7
+	// deprecated compatibility with old code < v0.1.7
 	if len(ZINC_INDEX_LIST) == 0 {
-		log.Error().Bool("deprecation", true).Msg("Loading user indexes for old version...")
+		log.Error().Bool("deprecated", true).Msg("Loading user indexes for old version...")
 		ZINC_INDEX_LIST, _ = LoadZincIndexesFromDisk()
 		s3List, _ := LoadZincIndexesFromS3()
 		for k, v := range s3List {

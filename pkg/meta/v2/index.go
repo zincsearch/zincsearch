@@ -12,10 +12,10 @@ type IndexSettings struct {
 }
 
 type IndexAnalysis struct {
-	Analyzer    map[string]*Analyzer    `json:"analyzer"`
-	CharFilter  map[string]*CharFilter  `json:"char_filter"`
-	Tokenizer   map[string]*Tokenizer   `json:"tokenizer"`
-	TokenFilter map[string]*TokenFilter `json:"token_filter"`
+	Analyzer    map[string]*Analyzer    `json:"analyzer,omitempty"`
+	CharFilter  map[string]*CharFilter  `json:"char_filter,omitempty"`
+	Tokenizer   map[string]*Tokenizer   `json:"tokenizer,omitempty"`
+	TokenFilter map[string]*TokenFilter `json:"token_filter,omitempty"`
 }
 
 func NewIndex() *Index {

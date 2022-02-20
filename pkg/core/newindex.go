@@ -111,7 +111,18 @@ func StoreIndex(index *Index) error {
 	return nil
 }
 
-func GetIndex(indexName string) (*Index, bool) {
-	index, ok := ZINC_INDEX_LIST[indexName]
+func DeleteIndex(name string) error {
+	bdoc := bluge.NewDocument(name)
+	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
+	err := ZINC_SYSTEM_INDEX_LIST["_index"].Writer.Delete(bdoc.ID())
+	if err != nil {
+		return fmt.Errorf("core.DeleteIndex: error deleting template: %v", err)
+	}
+
+	return nil
+}
+
+func GetIndex(name string) (*Index, bool) {
+	index, ok := ZINC_INDEX_LIST[name]
 	return index, ok
 }

@@ -15,7 +15,10 @@ func UpdateDocument(c *gin.Context) {
 	query_id := c.Param("id") // ID for the document to be updated provided in URL path
 
 	var doc map[string]interface{}
-	c.BindJSON(&doc)
+	if err := c.BindJSON(&doc); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	docID := ""
 	mintedID := false

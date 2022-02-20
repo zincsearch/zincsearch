@@ -11,7 +11,10 @@ import (
 
 func CreateIndex(c *gin.Context) {
 	var newIndex core.Index
-	c.BindJSON(&newIndex)
+	if err := c.BindJSON(&newIndex); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	if newIndex.Name == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "index.name should be not empty"})

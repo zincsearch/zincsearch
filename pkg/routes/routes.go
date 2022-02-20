@@ -80,8 +80,11 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/api/:target/_search", auth.ZincAuthMiddleware, handlers.SearchIndex)
 	r.DELETE("/api/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
 
-	r.GET("/api/:target/_mapping", auth.ZincAuthMiddleware, handlers.GetIndexMapping)
-	r.PUT("/api/:target/_mapping", auth.ZincAuthMiddleware, handlers.UpdateIndexMapping)
+	r.GET("/api/:target/_mapping", auth.ZincAuthMiddleware, handlersV2.GetIndexMapping)
+	r.PUT("/api/:target/_mapping", auth.ZincAuthMiddleware, handlersV2.UpdateIndexMapping)
+
+	r.GET("/api/:target/_settings", auth.ZincAuthMiddleware, handlersV2.GetIndexSettings)
+	r.PUT("/api/:target/_settings", auth.ZincAuthMiddleware, handlersV2.UpdateIndexSettings)
 
 	r.POST("/api/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
 	r.POST("/api/:target/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
@@ -109,8 +112,11 @@ func SetRoutes(r *gin.Engine) {
 	r.HEAD("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.GetIndexTemplate)
 	r.DELETE("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.DeleteIndexTemplate)
 
-	r.GET("/es/:target/_mapping", auth.ZincAuthMiddleware, handlers.GetIndexMapping)
-	r.PUT("/es/:target/_mapping", auth.ZincAuthMiddleware, handlers.UpdateIndexMapping)
+	r.GET("/es/:target/_mapping", auth.ZincAuthMiddleware, handlersV2.GetIndexMapping)
+	r.PUT("/es/:target/_mapping", auth.ZincAuthMiddleware, handlersV2.UpdateIndexMapping)
+
+	r.GET("/es/:target/_settings", auth.ZincAuthMiddleware, handlersV2.GetIndexSettings)
+	r.PUT("/es/:target/_settings", auth.ZincAuthMiddleware, handlersV2.UpdateIndexSettings)
 
 	r.POST("/es/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
 	r.POST("/es/:target/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
