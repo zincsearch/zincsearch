@@ -42,7 +42,7 @@ func UpdateDocument(c *gin.Context) {
 			return
 		}
 		// store index
-		core.StoreIndex(index, false)
+		core.StoreIndex(index)
 	}
 
 	// doc, _ = flatten.Flatten(doc, "", flatten.DotStyle)

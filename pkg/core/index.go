@@ -108,7 +108,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 
 	if mappingsNeedsUpdate {
 		index.SetMappings(mappings)
-		StoreIndex(index, true)
+		StoreIndex(index)
 	}
 
 	docByteVal, _ := json.Marshal(*doc)

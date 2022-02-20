@@ -118,7 +118,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (*BulkResponse, error)
 					return bulkRes, err
 				}
 				// store index
-				core.StoreIndex(newIndex, false)
+				core.StoreIndex(newIndex)
 			}
 
 			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(docID, &doc)

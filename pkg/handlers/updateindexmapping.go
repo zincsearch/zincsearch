@@ -42,7 +42,7 @@ func UpdateIndexMapping(c *gin.Context) {
 	}
 
 	// store index
-	core.StoreIndex(index, false)
+	core.StoreIndex(index)
 
 	c.JSON(http.StatusOK, gin.H{"message": "ok"})
 }

@@ -41,7 +41,7 @@ func init() {
 		}
 		// store index for new version
 		for _, index := range ZINC_INDEX_LIST {
-			StoreIndex(index, false)
+			StoreIndex(index)
 		}
 	}
 }

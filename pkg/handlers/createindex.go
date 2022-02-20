@@ -42,14 +42,11 @@ func CreateIndex(c *gin.Context) {
 	index.SetMappings(mappings)
 
 	// store index
-	err = core.StoreIndex(index, false)
+	err = core.StoreIndex(index)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	// store index
-	core.StoreIndex(index, false)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":      "index created",

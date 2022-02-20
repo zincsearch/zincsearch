@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/blugelabs/bluge"
@@ -13,6 +14,13 @@ import (
 
 // NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
 func NewIndex(name string, storageType string, useNewIndexMeta int) (*Index, error) {
+	if name == "" {
+		return nil, fmt.Errorf("core.NewIndex: index name cannot be empty")
+	}
+	if strings.HasPrefix(name, "_") {
+		return nil, fmt.Errorf("core.NewIndex: index name cannot start with _")
+	}
+
 	var dataPath string
 	var config bluge.Config
 	switch storageType {
@@ -77,7 +85,7 @@ func LoadIndexWriter(name string, storageType string) (*bluge.Writer, error) {
 }
 
 // storeIndex stores the index to metadata
-func StoreIndex(index *Index, needUpdate bool) error {
+func StoreIndex(index *Index) error {
 	bdoc := bluge.NewDocument(index.Name)
 	bdoc.AddField(bluge.NewKeywordField("name", index.Name).StoreValue().Sortable())
 	bdoc.AddField(bluge.NewKeywordField("index_type", index.IndexType).StoreValue().Sortable())
@@ -92,15 +100,9 @@ func StoreIndex(index *Index, needUpdate bool) error {
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", nil))
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil)) // Add _all field that can be used for search
 
-	var err error
-	indexWriter := ZINC_SYSTEM_INDEX_LIST["_index"].Writer
-	if needUpdate {
-		err = indexWriter.Update(bdoc.ID(), bdoc)
-	} else {
-		err = indexWriter.Insert(bdoc)
-	}
+	err := ZINC_SYSTEM_INDEX_LIST["_index"].Writer.Update(bdoc.ID(), bdoc)
 	if err != nil {
-		return fmt.Errorf("core.StoreIndex: error updating document: %v", err)
+		return fmt.Errorf("core.StoreIndex: index: %s, error: %v", index.Name, err)
 	}
 
 	// cache index
