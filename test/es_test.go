@@ -46,7 +46,12 @@ func TestApiES(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`{"name": "` + indexName + `", "storage_type": "disk"}`)
 				resp := request("PUT", "/api/index", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				So(resp.Code, ShouldEqual, http.StatusBadRequest)
+
+				respData := make(map[string]string)
+				err := json.Unmarshal(resp.Body.Bytes(), &respData)
+				So(err, ShouldBeNil)
+				So(respData["error"], ShouldEqual, "index ["+indexName+"] already exists")
 
 				// check bulk
 				body.Reset()
