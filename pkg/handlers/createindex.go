@@ -18,38 +18,42 @@ func CreateIndex(c *gin.Context) {
 		return
 	}
 
+	if _, ok := core.GetIndex(newIndex.Name); ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "index [" + newIndex.Name + "] already exists"})
+		return
+	}
+
 	mappings, err := mappings.Request(newIndex.Mappings)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	var ok bool
-	var index *core.Index
-	if index, ok = core.GetIndex(newIndex.Name); !ok {
-		index, err = core.NewIndex(newIndex.Name, newIndex.StorageType)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		core.ZINC_INDEX_LIST[newIndex.Name] = index
-
-		// use template
-		if mappings == nil {
-			template, _ := core.UseTemplate(newIndex.Name)
-			if template != nil && template.Template.Mappings != nil {
-				mappings = template.Template.Mappings
-			}
-		}
+	index, err := core.NewIndex(newIndex.Name, newIndex.StorageType, core.UseNewIndexMeta)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
+
+	// update settings
+	index.SetSettings(newIndex.Settings)
 
 	// update mappings
-	if mappings != nil && len(mappings.Properties) > 0 {
-		index.SetMappings(mappings)
+	index.SetMappings(mappings)
+
+	// store index
+	err = core.StoreIndex(index, false)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
+	// store index
+	core.StoreIndex(index, false)
+
 	c.JSON(http.StatusOK, gin.H{
-		"message":      "index " + newIndex.Name + " created",
+		"message":      "index created",
+		"index":        newIndex.Name,
 		"storage_type": newIndex.StorageType,
 	})
 }

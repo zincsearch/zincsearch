@@ -68,8 +68,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (*v1.SearchResponse, error) {
 	}
 
 	// handle aggregations
-	mappings, _ := index.GetStoredMapping()
-	err = uquery.AddAggregations(searchRequest, iQuery.Aggregations, mappings)
+	err = uquery.AddAggregations(searchRequest, iQuery.Aggregations, index.CachedMappings)
 	if err != nil {
 		return &v1.SearchResponse{
 			Error: err.Error(),
@@ -113,7 +112,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (*v1.SearchResponse, error) {
 
 		hit := v1.Hit{
 			Index:     index.Name,
-			Type:      index.Name,
+			Type:      "_doc",
 			ID:        id,
 			Score:     next.Score,
 			Timestamp: timestamp,

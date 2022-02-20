@@ -108,6 +108,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 
 	if mappingsNeedsUpdate {
 		index.SetMappings(mappings)
+		StoreIndex(index, true)
 	}
 
 	docByteVal, _ := json.Marshal(*doc)
@@ -119,42 +120,57 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 	return bdoc, nil
 }
 
-// SetMapping Saves the mapping of the index to _index_mapping index
-// index: Name of the index ffor which the mapping needs to be saved
-// iMap: a map of the fileds that specify name and type of the field. e.g. movietitle: string
+func (index *Index) UseTemplate() error {
+	template, err := UseTemplate(index.Name)
+	if err != nil {
+		return err
+	}
+
+	if template == nil {
+		return nil
+	}
+
+	if template.Template.Settings != nil {
+		index.SetSettings(template.Template.Settings)
+	}
+
+	if template.Template.Mappings != nil {
+		index.SetMappings(template.Template.Mappings)
+	}
+
+	return nil
+}
+
+func (index *Index) SetSettings(settings *meta.IndexSettings) error {
+	if settings == nil {
+		return nil
+	}
+
+	index.Settings = settings
+
+	return nil
+}
+
 func (index *Index) SetMappings(mappings *meta.Mappings) error {
 	if mappings == nil || len(mappings.Properties) == 0 {
 		return nil
 	}
 
+	mappings.Properties["_id"] = meta.NewProperty("keyword")
+
 	// @timestamp need date_range/date_histogram aggregation, and mappings used for type check in aggregation
 	mappings.Properties["@timestamp"] = meta.NewProperty("time")
 
-	bdoc := bluge.NewDocument(index.Name)
-	for k, prop := range mappings.Properties {
-		bdoc.AddField(bluge.NewTextField(k, prop.Type).StoreValue())
-	}
-
-	docByteVal, _ := json.Marshal(mappings)
-	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
-
-	// update on the disk
-	systemIndex := ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Writer
-	err := systemIndex.Update(bdoc.ID(), bdoc)
-	if err != nil {
-		log.Printf("error updating document: %v", err)
-		return err
-	}
-
 	// update in the cache
 	index.CachedMappings = mappings
+	index.Mappings = nil
 
 	return nil
 }
 
-// GetStoredMapping returns the mappings of all the indexes from _index_mapping system index
+// deprecated GetStoredMapping returns the mappings of all the indexes from _index_mapping system index
 func (index *Index) GetStoredMapping() (*meta.Mappings, error) {
+	log.Error().Bool("deprecated", true).Msg("GetStoredMapping is deprecated, use index.CachedMappings instead")
 	for _, indexName := range systemIndexList {
 		if index.Name == indexName {
 			return nil, nil

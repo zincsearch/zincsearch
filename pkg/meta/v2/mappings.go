@@ -1,7 +1,7 @@
 package v2
 
 type Mappings struct {
-	Properties map[string]Property `json:"properties"`
+	Properties map[string]Property `json:"properties,omitempty"`
 }
 
 type Property struct {

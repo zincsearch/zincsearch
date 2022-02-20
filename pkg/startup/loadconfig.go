@@ -21,7 +21,7 @@ var aggregationTermsSize = DEFAULT_AGGREGATION_TERMS_SIZE
 func init() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Print("Error loading .env file")
+		log.Info().Msg("Error loading .env file")
 	}
 
 	var vs string

@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 func GetIndexMapping(c *gin.Context) {
@@ -16,16 +17,15 @@ func GetIndexMapping(c *gin.Context) {
 		return
 	}
 
-	mappings, err := index.GetStoredMapping()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
 	// format mappings
-	for field := range mappings.Properties {
-		if field == "_id" || field == "@timestamp" {
-			delete(mappings.Properties, field)
+	mappings := index.CachedMappings
+	if mappings == nil {
+		mappings = new(meta.Mappings)
+	} else {
+		for field := range mappings.Properties {
+			if field == "_id" || field == "@timestamp" {
+				delete(mappings.Properties, field)
+			}
 		}
 	}
 

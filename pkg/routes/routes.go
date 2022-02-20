@@ -79,8 +79,12 @@ func SetRoutes(r *gin.Engine) {
 	r.PUT("/api/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 	r.POST("/api/:target/_search", auth.ZincAuthMiddleware, handlers.SearchIndex)
 	r.DELETE("/api/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
+
 	r.GET("/api/:target/_mapping", auth.ZincAuthMiddleware, handlers.GetIndexMapping)
 	r.PUT("/api/:target/_mapping", auth.ZincAuthMiddleware, handlers.UpdateIndexMapping)
+
+	r.POST("/api/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
+	r.POST("/api/:target/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
 
 	/**
 	 * elastic compatible APIs
@@ -107,6 +111,9 @@ func SetRoutes(r *gin.Engine) {
 
 	r.GET("/es/:target/_mapping", auth.ZincAuthMiddleware, handlers.GetIndexMapping)
 	r.PUT("/es/:target/_mapping", auth.ZincAuthMiddleware, handlers.UpdateIndexMapping)
+
+	r.POST("/es/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
+	r.POST("/es/:target/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
 
 	r.POST("/es/:target/_doc", auth.ZincAuthMiddleware, handlers.UpdateDocument)
 	r.PUT("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
