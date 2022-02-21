@@ -25,10 +25,10 @@ func Request(data map[string]interface{}) (*meta.Index, error) {
 			for k, v := range v {
 				k = strings.ToLower(k)
 				switch k {
-				case "number_of_replicas":
-					index.Settings.NumberOfReplicas = int(v.(float64))
 				case "number_of_shards":
 					index.Settings.NumberOfShards = int(v.(float64))
+				case "number_of_replicas":
+					index.Settings.NumberOfReplicas = int(v.(float64))
 				default:
 					// ignore unknown settings
 					// return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[index] settings unknown option [%s]", k))

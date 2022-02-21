@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/mappings"
 )
 
@@ -26,6 +28,15 @@ func CreateIndex(c *gin.Context) {
 		return
 	}
 
+	if newIndex.Settings == nil {
+		newIndex.Settings = meta.NewIndexSettings()
+	}
+	analysis, err := analyzer.Request(newIndex.Settings.Analysis)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	mappings, err := mappings.Request(newIndex.Mappings)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -40,6 +51,9 @@ func CreateIndex(c *gin.Context) {
 
 	// update settings
 	index.SetSettings(newIndex.Settings)
+
+	// update analysis
+	index.SetAnalysis(analysis)
 
 	// update mappings
 	index.SetMappings(mappings)

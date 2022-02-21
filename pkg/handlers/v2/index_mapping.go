@@ -21,12 +21,11 @@ func GetIndexMapping(c *gin.Context) {
 	// format mappings
 	mappings := index.CachedMappings
 	if mappings == nil {
-		mappings = new(meta.Mappings)
-	} else {
-		for field := range mappings.Properties {
-			if field == "_id" || field == "@timestamp" {
-				delete(mappings.Properties, field)
-			}
+		mappings = meta.NewMappings()
+	}
+	for field := range mappings.Properties {
+		if field == "_id" || field == "@timestamp" {
+			delete(mappings.Properties, field)
 		}
 	}
 
@@ -40,17 +39,18 @@ func UpdateIndexMapping(c *gin.Context) {
 		return
 	}
 
+	var newIndex core.Index
+	if err := c.BindJSON(&newIndex); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	_, exists := core.GetIndex(indexName)
 	if exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "index [" + indexName + "] already exists"})
 		return
 	}
 
-	var newIndex core.Index
-	if err := c.BindJSON(&newIndex); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 	mappings, err := mappings.Request(newIndex.Mappings)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

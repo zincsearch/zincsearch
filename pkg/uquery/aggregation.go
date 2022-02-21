@@ -6,7 +6,7 @@ import (
 	"github.com/blugelabs/bluge/search"
 	"github.com/blugelabs/bluge/search/aggregations"
 
-	"github.com/prabhatsharma/zinc/pkg/aggregationx"
+	"github.com/prabhatsharma/zinc/pkg/bluge/aggregationx"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )

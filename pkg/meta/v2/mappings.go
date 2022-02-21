@@ -16,6 +16,12 @@ type Property struct {
 	Highlightable  bool   `json:"highlightable"`
 }
 
+func NewMappings() *Mappings {
+	return &Mappings{
+		Properties: make(map[string]Property),
+	}
+}
+
 func NewProperty(typ string) Property {
 	p := Property{
 		Type:           typ,

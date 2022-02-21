@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
 	"github.com/rs/zerolog/log"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
@@ -47,13 +48,14 @@ func init() {
 }
 
 type Index struct {
-	Name           string                 `json:"name"`
-	IndexType      string                 `json:"index_type"`   // "system" or "user"
-	StorageType    string                 `json:"storage_type"` // disk, memory, s3
-	Mappings       map[string]interface{} `json:"mappings"`
-	Settings       *meta.IndexSettings    `json:"settings"`
-	CachedMappings *meta.Mappings         `json:"-"`
-	Writer         *bluge.Writer          `json:"-"`
+	Name           string                        `json:"name"`
+	IndexType      string                        `json:"index_type"`   // "system" or "user"
+	StorageType    string                        `json:"storage_type"` // disk, memory, s3
+	Mappings       map[string]interface{}        `json:"mappings"`
+	Settings       *meta.IndexSettings           `json:"settings"`
+	CachedAnalysis map[string]*analysis.Analyzer `json:"-"`
+	CachedMappings *meta.Mappings                `json:"-"`
+	Writer         *bluge.Writer                 `json:"-"`
 }
 
 type IndexTemplate struct {

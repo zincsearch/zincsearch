@@ -7,8 +7,10 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
 
 	"github.com/prabhatsharma/zinc/pkg/directory"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
@@ -86,6 +88,16 @@ func LoadIndexWriter(name string, storageType string) (*bluge.Writer, error) {
 
 // storeIndex stores the index to metadata
 func StoreIndex(index *Index) error {
+	if index.Settings == nil {
+		index.Settings = meta.NewIndexSettings()
+	}
+	if index.CachedAnalysis == nil {
+		index.CachedAnalysis = make(map[string]*analysis.Analyzer)
+	}
+	if index.CachedMappings == nil {
+		index.CachedMappings = meta.NewMappings()
+	}
+
 	bdoc := bluge.NewDocument(index.Name)
 	bdoc.AddField(bluge.NewKeywordField("name", index.Name).StoreValue().Sortable())
 	bdoc.AddField(bluge.NewKeywordField("index_type", index.IndexType).StoreValue().Sortable())
@@ -93,8 +105,8 @@ func StoreIndex(index *Index) error {
 
 	settingByteVal, _ := json.Marshal(&index.Settings)
 	bdoc.AddField(bluge.NewStoredOnlyField("settings", settingByteVal))
-	mappingByteVal, _ := json.Marshal(&index.CachedMappings)
-	bdoc.AddField(bluge.NewStoredOnlyField("mappings", mappingByteVal))
+	mappingsByteVal, _ := json.Marshal(&index.CachedMappings)
+	bdoc.AddField(bluge.NewStoredOnlyField("mappings", mappingsByteVal))
 
 	bdoc.AddField(bluge.NewDateTimeField("@timestamp", time.Now()).StoreValue().Sortable().Aggregatable())
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", nil))

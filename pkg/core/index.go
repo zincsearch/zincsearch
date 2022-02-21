@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
 	"github.com/jeremywohl/flatten"
 	"github.com/rs/zerolog/log"
 
@@ -22,8 +23,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 	// Pick the index mapping from the cache if it already exists
 	mappings := index.CachedMappings
 	if mappings == nil {
-		mappings = new(meta.Mappings)
-		mappings.Properties = make(map[string]meta.Property)
+		mappings = meta.NewMappings()
 	}
 
 	mappingsNeedsUpdate := false
@@ -146,7 +146,24 @@ func (index *Index) SetSettings(settings *meta.IndexSettings) error {
 		return nil
 	}
 
+	if settings.NumberOfShards == 0 {
+		settings.NumberOfShards = 3
+	}
+	if settings.NumberOfReplicas == 0 {
+		settings.NumberOfReplicas = 1
+	}
+
 	index.Settings = settings
+
+	return nil
+}
+
+func (index *Index) SetAnalysis(analysis map[string]*analysis.Analyzer) error {
+	if len(analysis) == 0 {
+		return nil
+	}
+
+	index.CachedAnalysis = analysis
 
 	return nil
 }

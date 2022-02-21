@@ -7,6 +7,7 @@ import (
 
 	"github.com/prabhatsharma/zinc/pkg/core"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer"
 )
 
 func GetIndexSettings(c *gin.Context) {
@@ -33,9 +34,6 @@ func UpdateIndexSettings(c *gin.Context) {
 	}
 
 	var newIndex core.Index
-	newIndex.Settings = new(meta.IndexSettings)
-	newIndex.Settings.NumberOfShards = -1
-	newIndex.Settings.NumberOfReplicas = -1
 	if err := c.BindJSON(&newIndex); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -46,10 +44,16 @@ func UpdateIndexSettings(c *gin.Context) {
 		return
 	}
 
+	analysis, err := analyzer.Request(newIndex.Settings.Analysis)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	index, exists := core.GetIndex(indexName)
 	if exists {
 		// it can only change settings.NumberOfReplicas when index exists
-		if newIndex.Settings.NumberOfReplicas >= 0 {
+		if newIndex.Settings.NumberOfReplicas > 0 {
 			index.Settings.NumberOfReplicas = newIndex.Settings.NumberOfReplicas
 		}
 		if newIndex.Settings.Analysis != nil && len(newIndex.Settings.Analysis.Analyzer) > 0 {
@@ -63,7 +67,7 @@ func UpdateIndexSettings(c *gin.Context) {
 		return
 	}
 
-	index, err := core.NewIndex(indexName, newIndex.StorageType, core.UseNewIndexMeta)
+	index, err = core.NewIndex(indexName, newIndex.StorageType, core.UseNewIndexMeta)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -71,6 +75,9 @@ func UpdateIndexSettings(c *gin.Context) {
 
 	// update settings
 	index.SetSettings(newIndex.Settings)
+
+	// update analysis
+	index.SetAnalysis(analysis)
 
 	// store index
 	core.StoreIndex(index)

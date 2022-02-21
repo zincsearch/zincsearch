@@ -22,8 +22,7 @@ func Request(data map[string]interface{}) (*meta.Mappings, error) {
 		return nil, meta.NewError(meta.ErrorTypeParsingException, "[mappings] properties should be an object")
 	}
 
-	mappings := new(meta.Mappings)
-	mappings.Properties = make(map[string]meta.Property)
+	mappings := meta.NewMappings()
 	for field, prop := range properties {
 		prop, ok := prop.(map[string]interface{})
 		if !ok {
@@ -52,7 +51,7 @@ func Request(data map[string]interface{}) (*meta.Mappings, error) {
 		case "flattened", "object", "match_only_text":
 			// ignore
 		default:
-			return nil, fmt.Errorf("[mappings] properties [%s] doesn't support type [%s]", field, propTypeStr)
+			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[mappings] properties [%s] doesn't support type [%s]", field, propTypeStr))
 		}
 
 		for k, v := range prop {

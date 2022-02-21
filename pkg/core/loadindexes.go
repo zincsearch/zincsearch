@@ -13,6 +13,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
 
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
@@ -74,10 +75,20 @@ func LoadZincIndexesFromMeta() (map[string]*Index, error) {
 			log.Printf("core.LoadZincIndexesFromMeta: error accessing stored fields: %v", err)
 		}
 
+		// load index analysis
+		if index.Settings != nil && index.Settings.Analysis != nil {
+			index.CachedAnalysis, err = analyzer.Request(index.Settings.Analysis)
+			if err != nil {
+				log.Printf("core.LoadZincIndexesFromMeta: error parse stored analysis: %v", err)
+			}
+		}
+
+		// load index data
 		index.Writer, err = LoadIndexWriter(index.Name, index.StorageType)
 		if err != nil {
 			log.Error().Msgf("Loading user   index... [%s:%s] error: %v", index.Name, index.StorageType, err)
 		}
+
 		indexList[index.Name] = index
 
 		next, err = dmi.Next()

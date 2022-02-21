@@ -7,6 +7,7 @@ const (
 	ErrorTypeXContentParseException   = "x_content_parse_exception"
 	ErrorTypeIllegalArgumentException = "illegal_argument_exception"
 	ErrorTypeNotImplemented           = "not_implemented"
+	ErrorTypeRuntimeException         = "runtime_exception"
 )
 
 type Error struct {
