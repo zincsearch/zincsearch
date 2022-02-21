@@ -8,6 +8,7 @@ import (
 	"github.com/blugelabs/bluge/analysis/analyzer"
 	querystr "github.com/blugelabs/query_string"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
@@ -33,7 +34,7 @@ func QueryStringQuery(query map[string]interface{}) (bluge.Query, error) {
 		case "boost":
 			value.Boost = v.(float64)
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[query_string] unsupported children %s", k))
+			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[query_string] unsupported children %s", k))
 		}
 	}
 

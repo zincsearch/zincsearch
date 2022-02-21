@@ -1,4 +1,4 @@
-package v2
+package errors
 
 import "fmt"
 
@@ -16,7 +16,7 @@ type Error struct {
 	CausedBy error  `json:"caused_by,omitempty"`
 }
 
-func NewError(errType string, errReason string) *Error {
+func New(errType string, errReason string) *Error {
 	return &Error{Type: errType, Reason: errReason}
 }
 

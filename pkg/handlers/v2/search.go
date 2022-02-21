@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
@@ -44,7 +45,7 @@ func SearchIndex(c *gin.Context) {
 
 	if err != nil {
 		switch v := err.(type) {
-		case *meta.Error:
+		case *errors.Error:
 			c.JSON(http.StatusBadRequest, v)
 		default:
 			c.JSON(http.StatusBadRequest, gin.H{"error": v.Error()})

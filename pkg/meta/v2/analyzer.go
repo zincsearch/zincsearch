@@ -1,4 +1,4 @@
-package analyzer
+package v2
 
 type Analyzer struct {
 	CharFilter  []string `json:"char_filter,omitempty"`

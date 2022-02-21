@@ -7,12 +7,13 @@ import (
 
 	"github.com/blugelabs/bluge"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 func TermQuery(query map[string]interface{}) (bluge.Query, error) {
 	if len(query) > 1 {
-		return nil, meta.NewError(meta.ErrorTypeParsingException, "[term] query doesn't support multiple fields")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[term] query doesn't support multiple fields")
 	}
 
 	field := ""
@@ -40,18 +41,18 @@ func TermQuery(query map[string]interface{}) (bluge.Query, error) {
 					case bool:
 						value.Value = vv
 					default:
-						return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", v))
+						return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", v))
 					}
 				case "case_insensitive":
 					value.CaseInsensitive = v.(bool)
 				case "boost":
 					value.Boost = v.(float64)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[term] unknown field [%s]", k))
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[term] unknown field [%s]", k))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", v))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", v))
 		}
 	}
 
@@ -77,6 +78,6 @@ func TermQuery(query map[string]interface{}) (bluge.Query, error) {
 		}
 		return subq, nil
 	default:
-		return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", value.Value))
+		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", value.Value))
 	}
 }

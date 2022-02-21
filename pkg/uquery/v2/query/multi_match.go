@@ -7,6 +7,7 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis/analyzer"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
@@ -32,7 +33,7 @@ func MultiMatchQuery(query map[string]interface{}) (bluge.Query, error) {
 		case "minimum_should_match":
 			value.MinimumShouldMatch = v.(float64)
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[multi_match] unknown field [%s]", k))
+			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[multi_match] unknown field [%s]", k))
 		}
 	}
 
@@ -56,7 +57,7 @@ func MultiMatchQuery(query map[string]interface{}) (bluge.Query, error) {
 		case "AND":
 			operator = bluge.MatchQueryOperatorAnd
 		default:
-			return nil, meta.NewError(meta.ErrorTypeIllegalArgumentException, fmt.Sprintf("[multi_match] unknown operator %s", op))
+			return nil, errors.New(errors.ErrorTypeIllegalArgumentException, fmt.Sprintf("[multi_match] unknown operator %s", op))
 		}
 	}
 

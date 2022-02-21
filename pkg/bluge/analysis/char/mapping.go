@@ -1,4 +1,4 @@
-package charx
+package char
 
 import (
 	"bytes"

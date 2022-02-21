@@ -6,6 +6,7 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/search"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/startup"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/aggregation"
@@ -32,7 +33,7 @@ func ParseQueryDSL(q *meta.ZincQuery, mappings *meta.Mappings) (bluge.SearchRequ
 		return nil, err
 	}
 	if query == nil {
-		return nil, meta.NewError(meta.ErrorTypeNotImplemented, fmt.Sprintf("[%s] query doesn't support", q.Query))
+		return nil, errors.New(errors.ErrorTypeNotImplemented, fmt.Sprintf("[%s] query doesn't support", q.Query))
 	}
 
 	// create search request

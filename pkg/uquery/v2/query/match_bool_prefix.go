@@ -7,12 +7,13 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis/analyzer"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 func MatchBoolPrefixQuery(query map[string]interface{}) (bluge.Query, error) {
 	if len(query) > 1 {
-		return nil, meta.NewError(meta.ErrorTypeParsingException, "[match_bool_prefix] query doesn't support multiple fields")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[match_bool_prefix] query doesn't support multiple fields")
 	}
 
 	field := ""
@@ -31,11 +32,11 @@ func MatchBoolPrefixQuery(query map[string]interface{}) (bluge.Query, error) {
 				case "analyzer":
 					value.Analyzer = v.(string)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match_bool_prefix] unknown field [%s]", k))
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[match_bool_prefix] unknown field [%s]", k))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[match_bool_prefix] %s doesn't support values of type: %T", k, v))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[match_bool_prefix] %s doesn't support values of type: %T", k, v))
 		}
 	}
 

@@ -6,12 +6,13 @@ import (
 
 	"github.com/blugelabs/bluge"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
 	if len(query) > 1 {
-		return nil, meta.NewError(meta.ErrorTypeParsingException, "[fuzzy] query doesn't support multiple fields")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[fuzzy] query doesn't support multiple fields")
 	}
 
 	field := ""
@@ -35,11 +36,11 @@ func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
 				case "boost":
 					value.Boost = v.(float64)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[fuzzy] unknown field [%s]", k))
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[fuzzy] unknown field [%s]", k))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[fuzzy] %s doesn't support values of type: %T", k, v))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[fuzzy] %s doesn't support values of type: %T", k, v))
 		}
 	}
 

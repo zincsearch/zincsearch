@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/mappings"
 )
@@ -20,7 +21,7 @@ func Request(data map[string]interface{}) (*meta.Index, error) {
 		case "settings":
 			v, ok := v.(map[string]interface{})
 			if !ok {
-				return nil, meta.NewError(meta.ErrorTypeParsingException, "[index] settings should be an object")
+				return nil, errors.New(errors.ErrorTypeParsingException, "[index] settings should be an object")
 			}
 			for k, v := range v {
 				k = strings.ToLower(k)
@@ -31,13 +32,13 @@ func Request(data map[string]interface{}) (*meta.Index, error) {
 					index.Settings.NumberOfReplicas = int(v.(float64))
 				default:
 					// ignore unknown settings
-					// return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[index] settings unknown option [%s]", k))
+					// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[index] settings unknown option [%s]", k))
 				}
 			}
 		case "mappings":
 			v, ok := v.(map[string]interface{})
 			if !ok {
-				return nil, meta.NewError(meta.ErrorTypeParsingException, "[index] mappings should be an object")
+				return nil, errors.New(errors.ErrorTypeParsingException, "[index] mappings should be an object")
 			}
 			mappings, err := mappings.Request(v)
 			if err != nil {
@@ -45,7 +46,7 @@ func Request(data map[string]interface{}) (*meta.Index, error) {
 			}
 			index.Mappings = mappings
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[index] unknown option [%s]", k))
+			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[index] unknown option [%s]", k))
 		}
 	}
 

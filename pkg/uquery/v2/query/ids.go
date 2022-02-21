@@ -6,12 +6,13 @@ import (
 
 	"github.com/blugelabs/bluge"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 func IdsQuery(query map[string]interface{}) (bluge.Query, error) {
 	if len(query) > 1 {
-		return nil, meta.NewError(meta.ErrorTypeParsingException, "[ids] query doesn't support multiple fields")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[ids] query doesn't support multiple fields")
 	}
 
 	value := new(meta.IdsQuery)
@@ -36,14 +37,14 @@ func IdsQuery(query map[string]interface{}) (bluge.Query, error) {
 							value.Values[i] = v.(string)
 						}
 					default:
-						return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[ids] %s doesn't support values of type: %T", k, v))
+						return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[ids] %s doesn't support values of type: %T", k, v))
 					}
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[ids] unknown field [%s]", k))
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[ids] unknown field [%s]", k))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[ids] %s doesn't support values of type: %T", k, v))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[ids] %s doesn't support values of type: %T", k, v))
 		}
 	}
 

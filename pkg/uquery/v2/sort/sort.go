@@ -4,8 +4,7 @@ import (
 	"strings"
 
 	"github.com/blugelabs/bluge/search"
-
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/prabhatsharma/zinc/pkg/errors"
 )
 
 func Request(v interface{}) (search.SortOrder, error) {
@@ -25,7 +24,7 @@ func Request(v interface{}) (search.SortOrder, error) {
 				sorts = append(sorts, search.ParseSearchSortString(v))
 			case map[string]interface{}:
 				if len(v) > 1 {
-					return nil, meta.NewError(meta.ErrorTypeParsingException, "[sort] field doesn't support multiple values")
+					return nil, errors.New(errors.ErrorTypeParsingException, "[sort] field doesn't support multiple values")
 				}
 				for field, v := range v {
 					sort := search.SortBy(search.Field(field))
@@ -53,7 +52,7 @@ func Request(v interface{}) (search.SortOrder, error) {
 			}
 		}
 	default:
-		return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[sort] value should be string or array")
+		return nil, errors.New(errors.ErrorTypeXContentParseException, "[sort] value should be string or array")
 	}
 
 	return sorts, nil

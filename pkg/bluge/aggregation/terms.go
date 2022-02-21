@@ -1,4 +1,4 @@
-package aggregationx
+package aggregation
 
 import (
 	"sort"

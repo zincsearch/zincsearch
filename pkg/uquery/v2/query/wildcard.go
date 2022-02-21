@@ -6,12 +6,13 @@ import (
 
 	"github.com/blugelabs/bluge"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 func WildcardQuery(query map[string]interface{}) (bluge.Query, error) {
 	if len(query) > 1 {
-		return nil, meta.NewError(meta.ErrorTypeParsingException, "[wildcard] query doesn't support multiple fields")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[wildcard] query doesn't support multiple fields")
 	}
 
 	field := ""
@@ -31,11 +32,11 @@ func WildcardQuery(query map[string]interface{}) (bluge.Query, error) {
 				case "boost":
 					value.Boost = v.(float64)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[wildcard] unknown field [%s]", k))
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[wildcard] unknown field [%s]", k))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[wildcard] %s doesn't support values of type: %T", k, v))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[wildcard] %s doesn't support values of type: %T", k, v))
 		}
 	}
 

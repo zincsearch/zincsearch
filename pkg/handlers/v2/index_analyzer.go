@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/prabhatsharma/zinc/pkg/core"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer"
 )

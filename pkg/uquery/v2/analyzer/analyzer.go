@@ -8,6 +8,7 @@ import (
 	"github.com/blugelabs/bluge/analysis/analyzer"
 	"github.com/blugelabs/bluge/analysis/char"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
@@ -16,7 +17,7 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 		return nil, nil
 	}
 
-	charFilters, err := QueryCharFilter(data.CharFilter)
+	charFilters, err := RequestCharFilter(data.CharFilter)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +30,7 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 	for name, v := range data.Analyzer {
 		var ana *analysis.Analyzer
 		if v.Tokenizer == "" {
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] is missing tokenizer", name))
+			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] is missing tokenizer", name))
 		}
 
 		chars := make([]analysis.CharFilter, 0, len(v.CharFilter))
@@ -37,7 +38,7 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 			switch filter {
 			case "ascii_folding":
 				chars = append(chars, char.NewASCIIFoldingFilter())
-			case "html":
+			case "html", "html_strip":
 				chars = append(chars, char.NewHTMLCharFilter())
 			case "zero_width_non_joiner":
 				chars = append(chars, char.NewZeroWidthNonJoinerCharFilter())
@@ -45,7 +46,7 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 				if v, ok := charFilters[filter]; ok {
 					chars = append(chars, v)
 				} else {
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] used undefined char_filter [%s]", name, filter))
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] used undefined char_filter [%s]", name, filter))
 				}
 			}
 		}
@@ -61,7 +62,7 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 		case "web":
 			ana = analyzer.NewWebAnalyzer()
 		default:
-			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[analyzer] [%s] doesn't support tokenizer [%s]", name, v.Tokenizer))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[analyzer] [%s] doesn't support tokenizer [%s]", name, v.Tokenizer))
 		}
 
 		if len(chars) > 0 {
@@ -88,6 +89,6 @@ func Query(data map[string]*analysis.Analyzer, name string) (*analysis.Analyzer,
 	case "web":
 		return analyzer.NewWebAnalyzer(), nil
 	default:
-		return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] doesn't exists", name))
+		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] doesn't exists", name))
 	}
 }

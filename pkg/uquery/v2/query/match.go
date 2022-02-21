@@ -7,12 +7,13 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis/analyzer"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 func MatchQuery(query map[string]interface{}) (bluge.Query, error) {
 	if len(query) > 1 {
-		return nil, meta.NewError(meta.ErrorTypeParsingException, "[match] query doesn't support multiple fields")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[match] query doesn't support multiple fields")
 	}
 
 	field := ""
@@ -40,11 +41,11 @@ func MatchQuery(query map[string]interface{}) (bluge.Query, error) {
 				case "boost":
 					value.Boost = v.(float64)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match] unknown field [%s]", k))
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[match] unknown field [%s]", k))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[match] %s doesn't support values of type: %T", k, v))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[match] %s doesn't support values of type: %T", k, v))
 		}
 	}
 
@@ -65,7 +66,7 @@ func MatchQuery(query map[string]interface{}) (bluge.Query, error) {
 		case "AND":
 			subq.SetOperator(bluge.MatchQueryOperatorAnd)
 		default:
-			return nil, meta.NewError(meta.ErrorTypeIllegalArgumentException, fmt.Sprintf("[match] unknown operator %s", op))
+			return nil, errors.New(errors.ErrorTypeIllegalArgumentException, fmt.Sprintf("[match] unknown operator %s", op))
 		}
 	}
 	if value.Fuzziness != nil {
