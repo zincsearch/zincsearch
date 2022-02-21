@@ -28,7 +28,7 @@ func init() {
 		log.Error().Msgf("Error loading user index: %s", err.Error())
 	}
 
-	// deprecated compatibility with old code < v0.1.7
+	// DEPRECATED compatibility with old code < v0.1.7
 	if len(ZINC_INDEX_LIST) == 0 {
 		log.Error().Bool("deprecated", true).Msg("Loading user indexes for old version...")
 		ZINC_INDEX_LIST, _ = LoadZincIndexesFromDisk()

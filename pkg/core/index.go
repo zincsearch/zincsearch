@@ -185,7 +185,7 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 	return nil
 }
 
-// deprecated GetStoredMapping returns the mappings of all the indexes from _index_mapping system index
+// DEPRECATED GetStoredMapping returns the mappings of all the indexes from _index_mapping system index
 func (index *Index) GetStoredMapping() (*meta.Mappings, error) {
 	log.Error().Bool("deprecated", true).Msg("GetStoredMapping is deprecated, use index.CachedMappings instead")
 	for _, indexName := range systemIndexList {
