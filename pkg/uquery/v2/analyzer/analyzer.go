@@ -7,6 +7,7 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/analyzer"
 	"github.com/blugelabs/bluge/analysis/char"
+	"github.com/blugelabs/bluge/analysis/token"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
@@ -17,13 +18,18 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 		return nil, nil
 	}
 
+	if data.Analyzer == nil {
+		return nil, nil
+	}
+
 	charFilters, err := RequestCharFilter(data.CharFilter)
 	if err != nil {
 		return nil, err
 	}
 
-	if data.Analyzer == nil {
-		return nil, nil
+	tokenFilters, err := RequestTokenFilter(data.TokenFilter)
+	if err != nil {
+		return nil, err
 	}
 
 	analyzers := make(map[string]*analysis.Analyzer)
@@ -51,6 +57,30 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 			}
 		}
 
+		tokens := make([]analysis.TokenFilter, 0, len(v.TokenFilter))
+		for _, filter := range v.TokenFilter {
+			switch filter {
+			case "apostrophe":
+				tokens = append(tokens, token.NewApostropheFilter())
+			case "camel_case":
+				tokens = append(tokens, token.NewCamelCaseFilter())
+			case "lower_case":
+				tokens = append(tokens, token.NewLowerCaseFilter())
+			case "porter":
+				tokens = append(tokens, token.NewPorterStemmer())
+			case "reverse":
+				tokens = append(tokens, token.NewReverseFilter())
+			case "unique":
+				tokens = append(tokens, token.NewUniqueTermFilter())
+			default:
+				if v, ok := tokenFilters[filter]; ok {
+					tokens = append(tokens, v)
+				} else {
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] used undefined token_filter [%s]", name, filter))
+				}
+			}
+		}
+
 		v.Tokenizer = strings.ToLower(v.Tokenizer)
 		switch v.Tokenizer {
 		case "standard":
@@ -67,6 +97,9 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 
 		if len(chars) > 0 {
 			ana.CharFilters = append(ana.CharFilters, chars...)
+		}
+		if len(tokens) > 0 {
+			ana.TokenFilters = append(ana.TokenFilters, tokens...)
 		}
 		analyzers[name] = ana
 	}

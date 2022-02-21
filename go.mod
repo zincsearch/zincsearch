@@ -26,5 +26,6 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
+	golang.org/x/text v0.3.6
 	gopkg.in/segmentio/analytics-go.v3 v3.1.0
 )

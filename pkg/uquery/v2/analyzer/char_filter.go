@@ -2,14 +2,13 @@ package analyzer
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/char"
 
-	zincchar "github.com/prabhatsharma/zinc/pkg/bluge/analysis/char"
 	"github.com/prabhatsharma/zinc/pkg/errors"
+	zincchar "github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer/char"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
@@ -33,29 +32,15 @@ func RequestCharFilter(data map[string]interface{}) (map[string]analysis.CharFil
 		case "zero_width_non_joiner":
 			filters[name] = char.NewZeroWidthNonJoinerCharFilter()
 		case "regexp", "pattern_replace":
-			pattern, err := zutils.GetStringFromMap(options, "pattern")
-			if err != nil {
-				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[char_filter] %s option [%s] should be exists", filterType, "pattern"))
-			}
-			replacement, err := zutils.GetStringFromMap(options, "replacement")
-			if err != nil {
-				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[char_filter] %s option [%s] should be exists", filterType, "replacement"))
-			}
-			re := regexp.MustCompile(pattern)
-			filters[name] = char.NewRegexpCharFilter(re, []byte(replacement))
+			filters[name], err = zincchar.NewRegexpCharFilter(options)
 		case "mapping":
-			mappings, err := zutils.GetStringSliceFromMap(options, "mappings")
-			if err != nil {
-				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[char_filter] %s option [%s] should be exists", filterType, "mappings"))
-			}
-			for _, mapping := range mappings {
-				if !strings.Contains(mapping, " => ") {
-					return nil, errors.New(errors.ErrorTypeRuntimeException, fmt.Sprintf("[char_filter] %s option [%s] Invalid Mapping Rule: [%s]", filterType, "mappings", mapping))
-				}
-			}
-			filters[name] = zincchar.NewMappingCharFilter(mappings)
+			filters[name], err = zincchar.NewMappingCharFilter(options)
 		default:
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] doesn't support type [%s]", filterType))
+		}
+
+		if err != nil {
+			return nil, err
 		}
 	}
 
