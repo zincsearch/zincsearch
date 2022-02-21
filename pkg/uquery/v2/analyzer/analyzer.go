@@ -108,12 +108,14 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 }
 
 func Query(data map[string]*analysis.Analyzer, name string) (*analysis.Analyzer, error) {
-	if v, ok := data[name]; ok {
-		return v, nil
+	if data != nil {
+		if v, ok := data[name]; ok {
+			return v, nil
+		}
 	}
 
 	switch name {
-	case "standard":
+	case "", "standard":
 		return analyzer.NewStandardAnalyzer(), nil
 	case "keyword":
 		return analyzer.NewKeywordAnalyzer(), nil

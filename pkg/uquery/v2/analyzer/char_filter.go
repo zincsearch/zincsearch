@@ -36,11 +36,38 @@ func RequestCharFilter(data map[string]interface{}) (map[string]analysis.CharFil
 		case "mapping":
 			filters[name], err = zincchar.NewMappingCharFilter(options)
 		default:
-			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] doesn't support type [%s]", filterType))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] doesn't support filter [%s]", filterType))
 		}
 
 		if err != nil {
 			return nil, err
+		}
+	}
+
+	return filters, nil
+}
+
+func RequestCharFilterSlice(data []interface{}) ([]analysis.CharFilter, error) {
+	if data == nil {
+		return nil, nil
+	}
+
+	filters := make([]analysis.CharFilter, 0, len(data))
+	for _, name := range data {
+		name, ok := name.(string)
+		if !ok {
+			return nil, errors.New(errors.ErrorTypeParsingException, "[char_filter] option should be string")
+		}
+		name = strings.ToLower(name)
+		switch name {
+		case "ascii_folding":
+			filters = append(filters, char.NewASCIIFoldingFilter())
+		case "html", "html_strip":
+			filters = append(filters, char.NewHTMLCharFilter())
+		case "zero_width_non_joiner":
+			filters = append(filters, char.NewZeroWidthNonJoinerCharFilter())
+		default:
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] doesn't support filter [%s]", name))
 		}
 	}
 

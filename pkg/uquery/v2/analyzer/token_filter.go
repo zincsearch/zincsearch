@@ -58,12 +58,60 @@ func RequestTokenFilter(data map[string]interface{}) (map[string]analysis.TokenF
 		case "unique":
 			filters[name] = token.NewUniqueTermFilter()
 		default:
-			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[token_filter] doesn't support type [%s]", filterType))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[token_filter] doesn't support filter [%s]", filterType))
 		}
 
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	return filters, nil
+}
+
+func RequestTokenFilterSlice(data []interface{}) ([]analysis.TokenFilter, error) {
+	if data == nil {
+		return nil, nil
+	}
+
+	filters := make([]analysis.TokenFilter, 0, len(data))
+	for _, name := range data {
+		name, ok := name.(string)
+		if !ok {
+			return nil, errors.New(errors.ErrorTypeParsingException, "[token_filter] option should be string")
+		}
+		name = strings.ToLower(name)
+		var filter analysis.TokenFilter
+		switch name {
+		case "apostrophe":
+			filter = token.NewApostropheFilter()
+		case "camel_case":
+			filter = token.NewCamelCaseFilter()
+		case "edge_ngram":
+			filter, _ = zinctoken.NewEdgeNgramTokenFilter(nil)
+		case "length":
+			filter, _ = zinctoken.NewLengthTokenFilter(nil)
+		case "lower_case":
+			filter = token.NewLowerCaseFilter()
+		case "ngram":
+			filter, _ = zinctoken.NewNgramTokenFilter(nil)
+		case "porter":
+			filter = token.NewPorterStemmer()
+		case "reverse":
+			filter = token.NewReverseFilter()
+		case "shingle":
+			filter, _ = zinctoken.NewShingleTokenFilter(nil)
+		case "stop":
+			filter, _ = zinctoken.NewStopTokenFilter(nil)
+		case "truncate":
+			filter, _ = zinctoken.NewTruncateTokenFilter(nil)
+		case "unique":
+			filter = token.NewUniqueTermFilter()
+		default:
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[token_filter] doesn't support filter [%s]", name))
+		}
+
+		filters = append(filters, filter)
 	}
 
 	return filters, nil
