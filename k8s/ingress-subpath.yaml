@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/connection-proxy-header: keep-alive
+    nginx.ingress.kubernetes.io/proxy-body-size: 15m
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  name: zinc
+  namespace: zinc
+spec:
+  rules:
+  - host: zinc.yourdomain.com
+    http:
+      paths:
+      - pathType: Prefix
+        backend:
+          service:
+            name: z
+            port:
+              number: 4080
+        path: /subpath(/|$)(.*)
+  tls:
+  - hosts:
+    - zinc.yourdomain.com
+    secretName: zinc-tls
