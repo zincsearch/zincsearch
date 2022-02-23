@@ -19,29 +19,15 @@ func RequestCharFilter(data map[string]interface{}) (map[string]analysis.CharFil
 
 	filters := make(map[string]analysis.CharFilter)
 	for name, options := range data {
-		filterType, err := zutils.GetStringFromMap(options, "type")
+		typ, err := zutils.GetStringFromMap(options, "type")
 		if err != nil {
 			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[char_filter] %s option [%s] should be exists", name, "type"))
 		}
-		filterType = strings.ToLower(filterType)
-		switch filterType {
-		case "ascii_folding":
-			filters[name] = char.NewASCIIFoldingFilter()
-		case "html", "html_strip":
-			filters[name] = char.NewHTMLCharFilter()
-		case "zero_width_non_joiner":
-			filters[name] = char.NewZeroWidthNonJoinerCharFilter()
-		case "regexp", "pattern_replace":
-			filters[name], err = zincchar.NewRegexpCharFilter(options)
-		case "mapping":
-			filters[name], err = zincchar.NewMappingCharFilter(options)
-		default:
-			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] doesn't support filter [%s]", filterType))
-		}
-
+		filter, err := RequestCharFilterSingle(typ, options)
 		if err != nil {
 			return nil, err
 		}
+		filters[name] = filter
 	}
 
 	return filters, nil
@@ -53,23 +39,35 @@ func RequestCharFilterSlice(data []interface{}) ([]analysis.CharFilter, error) {
 	}
 
 	filters := make([]analysis.CharFilter, 0, len(data))
-	for _, name := range data {
-		name, ok := name.(string)
+	for _, typ := range data {
+		typ, ok := typ.(string)
 		if !ok {
 			return nil, errors.New(errors.ErrorTypeParsingException, "[char_filter] option should be string")
 		}
-		name = strings.ToLower(name)
-		switch name {
-		case "ascii_folding":
-			filters = append(filters, char.NewASCIIFoldingFilter())
-		case "html", "html_strip":
-			filters = append(filters, char.NewHTMLCharFilter())
-		case "zero_width_non_joiner":
-			filters = append(filters, char.NewZeroWidthNonJoinerCharFilter())
-		default:
-			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] doesn't support filter [%s]", name))
+		filter, err := RequestCharFilterSingle(typ, nil)
+		if err != nil {
+			return nil, err
 		}
+		filters = append(filters, filter)
 	}
 
 	return filters, nil
+}
+
+func RequestCharFilterSingle(typ string, options interface{}) (analysis.CharFilter, error) {
+	typ = strings.ToLower(typ)
+	switch typ {
+	case "ascii_folding":
+		return char.NewASCIIFoldingFilter(), nil
+	case "html", "html_strip":
+		return char.NewHTMLCharFilter(), nil
+	case "zero_width_non_joiner":
+		return char.NewZeroWidthNonJoinerCharFilter(), nil
+	case "regexp", "pattern_replace":
+		return zincchar.NewRegexpCharFilter(options)
+	case "mapping":
+		return zincchar.NewMappingCharFilter(options)
+	default:
+		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] doesn't support filter [%s]", typ))
+	}
 }

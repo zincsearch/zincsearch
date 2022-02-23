@@ -1,6 +1,7 @@
 package char
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/blugelabs/bluge/analysis"
@@ -19,6 +20,10 @@ func NewRegexpCharFilter(options interface{}) (analysis.CharFilter, error) {
 	if err != nil || replacement == "" {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[char_filter] regexp option [replacement] should be exists")
 	}
-	re := regexp.MustCompile(pattern)
-	return char.NewRegexpCharFilter(re, []byte(replacement)), nil
+	r, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[char_filter] regexp option [pattern] compile error: %v", err.Error()))
+	}
+
+	return char.NewRegexpCharFilter(r, []byte(replacement)), nil
 }
