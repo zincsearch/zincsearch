@@ -50,31 +50,35 @@ Join slack channel
 
 ## Download / Installation / Run
 
-Check installation [installation docs](https://docs.zincsearch.io/04_installation/)
+Check installation [installation docs](https://docs.zinclabs.io/04_installation/)
 
 
 ## Data ingestion
 
 ### Single record
 
-Check [single record ingestion docs](https://docs.zincsearch.io/ingestion/single-record/)
+Check [single record ingestion docs](https://docs.zinclabs.io/ingestion/single-record/)
 
 ### Bulk ingestion
 
-Check [bulk ingestion docs](https://docs.zincsearch.io/ingestion/bulk-ingestion/#bulk-ingestion)
+Check [bulk ingestion docs](https://docs.zinclabs.io/ingestion/bulk-ingestion/#bulk-ingestion)
 
 ### Fluent bit
 
-Check [fluet-bit ingestion docs](https://docs.zincsearch.io/ingestion/fluent-bit/)
+Check [fluet-bit ingestion docs](https://docs.zinclabs.io/ingestion/fluent-bit/)
 
 ### Syslog-ng
 
-Check [syslog-ng ingestion docs](https://docs.zincsearch.io/ingestion/syslog-ng/)
+Check [syslog-ng ingestion docs](https://docs.zinclabs.io/ingestion/syslog-ng/)
 
 ## API Reference
 
-Check [Zinc API docs](https://docs.zincsearch.io/API%20Reference/)
+Check [Zinc API docs](https://docs.zinclabs.io/API%20Reference/)
 
+
+# How to develop and contribute to Zinc
+
+Check the [contributing guide](./CONTRIBUTING.md)
 
 # Who uses Zinc (Known users)?
 
