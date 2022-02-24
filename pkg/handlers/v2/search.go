@@ -44,12 +44,7 @@ func SearchIndex(c *gin.Context) {
 	}
 
 	if err != nil {
-		switch v := err.(type) {
-		case *errors.Error:
-			c.JSON(http.StatusBadRequest, v)
-		default:
-			c.JSON(http.StatusBadRequest, gin.H{"error": v.Error()})
-		}
+		handleError(c, err)
 		return
 	}
 
@@ -62,4 +57,17 @@ func SearchIndex(c *gin.Context) {
 	core.Telemetry.Event("search", event_data)
 
 	c.JSON(http.StatusOK, resp)
+}
+
+func handleError(c *gin.Context, err error) {
+	if err != nil {
+		switch v := err.(type) {
+		case *errors.Error:
+			c.JSON(http.StatusBadRequest, gin.H{"error": v})
+		default:
+			c.JSON(http.StatusBadRequest, gin.H{"error": v.Error()})
+		}
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "ok"})
 }

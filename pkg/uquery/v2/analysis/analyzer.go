@@ -12,7 +12,7 @@ import (
 	zincanalyzer "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/analyzer"
 )
 
-func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
+func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 	if data == nil {
 		return nil, nil
 	}
@@ -127,7 +127,7 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 	return analyzers, nil
 }
 
-func Query(data map[string]*analysis.Analyzer, name string) (*analysis.Analyzer, error) {
+func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.Analyzer, error) {
 	if data != nil {
 		if v, ok := data[name]; ok {
 			return v, nil
@@ -135,7 +135,7 @@ func Query(data map[string]*analysis.Analyzer, name string) (*analysis.Analyzer,
 	}
 
 	switch name {
-	case "", "standard":
+	case "standard":
 		return zincanalyzer.NewStandardAnalyzer(nil)
 	case "keyword":
 		return analyzer.NewKeywordAnalyzer(), nil

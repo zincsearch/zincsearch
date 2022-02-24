@@ -61,6 +61,8 @@ func RequestTokenizerSingle(typ string, options interface{}) (analysis.Tokenizer
 		return zinctokenizer.NewCharacterTokenizer(options)
 	case "char_group":
 		return zinctokenizer.NewCharGroupTokenizer(options)
+	case "edge_ngram":
+		return zinctokenizer.NewEdgeNgramTokenizer(options)
 	case "exception":
 		return zinctokenizer.NewExceptionTokenizer(options)
 	case "letter", "simple":

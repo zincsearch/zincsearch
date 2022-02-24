@@ -7,6 +7,26 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/lang/ar"
 	"github.com/blugelabs/bluge/analysis/lang/cjk"
+	"github.com/blugelabs/bluge/analysis/lang/ckb"
+	"github.com/blugelabs/bluge/analysis/lang/da"
+	"github.com/blugelabs/bluge/analysis/lang/de"
+	"github.com/blugelabs/bluge/analysis/lang/en"
+	"github.com/blugelabs/bluge/analysis/lang/es"
+	"github.com/blugelabs/bluge/analysis/lang/fa"
+	"github.com/blugelabs/bluge/analysis/lang/fi"
+	"github.com/blugelabs/bluge/analysis/lang/fr"
+	"github.com/blugelabs/bluge/analysis/lang/ga"
+	"github.com/blugelabs/bluge/analysis/lang/hi"
+	"github.com/blugelabs/bluge/analysis/lang/hu"
+	"github.com/blugelabs/bluge/analysis/lang/in"
+	"github.com/blugelabs/bluge/analysis/lang/it"
+	"github.com/blugelabs/bluge/analysis/lang/nl"
+	"github.com/blugelabs/bluge/analysis/lang/no"
+	"github.com/blugelabs/bluge/analysis/lang/pt"
+	"github.com/blugelabs/bluge/analysis/lang/ro"
+	"github.com/blugelabs/bluge/analysis/lang/ru"
+	"github.com/blugelabs/bluge/analysis/lang/sv"
+	"github.com/blugelabs/bluge/analysis/lang/tr"
 	"github.com/blugelabs/bluge/analysis/token"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
@@ -63,10 +83,6 @@ func RequestTokenFilterSingle(typ string, options interface{}) (analysis.TokenFi
 		return token.NewApostropheFilter(), nil
 	case "camel_case", "camelcase":
 		return token.NewCamelCaseFilter(), nil
-	case "cjk_bigram":
-		return cjk.NewBigramFilter(false), nil
-	case "cjk_width":
-		return cjk.NewWidthFilter(), nil
 	case "dict":
 		return zinctoken.NewDictTokenFilter(options)
 	case "edge_ngram":
@@ -95,8 +111,77 @@ func RequestTokenFilterSingle(typ string, options interface{}) (analysis.TokenFi
 		return zinctoken.NewUnicodenormTokenFilter(options)
 	case "unique":
 		return token.NewUniqueTermFilter(), nil
-	case "arabic_normalization":
+		// language filters
+	case "ar_normalization", "arabic_normalization":
 		return ar.NormalizeFilter(), nil
+	case "ar_stemmer", "arabic_stemmer":
+		return ar.StemmerFilter(), nil
+	case "cjk_bigram":
+		return cjk.NewBigramFilter(false), nil
+	case "cjk_width":
+		return cjk.NewWidthFilter(), nil
+	case "ckb_normalization", "sorani_normalization":
+		return ckb.NormalizeFilter(), nil
+	case "ckb_stemmer", "sorani_stemmer":
+		return ckb.StemmerFilter(), nil
+	case "da_stemmer", "danish_stemmer":
+		return da.StemmerFilter(), nil
+	case "de_normalization", "german_normalization":
+		return de.NormalizeFilter(), nil
+	case "de_stemmer", "german_stemmer":
+		return de.StemmerFilter(), nil
+	case "de_light_stemmer", "german_light_stemmer":
+		return de.LightStemmerFilter(), nil
+	case "en_possessive_stemmer", "english_possessive_stemmer":
+		return en.NewPossessiveFilter(), nil
+	case "en_stemmer", "english_stemmer":
+		return en.StemmerFilter(), nil
+	case "es_stemmer", "spanish_stemmer":
+		return es.StemmerFilter(), nil
+	case "es_light_stemmer", "spanish_light_stemmer":
+		return es.LightStemmerFilter(), nil
+	case "fa_normalization", "persian_normalization":
+		return fa.NormalizeFilter(), nil
+	case "fi_stemmer", "finish_stemmer":
+		return fi.StemmerFilter(), nil
+	case "fr_elision", "french_elision":
+		return fr.ElisionFilter(), nil
+	case "fr_stemmer", "french_stemmer":
+		return fr.StemmerFilter(), nil
+	case "fr_light_stemmer", "french_light_stemmer":
+		return fr.LightStemmerFilter(), nil
+	case "fr_minimal_stemmer", "french_minimal_stemmer":
+		return fr.MinimalStemmerFilter(), nil
+	case "ga_elision", "irish_elision":
+		return ga.ElisionFilter(), nil
+	case "hi_normalization", "hindi_normalization":
+		return hi.NormalizeFilter(), nil
+	case "hi_stemmer", "hindi_stemmer":
+		return hi.StemmerFilter(), nil
+	case "hu_stemmer", "hungarian_stemmer":
+		return hu.StemmerFilter(), nil
+	case "in_normalization", "indic_normalization":
+		return in.NormalizeFilter(), nil
+	case "it_elision", "italian_elision":
+		return it.ElisionFilter(), nil
+	case "it_stemmer", "italian_stemmer":
+		return it.StemmerFilter(), nil
+	case "it_light_stemmer", "italian_light_stemmer":
+		return it.LightStemmerFilter(), nil
+	case "nl_stemmer", "dutch_stemmer":
+		return nl.StemmerFilter(), nil
+	case "no_stemmer", "norwegian_stemmer":
+		return no.StemmerFilter(), nil
+	case "pt_light_stemmer", "portuguese_stemmer", "portuguese_light_stemmer":
+		return pt.LightStemmerFilter(), nil
+	case "ro_stemmer", "romanian_stemmer":
+		return ro.StemmerFilter(), nil
+	case "ru_stemmer", "russian_stemmer":
+		return ru.StemmerFilter(), nil
+	case "sv_stemmer", "swedish_stemmer":
+		return sv.StemmerFilter(), nil
+	case "tr_stemmer", "turkish_stemmer":
+		return tr.StemmerFilter(), nil
 	default:
 		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[token_filter] doesn't support filter [%s]", typ))
 	}
