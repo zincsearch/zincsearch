@@ -24,11 +24,11 @@ func NewCharacterTokenizer(options interface{}) (analysis.Tokenizer, error) {
 		return tokenizer.NewCharacterTokenizer(unicode.IsLetter), nil
 	case "mark":
 		return tokenizer.NewCharacterTokenizer(unicode.IsMark), nil
-	case "number":
+	case "number", "digit":
 		return tokenizer.NewCharacterTokenizer(unicode.IsNumber), nil
-	case "punct":
+	case "punct", "punctuation":
 		return tokenizer.NewCharacterTokenizer(unicode.IsPunct), nil
-	case "space":
+	case "space", "whitespace", "white_space":
 		return tokenizer.NewCharacterTokenizer(unicode.IsSpace), nil
 	case "symbol":
 		return tokenizer.NewCharacterTokenizer(unicode.IsSymbol), nil

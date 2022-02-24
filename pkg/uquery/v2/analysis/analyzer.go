@@ -26,6 +26,10 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 		return nil, err
 	}
 
+	if data.TokenFilter == nil && data.Filter != nil {
+		data.TokenFilter = data.Filter
+		data.Filter = nil
+	}
 	tokenFilters, err := RequestTokenFilter(data.TokenFilter)
 	if err != nil {
 		return nil, err
@@ -47,6 +51,8 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 		if v.Type != "" {
 			v.Type = strings.ToLower(v.Type)
 			switch v.Type {
+			case "custom":
+				// omit
 			case "regexp", "pattern":
 				ana, err = zincanalyzer.NewRegexpAnalyzer(map[string]interface{}{
 					"pattern":   v.Pattern,
@@ -62,6 +68,14 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 				ana, err = zincanalyzer.NewStopAnalyzer(map[string]interface{}{
 					"stopwords": v.Stopwords,
 				})
+			case "whitespace":
+				ana, _ = zincanalyzer.NewWhitespaceAnalyzer()
+			case "keyword":
+				ana = analyzer.NewKeywordAnalyzer()
+			case "simple":
+				ana = analyzer.NewSimpleAnalyzer()
+			case "web":
+				ana = analyzer.NewWebAnalyzer()
 			default:
 				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] build-in [%s] doesn't support custom", v.Type))
 			}
@@ -84,29 +98,33 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 		}
 
 		chars := make([]analysis.CharFilter, 0, len(v.CharFilter))
-		for _, name := range v.CharFilter {
-			filter, err := RequestCharFilterSingle(name, nil)
+		for _, filterName := range v.CharFilter {
+			filter, err := RequestCharFilterSingle(filterName, nil)
 			if filter != nil && err == nil {
 				chars = append(chars, filter)
 			} else {
-				if v, ok := charFilters[name]; ok {
+				if v, ok := charFilters[filterName]; ok {
 					chars = append(chars, v)
 				} else {
-					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] used undefined char_filter [%s]", name, filter))
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] used undefined char_filter [%s]", name, filterName))
 				}
 			}
 		}
 
 		tokens := make([]analysis.TokenFilter, 0, len(v.TokenFilter))
-		for _, name := range v.TokenFilter {
-			filter, err := RequestTokenFilterSingle(name, nil)
+		if v.TokenFilter == nil && v.Filter != nil {
+			v.TokenFilter = v.Filter
+			v.Filter = nil
+		}
+		for _, filterName := range v.TokenFilter {
+			filter, err := RequestTokenFilterSingle(filterName, nil)
 			if filter != nil && err == nil {
 				tokens = append(tokens, filter)
 			} else {
-				if v, ok := tokenFilters[name]; ok {
+				if v, ok := tokenFilters[filterName]; ok {
 					tokens = append(tokens, v)
 				} else {
-					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] used undefined token_filter [%s]", name, filter))
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] used undefined token_filter [%s]", name, filterName))
 				}
 			}
 		}
@@ -114,7 +132,6 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 		if ana == nil {
 			ana = &analysis.Analyzer{Tokenizer: zer}
 		}
-
 		if len(chars) > 0 {
 			ana.CharFilters = append(ana.CharFilters, chars...)
 		}
@@ -128,6 +145,10 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 }
 
 func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.Analyzer, error) {
+	if name == "" {
+		name = "default"
+	}
+
 	if data != nil {
 		if v, ok := data[name]; ok {
 			return v, nil
@@ -152,4 +173,36 @@ func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.A
 	default:
 		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] doesn't exists", name))
 	}
+}
+
+func QueryAnalyzerForField(data map[string]*analysis.Analyzer, mappings *meta.Mappings, field string) (*analysis.Analyzer, *analysis.Analyzer) {
+	if field == "" {
+		return nil, nil
+	}
+
+	analyzerName := ""
+	searchAnalyzerName := ""
+	if mappings != nil && len(mappings.Properties) > 0 {
+		if v, ok := mappings.Properties[field]; ok {
+			if v.Type != "text" {
+				return nil, nil
+			}
+			if v.Analyzer != "" {
+				analyzerName = v.Analyzer
+			}
+			if v.SearchAnalyzer != "" {
+				searchAnalyzerName = v.SearchAnalyzer
+			}
+		}
+	}
+
+	var analyzer, searchAnalyzer *analysis.Analyzer
+	if analyzerName != "" {
+		analyzer, _ = QueryAnalyzer(data, analyzerName)
+	}
+	if searchAnalyzerName != "" {
+		searchAnalyzer, _ = QueryAnalyzer(data, searchAnalyzerName)
+	}
+
+	return analyzer, searchAnalyzer
 }

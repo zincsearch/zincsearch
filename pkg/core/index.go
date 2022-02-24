@@ -14,6 +14,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 )
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
@@ -65,6 +66,10 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 		switch mappings.Properties[key].Type {
 		case "text":
 			field = bluge.NewTextField(key, value.(string)).SearchTermPositions()
+			fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.CachedAnalysis, index.CachedMappings, key)
+			if fieldAnalyzer != nil {
+				field.WithAnalyzer(fieldAnalyzer)
+			}
 		case "numeric":
 			field = bluge.NewNumericField(key, value.(float64))
 		case "keyword":

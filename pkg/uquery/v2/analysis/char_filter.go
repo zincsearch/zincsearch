@@ -57,13 +57,13 @@ func RequestCharFilterSlice(data []interface{}) ([]analysis.CharFilter, error) {
 func RequestCharFilterSingle(typ string, options interface{}) (analysis.CharFilter, error) {
 	typ = strings.ToLower(typ)
 	switch typ {
-	case "ascii_folding":
+	case "ascii_folding", "asciifolding":
 		return char.NewASCIIFoldingFilter(), nil
 	case "html", "html_strip":
 		return char.NewHTMLCharFilter(), nil
 	case "zero_width_non_joiner":
 		return char.NewZeroWidthNonJoinerCharFilter(), nil
-	case "regexp", "pattern_replace":
+	case "regexp", "pattern", "pattern_replace":
 		return zincchar.NewRegexpCharFilter(options)
 	case "mapping":
 		return zincchar.NewMappingCharFilter(options)

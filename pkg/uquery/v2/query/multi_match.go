@@ -5,13 +5,14 @@ import (
 	"strings"
 
 	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis/analyzer"
+	"github.com/blugelabs/bluge/analysis"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 )
 
-func MultiMatchQuery(query map[string]interface{}) (bluge.Query, error) {
+func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
 	value := new(meta.MultiMatchQuery)
 	for k, v := range query {
 		k := strings.ToLower(k)
@@ -37,15 +38,9 @@ func MultiMatchQuery(query map[string]interface{}) (bluge.Query, error) {
 		}
 	}
 
-	// TODO support analyzer
-	zer := analyzer.NewStandardAnalyzer()
+	var zer *analysis.Analyzer
 	if value.Analyzer != "" {
-		switch value.Analyzer {
-		case "standard":
-			zer = analyzer.NewStandardAnalyzer()
-		default:
-			// TODO: support analyzer
-		}
+		zer, _ = zincanalysis.QueryAnalyzer(analyzers, value.Analyzer)
 	}
 
 	var operator bluge.MatchQueryOperator = bluge.MatchQueryOperatorOr
@@ -66,7 +61,11 @@ func MultiMatchQuery(query map[string]interface{}) (bluge.Query, error) {
 		subq.SetMinShould(int(value.MinimumShouldMatch))
 	}
 	for _, field := range value.Fields {
-		subq.AddShould(bluge.NewMatchQuery(value.Query).SetField(field).SetAnalyzer(zer).SetOperator(operator))
+		subqq := bluge.NewMatchQuery(value.Query).SetField(field).SetOperator(operator)
+		if zer != nil {
+			subqq.SetAnalyzer(zer)
+		}
+		subq.AddShould(subqq)
 	}
 
 	return subq, nil

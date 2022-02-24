@@ -5,12 +5,13 @@ import (
 	"strings"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
-func Query(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
+func Query(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
 	var subq bluge.Query
 	var cmd string
 	var err error
@@ -26,7 +27,7 @@ func Query(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, 
 		}
 		switch k {
 		case "bool":
-			if subq, err = BoolQuery(v, mappings); err != nil {
+			if subq, err = BoolQuery(v, mappings, analyzers); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[bool] failed to parse field").Cause(err)
 			}
 		case "boosting":
@@ -34,23 +35,23 @@ func Query(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, 
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[boosting] failed to parse field").Cause(err)
 			}
 		case "match":
-			if subq, err = MatchQuery(v); err != nil {
+			if subq, err = MatchQuery(v, mappings, analyzers); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[match] failed to parse field").Cause(err)
 			}
 		case "match_bool_prefix":
-			if subq, err = MatchBoolPrefixQuery(v); err != nil {
+			if subq, err = MatchBoolPrefixQuery(v, mappings, analyzers); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[match_bool_prefix] failed to parse field").Cause(err)
 			}
 		case "match_phrase":
-			if subq, err = MatchPhraseQuery(v); err != nil {
+			if subq, err = MatchPhraseQuery(v, mappings, analyzers); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[match_phrase] failed to parse field").Cause(err)
 			}
 		case "match_phrase_prefix":
-			if subq, err = MatchPhrasePrefixQuery(v); err != nil {
+			if subq, err = MatchPhrasePrefixQuery(v, mappings, analyzers); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[match_phrase_prefix] failed to parse field").Cause(err)
 			}
 		case "multi_match":
-			if subq, err = MultiMatchQuery(v); err != nil {
+			if subq, err = MultiMatchQuery(v, mappings, analyzers); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[multi_match] failed to parse field").Cause(err)
 			}
 		case "match_all":
@@ -66,11 +67,11 @@ func Query(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, 
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[combined_fields] failed to parse field").Cause(err)
 			}
 		case "query_string":
-			if subq, err = QueryStringQuery(v); err != nil {
+			if subq, err = QueryStringQuery(v, mappings, analyzers); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[query_string] failed to parse field").Cause(err)
 			}
 		case "simple_query_string":
-			if subq, err = SimpleQueryStringQuery(v); err != nil {
+			if subq, err = SimpleQueryStringQuery(v, mappings, analyzers); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[simple_query_string] failed to parse field").Cause(err)
 			}
 		case "exists":

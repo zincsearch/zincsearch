@@ -5,13 +5,14 @@ import (
 	"strings"
 
 	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis/analyzer"
+	"github.com/blugelabs/bluge/analysis"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 )
 
-func MatchQuery(query map[string]interface{}) (bluge.Query, error) {
+func MatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[match] query doesn't support multiple fields")
 	}
@@ -51,11 +52,9 @@ func MatchQuery(query map[string]interface{}) (bluge.Query, error) {
 
 	subq := bluge.NewMatchQuery(value.Query).SetField(field)
 	if value.Analyzer != "" {
-		switch value.Analyzer {
-		case "standard":
-			subq.SetAnalyzer(analyzer.NewStandardAnalyzer())
-		default:
-			// TODO: support analyzer
+		zer, err := zincanalysis.QueryAnalyzer(analyzers, value.Analyzer)
+		if zer != nil && err == nil {
+			subq.SetAnalyzer(zer)
 		}
 	}
 	if value.Operator != "" {

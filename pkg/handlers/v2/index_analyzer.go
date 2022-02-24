@@ -64,6 +64,10 @@ func Analyze(c *gin.Context) {
 		return
 	}
 
+	if query.TokenFilter == nil && query.Filter != nil {
+		query.TokenFilter = query.Filter
+		query.Filter = nil
+	}
 	tokenFilters, err := parseTokenFilter(query.TokenFilter)
 	if err != nil {
 		handleError(c, err)
@@ -244,21 +248,21 @@ func formatToken(token *analysis.Token) gin.H {
 func formatTokenType(typ analysis.TokenType) string {
 	switch typ {
 	case analysis.AlphaNumeric:
-		return "<ALPHANUM>"
+		return "AlphaNumeric"
 	case analysis.Ideographic:
-		return "<IDEOGRAPHIC>"
+		return "Ideographic"
 	case analysis.Numeric:
-		return "<NUM>"
+		return "Numeric"
 	case analysis.DateTime:
-		return "<DATETIME>"
+		return "DateTime"
 	case analysis.Shingle:
-		return "<SHINGLE>"
+		return "Shingle"
 	case analysis.Single:
-		return "<SINGLE>"
+		return "Single"
 	case analysis.Double:
-		return "<DOUBLE>"
+		return "Double"
 	case analysis.Boolean:
-		return "<BOOLEAN>"
+		return "Boolean"
 	default:
 		return "Unknown"
 	}
@@ -271,4 +275,5 @@ type analyzeRequest struct {
 	Tokenizer   interface{} `json:"tokenizer"`
 	CharFilter  interface{} `json:"char_filter"`
 	TokenFilter interface{} `json:"token_filter"`
+	Filter      interface{} `json:"filter"` // compatibility with es, alias for TokenFilter
 }
