@@ -1,4 +1,4 @@
-package analyzer
+package analysis
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/blugelabs/bluge/analysis/tokenizer"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
-	zinctokenizer "github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer/tokenizer"
+	zinctokenizer "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/tokenizer"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
@@ -59,15 +59,17 @@ func RequestTokenizerSingle(typ string, options interface{}) (analysis.Tokenizer
 	switch typ {
 	case "character":
 		return zinctokenizer.NewCharacterTokenizer(options)
+	case "char_group":
+		return zinctokenizer.NewCharGroupTokenizer(options)
 	case "exception":
 		return zinctokenizer.NewExceptionTokenizer(options)
-	case "letter":
+	case "letter", "simple":
 		return tokenizer.NewLetterTokenizer(), nil
 	case "regexp":
 		return zinctokenizer.NewRegexpTokenizer(options)
-	case "single":
+	case "single", "keyword":
 		return tokenizer.NewSingleTokenTokenizer(), nil
-	case "unicode":
+	case "unicode", "standard":
 		return tokenizer.NewUnicodeTokenizer(), nil
 	case "web":
 		return tokenizer.NewWebTokenizer(), nil

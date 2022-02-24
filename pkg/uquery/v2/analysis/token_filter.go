@@ -1,14 +1,16 @@
-package analyzer
+package analysis
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/blugelabs/bluge/analysis"
+	"github.com/blugelabs/bluge/analysis/lang/ar"
+	"github.com/blugelabs/bluge/analysis/lang/cjk"
 	"github.com/blugelabs/bluge/analysis/token"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
-	zinctoken "github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer/token"
+	zinctoken "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/token"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
@@ -59,8 +61,12 @@ func RequestTokenFilterSingle(typ string, options interface{}) (analysis.TokenFi
 	switch typ {
 	case "apostrophe":
 		return token.NewApostropheFilter(), nil
-	case "camel_case":
+	case "camel_case", "camelcase":
 		return token.NewCamelCaseFilter(), nil
+	case "cjk_bigram":
+		return cjk.NewBigramFilter(false), nil
+	case "cjk_width":
+		return cjk.NewWidthFilter(), nil
 	case "dict":
 		return zinctoken.NewDictTokenFilter(options)
 	case "edge_ngram":
@@ -71,7 +77,7 @@ func RequestTokenFilterSingle(typ string, options interface{}) (analysis.TokenFi
 		return zinctoken.NewKeywordTokenFilter(options)
 	case "length":
 		return zinctoken.NewLengthTokenFilter(options)
-	case "lower_case":
+	case "lower_case", "lowercase":
 		return token.NewLowerCaseFilter(), nil
 	case "ngram":
 		return zinctoken.NewNgramTokenFilter(options)
@@ -89,6 +95,8 @@ func RequestTokenFilterSingle(typ string, options interface{}) (analysis.TokenFi
 		return zinctoken.NewUnicodenormTokenFilter(options)
 	case "unique":
 		return token.NewUniqueTermFilter(), nil
+	case "arabic_normalization":
+		return ar.NormalizeFilter(), nil
 	default:
 		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[token_filter] doesn't support filter [%s]", typ))
 	}

@@ -1,4 +1,4 @@
-package analyzer
+package analysis
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/blugelabs/bluge/analysis/char"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
-	zincchar "github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer/char"
+	zincchar "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/char"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 

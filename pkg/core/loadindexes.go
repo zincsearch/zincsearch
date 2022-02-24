@@ -13,7 +13,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
 
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer"
+	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
@@ -77,7 +77,7 @@ func LoadZincIndexesFromMeta() (map[string]*Index, error) {
 
 		// load index analysis
 		if index.Settings != nil && index.Settings.Analysis != nil {
-			index.CachedAnalysis, err = analyzer.Request(index.Settings.Analysis)
+			index.CachedAnalysis, err = zincanalysis.Request(index.Settings.Analysis)
 			if err != nil {
 				log.Printf("core.LoadZincIndexesFromMeta: error parse stored analysis: %v", err)
 			}

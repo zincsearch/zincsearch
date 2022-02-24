@@ -1,13 +1,15 @@
-package analyzer
+package analysis
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/analyzer"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	zincanalyzer "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/analyzer"
 )
 
 func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
@@ -40,13 +42,44 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] is missing tokenizer", name))
 		}
 
+		// custom build-in analyzer
+		var ana *analysis.Analyzer
+		if v.Type != "" {
+			v.Type = strings.ToLower(v.Type)
+			switch v.Type {
+			case "pattern":
+				ana, err = zincanalyzer.NewPatternAnalyzer(map[string]interface{}{
+					"pattern":   v.Pattern,
+					"lowercase": v.Lowercase,
+					"stopwords": v.Stopwords,
+				})
+			case "standard":
+				ana, err = zincanalyzer.NewStandardAnalyzer(map[string]interface{}{
+					"max_token_length": v.MaxTokenLength,
+					"stopwords":        v.Stopwords,
+				})
+			case "stop":
+				ana, err = zincanalyzer.NewStopAnalyzer(map[string]interface{}{
+					"stopwords": v.Stopwords,
+				})
+			default:
+				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] build-in [%s] doesn't support custom", v.Type))
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		// use tokenizer
 		var ok bool
 		zer, err := RequestTokenizerSingle(v.Tokenizer, nil)
 		if zer != nil && err == nil {
 			// use standard tokenizer
 		} else {
 			if zer, ok = tokenizers[v.Tokenizer]; !ok {
-				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] used undifined tokenizer %s", name, v.Tokenizer))
+				if ana == nil { // returns error if not user build-in analyzer
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] used undifined tokenizer %s", name, v.Tokenizer))
+				}
 			}
 		}
 
@@ -78,7 +111,10 @@ func Request(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
 			}
 		}
 
-		ana := &analysis.Analyzer{Tokenizer: zer}
+		if ana == nil {
+			ana = &analysis.Analyzer{Tokenizer: zer}
+		}
+
 		if len(chars) > 0 {
 			ana.CharFilters = append(ana.CharFilters, chars...)
 		}
@@ -100,13 +136,19 @@ func Query(data map[string]*analysis.Analyzer, name string) (*analysis.Analyzer,
 
 	switch name {
 	case "", "standard":
-		return analyzer.NewStandardAnalyzer(), nil
+		return zincanalyzer.NewStandardAnalyzer(nil)
 	case "keyword":
 		return analyzer.NewKeywordAnalyzer(), nil
 	case "simple":
 		return analyzer.NewSimpleAnalyzer(), nil
 	case "web":
 		return analyzer.NewWebAnalyzer(), nil
+	case "pattern":
+		return zincanalyzer.NewPatternAnalyzer(nil)
+	case "whitespace":
+		return zincanalyzer.NewWhitespaceAnalyzer()
+	case "stop":
+		return zincanalyzer.NewStopAnalyzer(nil)
 	default:
 		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] doesn't exists", name))
 	}

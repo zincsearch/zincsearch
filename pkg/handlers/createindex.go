@@ -7,7 +7,7 @@ import (
 
 	"github.com/prabhatsharma/zinc/pkg/core"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer"
+	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/mappings"
 )
 
@@ -31,7 +31,7 @@ func CreateIndex(c *gin.Context) {
 	if newIndex.Settings == nil {
 		newIndex.Settings = meta.NewIndexSettings()
 	}
-	analysis, err := analyzer.Request(newIndex.Settings.Analysis)
+	analysis, err := zincanalysis.Request(newIndex.Settings.Analysis)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

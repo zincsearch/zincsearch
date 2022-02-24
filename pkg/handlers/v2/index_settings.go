@@ -7,7 +7,7 @@ import (
 
 	"github.com/prabhatsharma/zinc/pkg/core"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer"
+	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 )
 
 func GetIndexSettings(c *gin.Context) {
@@ -44,7 +44,7 @@ func UpdateIndexSettings(c *gin.Context) {
 		return
 	}
 
-	analysis, err := analyzer.Request(newIndex.Settings.Analysis)
+	analysis, err := zincanalysis.Request(newIndex.Settings.Analysis)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

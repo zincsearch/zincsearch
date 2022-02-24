@@ -7,7 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/analyzer"
+	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
+	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
 func Analyze(c *gin.Context) {
@@ -20,15 +21,27 @@ func Analyze(c *gin.Context) {
 	var err error
 	var ana *analysis.Analyzer
 	indexName := c.Param("target")
-	index, exists := core.GetIndex(indexName)
-	if exists {
-		ana, err = analyzer.Query(index.CachedAnalysis, query.Analyzer)
+	if indexName != "" {
+		index, exists := core.GetIndex(indexName)
+		if !exists {
+			c.JSON(http.StatusNotFound, gin.H{"error": "index " + indexName + " does not exists"})
+			return
+		}
+		if query.Filed != "" && query.Analyzer == "" {
+			if index.CachedMappings != nil && index.CachedMappings.Properties != nil {
+				if prop, ok := index.CachedMappings.Properties[query.Filed]; ok {
+					query.Analyzer = prop.Analyzer
+				}
+			}
+		}
+		ana, err = zincanalysis.Query(index.CachedAnalysis, query.Analyzer)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "analyzer " + query.Analyzer + " does not exists"})
 			return
 		}
 	} else {
-		ana, err = analyzer.Query(nil, query.Analyzer)
+		// none index specified
+		ana, err = zincanalysis.Query(nil, query.Analyzer)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "analyzer " + query.Analyzer + " does not exists"})
 			return
@@ -39,27 +52,37 @@ func Analyze(c *gin.Context) {
 	if query.CharFilter != nil {
 		switch v := query.CharFilter.(type) {
 		case string:
-			filter, err := analyzer.RequestCharFilterSingle(v, nil)
+			filter, err := zincanalysis.RequestCharFilterSingle(v, nil)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
 			charFilters = append(charFilters, filter)
 		case []interface{}:
-			filters, err := analyzer.RequestCharFilterSlice(v)
+			filters, err := zincanalysis.RequestCharFilterSlice(v)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
 			charFilters = append(charFilters, filters...)
 		case map[string]interface{}:
-			filters, err := analyzer.RequestCharFilter(v)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				return
-			}
-			for _, filter := range filters {
+			typ, err := zutils.GetStringFromMap(v, "type")
+			if typ != "" && err == nil {
+				filter, err := zincanalysis.RequestCharFilterSingle(typ, v)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
 				charFilters = append(charFilters, filter)
+			} else {
+				filters, err := zincanalysis.RequestCharFilter(v)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
+				for _, filter := range filters {
+					charFilters = append(charFilters, filter)
+				}
 			}
 		default:
 			c.JSON(http.StatusBadRequest, gin.H{"error": "char_filter unsuported type"})
@@ -71,27 +94,37 @@ func Analyze(c *gin.Context) {
 	if query.TokenFilter != nil {
 		switch v := query.TokenFilter.(type) {
 		case string:
-			filter, err := analyzer.RequestTokenFilterSingle(v, nil)
+			filter, err := zincanalysis.RequestTokenFilterSingle(v, nil)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
 			tokenFilters = append(tokenFilters, filter)
 		case []interface{}:
-			filters, err := analyzer.RequestTokenFilterSlice(v)
+			filters, err := zincanalysis.RequestTokenFilterSlice(v)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
 			tokenFilters = append(tokenFilters, filters...)
 		case map[string]interface{}:
-			filters, err := analyzer.RequestTokenFilter(v)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				return
-			}
-			for _, filter := range filters {
+			typ, err := zutils.GetStringFromMap(v, "type")
+			if typ != "" && err == nil {
+				filter, err := zincanalysis.RequestTokenFilterSingle(typ, v)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
 				tokenFilters = append(tokenFilters, filter)
+			} else {
+				filters, err := zincanalysis.RequestTokenFilter(v)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
+				for _, filter := range filters {
+					tokenFilters = append(tokenFilters, filter)
+				}
 			}
 		default:
 			c.JSON(http.StatusBadRequest, gin.H{"error": "token_filter unsuported type"})
@@ -103,27 +136,37 @@ func Analyze(c *gin.Context) {
 	if query.Tokenizer != nil {
 		switch v := query.Tokenizer.(type) {
 		case string:
-			zer, err := analyzer.RequestTokenizerSingle(v, nil)
+			zer, err := zincanalysis.RequestTokenizerSingle(v, nil)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
 			tokenizers = append(tokenizers, zer)
 		case []interface{}:
-			zers, err := analyzer.RequestTokenizerSlice(v)
+			zers, err := zincanalysis.RequestTokenizerSlice(v)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
 			tokenizers = append(tokenizers, zers...)
 		case map[string]interface{}:
-			zers, err := analyzer.RequestTokenizer(v)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				return
-			}
-			for _, zer := range zers {
+			typ, err := zutils.GetStringFromMap(v, "type")
+			if typ != "" && err == nil {
+				zer, err := zincanalysis.RequestTokenizerSingle(typ, v)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
 				tokenizers = append(tokenizers, zer)
+			} else {
+				zers, err := zincanalysis.RequestTokenizer(v)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
+				for _, zer := range zers {
+					tokenizers = append(tokenizers, zer)
+				}
 			}
 		default:
 			c.JSON(http.StatusBadRequest, gin.H{"error": "tokenizer unsuported type"})
@@ -149,6 +192,7 @@ func Analyze(c *gin.Context) {
 
 type analyzeRequest struct {
 	Analyzer    string      `json:"analyzer"`
+	Filed       string      `json:"field"`
 	Text        string      `json:"text"`
 	Tokenizer   interface{} `json:"tokenizer"`
 	CharFilter  interface{} `json:"char_filter"`

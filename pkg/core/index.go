@@ -173,6 +173,14 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 		return nil
 	}
 
+	// custom analyzer just for text field
+	for _, prop := range mappings.Properties {
+		if prop.Type != "text" {
+			prop.Analyzer = ""
+			prop.SearchAnalyzer = ""
+		}
+	}
+
 	mappings.Properties["_id"] = meta.NewProperty("keyword")
 
 	// @timestamp need date_range/date_histogram aggregation, and mappings used for type check in aggregation
