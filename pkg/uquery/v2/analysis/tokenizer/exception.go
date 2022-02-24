@@ -7,6 +7,7 @@ import (
 
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/tokenizer"
+
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )

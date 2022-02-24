@@ -47,8 +47,8 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 		if v.Type != "" {
 			v.Type = strings.ToLower(v.Type)
 			switch v.Type {
-			case "pattern":
-				ana, err = zincanalyzer.NewPatternAnalyzer(map[string]interface{}{
+			case "regexp", "pattern":
+				ana, err = zincanalyzer.NewRegexpAnalyzer(map[string]interface{}{
 					"pattern":   v.Pattern,
 					"lowercase": v.Lowercase,
 					"stopwords": v.Stopwords,
@@ -143,8 +143,8 @@ func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.A
 		return analyzer.NewSimpleAnalyzer(), nil
 	case "web":
 		return analyzer.NewWebAnalyzer(), nil
-	case "pattern":
-		return zincanalyzer.NewPatternAnalyzer(nil)
+	case "regexp", "pattern":
+		return zincanalyzer.NewRegexpAnalyzer(nil)
 	case "whitespace":
 		return zincanalyzer.NewWhitespaceAnalyzer()
 	case "stop":

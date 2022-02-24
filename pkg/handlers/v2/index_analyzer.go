@@ -88,6 +88,11 @@ func Analyze(c *gin.Context) {
 		ana.Tokenizer = tokenizers[0]
 	}
 
+	if ana.Tokenizer == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "analyzer need set a tokenizer"})
+		return
+	}
+
 	tokens := ana.Analyze([]byte(query.Text))
 	ret := make([]gin.H, 0, len(tokens))
 	for _, token := range tokens {

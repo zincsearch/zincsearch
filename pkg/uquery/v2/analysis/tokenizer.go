@@ -67,7 +67,13 @@ func RequestTokenizerSingle(typ string, options interface{}) (analysis.Tokenizer
 		return zinctokenizer.NewExceptionTokenizer(options)
 	case "letter", "simple":
 		return tokenizer.NewLetterTokenizer(), nil
-	case "regexp":
+	case "lower_case", "lowercase":
+		return zinctokenizer.NewLowerCaseTokenizer()
+	case "ngram":
+		return zinctokenizer.NewNgramTokenizer(options)
+	case "path_hierarchy":
+		return zinctokenizer.NewPathHierarchyTokenizer(options)
+	case "regexp", "pattern":
 		return zinctokenizer.NewRegexpTokenizer(options)
 	case "single", "keyword":
 		return tokenizer.NewSingleTokenTokenizer(), nil

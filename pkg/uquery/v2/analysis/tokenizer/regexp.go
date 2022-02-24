@@ -11,9 +11,9 @@ import (
 )
 
 func NewRegexpTokenizer(options interface{}) (analysis.Tokenizer, error) {
-	pattern, err := zutils.GetStringFromMap(options, "pattern")
-	if err != nil {
-		return nil, errors.New(errors.ErrorTypeParsingException, "[tokenizer] regexp option [pattern] should be a strings")
+	pattern, _ := zutils.GetStringFromMap(options, "pattern")
+	if len(pattern) == 0 {
+		pattern = "\\w+"
 	}
 
 	r, err := regexp.Compile(pattern)

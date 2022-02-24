@@ -11,10 +11,10 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
-func NewPatternAnalyzer(options interface{}) (*analysis.Analyzer, error) {
+func NewRegexpAnalyzer(options interface{}) (*analysis.Analyzer, error) {
 	pattern, _ := zutils.GetStringFromMap(options, "pattern")
 	if pattern == "" {
-		pattern = "\\W+"
+		pattern = "\\w+"
 	}
 	lowerCase, err := zutils.GetBoolFromMap(options, "lowercase")
 	if err != nil {
