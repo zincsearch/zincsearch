@@ -44,7 +44,7 @@ func UpdateIndexSettings(c *gin.Context) {
 		return
 	}
 
-	analysis, err := zincanalysis.RequestAnalyzer(newIndex.Settings.Analysis)
+	analyzers, err := zincanalysis.RequestAnalyzer(newIndex.Settings.Analysis)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -76,8 +76,8 @@ func UpdateIndexSettings(c *gin.Context) {
 	// update settings
 	index.SetSettings(newIndex.Settings)
 
-	// update analysis
-	index.SetAnalysis(analysis)
+	// update analyzers
+	index.SetAnalyzers(analyzers)
 
 	// store index
 	core.StoreIndex(index)

@@ -36,7 +36,7 @@ func Analyze(c *gin.Context) {
 				}
 			}
 		}
-		ana, err = zincanalysis.QueryAnalyzer(index.CachedAnalysis, query.Analyzer)
+		ana, err = zincanalysis.QueryAnalyzer(index.CachedAnalyzers, query.Analyzer)
 		if err != nil {
 			if query.Analyzer == "" {
 				ana = new(analysis.Analyzer)

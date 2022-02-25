@@ -16,7 +16,7 @@ import (
 )
 
 func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error) {
-	searchRequest, err := parser.ParseQueryDSL(query, index.CachedMappings)
+	searchRequest, err := parser.ParseQueryDSL(query, index.CachedMappings, index.CachedAnalyzers)
 	if err != nil {
 		return nil, err
 	}

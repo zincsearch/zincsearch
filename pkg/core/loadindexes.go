@@ -77,7 +77,7 @@ func LoadZincIndexesFromMeta() (map[string]*Index, error) {
 
 		// load index analysis
 		if index.Settings != nil && index.Settings.Analysis != nil {
-			index.CachedAnalysis, err = zincanalysis.RequestAnalyzer(index.Settings.Analysis)
+			index.CachedAnalyzers, err = zincanalysis.RequestAnalyzer(index.Settings.Analysis)
 			if err != nil {
 				log.Printf("core.LoadZincIndexesFromMeta: error parse stored analysis: %v", err)
 			}

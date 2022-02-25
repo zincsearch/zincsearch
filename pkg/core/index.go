@@ -66,7 +66,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 		switch mappings.Properties[key].Type {
 		case "text":
 			field = bluge.NewTextField(key, value.(string)).SearchTermPositions()
-			fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.CachedAnalysis, index.CachedMappings, key)
+			fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.CachedAnalyzers, index.CachedMappings, key)
 			if fieldAnalyzer != nil {
 				field.WithAnalyzer(fieldAnalyzer)
 			}
@@ -163,12 +163,12 @@ func (index *Index) SetSettings(settings *meta.IndexSettings) error {
 	return nil
 }
 
-func (index *Index) SetAnalysis(analysis map[string]*analysis.Analyzer) error {
-	if len(analysis) == 0 {
+func (index *Index) SetAnalyzers(analyzers map[string]*analysis.Analyzer) error {
+	if len(analyzers) == 0 {
 		return nil
 	}
 
-	index.CachedAnalysis = analysis
+	index.CachedAnalyzers = analyzers
 
 	return nil
 }
