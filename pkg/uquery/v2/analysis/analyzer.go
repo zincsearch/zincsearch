@@ -195,13 +195,8 @@ func QueryAnalyzerForField(data map[string]*analysis.Analyzer, mappings *meta.Ma
 		}
 	}
 
-	var analyzer, searchAnalyzer *analysis.Analyzer
-	if analyzerName != "" {
-		analyzer, _ = QueryAnalyzer(data, analyzerName)
-	}
-	if searchAnalyzerName != "" {
-		searchAnalyzer, _ = QueryAnalyzer(data, searchAnalyzerName)
-	}
+	analyzer, _ := QueryAnalyzer(data, analyzerName)
+	searchAnalyzer, _ := QueryAnalyzer(data, searchAnalyzerName)
 
 	return analyzer, searchAnalyzer
 }

@@ -32,7 +32,12 @@ func Analyze(c *gin.Context) {
 		if query.Filed != "" && query.Analyzer == "" {
 			if index.CachedMappings != nil && index.CachedMappings.Properties != nil {
 				if prop, ok := index.CachedMappings.Properties[query.Filed]; ok {
-					query.Analyzer = prop.Analyzer
+					if query.Analyzer == "" && prop.SearchAnalyzer != "" {
+						query.Analyzer = prop.SearchAnalyzer
+					}
+					if query.Analyzer == "" && prop.Analyzer != "" {
+						query.Analyzer = prop.Analyzer
+					}
 				}
 			}
 		}
