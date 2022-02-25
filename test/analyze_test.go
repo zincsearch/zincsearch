@@ -130,6 +130,151 @@ func TestAnalyze(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 		})
+
+		Convey("keyword analyzer", func() {
+			input := `{
+				"analyzer": "keyword",
+				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
+			  }`
+			output := `[The 2 QUICK Brown-Foxes jumped over the lazy dog's bone.]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("regexp analyzer", func() {
+			input := `{
+				"analyzer": "regexp",
+				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
+			  }`
+			output := `[the 2 quick brown foxes jumped over the lazy dog s bone]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("regexp analyzer with pattern", func() {
+			index := `{
+				"settings": {
+				  "analysis": {
+					"analyzer": {
+					  "my_email_analyzer": {
+						"type":      "pattern",
+						"pattern":   "[^\\W_]+", 
+						"lowercase": true
+					  }
+					}
+				  }
+				}
+			  }`
+			input := `{
+				"analyzer": "my_email_analyzer",
+				"text": "John_Smith@foo-bar.com"
+			  }`
+			output := `[john smith foo bar com]`
+
+			// create index with custom analyzer
+			body := bytes.NewBuffer(nil)
+			body.WriteString(index)
+			resp := request("PUT", "/api/index/my-index-001", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			// analyze
+			body.Reset()
+			body.WriteString(input)
+			resp = request("POST", "/api/my-index-001/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+
+			// delete index
+			request("DELETE", "/api/index/my-index-001", nil)
+		})
+
+		Convey("stop analyzer", func() {
+			input := `{
+				"analyzer": "stop",
+				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
+			  }`
+			output := `[quick brown foxes jumped lazy dog s bone]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("stop analyzer with stopwords", func() {
+			index := `{
+				"settings": {
+				  "analysis": {
+					"analyzer": {
+					  "my_stop_analyzer": {
+						"type": "stop",
+						"stopwords": ["the", "over"]
+					  }
+					}
+				  }
+				}
+			  }`
+			input := `{
+				"analyzer": "my_stop_analyzer",
+				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
+			  }`
+			output := `[quick brown foxes jumped lazy dog s bone]`
+
+			// create index with custom analyzer
+			body := bytes.NewBuffer(nil)
+			body.WriteString(index)
+			resp := request("PUT", "/api/index/my-index-001", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			// analyze
+			body.Reset()
+			body.WriteString(input)
+			resp = request("POST", "/api/my-index-001/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+
+			// delete index
+			request("DELETE", "/api/index/my-index-001", nil)
+		})
+
+		Convey("whitespace analyzer", func() {
+			input := `{
+				"analyzer": "whitespace",
+				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
+			  }`
+			output := `[The 2 QUICK Brown-Foxes jumped over the lazy dog's bone.]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
 	})
 
 	Convey("test tokenizer", t, func() {
