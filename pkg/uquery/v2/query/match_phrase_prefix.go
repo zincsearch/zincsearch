@@ -53,7 +53,13 @@ func MatchPhrasePrefixQuery(query map[string]interface{}, mappings *meta.Mapping
 			return nil, err
 		}
 	} else {
-		_, zer = zincanalysis.QueryAnalyzerForField(analyzers, mappings, field)
+		indexZer, searchZer := zincanalysis.QueryAnalyzerForField(analyzers, mappings, field)
+		if zer == nil && searchZer != nil {
+			zer = searchZer
+		}
+		if zer == nil && indexZer != nil {
+			zer = indexZer
+		}
 	}
 	if zer == nil {
 		zer = analyzer.NewStandardAnalyzer()

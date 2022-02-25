@@ -44,12 +44,26 @@ func MatchPhraseQuery(query map[string]interface{}, mappings *meta.Mappings, ana
 		}
 	}
 
-	subq := bluge.NewMatchPhraseQuery(value.Query).SetField(field)
+	var err error
+	var zer *analysis.Analyzer
 	if value.Analyzer != "" {
-		zer, err := zincanalysis.QueryAnalyzer(analyzers, value.Analyzer)
-		if zer != nil && err == nil {
-			subq.SetAnalyzer(zer)
+		zer, err = zincanalysis.QueryAnalyzer(analyzers, value.Analyzer)
+		if err != nil {
+			return nil, err
 		}
+	} else {
+		indexZer, searchZer := zincanalysis.QueryAnalyzerForField(analyzers, mappings, field)
+		if zer == nil && searchZer != nil {
+			zer = searchZer
+		}
+		if zer == nil && indexZer != nil {
+			zer = indexZer
+		}
+	}
+
+	subq := bluge.NewMatchPhraseQuery(value.Query).SetField(field)
+	if zer != nil {
+		subq.SetAnalyzer(zer)
 	}
 	if value.Boost >= 0 {
 		subq.SetBoost(value.Boost)

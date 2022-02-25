@@ -50,7 +50,13 @@ func MatchBoolPrefixQuery(query map[string]interface{}, mappings *meta.Mappings,
 			return nil, err
 		}
 	} else {
-		_, zer = zincanalysis.QueryAnalyzerForField(analyzers, mappings, field)
+		indexZer, searchZer := zincanalysis.QueryAnalyzerForField(analyzers, mappings, field)
+		if zer == nil && searchZer != nil {
+			zer = searchZer
+		}
+		if zer == nil && indexZer != nil {
+			zer = indexZer
+		}
 	}
 	if zer == nil {
 		zer = analyzer.NewStandardAnalyzer()
