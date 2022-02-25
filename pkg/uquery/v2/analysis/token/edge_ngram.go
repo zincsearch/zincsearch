@@ -6,6 +6,7 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/token"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
@@ -24,6 +25,9 @@ func NewEdgeNgramTokenFilter(options interface{}) (analysis.TokenFilter, error) 
 	}
 	if max == 0 {
 		max = 2
+	}
+	if min > max {
+		return nil, errors.New(errors.ErrorTypeParsingException, "[token_filter] edge_ngram option [min_gram] should be not greater than [max_gram]")
 	}
 	return token.NewEdgeNgramFilter(boolSide, int(min), int(max)), nil
 }

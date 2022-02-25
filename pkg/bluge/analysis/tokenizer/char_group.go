@@ -9,54 +9,60 @@ import (
 type IsTokenRune func(r rune) bool
 
 type CharGroupTokenizer struct {
-	cahrs []string
+	chars []string
 }
 
 func NewCharGroupTokenizer(chars []string) *tokenizer.CharacterTokenizer {
-	cg := new(CharGroupTokenizer)
+	t := new(CharGroupTokenizer)
 	for _, char := range chars {
 		if len(char) == 0 {
 			continue
 		}
-		cg.cahrs = append(cg.cahrs, char)
+		t.chars = append(t.chars, char)
 	}
-	return tokenizer.NewCharacterTokenizer(cg.isChar)
+	return tokenizer.NewCharacterTokenizer(t.isChar)
 }
 
-func (cg *CharGroupTokenizer) isChar(r rune) bool {
+func (t *CharGroupTokenizer) isChar(r rune) bool {
 	var ok bool
-	for _, char := range cg.cahrs {
-		switch char {
-		case "graphic":
-			ok = unicode.IsGraphic(r)
-		case "print":
-			ok = unicode.IsPrint(r)
-		case "control":
-			ok = unicode.IsControl(r)
-		case "letter":
-			ok = unicode.IsLetter(r)
-		case "mark":
-			ok = unicode.IsMark(r)
-		case "number", "digit":
-			ok = unicode.IsNumber(r)
-		case "punct", "punctuation":
-			ok = unicode.IsPunct(r)
-		case "space", "whitespace", "white_space":
-			ok = unicode.IsSpace(r)
-		case "symbol":
-			ok = unicode.IsSymbol(r)
-		default:
-			for _, c := range char {
-				if r == c {
-					ok = true
-					break
-				}
-			}
-		}
-		if ok {
+	for _, char := range t.chars {
+		if ok = isChar(char, r); ok {
 			return false
 		}
 	}
 
 	return true
+}
+
+func isChar(char string, r rune) bool {
+	ok := false
+	switch char {
+	case "graphic":
+		ok = unicode.IsGraphic(r)
+	case "print":
+		ok = unicode.IsPrint(r)
+	case "control":
+		ok = unicode.IsControl(r)
+	case "letter":
+		ok = unicode.IsLetter(r)
+	case "mark":
+		ok = unicode.IsMark(r)
+	case "number", "digit":
+		ok = unicode.IsNumber(r)
+	case "punct", "punctuation":
+		ok = unicode.IsPunct(r)
+	case "space", "whitespace", "white_space":
+		ok = unicode.IsSpace(r)
+	case "symbol":
+		ok = unicode.IsSymbol(r)
+	default:
+		for _, c := range char {
+			if r == c {
+				ok = true
+				break
+			}
+		}
+	}
+
+	return ok
 }
