@@ -67,6 +67,69 @@ func TestAnalyze(t *testing.T) {
 			// delete index
 			request("DELETE", "/api/index/my-index-001", nil)
 		})
+
+		Convey("standard analyzer with stopwords and filters", func() {
+			index := `{
+				"settings": {
+				  "analysis": {
+					"analyzer": {
+					  "my_english_analyzer": {
+						"type": "standard",
+						"stopwords": ["_english_"],
+						"token_filter": ["lowercase", "apostrophe", "my_length"]
+					  }
+					},
+					"token_filter": {
+						"my_length": {
+							"type": "length",
+							"min": 2,
+							"max": 10
+						}
+					}
+				  }
+				}
+			  }`
+			input := `{
+				"analyzer": "my_english_analyzer",
+				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
+			  }`
+			output := `[quick brown foxes jumped lazy dog bone]`
+
+			// create index with custom analyzer
+			body := bytes.NewBuffer(nil)
+			body.WriteString(index)
+			resp := request("PUT", "/api/index/my-index-001", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			// analyze
+			body.Reset()
+			body.WriteString(input)
+			resp = request("POST", "/api/my-index-001/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+
+			// delete index
+			request("DELETE", "/api/index/my-index-001", nil)
+		})
+
+		Convey("simple analyzer", func() {
+			input := `{
+				"analyzer": "simple",
+				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
+			  }`
+			output := `[the quick brown foxes jumped over the lazy dog s bone]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
 	})
 
 	Convey("test tokenizer", t, func() {
