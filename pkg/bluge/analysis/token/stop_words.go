@@ -44,7 +44,7 @@ func StopWords(stopwords []string) analysis.TokenMap {
 
 	rv := analysis.NewTokenMap()
 	for _, word := range stopwords {
-		if ok := loadLanguageStopWords(rv, word); !ok {
+		if ok := loadLanguageStopWords(&rv, word); !ok {
 			rv.AddToken(word)
 		}
 	}
@@ -52,7 +52,7 @@ func StopWords(stopwords []string) analysis.TokenMap {
 	return rv
 }
 
-func loadLanguageStopWords(rv analysis.TokenMap, language string) bool {
+func loadLanguageStopWords(rv *analysis.TokenMap, language string) bool {
 	var dict analysis.TokenMap
 	switch language {
 	case "_ar_", "_arabic_":

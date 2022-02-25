@@ -19,7 +19,7 @@ import (
 
 // DeleteIndex deletes a zinc index and its associated data. Be careful using thus as you ca't undo this action.
 func DeleteIndex(c *gin.Context) {
-	indexName := c.Param("indexName")
+	indexName := c.Param("target")
 
 	// 0. Check if index exists and Get the index storage type - disk, s3 or memory
 	index, exists := core.GetIndex(indexName)

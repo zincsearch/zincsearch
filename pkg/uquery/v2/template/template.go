@@ -26,7 +26,7 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 		case "index_patterns":
 			patterns, ok := v.([]interface{})
 			if !ok {
-				return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] index_patterns value should be an array of strings")
+				return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] index_patterns value should be an array of string")
 			}
 			for _, pattern := range patterns {
 				template.IndexPatterns = append(template.IndexPatterns, pattern.(string))

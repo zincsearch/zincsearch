@@ -65,9 +65,10 @@ func SetRoutes(r *gin.Engine) {
 	r.DELETE("/api/user/:userID", auth.ZincAuthMiddleware, handlers.DeleteUser)
 	r.GET("/api/users", auth.ZincAuthMiddleware, handlers.GetUsers)
 
-	r.PUT("/api/index", auth.ZincAuthMiddleware, handlers.CreateIndex)
 	r.GET("/api/index", auth.ZincAuthMiddleware, handlers.ListIndexes)
-	r.DELETE("/api/index/:indexName", auth.ZincAuthMiddleware, handlers.DeleteIndex)
+	r.PUT("/api/index", auth.ZincAuthMiddleware, handlers.CreateIndex)
+	r.PUT("/api/index/:target", auth.ZincAuthMiddleware, handlers.CreateIndex)
+	r.DELETE("/api/index/:target", auth.ZincAuthMiddleware, handlers.DeleteIndex)
 
 	// Bulk update/insert
 	r.POST("/api/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)

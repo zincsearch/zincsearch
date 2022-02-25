@@ -11,7 +11,7 @@ import (
 func NewDictTokenFilter(options interface{}) (analysis.TokenFilter, error) {
 	words, err := zutils.GetStringSliceFromMap(options, "words")
 	if err != nil {
-		return nil, errors.New(errors.ErrorTypeParsingException, "[token_filter] dict option [words] should be an array of strings")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[token_filter] dict option [words] should be an array of string")
 	}
 	dict := analysis.NewTokenMap()
 	for _, word := range words {

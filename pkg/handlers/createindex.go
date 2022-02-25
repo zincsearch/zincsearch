@@ -18,6 +18,11 @@ func CreateIndex(c *gin.Context) {
 		return
 	}
 
+	indexName := c.Param("target")
+	if newIndex.Name == "" && indexName != "" {
+		newIndex.Name = indexName
+	}
+
 	if newIndex.Name == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "index.name should be not empty"})
 		return

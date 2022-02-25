@@ -15,7 +15,7 @@ import (
 func NewExceptionTokenizer(options interface{}) (analysis.Tokenizer, error) {
 	patterns, err := zutils.GetStringSliceFromMap(options, "patterns")
 	if err != nil {
-		return nil, errors.New(errors.ErrorTypeParsingException, "[tokenizer] exception option [patterns] should be an array of strings")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[tokenizer] exception option [patterns] should be an array of string")
 	}
 
 	pattern := strings.Join(patterns, "|")

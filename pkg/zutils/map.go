@@ -45,16 +45,21 @@ func GetStringSliceFromMap(m interface{}, key string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("GetStringSliceFromMap: key [%s] not found", key)
 	}
-	vs, ok := v.([]interface{})
-	if !ok {
-		return nil, fmt.Errorf("GetStringSliceFromMap: value [%s] should be an array of strings", key)
+	var vs []interface{}
+	switch v := v.(type) {
+	case []string:
+		return v, nil
+	case []interface{}:
+		vs = v
+	default:
+		return nil, fmt.Errorf("GetStringSliceFromMap: value [%s] should be an array of string", key)
 	}
 
 	ss := make([]string, 0, len(vs))
 	for _, v := range vs {
 		sv, ok := v.(string)
 		if !ok {
-			return nil, fmt.Errorf("GetStringSliceFromMap: value [%s] should be an array of strings", key)
+			return nil, fmt.Errorf("GetStringSliceFromMap: value [%s] should be an array of string", key)
 		}
 		ss = append(ss, sv)
 	}

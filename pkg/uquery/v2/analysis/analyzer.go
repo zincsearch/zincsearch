@@ -42,7 +42,7 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 
 	analyzers := make(map[string]*analysis.Analyzer)
 	for name, v := range data.Analyzer {
-		if v.Tokenizer == "" {
+		if v.Tokenizer == "" && v.Type == "" {
 			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] is missing tokenizer", name))
 		}
 
@@ -61,8 +61,7 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 				})
 			case "standard":
 				ana, err = zincanalyzer.NewStandardAnalyzer(map[string]interface{}{
-					"max_token_length": v.MaxTokenLength,
-					"stopwords":        v.Stopwords,
+					"stopwords": v.Stopwords,
 				})
 			case "stop":
 				ana, err = zincanalyzer.NewStopAnalyzer(map[string]interface{}{
