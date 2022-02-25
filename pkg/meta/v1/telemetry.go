@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"time"
+
 	"gopkg.in/segmentio/analytics-go.v3"
 )
 
@@ -11,7 +13,7 @@ var (
 
 func init() {
 	cf := analytics.Config{
-		Interval:  10,
+		Interval:  15 * time.Second,
 		BatchSize: 100,
 		// Endpoint: "http://localhost:8080/api/v1/segment",
 	}

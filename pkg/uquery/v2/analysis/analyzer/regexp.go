@@ -7,6 +7,7 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/token"
 	"github.com/blugelabs/bluge/analysis/tokenizer"
+
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
@@ -23,7 +24,7 @@ func NewRegexpAnalyzer(options interface{}) (*analysis.Analyzer, error) {
 	stopwords, _ := zutils.GetStringSliceFromMap(options, "stopwords")
 	r, err := regexp.Compile(pattern)
 	if err != nil {
-		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] pattern option [pattern] compile error: %v", err.Error()))
+		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] regexp option [pattern] compile error: %v", err.Error()))
 	}
 	ana := &analysis.Analyzer{Tokenizer: tokenizer.NewRegexpTokenizer(r)}
 	if lowerCase {

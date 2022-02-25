@@ -4,14 +4,10 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 
 	"github.com/prabhatsharma/zinc/pkg/bluge/analysis/token"
-	"github.com/prabhatsharma/zinc/pkg/errors"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
 func NewStopTokenFilter(options interface{}) (analysis.TokenFilter, error) {
-	stopwords, err := zutils.GetStringSliceFromMap(options, "stopwords")
-	if err != nil {
-		return nil, errors.New(errors.ErrorTypeParsingException, "[token_filter] keyword option [keywords] should be an array of strings")
-	}
+	stopwords, _ := zutils.GetStringSliceFromMap(options, "stopwords")
 	return token.NewStopTokenFilter(stopwords), nil
 }
