@@ -10,11 +10,15 @@ import (
 func NewShingleTokenFilter(options interface{}) (analysis.TokenFilter, error) {
 	min, _ := zutils.GetFloatFromMap(options, "min_shingle_size")
 	max, _ := zutils.GetFloatFromMap(options, "max_shingle_size")
-	outputOriginal, _ := zutils.GetBoolFromMap(options, "output_unigrams")
 	sep, _ := zutils.GetStringFromMap(options, "token_separator")
 	fill, _ := zutils.GetStringFromMap(options, "filler_token")
+	outputOriginalBool := true
+	outputOriginal, _ := zutils.GetAnyFromMap(options, "output_original")
+	if outputOriginal != nil {
+		outputOriginalBool = outputOriginal.(bool)
+	}
 	if min == 0 {
-		min = 3
+		min = 2
 	}
 	if max == 0 {
 		max = 2
@@ -25,5 +29,5 @@ func NewShingleTokenFilter(options interface{}) (analysis.TokenFilter, error) {
 	if fill == "" {
 		fill = "_"
 	}
-	return token.NewShingleFilter(int(min), int(max), outputOriginal, sep, fill), nil
+	return token.NewShingleFilter(int(min), int(max), outputOriginalBool, sep, fill), nil
 }

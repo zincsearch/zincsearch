@@ -275,6 +275,23 @@ func TestAnalyze(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 		})
+
+		Convey("web analyzer", func() {
+			input := `{
+				"analyzer": "web",
+				"text": "Hello info@blugelabs.com, i come from https://docs.zinclabs.io/"
+			  }`
+			output := `[hello info@blugelabs.com come https://docs.zinclabs.io/]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
 	})
 
 	Convey("test tokenizer", t, func() {
@@ -346,7 +363,7 @@ func TestAnalyze(t *testing.T) {
 			So(tokens, ShouldEqual, output)
 		})
 
-		Convey("ngram tokenizer", func() {
+		Convey("n-gram tokenizer", func() {
 			input := `{
 				"tokenizer": "ngram",
 				"text": "Quick Fox"
@@ -363,7 +380,7 @@ func TestAnalyze(t *testing.T) {
 			So(tokens, ShouldEqual, output)
 		})
 
-		Convey("ngram tokenizer with configuration", func() {
+		Convey("n-gram tokenizer with configuration", func() {
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -411,7 +428,7 @@ func TestAnalyze(t *testing.T) {
 			request("DELETE", "/api/index/my-index-001", nil)
 		})
 
-		Convey("edge_ngram tokenizer", func() {
+		Convey("edge n-gram tokenizer", func() {
 			input := `{
 				"tokenizer": "edge_ngram",
 				"text": "Quick Fox"
@@ -428,7 +445,7 @@ func TestAnalyze(t *testing.T) {
 			So(tokens, ShouldEqual, output)
 		})
 
-		Convey("edge_ngram tokenizer with configuration", func() {
+		Convey("edge n-gram tokenizer with configuration", func() {
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -614,7 +631,7 @@ func TestAnalyze(t *testing.T) {
 			request("DELETE", "/api/index/my-index-001", nil)
 		})
 
-		Convey("char_group tokenizer", func() {
+		Convey("character group tokenizer", func() {
 			input := `{
 				"tokenizer": {
 				  "type": "char_group",
@@ -638,7 +655,7 @@ func TestAnalyze(t *testing.T) {
 			So(tokens, ShouldEqual, output)
 		})
 
-		Convey("path_hierarchy tokenizer", func() {
+		Convey("path hierarchy tokenizer", func() {
 			input := `{
 				"tokenizer": "path_hierarchy",
 				"text": "/one/two/three"
@@ -655,7 +672,7 @@ func TestAnalyze(t *testing.T) {
 			So(tokens, ShouldEqual, output)
 		})
 
-		Convey("path_hierarchy tokenizer with configuration", func() {
+		Convey("path hierarchy tokenizer with configuration", func() {
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -709,6 +726,404 @@ func TestAnalyze(t *testing.T) {
 				"text" : "Istanbul'a veya Istanbul'dan"
 			  }`
 			output := `[Istanbul veya Istanbul]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("CJK bigram token filter", func() {
+			input := `{
+				"tokenizer" : "standard",
+				"filter" : ["cjk_bigram"],
+				"text" : "東京都は、日本の首都であり"
+			  }`
+			output := `[東京 京都 都は 日本 本の の首 首都 都で であ あり]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("CJK width token filter", func() {
+			input := `{
+				"tokenizer" : "standard",
+				"filter" : ["cjk_width"],
+				"text" : "ｼｰｻｲﾄﾞﾗｲﾅｰ"
+			  }`
+			output := `[シーサイドライナー]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Dictionary token filter", func() {
+			input := `{
+				"tokenizer": "standard",
+				"filter": [
+				  {
+					"type": "dict",
+					"words": ["Donau", "dampf", "meer", "schiff"]
+				  }
+				],
+				"text": "Donaudampfschiff"
+			  }`
+			output := `[Donaudampfschiff Donau dampf schiff]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Edge n-gram token filter", func() {
+			input := `{
+				"tokenizer": "standard",
+				"filter": [
+				  { "type": "edge_ngram",
+					"min_gram": 1,
+					"max_gram": 2
+				  }
+				],
+				"text": "the quick brown fox jumps"
+			  }`
+			output := `[t th q qu b br f fo j ju]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("N-gram token filter", func() {
+			input := `{
+				"tokenizer": "standard",
+				"filter": [ "ngram" ],
+				"text": "Quick fox"
+			  }`
+			output := `[Q Qu u ui i ic c ck k f fo o ox x]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Elision token filter", func() {
+			input := `{
+				"tokenizer" : "standard",
+				"filter" : ["elision"],
+				"text" : "j’examine près du wharf"
+			  }`
+			output := `[examine près du wharf]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Stemmer token filter", func() {
+			input := `{
+				"tokenizer": "whitespace",
+				"filter": [ "stemmer" ],
+				"text": "fox running and jumping"
+			  }`
+			output := `[fox run and jump]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Keyword token filter", func() {
+			input := `{
+				"tokenizer": "whitespace",
+				"filter": [
+				  {
+					"type": "keyword",
+					"keywords": [ "jumping" ]
+				  },
+				  "stemmer"
+				],
+				"text": "fox running and jumping"
+			  }`
+			output := `[fox run and jumping]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Length token filter", func() {
+			input := `{
+				"tokenizer": "whitespace",
+				"filter": [
+				  {
+					"type": "length",
+					"min": 0,
+					"max": 4
+				  }
+				],
+				"text": "the quick brown fox jumps over the lazy dog"
+			  }`
+			output := `[the fox over the lazy dog]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Lowercase token filter", func() {
+			input := `{
+				"tokenizer" : "standard",
+				"filter" : ["lowercase"],
+				"text" : "THE Quick FoX JUMPs"
+			  }`
+			output := `[the quick fox jumps]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Pattern replace token filter", func() {
+			input := `{
+				"tokenizer": "whitespace",
+				"filter": [
+				  {
+					"type": "pattern_replace",
+					"pattern": "(dog)",
+					"replacement": "watch$1"
+				  }
+				],
+				"text": "foxes jump lazy dogs"
+			  }`
+			output := `[foxes jump lazy watchdogs]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Reverse token filter", func() {
+			input := `{
+				"tokenizer" : "standard",
+				"filter" : ["reverse"],
+				"text" : "quick fox jumps"
+			  }`
+			output := `[kciuq xof spmuj]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Shingle token filter", func() {
+			input := `{
+				"tokenizer": "whitespace",
+				"filter": [ "shingle" ],
+				"text": "quick brown fox jumps"
+			  }`
+			output := `[quick brown quick brown fox brown fox jumps fox jumps]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Stop token filter", func() {
+			input := `{
+				"tokenizer": "standard",
+				"filter": [ "stop" ],
+				"text": "a quick fox jumps over the lazy dog"
+			  }`
+			output := `[quick fox jumps lazy dog]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Stop token filter with configuration", func() {
+			input := `{
+				"tokenizer": "standard",
+				"filter": [
+					{
+						"type": "stop",
+						"stopwords": ["a", "the", "dog"]
+					}
+				],
+				"text": "a quick fox jumps over the lazy dog"
+			}`
+			output := `[quick fox jumps over lazy]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Stop token filter with configuration language", func() {
+			input := `{
+				"tokenizer": "standard",
+				"filter": [
+					{
+						"type": "stop",
+						"stopwords": ["_english_"]
+					}
+				],
+				"text": "a quick fox jumps over the lazy dog"
+			  }`
+			output := `[quick fox jumps lazy dog]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Trim token filter", func() {
+			input := `{
+				"tokenizer" : "keyword",
+				"filter" : ["trim"],
+				"text" : " fox "
+			  }`
+			output := `[fox]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Truncate token filter", func() {
+			input := `{
+				"tokenizer" : "whitespace",
+				"filter" : ["truncate"],
+				"text" : "the quinquennial extravaganza carried on"
+			  }`
+			output := `[the quinquenni extravagan carried on]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Unique token filter", func() {
+			input := `{
+				"tokenizer" : "whitespace",
+				"filter" : ["unique"],
+				"text" : "the quick fox jumps the lazy fox"
+			  }`
+			output := `[the quick fox jumps lazy]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Uppercase token filter", func() {
+			input := `{
+				"tokenizer" : "standard",
+				"filter" : ["uppercase"],
+				"text" : "the Quick FoX JUMPs"
+			  }`
+			output := `[THE QUICK FOX JUMPS]`
 
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)

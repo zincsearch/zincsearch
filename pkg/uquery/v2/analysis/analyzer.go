@@ -157,18 +157,18 @@ func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.A
 	switch name {
 	case "standard":
 		return zincanalyzer.NewStandardAnalyzer(nil)
-	case "keyword":
-		return analyzer.NewKeywordAnalyzer(), nil
 	case "simple":
 		return analyzer.NewSimpleAnalyzer(), nil
+	case "keyword":
+		return analyzer.NewKeywordAnalyzer(), nil
 	case "web":
 		return analyzer.NewWebAnalyzer(), nil
 	case "regexp", "pattern":
 		return zincanalyzer.NewRegexpAnalyzer(nil)
-	case "whitespace":
-		return zincanalyzer.NewWhitespaceAnalyzer()
 	case "stop":
 		return zincanalyzer.NewStopAnalyzer(nil)
+	case "whitespace":
+		return zincanalyzer.NewWhitespaceAnalyzer()
 	default:
 		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] doesn't exists", name))
 	}

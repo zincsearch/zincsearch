@@ -22,5 +22,14 @@ func NewDictTokenFilter(options interface{}) (analysis.TokenFilter, error) {
 	minSubWordSize, _ := zutils.GetFloatFromMap(options, "min_sub_word_size")
 	maxSubWordSize, _ := zutils.GetFloatFromMap(options, "max_sub_word_size")
 	onlyLongestMatch, _ := zutils.GetBoolFromMap(options, "only_longest_match")
+	if minWordSize == 0 {
+		minWordSize = 5
+	}
+	if minSubWordSize == 0 {
+		minSubWordSize = 2
+	}
+	if maxSubWordSize == 0 {
+		maxSubWordSize = 15
+	}
 	return token.NewDictionaryCompoundFilter(dict, int(minWordSize), int(minSubWordSize), int(maxSubWordSize), onlyLongestMatch), nil
 }

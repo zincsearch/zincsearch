@@ -21,5 +21,6 @@ func NewMappingCharFilter(options interface{}) (analysis.CharFilter, error) {
 			return nil, errors.New(errors.ErrorTypeRuntimeException, fmt.Sprintf("[char_filter] mapping option [mappings] Invalid Mapping Rule: [%s], should be [old => new]", mapping))
 		}
 	}
+
 	return zincchar.NewMappingCharFilter(mappings), nil
 }

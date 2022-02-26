@@ -99,7 +99,7 @@ func RequestTokenFilterSingle(typ string, options interface{}) (analysis.TokenFi
 		return zinctoken.NewEdgeNgramTokenFilter(options)
 	case "elision":
 		return zinctoken.NewElisionTokenFilter(options)
-	case "keyword":
+	case "keyword", "keyword_marker":
 		return zinctoken.NewKeywordTokenFilter(options)
 	case "length":
 		return zinctoken.NewLengthTokenFilter(options)
@@ -107,12 +107,16 @@ func RequestTokenFilterSingle(typ string, options interface{}) (analysis.TokenFi
 		return token.NewLowerCaseFilter(), nil
 	case "ngram":
 		return zinctoken.NewNgramTokenFilter(options)
-	case "porter":
+	case "porter", "stemmer":
 		return token.NewPorterStemmer(), nil
 	case "reverse":
 		return token.NewReverseFilter(), nil
+	case "regexp", "pattern_replace":
+		return zinctoken.NewRegexpTokenFilter(options)
 	case "shingle":
 		return zinctoken.NewShingleTokenFilter(options)
+	case "trim":
+		return zinctoken.NewTrimTokenFilter()
 	case "stop":
 		return zinctoken.NewStopTokenFilter(options)
 	case "truncate":
@@ -121,6 +125,8 @@ func RequestTokenFilterSingle(typ string, options interface{}) (analysis.TokenFi
 		return zinctoken.NewUnicodenormTokenFilter(options)
 	case "unique":
 		return token.NewUniqueTermFilter(), nil
+	case "upper_case", "uppercase":
+		return zinctoken.NewUpperCaseTokenFilter()
 		// language filters
 	case "ar_normalization", "arabic_normalization":
 		return ar.NormalizeFilter(), nil

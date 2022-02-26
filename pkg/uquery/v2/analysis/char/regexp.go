@@ -16,10 +16,7 @@ func NewRegexpCharFilter(options interface{}) (analysis.CharFilter, error) {
 	if err != nil || pattern == "" {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[char_filter] regexp option [pattern] should be exists")
 	}
-	replacement, err := zutils.GetStringFromMap(options, "replacement")
-	if err != nil || replacement == "" {
-		return nil, errors.New(errors.ErrorTypeParsingException, "[char_filter] regexp option [replacement] should be exists")
-	}
+	replacement, _ := zutils.GetStringFromMap(options, "replacement")
 	r, err := regexp.Compile(pattern)
 	if err != nil {
 		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[char_filter] regexp option [pattern] compile error: %v", err.Error()))

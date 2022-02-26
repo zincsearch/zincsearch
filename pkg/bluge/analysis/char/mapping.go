@@ -24,9 +24,9 @@ func NewMappingCharFilter(mappings []string) *MappingCharFilter {
 	return m
 }
 
-func (s *MappingCharFilter) Filter(input []byte) []byte {
-	for i := 0; i < len(s.old); i++ {
-		input = []byte(bytes.ReplaceAll(input, s.old[i], s.new[i]))
+func (t *MappingCharFilter) Filter(input []byte) []byte {
+	for i := 0; i < len(t.old); i++ {
+		input = []byte(bytes.ReplaceAll(input, t.old[i], t.new[i]))
 	}
 	return input
 }
