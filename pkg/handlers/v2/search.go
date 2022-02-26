@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"math"
 	"net/http"
 	"strings"
 
@@ -39,7 +38,7 @@ func SearchIndex(c *gin.Context) {
 		}
 
 		storageType = index.StorageType
-		indexSize = math.Round(core.Telemetry.GetIndexSize(indexName))
+		indexSize = core.Telemetry.GetIndexSize(indexName)
 		resp, err = index.SearchV2(query)
 	}
 

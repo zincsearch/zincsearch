@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"math"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,8 +32,8 @@ func SearchIndex(c *gin.Context) {
 
 	event_data := make(map[string]interface{})
 	event_data["search_type"] = iQuery.SearchType
-	event_data["search_index_storage"] = core.ZINC_INDEX_LIST[indexName].StorageType
-	event_data["search_index_size_in_mb"] = math.Round(core.Telemetry.GetIndexSize(indexName))
+	event_data["search_index_storage"] = index.StorageType
+	event_data["search_index_size_in_mb"] = core.Telemetry.GetIndexSize(indexName)
 	event_data["time_taken_to_search_in_ms"] = res.Took
 	event_data["aggregations_count"] = len(iQuery.Aggregations)
 	core.Telemetry.Event("search", event_data)

@@ -129,16 +129,10 @@ func (t *telemetry) Event(event string, data map[string]interface{}) {
 		return
 	}
 
-	m, _ := mem.VirtualMemory()
-	props := analytics.NewProperties().
-		Set("index_count", len(ZINC_INDEX_LIST)).
-		Set("total_index_size_mb", t.TotalIndexSize()).
-		Set("memory_used_percent", m.UsedPercent)
-
+	props := analytics.NewProperties()
 	for k, v := range t.baseInfo {
 		props.Set(k, v)
 	}
-
 	for k, v := range data {
 		props.Set(k, v)
 	}
@@ -182,7 +176,12 @@ func (t *telemetry) GetIndexSize(indexName string) float64 {
 }
 
 func (t *telemetry) HeartBeat() {
-	t.Event("heartbeat", nil)
+	m, _ := mem.VirtualMemory()
+	data := make(map[string]interface{})
+	data["index_count"] = len(ZINC_INDEX_LIST)
+	data["total_index_size_mb"] = t.TotalIndexSize()
+	data["memory_used_percent"] = m.UsedPercent
+	t.Event("heartbeat", data)
 }
 
 func (t *telemetry) Cron() {
