@@ -699,15 +699,146 @@ func TestAnalyze(t *testing.T) {
 			// delete index
 			request("DELETE", "/api/index/my-index-001", nil)
 		})
+	})
+
+	Convey("test token filter", t, func() {
+		Convey("Apostrophe token filter", func() {
+			input := `{
+				"tokenizer" : "standard",
+				"filter" : ["apostrophe"],
+				"text" : "Istanbul'a veya Istanbul'dan"
+			  }`
+			output := `[Istanbul veya Istanbul]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
 
 	})
 
-	Convey("test char_filter", t, func() {
+	Convey("test character filter", t, func() {
+		Convey("ASCII folding character filter", func() {
+			input := `{
+				"tokenizer" : "standard",
+				"char_filter" : ["asciifolding"],
+				"text" : "açaí à la carte"
+			  }`
+			output := `[acai a la carte]`
 
-	})
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
 
-	Convey("test token_filter", t, func() {
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
 
+		Convey("HTML strip character filter", func() {
+			input := `{
+				"tokenizer" : "standard",
+				"char_filter" : ["html_strip"],
+				"text": "<p>I'm so <b>happy</b>!</p>"
+			  }`
+			output := `[I'm so happy]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Mapping character filter", func() {
+			input := `{
+				"tokenizer": "keyword",
+				"char_filter": [
+				  {
+					"type": "mapping",
+					"mappings": [
+					  "٠ => 0",
+					  "١ => 1",
+					  "٢ => 2",
+					  "٣ => 3",
+					  "٤ => 4",
+					  "٥ => 5",
+					  "٦ => 6",
+					  "٧ => 7",
+					  "٨ => 8",
+					  "٩ => 9"
+					]
+				  }
+				],
+				"text": "My license plate is ٢٥٠١٥"
+			  }`
+			output := `[My license plate is 25015]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("Pattern replace character filter", func() {
+			index := `{
+				"settings": {
+				  "analysis": {
+					"analyzer": {
+					  "my_analyzer": {
+						"tokenizer": "standard",
+						"char_filter": [
+						  "my_char_filter"
+						]
+					  }
+					},
+					"char_filter": {
+					  "my_char_filter": {
+						"type": "pattern_replace",
+						"pattern": "(\\d+)-",
+						"replacement": "${1}_"
+					  }
+					}
+				  }
+				}
+			  }`
+			input := `{
+				"analyzer": "my_analyzer",
+				"text": "My credit card is 123-456-789"
+			  }`
+			output := `[My credit card is 123_456_789]`
+
+			// create index with custom analyzer
+			body := bytes.NewBuffer(nil)
+			body.WriteString(index)
+			resp := request("PUT", "/api/index/my-index-001", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			// analyze
+			body.Reset()
+			body.WriteString(input)
+			resp = request("POST", "/api/my-index-001/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+
+			// delete index
+			request("DELETE", "/api/index/my-index-001", nil)
+		})
 	})
 }
 

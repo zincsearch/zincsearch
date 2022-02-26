@@ -39,12 +39,22 @@ func RequestCharFilterSlice(data []interface{}) ([]analysis.CharFilter, error) {
 	}
 
 	filters := make([]analysis.CharFilter, 0, len(data))
-	for _, typ := range data {
-		typ, ok := typ.(string)
-		if !ok {
-			return nil, errors.New(errors.ErrorTypeParsingException, "[char_filter] option should be string")
+	for _, options := range data {
+		var err error
+		var filter analysis.CharFilter
+		switch v := options.(type) {
+		case string:
+			filter, err = RequestCharFilterSingle(v, nil)
+		case map[string]interface{}:
+			var typ string
+			typ, err = zutils.GetStringFromMap(options, "type")
+			if err != nil {
+				return nil, errors.New(errors.ErrorTypeParsingException, "[char_filter] option [type] should be exists")
+			}
+			filter, err = RequestCharFilterSingle(typ, options)
+		default:
+			return nil, errors.New(errors.ErrorTypeParsingException, "[char_filter] option should be string or object")
 		}
-		filter, err := RequestCharFilterSingle(typ, nil)
 		if err != nil {
 			return nil, err
 		}

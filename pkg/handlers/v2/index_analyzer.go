@@ -110,47 +110,47 @@ func Analyze(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"tokens": ret})
 }
 
-func parseCharFilter(data interface{}) ([]analysis.CharFilter, error) {
+func parseTokenizer(data interface{}) ([]analysis.Tokenizer, error) {
 	if data == nil {
 		return nil, nil
 	}
 
-	chars := make([]analysis.CharFilter, 0)
+	tokenizers := make([]analysis.Tokenizer, 0)
 	switch v := data.(type) {
 	case string:
-		filter, err := zincanalysis.RequestCharFilterSingle(v, nil)
+		zer, err := zincanalysis.RequestTokenizerSingle(v, nil)
 		if err != nil {
 			return nil, err
 		}
-		chars = append(chars, filter)
+		tokenizers = append(tokenizers, zer)
 	case []interface{}:
-		filters, err := zincanalysis.RequestCharFilterSlice(v)
+		zers, err := zincanalysis.RequestTokenizerSlice(v)
 		if err != nil {
 			return nil, err
 		}
-		chars = append(chars, filters...)
+		tokenizers = append(tokenizers, zers...)
 	case map[string]interface{}:
 		typ, err := zutils.GetStringFromMap(v, "type")
 		if typ != "" && err == nil {
-			filter, err := zincanalysis.RequestCharFilterSingle(typ, v)
+			zer, err := zincanalysis.RequestTokenizerSingle(typ, v)
 			if err != nil {
 				return nil, err
 			}
-			chars = append(chars, filter)
+			tokenizers = append(tokenizers, zer)
 		} else {
-			filters, err := zincanalysis.RequestCharFilter(v)
+			zers, err := zincanalysis.RequestTokenizer(v)
 			if err != nil {
 				return nil, err
 			}
-			for _, filter := range filters {
-				chars = append(chars, filter)
+			for _, zer := range zers {
+				tokenizers = append(tokenizers, zer)
 			}
 		}
 	default:
-		return nil, fmt.Errorf("char_filter unsuported type")
+		return nil, fmt.Errorf("tokenizer unsuported type")
 	}
 
-	return chars, nil
+	return tokenizers, nil
 }
 
 func parseTokenFilter(data interface{}) ([]analysis.TokenFilter, error) {
@@ -196,47 +196,47 @@ func parseTokenFilter(data interface{}) ([]analysis.TokenFilter, error) {
 	return tokens, nil
 }
 
-func parseTokenizer(data interface{}) ([]analysis.Tokenizer, error) {
+func parseCharFilter(data interface{}) ([]analysis.CharFilter, error) {
 	if data == nil {
 		return nil, nil
 	}
 
-	tokenizers := make([]analysis.Tokenizer, 0)
+	chars := make([]analysis.CharFilter, 0)
 	switch v := data.(type) {
 	case string:
-		zer, err := zincanalysis.RequestTokenizerSingle(v, nil)
+		filter, err := zincanalysis.RequestCharFilterSingle(v, nil)
 		if err != nil {
 			return nil, err
 		}
-		tokenizers = append(tokenizers, zer)
+		chars = append(chars, filter)
 	case []interface{}:
-		zers, err := zincanalysis.RequestTokenizerSlice(v)
+		filters, err := zincanalysis.RequestCharFilterSlice(v)
 		if err != nil {
 			return nil, err
 		}
-		tokenizers = append(tokenizers, zers...)
+		chars = append(chars, filters...)
 	case map[string]interface{}:
 		typ, err := zutils.GetStringFromMap(v, "type")
 		if typ != "" && err == nil {
-			zer, err := zincanalysis.RequestTokenizerSingle(typ, v)
+			filter, err := zincanalysis.RequestCharFilterSingle(typ, v)
 			if err != nil {
 				return nil, err
 			}
-			tokenizers = append(tokenizers, zer)
+			chars = append(chars, filter)
 		} else {
-			zers, err := zincanalysis.RequestTokenizer(v)
+			filters, err := zincanalysis.RequestCharFilter(v)
 			if err != nil {
 				return nil, err
 			}
-			for _, zer := range zers {
-				tokenizers = append(tokenizers, zer)
+			for _, filter := range filters {
+				chars = append(chars, filter)
 			}
 		}
 	default:
-		return nil, fmt.Errorf("tokenizer unsuported type")
+		return nil, fmt.Errorf("char_filter unsuported type")
 	}
 
-	return tokenizers, nil
+	return chars, nil
 }
 
 func formatToken(token *analysis.Token) gin.H {

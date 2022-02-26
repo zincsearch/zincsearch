@@ -61,12 +61,22 @@ func RequestTokenFilterSlice(data []interface{}) ([]analysis.TokenFilter, error)
 	}
 
 	filters := make([]analysis.TokenFilter, 0, len(data))
-	for _, typ := range data {
-		typ, ok := typ.(string)
-		if !ok {
-			return nil, errors.New(errors.ErrorTypeParsingException, "[token_filter] option should be string")
+	for _, options := range data {
+		var err error
+		var filter analysis.TokenFilter
+		switch v := options.(type) {
+		case string:
+			filter, err = RequestTokenFilterSingle(v, nil)
+		case map[string]interface{}:
+			var typ string
+			typ, err = zutils.GetStringFromMap(options, "type")
+			if err != nil {
+				return nil, errors.New(errors.ErrorTypeParsingException, "[token_filter] option [type] should be exists")
+			}
+			filter, err = RequestTokenFilterSingle(typ, options)
+		default:
+			return nil, errors.New(errors.ErrorTypeParsingException, "[token_filter] option should be string or object")
 		}
-		filter, err := RequestTokenFilterSingle(typ, nil)
 		if err != nil {
 			return nil, err
 		}
