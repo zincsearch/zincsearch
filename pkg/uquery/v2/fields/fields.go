@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
@@ -29,12 +30,12 @@ func Request(v []interface{}) ([]*meta.Field, error) {
 				case "format":
 					f.Format = v.(string)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[fields] unknown field [%s]", k))
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[fields] unknown field [%s]", k))
 				}
 			}
 			fields = append(fields, f)
 		default:
-			return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[fields] value should be string or object")
+			return nil, errors.New(errors.ErrorTypeXContentParseException, "[fields] value should be string or object")
 
 		}
 	}

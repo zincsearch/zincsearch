@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
 	"github.com/rs/zerolog/log"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
@@ -15,13 +16,15 @@ import (
 
 func MultiSearchV2(indexName string, query *meta.ZincQuery) (*meta.SearchResponse, error) {
 	var mappings *meta.Mappings
+	var analyzers map[string]*analysis.Analyzer
 	var readers []*bluge.Reader
-	for name, value := range ZINC_INDEX_LIST {
+	for name, index := range ZINC_INDEX_LIST {
 		if indexName == "" || (indexName != "" && strings.HasPrefix(name, indexName[:len(indexName)-1])) {
-			reader, _ := value.Writer.Reader()
+			reader, _ := index.Writer.Reader()
 			readers = append(readers, reader)
 			if mappings == nil {
-				mappings, _ = value.GetStoredMapping()
+				mappings = index.CachedMappings
+				analyzers = index.CachedAnalyzers
 			}
 		}
 	}
@@ -30,7 +33,7 @@ func MultiSearchV2(indexName string, query *meta.ZincQuery) (*meta.SearchRespons
 		return nil, fmt.Errorf("core.MultiSearchV2: error accessing reader: no index found")
 	}
 
-	searchRequest, err := parser.ParseQueryDSL(query, mappings)
+	searchRequest, err := parser.ParseQueryDSL(query, mappings, analyzers)
 	if err != nil {
 		return nil, err
 	}

@@ -119,7 +119,7 @@ func TestApiStandard(t *testing.T) {
 				body.WriteString(fmt.Sprintf(`{"name":"%s","storage_type":"disk"}`, "newindex"))
 				resp := request("PUT", "/api/index", body)
 				So(resp.Code, ShouldEqual, http.StatusOK)
-				So(resp.Body.String(), ShouldEqual, `{"message":"index newindex created","storage_type":"disk"}`)
+				So(resp.Body.String(), ShouldEqual, `{"index":"newindex","message":"index created","storage_type":"disk"}`)
 			})
 			Convey("create index with error input", func() {
 				body := bytes.NewBuffer(nil)
@@ -225,7 +225,12 @@ func TestApiStandard(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`{"name": "` + indexName + `", "storage_type": "disk"}`)
 				resp := request("PUT", "/api/index", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				So(resp.Code, ShouldEqual, http.StatusBadRequest)
+
+				respData := make(map[string]string)
+				err := json.Unmarshal(resp.Body.Bytes(), &respData)
+				So(err, ShouldBeNil)
+				So(respData["error"], ShouldEqual, "index ["+indexName+"] already exists")
 
 				// check bulk
 				body.Reset()

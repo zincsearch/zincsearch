@@ -1,4 +1,4 @@
-package v2
+package errors
 
 import "fmt"
 
@@ -7,6 +7,7 @@ const (
 	ErrorTypeXContentParseException   = "x_content_parse_exception"
 	ErrorTypeIllegalArgumentException = "illegal_argument_exception"
 	ErrorTypeNotImplemented           = "not_implemented"
+	ErrorTypeRuntimeException         = "runtime_exception"
 )
 
 type Error struct {
@@ -15,7 +16,7 @@ type Error struct {
 	CausedBy error  `json:"caused_by,omitempty"`
 }
 
-func NewError(errType string, errReason string) *Error {
+func New(errType string, errReason string) *Error {
 	return &Error{Type: errType, Reason: errReason}
 }
 

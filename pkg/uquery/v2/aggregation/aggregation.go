@@ -7,13 +7,14 @@ import (
 	"github.com/blugelabs/bluge/search"
 	"github.com/blugelabs/bluge/search/aggregations"
 
-	"github.com/prabhatsharma/zinc/pkg/aggregationx"
+	zincaggregation "github.com/prabhatsharma/zinc/pkg/bluge/aggregation"
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/startup"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
-func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregations, mappings *meta.Mappings) error {
+func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggregations, mappings *meta.Mappings) error {
 	if len(aggs) == 0 {
 		return nil // not need aggregation
 	}
@@ -41,15 +42,15 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 			if agg.Terms.Size == 0 {
 				agg.Terms.Size = startup.LoadAggregationTermsSize()
 			}
-			var subreq *aggregationx.TermsAggregation
+			var subreq *zincaggregation.TermsAggregation
 			switch mappings.Properties[agg.Terms.Field].Type {
 			case "text", "keyword":
-				subreq = aggregationx.NewTermsAggregation(search.Field(agg.Terms.Field), aggregationx.TextValueSource, agg.Terms.Size)
+				subreq = zincaggregation.NewTermsAggregation(search.Field(agg.Terms.Field), zincaggregation.TextValueSource, agg.Terms.Size)
 			case "numeric":
-				subreq = aggregationx.NewTermsAggregation(search.Field(agg.Terms.Field), aggregationx.NumericValueSource, agg.Terms.Size)
+				subreq = zincaggregation.NewTermsAggregation(search.Field(agg.Terms.Field), zincaggregation.NumericValueSource, agg.Terms.Size)
 			default:
-				return meta.NewError(
-					meta.ErrorTypeParsingException,
+				return errors.New(
+					errors.ErrorTypeParsingException,
 					fmt.Sprintf("[terms] aggregation doesn't support values of type: [%s:[%v]]", agg.Terms.Field, mappings.Properties[agg.Terms.Field].Type),
 				)
 			}
@@ -61,7 +62,7 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 			req.AddAggregation(name, subreq)
 		case agg.Range != nil:
 			if len(agg.Range.Ranges) == 0 {
-				return meta.NewError(meta.ErrorTypeParsingException, "[range] aggregation needs ranges")
+				return errors.New(errors.ErrorTypeParsingException, "[range] aggregation needs ranges")
 			}
 			var subreq *aggregations.RangeAggregation
 			switch mappings.Properties[agg.Range.Field].Type {
@@ -72,11 +73,11 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 				}
 				req.AddAggregation(name, subreq)
 			default:
-				return meta.NewError(meta.ErrorTypeParsingException, "[range] aggregation only support type numeric")
+				return errors.New(errors.ErrorTypeParsingException, "[range] aggregation only support type numeric")
 			}
 		case agg.DateRange != nil:
 			if len(agg.DateRange.Ranges) == 0 {
-				return meta.NewError(meta.ErrorTypeParsingException, "[date_range] aggregation needs ranges")
+				return errors.New(errors.ErrorTypeParsingException, "[date_range] aggregation needs ranges")
 			}
 			var subreq *aggregations.DateRangeAggregation
 			format := time.RFC3339
@@ -92,7 +93,7 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 			if agg.DateRange.TimeZone != "" {
 				timeZone, err = zutils.ParseTimeZone(agg.DateRange.TimeZone)
 				if err != nil {
-					return meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[date_range] time_zone parse err %v", err))
+					return errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[date_range] time_zone parse err %v", err))
 				}
 			}
 			switch mappings.Properties[agg.DateRange.Field].Type {
@@ -104,27 +105,27 @@ func Request(req aggregationx.SearchAggregation, aggs map[string]meta.Aggregatio
 					if v.From != "" {
 						from, err = time.ParseInLocation(format, v.From, timeZone)
 						if err != nil {
-							return meta.NewError(meta.ErrorTypeIllegalArgumentException, "[date_range] range value from parse error "+err.Error())
+							return errors.New(errors.ErrorTypeIllegalArgumentException, "[date_range] range value from parse error "+err.Error())
 						}
 					}
 					if v.To != "" {
 						to, err = time.ParseInLocation(format, v.To, timeZone)
 						if err != nil {
-							return meta.NewError(meta.ErrorTypeIllegalArgumentException, "[date_range] range value to parse error "+err.Error())
+							return errors.New(errors.ErrorTypeIllegalArgumentException, "[date_range] range value to parse error "+err.Error())
 						}
 					}
 					subreq.AddRange(aggregations.NewDateRange(from, to))
 				}
 				req.AddAggregation(name, subreq)
 			default:
-				return meta.NewError(meta.ErrorTypeParsingException, "[date_range] aggregation only support type datetime")
+				return errors.New(errors.ErrorTypeParsingException, "[date_range] aggregation only support type datetime")
 			}
 		case agg.IPRange != nil:
-			return meta.NewError(meta.ErrorTypeNotImplemented, "[ip_range] aggregation doesn't support")
+			return errors.New(errors.ErrorTypeNotImplemented, "[ip_range] aggregation doesn't support")
 		case agg.Histogram != nil:
-			return meta.NewError(meta.ErrorTypeNotImplemented, "[histogram] aggregation doesn't support")
+			return errors.New(errors.ErrorTypeNotImplemented, "[histogram] aggregation doesn't support")
 		case agg.DateHistogram != nil:
-			return meta.NewError(meta.ErrorTypeNotImplemented, "[date_histogram] aggregation doesn't support")
+			return errors.New(errors.ErrorTypeNotImplemented, "[date_histogram] aggregation doesn't support")
 		default:
 			// nothing
 		}
@@ -161,7 +162,7 @@ func Response(bucket *search.Bucket) (map[string]meta.AggregationResponse, error
 			aggResp.Buckets = aggRespBuckets
 			resp[name] = aggResp
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[%s:%T] aggregation doesn't support", name, v))
+			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[%s:%T] aggregation doesn't support", name, v))
 		}
 	}
 

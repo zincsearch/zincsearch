@@ -6,13 +6,12 @@ import (
 	"strings"
 
 	"github.com/blugelabs/bluge"
-
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/prabhatsharma/zinc/pkg/errors"
 )
 
 func TermsQuery(query map[string]interface{}) (bluge.Query, error) {
 	if len(query) > 2 {
-		return nil, meta.NewError(meta.ErrorTypeParsingException, "[terms] query doesn't support multiple fields")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[terms] query doesn't support multiple fields")
 	}
 
 	field := ""
@@ -44,11 +43,11 @@ func TermsQuery(query map[string]interface{}) (bluge.Query, error) {
 				case bool:
 					valueBools = append(valueBools, vvv)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", vv))
+					return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", vv))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[terms] doesn't support values of type: %T", v))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[terms] doesn't support values of type: %T", v))
 		}
 	}
 

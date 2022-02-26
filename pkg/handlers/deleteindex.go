@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/blugelabs/bluge"
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -20,7 +19,7 @@ import (
 
 // DeleteIndex deletes a zinc index and its associated data. Be careful using thus as you ca't undo this action.
 func DeleteIndex(c *gin.Context) {
-	indexName := c.Param("indexName")
+	indexName := c.Param("target")
 
 	// 0. Check if index exists and Get the index storage type - disk, s3 or memory
 	index, exists := core.GetIndex(indexName)
@@ -36,49 +35,41 @@ func DeleteIndex(c *gin.Context) {
 	delete(core.ZINC_INDEX_LIST, index.Name)
 
 	// 3. Physically delete the index
-	deleteIndexMapping := false
 	if index.StorageType == "disk" {
 		dataPath := zutils.GetEnv("ZINC_DATA_PATH", "./data")
 		err := os.RemoveAll(dataPath + "/" + index.Name)
 		if err != nil {
+			log.Error().Msgf("failed to delete index: %s", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
-		} else {
-			deleteIndexMapping = true
 		}
 	} else if index.StorageType == "s3" {
 		err := deleteFilesForIndexFromS3(index.Name)
 		if err != nil {
+			log.Error().Msgf("failed to delete index: %s", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			log.Print("failed to delete index: ", err.Error())
-		} else {
-			deleteIndexMapping = true
+			return
 		}
 	} else if index.StorageType == "minio" {
 		err := deleteFilesForIndexFromMinIO(index.Name)
 		if err != nil {
+			log.Error().Msgf("failed to delete index: %s", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			log.Print("failed to delete index: ", err.Error())
-		} else {
-			deleteIndexMapping = true
+			return
 		}
 	}
 
-	if deleteIndexMapping {
-		// 4. Delete the index mapping
-		bdoc := bluge.NewDocument(index.Name)
-		err := core.ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Writer.Delete(bdoc.ID())
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		} else {
-			c.JSON(http.StatusOK, gin.H{
-				"message": "Deleted",
-				"index":   index.Name,
-				"storage": index.StorageType,
-			})
-		}
+	// delete meta
+	if err := core.DeleteIndex(index.Name); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "deleted",
+		"index":   index.Name,
+		"storage": index.StorageType,
+	})
 }
 
 func deleteFilesForIndexFromMinIO(indexName string) error {

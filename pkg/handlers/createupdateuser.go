@@ -9,7 +9,11 @@ import (
 
 func CreateUpdateUser(c *gin.Context) {
 	var user auth.ZincUser
-	c.BindJSON(&user)
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	if user.ID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "user.id should be not empty"})
 		return

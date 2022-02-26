@@ -10,7 +10,10 @@ import (
 
 func ValidateCredentials(c *gin.Context) {
 	var user auth.ZincUser
-	c.BindJSON(&user)
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	loggedInUser, validationResult := auth.VerifyCredentials(user.ID, user.Password)
 	c.JSON(http.StatusOK, gin.H{

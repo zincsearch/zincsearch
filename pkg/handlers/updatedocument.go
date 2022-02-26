@@ -15,7 +15,10 @@ func UpdateDocument(c *gin.Context) {
 	query_id := c.Param("id") // ID for the document to be updated provided in URL path
 
 	var doc map[string]interface{}
-	c.BindJSON(&doc)
+	if err := c.BindJSON(&doc); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	docID := ""
 	mintedID := false
@@ -35,26 +38,22 @@ func UpdateDocument(c *gin.Context) {
 	// If the index does not exist, then create it
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		index, err = core.NewIndex(indexName, "disk") // Create a new index with disk storage as default
+		index, err = core.NewIndex(indexName, "disk", core.UseNewIndexMeta) // Create a new index with disk storage as default
 		if err != nil {
 			log.Print(err)
-			c.JSON(http.StatusInternalServerError, err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		core.ZINC_INDEX_LIST[indexName] = index
-
-		// use template
-		template, _ := core.UseTemplate(indexName)
-		if template != nil && template.Template.Mappings != nil {
-			index.SetMappings(template.Template.Mappings)
-		}
+		// store index
+		core.StoreIndex(index)
 	}
 
 	// doc, _ = flatten.Flatten(doc, "", flatten.DotStyle)
 	err = index.UpdateDocument(docID, &doc, mintedID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-	} else {
-		c.JSON(http.StatusOK, gin.H{"id": docID})
+		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{"id": docID})
 }

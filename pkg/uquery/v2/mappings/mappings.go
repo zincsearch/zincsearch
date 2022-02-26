@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
@@ -13,29 +14,28 @@ func Request(data map[string]interface{}) (*meta.Mappings, error) {
 	}
 
 	if data["properties"] == nil {
-		return nil, meta.NewError(meta.ErrorTypeParsingException, "[mappings] properties should be defined")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[mappings] properties should be defined")
 
 	}
 
 	properties, ok := data["properties"].(map[string]interface{})
 	if !ok {
-		return nil, meta.NewError(meta.ErrorTypeParsingException, "[mappings] properties should be an object")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[mappings] properties should be an object")
 	}
 
-	mappings := new(meta.Mappings)
-	mappings.Properties = make(map[string]meta.Property)
+	mappings := meta.NewMappings()
 	for field, prop := range properties {
 		prop, ok := prop.(map[string]interface{})
 		if !ok {
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be an object", field))
+			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be an object", field))
 		}
 		propType, ok := prop["type"]
 		if !ok {
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be exists", "type"))
+			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be exists", "type"))
 		}
 		propTypeStr, ok := propType.(string)
 		if !ok {
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be an string", "type"))
+			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be an string", "type"))
 		}
 
 		var newProp meta.Property
@@ -52,7 +52,7 @@ func Request(data map[string]interface{}) (*meta.Mappings, error) {
 		case "flattened", "object", "match_only_text":
 			// ignore
 		default:
-			return nil, fmt.Errorf("[mappings] properties [%s] doesn't support type [%s]", field, propTypeStr)
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[mappings] properties [%s] doesn't support type [%s]", field, propTypeStr))
 		}
 
 		for k, v := range prop {
@@ -77,7 +77,7 @@ func Request(data map[string]interface{}) (*meta.Mappings, error) {
 				newProp.Highlightable = v.(bool)
 			default:
 				// ignore unknown options
-				// return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] unknown option [%s]", field, k))
+				// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] unknown option [%s]", field, k))
 			}
 		}
 

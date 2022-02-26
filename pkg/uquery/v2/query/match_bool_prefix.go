@@ -5,14 +5,17 @@ import (
 	"strings"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/analyzer"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 )
 
-func MatchBoolPrefixQuery(query map[string]interface{}) (bluge.Query, error) {
+func MatchBoolPrefixQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
 	if len(query) > 1 {
-		return nil, meta.NewError(meta.ErrorTypeParsingException, "[match_bool_prefix] query doesn't support multiple fields")
+		return nil, errors.New(errors.ErrorTypeParsingException, "[match_bool_prefix] query doesn't support multiple fields")
 	}
 
 	field := ""
@@ -31,23 +34,32 @@ func MatchBoolPrefixQuery(query map[string]interface{}) (bluge.Query, error) {
 				case "analyzer":
 					value.Analyzer = v.(string)
 				default:
-					return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[match_bool_prefix] unknown field [%s]", k))
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[match_bool_prefix] unknown field [%s]", k))
 				}
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[match_bool_prefix] %s doesn't support values of type: %T", k, v))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[match_bool_prefix] %s doesn't support values of type: %T", k, v))
 		}
 	}
 
-	// TODO support analyzer
-	zer := analyzer.NewStandardAnalyzer()
+	var err error
+	var zer *analysis.Analyzer
 	if value.Analyzer != "" {
-		switch value.Analyzer {
-		case "standard":
-			zer = analyzer.NewStandardAnalyzer()
-		default:
-			// TODO: support analyzer
+		zer, err = zincanalysis.QueryAnalyzer(analyzers, value.Analyzer)
+		if err != nil {
+			return nil, err
 		}
+	} else {
+		indexZer, searchZer := zincanalysis.QueryAnalyzerForField(analyzers, mappings, field)
+		if zer == nil && searchZer != nil {
+			zer = searchZer
+		}
+		if zer == nil && indexZer != nil {
+			zer = indexZer
+		}
+	}
+	if zer == nil {
+		zer = analyzer.NewStandardAnalyzer()
 	}
 
 	tokens := zer.Analyze([]byte(value.Query))

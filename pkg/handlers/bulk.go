@@ -113,17 +113,12 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (*BulkResponse, error)
 
 			_, exists := core.GetIndex(indexName)
 			if !exists { // If the requested indexName does not exist then create it
-				newIndex, err := core.NewIndex(indexName, "disk")
+				newIndex, err := core.NewIndex(indexName, "disk", core.UseNewIndexMeta)
 				if err != nil {
 					return bulkRes, err
 				}
-				core.ZINC_INDEX_LIST[indexName] = newIndex // Load the index in memory
-
-				// use template
-				template, _ := core.UseTemplate(indexName)
-				if template != nil && template.Template.Mappings != nil {
-					newIndex.SetMappings(template.Template.Mappings)
-				}
+				// store index
+				core.StoreIndex(newIndex)
 			}
 
 			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(docID, &doc)
@@ -231,7 +226,7 @@ func DoesExistInThisRequest(slice []string, val string) int {
 func NewBulkResponseItem(seqNo int, index, id, result string, err error) *BulkResponseItem {
 	return &BulkResponseItem{
 		Index:   index,
-		Type:    index,
+		Type:    "_doc",
 		ID:      id,
 		Version: 1,
 		Result:  result,
