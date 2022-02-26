@@ -346,7 +346,7 @@ func TestAnalyze(t *testing.T) {
 			So(tokens, ShouldEqual, output)
 		})
 
-		Convey("N-Gram tokenizer", func() {
+		Convey("ngram tokenizer", func() {
 			input := `{
 				"tokenizer": "ngram",
 				"text": "Quick Fox"
@@ -363,7 +363,7 @@ func TestAnalyze(t *testing.T) {
 			So(tokens, ShouldEqual, output)
 		})
 
-		Convey("N-Gram tokenizer with configuration", func() {
+		Convey("ngram tokenizer with configuration", func() {
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -410,6 +410,296 @@ func TestAnalyze(t *testing.T) {
 			// delete index
 			request("DELETE", "/api/index/my-index-001", nil)
 		})
+
+		Convey("edge_ngram tokenizer", func() {
+			input := `{
+				"tokenizer": "edge_ngram",
+				"text": "Quick Fox"
+			  }`
+			output := `[Q Qu]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("edge_ngram tokenizer with configuration", func() {
+			index := `{
+				"settings": {
+				  "analysis": {
+					"analyzer": {
+					  "my_analyzer": {
+						"tokenizer": "my_tokenizer"
+					  }
+					},
+					"tokenizer": {
+					  "my_tokenizer": {
+						"type": "edge_ngram",
+						"min_gram": 2,
+						"max_gram": 10,
+						"token_chars": [
+						  "letter",
+						  "digit"
+						]
+					  }
+					}
+				  }
+				}
+			  }`
+			input := `{
+				"analyzer": "my_analyzer",
+				"text": "2 Quick Foxes."
+			  }`
+			output := `[Qu Qui Quic Quick Fo Fox Foxe Foxes]`
+
+			// create index with custom analyzer
+			body := bytes.NewBuffer(nil)
+			body.WriteString(index)
+			resp := request("PUT", "/api/index/my-index-001", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			// analyze
+			body.Reset()
+			body.WriteString(input)
+			resp = request("POST", "/api/my-index-001/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+
+			// delete index
+			request("DELETE", "/api/index/my-index-001", nil)
+		})
+
+		Convey("keyword tokenizer", func() {
+			input := `{
+				"tokenizer": "keyword",
+				"text": "New York"
+			  }`
+			output := `[New York]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("keyword tokenizer with filters", func() {
+			input := `{
+				"tokenizer": "keyword",
+				"token_filter": [ "lowercase" ],
+				"text": "john.SMITH@example.COM"
+			  }`
+			output := `[john.smith@example.com]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("regexp tokenizer", func() {
+			input := `{
+				"tokenizer": "regexp",
+				"text": "The foo_bar_size's default is 5."
+			  }`
+			output := `[The foo_bar_size s default is 5]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("regexp tokenizer with configuration example1", func() {
+			index := `{
+				"settings": {
+				  "analysis": {
+					"analyzer": {
+					  "my_analyzer": {
+						"tokenizer": "my_tokenizer"
+					  }
+					},
+					"tokenizer": {
+					  "my_tokenizer": {
+						"type": "pattern",
+						"pattern": "[^,]+"
+					  }
+					}
+				  }
+				}
+			  }`
+			input := `{
+				"analyzer": "my_analyzer",
+				"text": "comma,separated,values"
+			  }`
+			output := `[comma separated values]`
+
+			// create index with custom analyzer
+			body := bytes.NewBuffer(nil)
+			body.WriteString(index)
+			resp := request("PUT", "/api/index/my-index-001", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			// analyze
+			body.Reset()
+			body.WriteString(input)
+			resp = request("POST", "/api/my-index-001/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+
+			// delete index
+			request("DELETE", "/api/index/my-index-001", nil)
+		})
+
+		Convey("regexp tokenizer with configuration example2", func() {
+			index := `{
+				"settings": {
+				  "analysis": {
+					"analyzer": {
+					  "my_analyzer": {
+						"tokenizer": "my_tokenizer"
+					  }
+					},
+					"tokenizer": {
+					  "my_tokenizer": {
+						"type": "pattern",
+						"pattern": "((?:\\\\\"|[^\", ])+)"
+					  }
+					}
+				  }
+				}
+			  }`
+			input := `{
+				"analyzer": "my_analyzer",
+				"text": "\"value\", \"value with embedded \\\" quote\""
+			  }`
+			output := `[value value with embedded \" quote]`
+
+			// create index with custom analyzer
+			body := bytes.NewBuffer(nil)
+			body.WriteString(index)
+			resp := request("PUT", "/api/index/my-index-001", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			// analyze
+			body.Reset()
+			body.WriteString(input)
+			resp = request("POST", "/api/my-index-001/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+
+			// delete index
+			request("DELETE", "/api/index/my-index-001", nil)
+		})
+
+		Convey("char_group tokenizer", func() {
+			input := `{
+				"tokenizer": {
+				  "type": "char_group",
+				  "tokenize_on_chars": [
+					"whitespace",
+					"-",
+					"\n"
+				  ]
+				},
+				"text": "The QUICK brown-fox"
+			  }`
+			output := `[The QUICK brown fox]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("path_hierarchy tokenizer", func() {
+			input := `{
+				"tokenizer": "path_hierarchy",
+				"text": "/one/two/three"
+			  }`
+			output := `[/one /one/two /one/two/three]`
+
+			body := bytes.NewBuffer(nil)
+			body.WriteString(input)
+			resp := request("POST", "/api/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+		})
+
+		Convey("path_hierarchy tokenizer with configuration", func() {
+			index := `{
+				"settings": {
+				  "analysis": {
+					"analyzer": {
+					  "my_analyzer": {
+						"tokenizer": "my_tokenizer"
+					  }
+					},
+					"tokenizer": {
+					  "my_tokenizer": {
+						"type": "path_hierarchy",
+						"delimiter": "-",
+						"replacement": "/",
+						"skip": 2
+					  }
+					}
+				  }
+				}
+			  }`
+			input := `{
+				"analyzer": "my_analyzer",
+				"text": "one-two-three-four-five"
+			  }`
+			output := `[/three /three/four /three/four/five]`
+
+			// create index with custom analyzer
+			body := bytes.NewBuffer(nil)
+			body.WriteString(index)
+			resp := request("PUT", "/api/index/my-index-001", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+
+			// analyze
+			body.Reset()
+			body.WriteString(input)
+			resp = request("POST", "/api/my-index-001/_analyze", body)
+			So(resp.Code, ShouldEqual, http.StatusOK)
+			tokens, err := getTokenStrings(resp.Body.Bytes())
+			So(err, ShouldBeNil)
+			So(tokens, ShouldEqual, output)
+
+			// delete index
+			request("DELETE", "/api/index/my-index-001", nil)
+		})
+
 	})
 
 	Convey("test char_filter", t, func() {

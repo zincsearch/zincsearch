@@ -11,6 +11,7 @@ import (
 func NewEdgeNgramTokenizer(options interface{}) (analysis.Tokenizer, error) {
 	min, _ := zutils.GetFloatFromMap(options, "min_gram")
 	max, _ := zutils.GetFloatFromMap(options, "max_gram")
+	tokenChars, _ := zutils.GetStringSliceFromMap(options, "token_chars")
 	if min == 0 {
 		min = 1
 	}
@@ -20,5 +21,5 @@ func NewEdgeNgramTokenizer(options interface{}) (analysis.Tokenizer, error) {
 	if min > max {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[tokenizer] edge_ngram option [min_gram] should be not greater than [max_gram]")
 	}
-	return zinctokenizer.NewEdgeNgramTokenizer(int(min), int(max)), nil
+	return zinctokenizer.NewEdgeNgramTokenizer(int(min), int(max), tokenChars), nil
 }
