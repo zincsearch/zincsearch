@@ -16,16 +16,19 @@ const (
 )
 
 func Load() {
-	log.Print("Loading plugin... from disk")
+	log.Info().Msg("Loading plugin...")
 
 	dataPath := zutils.GetEnv("ZINC_PLUGIN_PATH", "./plugin")
 	files, err := os.ReadDir(dataPath)
 	if err != nil {
-		log.Error().Msgf("Error reading plugin directory: " + err.Error())
+		if !os.IsNotExist(err) {
+			log.Error().Msgf("Error reading plugin directory: " + err.Error())
+		}
 		return
 	}
 
 	for _, f := range files {
+		log.Info().Msg("Loading plugin: " + f.Name())
 		p, err := plugin.Open(dataPath + "/" + f.Name())
 		if err != nil {
 			log.Fatal().Msgf("Error loading plugin: %s, err %v", dataPath+"/"+f.Name(), err)

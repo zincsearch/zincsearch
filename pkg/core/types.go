@@ -19,14 +19,14 @@ var ZINC_INDEX_LIST map[string]*Index
 var ZINC_SYSTEM_INDEX_LIST map[string]*Index
 
 func init() {
+	// need load plugin before load index
+	plugin.Load()
+
 	var err error
 	ZINC_SYSTEM_INDEX_LIST, err = LoadZincSystemIndexes()
 	if err != nil {
 		log.Fatal().Msgf("Error loading system index: %s", err.Error())
 	}
-
-	// need load plugin before load index
-	plugin.Load()
 
 	ZINC_INDEX_LIST, _ = LoadZincIndexesFromMeta()
 	if err != nil {
