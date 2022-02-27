@@ -5,13 +5,16 @@ import (
 	"strings"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/analyzer"
 	querystr "github.com/blugelabs/query_string"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 )
 
-func QueryStringQuery(query map[string]interface{}) (bluge.Query, error) {
+func QueryStringQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
 	value := new(meta.QueryStringQuery)
 	for k, v := range query {
 		k := strings.ToLower(k)
@@ -33,7 +36,7 @@ func QueryStringQuery(query map[string]interface{}) (bluge.Query, error) {
 		case "boost":
 			value.Boost = v.(float64)
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[query_string] unsupported children %s", k))
+			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[query_string] unsupported children %s", k))
 		}
 	}
 
@@ -42,15 +45,12 @@ func QueryStringQuery(query map[string]interface{}) (bluge.Query, error) {
 	// TODO default_operator
 	// TODO boost
 
-	// TODO support analyzer
-	zer := analyzer.NewStandardAnalyzer()
+	var zer *analysis.Analyzer
 	if value.Analyzer != "" {
-		switch value.Analyzer {
-		case "standard":
-			zer = analyzer.NewStandardAnalyzer()
-		default:
-			// TODO: support analyzer
-		}
+		zer, _ = zincanalysis.QueryAnalyzer(analyzers, value.Analyzer)
+	}
+	if zer == nil {
+		zer = analyzer.NewStandardAnalyzer()
 	}
 
 	options := querystr.DefaultOptions()

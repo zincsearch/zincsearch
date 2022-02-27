@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/index"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/mappings"
@@ -15,7 +16,7 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 	}
 
 	if data["template"] == nil {
-		return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] template should be defined")
+		return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] template should be defined")
 	}
 
 	template := new(meta.Template)
@@ -25,7 +26,7 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 		case "index_patterns":
 			patterns, ok := v.([]interface{})
 			if !ok {
-				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] index_patterns value should be an array of strings")
+				return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] index_patterns value should be an array of string")
 			}
 			for _, pattern := range patterns {
 				template.IndexPatterns = append(template.IndexPatterns, pattern.(string))
@@ -33,7 +34,7 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 		case "priority":
 			priority, ok := v.(float64)
 			if !ok {
-				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] priority value should be a numberic")
+				return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] priority value should be a numberic")
 			}
 			template.Priority = int(priority)
 		case "template":
@@ -56,7 +57,7 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 					case "mappings":
 						v, ok := v.(map[string]interface{})
 						if !ok {
-							return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] mappings value should be an object")
+							return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] mappings value should be an object")
 						}
 						mappings, err := mappings.Request(v)
 						if err != nil {
@@ -68,19 +69,19 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 					case "alias":
 						// TODO: implement
 					default:
-						return nil, meta.NewError(meta.ErrorTypeXContentParseException, fmt.Sprintf("[template] template unknown option [%s]", k))
+						return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[template] template unknown option [%s]", k))
 					}
 				}
 			default:
-				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] template value should be an object")
+				return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] template value should be an object")
 			}
 		default:
-			return nil, meta.NewError(meta.ErrorTypeParsingException, fmt.Sprintf("[template] unknown option [%s]", k))
+			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[template] unknown option [%s]", k))
 		}
 	}
 
 	if len(template.IndexPatterns) == 0 {
-		return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[template] index_patterns should be defined")
+		return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] index_patterns should be defined")
 	}
 
 	return template, nil

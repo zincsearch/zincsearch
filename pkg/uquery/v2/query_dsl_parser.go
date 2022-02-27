@@ -4,8 +4,10 @@ import (
 	"fmt"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/search"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	"github.com/prabhatsharma/zinc/pkg/startup"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/aggregation"
@@ -17,7 +19,7 @@ import (
 )
 
 // ParseQueryDSL parse query DSL and return searchRequest
-func ParseQueryDSL(q *meta.ZincQuery, mappings *meta.Mappings) (bluge.SearchRequest, error) {
+func ParseQueryDSL(q *meta.ZincQuery, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.SearchRequest, error) {
 	// parse size
 	if q.Size == 0 {
 		q.Size = 10
@@ -27,12 +29,12 @@ func ParseQueryDSL(q *meta.ZincQuery, mappings *meta.Mappings) (bluge.SearchRequ
 	}
 
 	// parse query
-	query, err := query.Query(q.Query, mappings)
+	query, err := query.Query(q.Query, mappings, analyzers)
 	if err != nil {
 		return nil, err
 	}
 	if query == nil {
-		return nil, meta.NewError(meta.ErrorTypeNotImplemented, fmt.Sprintf("[%s] query doesn't support", q.Query))
+		return nil, errors.New(errors.ErrorTypeNotImplemented, fmt.Sprintf("[%s] query doesn't support", q.Query))
 	}
 
 	// create search request

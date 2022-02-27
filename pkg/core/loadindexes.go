@@ -2,32 +2,96 @@ package core
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/blugelabs/bluge"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
 
+	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
-var systemIndexList = []string{"_index_mapping", "_index_template", "_metadata", "_users"}
+var systemIndexList = []string{"_index_mapping", "_index_template", "_index", "_metadata", "_users"}
 
 func LoadZincSystemIndexes() (map[string]*Index, error) {
-	log.Print("Loading system indexes...")
-
 	indexList := make(map[string]*Index)
-	for _, systemIndex := range systemIndexList {
-		tempIndex, err := NewIndex(systemIndex, "disk")
+	for _, index := range systemIndexList {
+		log.Info().Msgf("Loading system index... [%s:%s]", index, "disk")
+		writer, err := LoadIndexWriter(index, "disk")
 		if err != nil {
-			log.Print("Error loading system index: ", systemIndex, " : ", err.Error())
 			return nil, err
 		}
-		indexList[systemIndex] = tempIndex
-		indexList[systemIndex].IndexType = "system"
-		log.Print("Index loaded: " + systemIndex)
+		indexList[index] = &Index{
+			Name:        index,
+			IndexType:   "system",
+			StorageType: "disk",
+			Writer:      writer,
+		}
+	}
+
+	return indexList, nil
+}
+
+func LoadZincIndexesFromMeta() (map[string]*Index, error) {
+	query := bluge.NewMatchAllQuery()
+	searchRequest := bluge.NewAllMatches(query).WithStandardAggregations()
+	reader, _ := ZINC_SYSTEM_INDEX_LIST["_index"].Writer.Reader()
+	defer reader.Close()
+
+	dmi, err := reader.Search(context.Background(), searchRequest)
+	if err != nil {
+		return nil, fmt.Errorf("core.LoadZincIndexesFromMeta: error executing search: %v", err)
+	}
+
+	indexList := make(map[string]*Index)
+	next, err := dmi.Next()
+	for err == nil && next != nil {
+		index := &Index{IndexType: "user"}
+		err = next.VisitStoredFields(func(field string, value []byte) bool {
+			switch field {
+			case "name":
+				index.Name = string(value)
+			case "index_type":
+				index.IndexType = string(value)
+			case "storage_type":
+				index.StorageType = string(value)
+			case "settings":
+				json.Unmarshal(value, &index.Settings)
+			case "mappings":
+				json.Unmarshal(value, &index.CachedMappings)
+			default:
+			}
+			return true
+		})
+
+		log.Info().Msgf("Loading user   index... [%s:%s]", index.Name, index.StorageType)
+		if err != nil {
+			log.Printf("core.LoadZincIndexesFromMeta: error accessing stored fields: %v", err)
+		}
+
+		// load index analysis
+		if index.Settings != nil && index.Settings.Analysis != nil {
+			index.CachedAnalyzers, err = zincanalysis.RequestAnalyzer(index.Settings.Analysis)
+			if err != nil {
+				log.Printf("core.LoadZincIndexesFromMeta: error parse stored analysis: %v", err)
+			}
+		}
+
+		// load index data
+		index.Writer, err = LoadIndexWriter(index.Name, index.StorageType)
+		if err != nil {
+			log.Error().Msgf("Loading user   index... [%s:%s] error: %v", index.Name, index.StorageType, err)
+		}
+
+		indexList[index.Name] = index
+
+		next, err = dmi.Next()
 	}
 
 	return indexList, nil
@@ -55,7 +119,7 @@ func LoadZincIndexesFromDisk() (map[string]*Index, error) {
 			continue
 		}
 
-		tempIndex, err := NewIndex(iName, "disk")
+		tempIndex, err := NewIndex(iName, "disk", NotCompatibleNewIndexMeta)
 		if err != nil {
 			log.Print("Error loading index: ", iName, " : ", err.Error()) // inform and move in to next index
 		} else {
@@ -97,7 +161,7 @@ func LoadZincIndexesFromS3() (map[string]*Index, error) {
 
 	for _, obj := range val.CommonPrefixes {
 		iName := (*obj.Prefix)[0 : len(*obj.Prefix)-1]
-		tempIndex, err := NewIndex(iName, "s3")
+		tempIndex, err := NewIndex(iName, "s3", NotCompatibleNewIndexMeta)
 		if err != nil {
 			log.Print("failed to load index "+iName+" in s3: ", err.Error())
 		} else {
@@ -147,7 +211,7 @@ func LoadZincIndexesFromMinIO() (map[string]*Index, error) {
 
 	for iName := range val {
 		indexName := iName.Key[:len(iName.Key)-1]
-		tempIndex, err := NewIndex(indexName, "minio")
+		tempIndex, err := NewIndex(indexName, "minio", NotCompatibleNewIndexMeta)
 		if err != nil {
 			log.Print("failed to load index "+iName.Key+" in minio: ", err.Error())
 		} else {

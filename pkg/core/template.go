@@ -66,17 +66,11 @@ func NewTemplate(name string, template *meta.Template) error {
 		return nil
 	}
 
-	update := false
-	_, tplExists, _ := LoadTemplate(name)
-	if tplExists {
-		update = true
-	}
-
 	// check pattern is exists
 	for _, pattern := range template.IndexPatterns {
 		results, _ := ListTemplates(pattern)
 		for _, result := range results {
-			if update && result.Name == name {
+			if result.Name == name {
 				continue
 			}
 			if result.IndexTemplate.Priority == template.Priority {
@@ -106,13 +100,8 @@ func NewTemplate(name string, template *meta.Template) error {
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil)) // Add _all field that can be used for search
 
-	var err error
 	index := ZINC_SYSTEM_INDEX_LIST["_index_template"].Writer
-	if update {
-		err = index.Update(bdoc.ID(), bdoc)
-	} else {
-		err = index.Insert(bdoc)
-	}
+	err := index.Update(bdoc.ID(), bdoc)
 	if err != nil {
 		return fmt.Errorf("template: error updating document: %v", err)
 	}

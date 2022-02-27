@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"math"
 	"net/http"
 	"strings"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
@@ -17,8 +17,7 @@ func SearchIndex(c *gin.Context) {
 	indexName := c.Param("target")
 
 	query := new(meta.ZincQuery)
-	err := c.BindJSON(query)
-	if err != nil {
+	if err := c.BindJSON(query); err != nil {
 		log.Printf("handlers.v2.SearchIndex: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -27,6 +26,7 @@ func SearchIndex(c *gin.Context) {
 	storageType := "disk"
 	indexSize := 0.0
 
+	var err error
 	var resp *meta.SearchResponse
 	if indexName == "" || strings.HasSuffix(indexName, "*") {
 		resp, err = core.MultiSearchV2(indexName, query)
@@ -38,17 +38,12 @@ func SearchIndex(c *gin.Context) {
 		}
 
 		storageType = index.StorageType
-		indexSize = math.Round(core.Telemetry.GetIndexSize(indexName))
+		indexSize = core.Telemetry.GetIndexSize(indexName)
 		resp, err = index.SearchV2(query)
 	}
 
 	if err != nil {
-		switch v := err.(type) {
-		case *meta.Error:
-			c.JSON(http.StatusBadRequest, v)
-		default:
-			c.JSON(http.StatusBadRequest, gin.H{"error": v.Error()})
-		}
+		handleError(c, err)
 		return
 	}
 
@@ -61,4 +56,17 @@ func SearchIndex(c *gin.Context) {
 	core.Telemetry.Event("search", event_data)
 
 	c.JSON(http.StatusOK, resp)
+}
+
+func handleError(c *gin.Context, err error) {
+	if err != nil {
+		switch v := err.(type) {
+		case *errors.Error:
+			c.JSON(http.StatusBadRequest, gin.H{"error": v})
+		default:
+			c.JSON(http.StatusBadRequest, gin.H{"error": v.Error()})
+		}
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "ok"})
 }

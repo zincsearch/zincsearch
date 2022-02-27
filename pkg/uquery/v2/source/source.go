@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
@@ -22,11 +23,11 @@ func Request(v interface{}) (*meta.Source, error) {
 			if v, ok := field.(string); ok {
 				source.Fields = append(source.Fields, v)
 			} else {
-				return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[_source] value should be boolean or []string")
+				return nil, errors.New(errors.ErrorTypeXContentParseException, "[_source] value should be boolean or []string")
 			}
 		}
 	default:
-		return nil, meta.NewError(meta.ErrorTypeXContentParseException, "[_source] value should be boolean or []string")
+		return nil, errors.New(errors.ErrorTypeXContentParseException, "[_source] value should be boolean or []string")
 	}
 
 	return source, nil

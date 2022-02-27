@@ -6,12 +6,12 @@ import (
 	"github.com/blugelabs/bluge/search"
 	"github.com/blugelabs/bluge/search/aggregations"
 
-	"github.com/prabhatsharma/zinc/pkg/aggregationx"
+	zincaggregation "github.com/prabhatsharma/zinc/pkg/bluge/aggregation"
 	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
-func AddAggregations(req aggregationx.SearchAggregation, aggs map[string]v1.AggregationParams, mapping *meta.Mappings) error {
+func AddAggregations(req zincaggregation.SearchAggregation, aggs map[string]v1.AggregationParams, mapping *meta.Mappings) error {
 	if len(aggs) == 0 {
 		return nil // not need aggregation
 	}
@@ -26,12 +26,12 @@ func AddAggregations(req aggregationx.SearchAggregation, aggs map[string]v1.Aggr
 		}
 		switch agg.AggType {
 		case "term", "terms":
-			var subreq *aggregationx.TermsAggregation
+			var subreq *zincaggregation.TermsAggregation
 			switch mapping.Properties[agg.Field].Type {
 			case "text", "keyword":
-				subreq = aggregationx.NewTermsAggregation(search.Field(agg.Field), aggregationx.TextValueSource, agg.Size)
+				subreq = zincaggregation.NewTermsAggregation(search.Field(agg.Field), zincaggregation.TextValueSource, agg.Size)
 			case "numeric":
-				subreq = aggregationx.NewTermsAggregation(search.Field(agg.Field), aggregationx.NumericValueSource, agg.Size)
+				subreq = zincaggregation.NewTermsAggregation(search.Field(agg.Field), zincaggregation.NumericValueSource, agg.Size)
 			default:
 				return fmt.Errorf("terms aggregation not supported type [%s:[%v]]", agg.Field, mapping.Properties[agg.Field].Type)
 			}

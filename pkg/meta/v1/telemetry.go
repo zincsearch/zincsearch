@@ -13,7 +13,7 @@ var (
 
 func init() {
 	cf := analytics.Config{
-		Interval:  10 * time.Second,
+		Interval:  15 * time.Second,
 		BatchSize: 100,
 		// Endpoint: "http://localhost:8080/api/v1/segment",
 	}
