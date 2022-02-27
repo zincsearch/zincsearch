@@ -8,6 +8,7 @@ import (
 	"github.com/blugelabs/bluge/analysis/tokenizer"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
+	pluginanalysis "github.com/prabhatsharma/zinc/pkg/plugin/analysis"
 	zinctokenizer "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/tokenizer"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
@@ -54,9 +55,9 @@ func RequestTokenizerSlice(data []interface{}) ([]analysis.Tokenizer, error) {
 	return tokenizers, nil
 }
 
-func RequestTokenizerSingle(typ string, options interface{}) (analysis.Tokenizer, error) {
-	typ = strings.ToLower(typ)
-	switch typ {
+func RequestTokenizerSingle(name string, options interface{}) (analysis.Tokenizer, error) {
+	name = strings.ToLower(name)
+	switch name {
 	case "character":
 		return zinctokenizer.NewCharacterTokenizer(options)
 	case "char_group":
@@ -84,6 +85,9 @@ func RequestTokenizerSingle(typ string, options interface{}) (analysis.Tokenizer
 	case "whitespace":
 		return tokenizer.NewWhitespaceTokenizer(), nil
 	default:
-		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[tokenizer] doesn't support type [%s]", typ))
+		if v, ok := pluginanalysis.GetTokenizer(name); ok {
+			return v, nil
+		}
+		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[tokenizer] unkown tokenizer [%s]", name))
 	}
 }

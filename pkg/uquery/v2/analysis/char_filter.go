@@ -8,6 +8,7 @@ import (
 	"github.com/blugelabs/bluge/analysis/char"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
+	pluginanalysis "github.com/prabhatsharma/zinc/pkg/plugin/analysis"
 	zincchar "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/char"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
@@ -64,9 +65,9 @@ func RequestCharFilterSlice(data []interface{}) ([]analysis.CharFilter, error) {
 	return filters, nil
 }
 
-func RequestCharFilterSingle(typ string, options interface{}) (analysis.CharFilter, error) {
-	typ = strings.ToLower(typ)
-	switch typ {
+func RequestCharFilterSingle(name string, options interface{}) (analysis.CharFilter, error) {
+	name = strings.ToLower(name)
+	switch name {
 	case "ascii_folding", "asciifolding":
 		return char.NewASCIIFoldingFilter(), nil
 	case "html", "html_strip":
@@ -78,6 +79,9 @@ func RequestCharFilterSingle(typ string, options interface{}) (analysis.CharFilt
 	case "mapping":
 		return zincchar.NewMappingCharFilter(options)
 	default:
-		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] doesn't support filter [%s]", typ))
+		if v, ok := pluginanalysis.GetCharFilter(name); ok {
+			return v, nil
+		}
+		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] unkown character filter [%s]", name))
 	}
 }

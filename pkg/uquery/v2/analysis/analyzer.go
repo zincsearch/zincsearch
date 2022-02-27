@@ -9,6 +9,7 @@ import (
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	pluginanalysis "github.com/prabhatsharma/zinc/pkg/plugin/analysis"
 	zincanalyzer "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/analyzer"
 )
 
@@ -170,7 +171,10 @@ func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.A
 	case "whitespace":
 		return zincanalyzer.NewWhitespaceAnalyzer()
 	default:
-		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] [%s] doesn't exists", name))
+		if v, ok := pluginanalysis.GetAnalyzer(name); ok {
+			return v, nil
+		}
+		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] unkown analyzer [%s]", name))
 	}
 }
 

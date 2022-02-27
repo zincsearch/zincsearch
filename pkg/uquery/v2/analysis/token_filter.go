@@ -30,6 +30,7 @@ import (
 	"github.com/blugelabs/bluge/analysis/token"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
+	pluginanalysis "github.com/prabhatsharma/zinc/pkg/plugin/analysis"
 	zinctoken "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/token"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
@@ -86,9 +87,9 @@ func RequestTokenFilterSlice(data []interface{}) ([]analysis.TokenFilter, error)
 	return filters, nil
 }
 
-func RequestTokenFilterSingle(typ string, options interface{}) (analysis.TokenFilter, error) {
-	typ = strings.ToLower(typ)
-	switch typ {
+func RequestTokenFilterSingle(name string, options interface{}) (analysis.TokenFilter, error) {
+	name = strings.ToLower(name)
+	switch name {
 	case "apostrophe":
 		return token.NewApostropheFilter(), nil
 	case "camel_case", "camelcase":
@@ -199,6 +200,9 @@ func RequestTokenFilterSingle(typ string, options interface{}) (analysis.TokenFi
 	case "tr_stemmer", "turkish_stemmer":
 		return tr.StemmerFilter(), nil
 	default:
-		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[token_filter] doesn't support filter [%s]", typ))
+		if v, ok := pluginanalysis.GetTokenFilter(name); ok {
+			return v, nil
+		}
+		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[token_filter] unkown token filter [%s]", name))
 	}
 }

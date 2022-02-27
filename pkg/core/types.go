@@ -6,6 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/prabhatsharma/zinc/pkg/plugin"
 )
 
 const (
@@ -23,6 +24,10 @@ func init() {
 	if err != nil {
 		log.Fatal().Msgf("Error loading system index: %s", err.Error())
 	}
+
+	// need load plugin before load index
+	plugin.Load()
+
 	ZINC_INDEX_LIST, _ = LoadZincIndexesFromMeta()
 	if err != nil {
 		log.Error().Msgf("Error loading user index: %s", err.Error())
