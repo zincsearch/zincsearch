@@ -7,8 +7,8 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
-func DeleteUser(userId string) bool {
-	bdoc := bluge.NewDocument(userId)
+func DeleteUser(userID string) bool {
+	bdoc := bluge.NewDocument(userID)
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
 	usersIndexWriter := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer
 	err := usersIndexWriter.Delete(bdoc.ID())
@@ -18,7 +18,7 @@ func DeleteUser(userId string) bool {
 	}
 
 	// delete cache
-	delete(ZINC_CACHED_USERS, userId)
+	delete(ZINC_CACHED_USERS, userID)
 
 	return true
 }

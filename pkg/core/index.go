@@ -119,7 +119,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 	return bdoc, nil
 }
 
-// SetMapping Saves the mapping of the index to _index_mapping index
+// SetMappings Saves the mapping of the index to _index_mapping index
 // index: Name of the index ffor which the mapping needs to be saved
 // iMap: a map of the fileds that specify name and type of the field. e.g. movietitle: string
 func (index *Index) SetMappings(mappings *meta.Mappings) error {

@@ -52,13 +52,13 @@ func SearchIndex(c *gin.Context) {
 		return
 	}
 
-	event_data := make(map[string]interface{})
-	event_data["search_type"] = "query_dsl"
-	event_data["search_index_storage"] = storageType
-	event_data["search_index_size_in_mb"] = indexSize
-	event_data["time_taken_to_search_in_ms"] = resp.Took
-	event_data["aggregations_count"] = len(query.Aggregations)
-	core.Telemetry.Event("search", event_data)
+	eventData := make(map[string]interface{})
+	eventData["search_type"] = "query_dsl"
+	eventData["search_index_storage"] = storageType
+	eventData["search_index_size_in_mb"] = indexSize
+	eventData["time_taken_to_search_in_ms"] = resp.Took
+	eventData["aggregations_count"] = len(query.Aggregations)
+	core.Telemetry.Event("search", eventData)
 
 	c.JSON(http.StatusOK, resp)
 }

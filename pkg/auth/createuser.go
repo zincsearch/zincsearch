@@ -11,9 +11,9 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
-func CreateUser(userId, name, plaintextPassword, role string) (*ZincUser, error) {
+func CreateUser(userID, name, plaintextPassword, role string) (*ZincUser, error) {
 	var newUser *ZincUser
-	existingUser, userExists, err := GetUser(userId)
+	existingUser, userExists, err := GetUser(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func CreateUser(userId, name, plaintextPassword, role string) (*ZincUser, error)
 		newUser.Timestamp = time.Now()
 	} else {
 		newUser = &ZincUser{
-			ID:        userId,
+			ID:        userID,
 			Name:      name,
 			Role:      role,
 			CreatedAt: time.Now(),

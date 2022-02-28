@@ -91,7 +91,7 @@ func (t *telemetry) getInstanceID() string {
 func (t *telemetry) initBaseInfo() {
 	t.baseInfoOnce.Do(func() {
 		m, _ := mem.VirtualMemory()
-		cpu_count, _ := cpu.Counts(true)
+		cpuCount, _ := cpu.Counts(true)
 		zone, _ := time.Now().Local().Zone()
 
 		t.baseInfo = map[string]interface{}{
@@ -99,7 +99,7 @@ func (t *telemetry) initBaseInfo() {
 			"arch":         runtime.GOARCH,
 			"zinc_version": v1.Version,
 			"time_zone":    zone,
-			"cpu_count":    cpu_count,
+			"cpu_count":    cpuCount,
 			"total_memory": m.Total / 1024 / 1024,
 		}
 	})
