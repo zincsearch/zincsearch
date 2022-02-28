@@ -30,13 +30,13 @@ func SearchIndex(c *gin.Context) {
 		return
 	}
 
-	event_data := make(map[string]interface{})
-	event_data["search_type"] = iQuery.SearchType
-	event_data["search_index_storage"] = index.StorageType
-	event_data["search_index_size_in_mb"] = core.Telemetry.GetIndexSize(indexName)
-	event_data["time_taken_to_search_in_ms"] = res.Took
-	event_data["aggregations_count"] = len(iQuery.Aggregations)
-	core.Telemetry.Event("search", event_data)
+	eventData := make(map[string]interface{})
+	eventData["search_type"] = iQuery.SearchType
+	eventData["search_index_storage"] = index.StorageType
+	eventData["search_index_size_in_mb"] = core.Telemetry.GetIndexSize(indexName)
+	eventData["time_taken_to_search_in_ms"] = res.Took
+	eventData["aggregations_count"] = len(iQuery.Aggregations)
+	core.Telemetry.Event("search", eventData)
 
 	c.JSON(http.StatusOK, res)
 }
