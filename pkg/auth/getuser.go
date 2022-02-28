@@ -9,11 +9,11 @@ import (
 	"github.com/prabhatsharma/zinc/pkg/core"
 )
 
-func GetUser(userId string) (ZincUser, bool, error) {
+func GetUser(userID string) (ZincUser, bool, error) {
 	userExists := false
 	var user ZincUser
 
-	query := bluge.NewTermQuery(userId)
+	query := bluge.NewTermQuery(userID)
 	searchRequest := bluge.NewTopNSearch(1, query)
 	reader, _ := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer.Reader()
 	dmi, err := reader.Search(context.Background(), searchRequest)
