@@ -6,6 +6,26 @@ import (
 
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/analyzer"
+	"github.com/blugelabs/bluge/analysis/lang/ar"
+	"github.com/blugelabs/bluge/analysis/lang/cjk"
+	"github.com/blugelabs/bluge/analysis/lang/ckb"
+	"github.com/blugelabs/bluge/analysis/lang/da"
+	"github.com/blugelabs/bluge/analysis/lang/de"
+	"github.com/blugelabs/bluge/analysis/lang/en"
+	"github.com/blugelabs/bluge/analysis/lang/es"
+	"github.com/blugelabs/bluge/analysis/lang/fa"
+	"github.com/blugelabs/bluge/analysis/lang/fi"
+	"github.com/blugelabs/bluge/analysis/lang/fr"
+	"github.com/blugelabs/bluge/analysis/lang/hi"
+	"github.com/blugelabs/bluge/analysis/lang/hu"
+	"github.com/blugelabs/bluge/analysis/lang/it"
+	"github.com/blugelabs/bluge/analysis/lang/nl"
+	"github.com/blugelabs/bluge/analysis/lang/no"
+	"github.com/blugelabs/bluge/analysis/lang/pt"
+	"github.com/blugelabs/bluge/analysis/lang/ro"
+	"github.com/blugelabs/bluge/analysis/lang/ru"
+	"github.com/blugelabs/bluge/analysis/lang/sv"
+	"github.com/blugelabs/bluge/analysis/lang/tr"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
@@ -77,7 +97,10 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 			case "web":
 				ana = analyzer.NewWebAnalyzer()
 			default:
-				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] build-in [%s] doesn't support custom", v.Type))
+				ana, err = QueryAnalyzer(nil, v.Type)
+				if ana == nil || err != nil {
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] unsuported build-in analyzer [%s]", v.Type))
+				}
 			}
 			if err != nil {
 				return nil, err
@@ -170,6 +193,47 @@ func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.A
 		return zincanalyzer.NewStopAnalyzer(nil)
 	case "whitespace":
 		return zincanalyzer.NewWhitespaceAnalyzer()
+		// language filters
+	case "ar", "arabic":
+		return ar.Analyzer(), nil
+	case "cjk":
+		return cjk.Analyzer(), nil
+	case "ckb", "sorani":
+		return ckb.Analyzer(), nil
+	case "da", "danish":
+		return da.Analyzer(), nil
+	case "de", "german":
+		return de.Analyzer(), nil
+	case "en", "english":
+		return en.NewAnalyzer(), nil
+	case "es", "spanish":
+		return es.Analyzer(), nil
+	case "fa", "persian":
+		return fa.Analyzer(), nil
+	case "fi", "finnish":
+		return fi.Analyzer(), nil
+	case "fr", "french":
+		return fr.Analyzer(), nil
+	case "hi", "hindi":
+		return hi.Analyzer(), nil
+	case "hu", "hungarian":
+		return hu.Analyzer(), nil
+	case "it", "italian":
+		return it.Analyzer(), nil
+	case "nl", "dutch":
+		return nl.Analyzer(), nil
+	case "no", "norwegian":
+		return no.Analyzer(), nil
+	case "pt", "portuguese":
+		return pt.Analyzer(), nil
+	case "ro", "romanian":
+		return ro.Analyzer(), nil
+	case "ru", "russian":
+		return ru.Analyzer(), nil
+	case "sv", "swedish":
+		return sv.Analyzer(), nil
+	case "tr", "turkish":
+		return tr.Analyzer(), nil
 	default:
 		if v, ok := pluginanalysis.GetAnalyzer(name); ok {
 			return v, nil

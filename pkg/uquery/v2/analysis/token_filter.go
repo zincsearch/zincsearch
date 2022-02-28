@@ -159,7 +159,7 @@ func RequestTokenFilterSingle(name string, options interface{}) (analysis.TokenF
 		return es.LightStemmerFilter(), nil
 	case "fa_normalization", "persian_normalization":
 		return fa.NormalizeFilter(), nil
-	case "fi_stemmer", "finish_stemmer":
+	case "fi_stemmer", "finnish_stemmer":
 		return fi.StemmerFilter(), nil
 	case "fr_elision", "french_elision":
 		return fr.ElisionFilter(), nil
