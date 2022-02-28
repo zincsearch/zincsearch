@@ -20,3 +20,16 @@ func DirSize(path string) (float64, error) {
 
 	return sizeMB, err
 }
+
+func IsExist(path string) (bool, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		if os.IsExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	f.Close()
+
+	return true, nil
+}

@@ -24,8 +24,8 @@ main
 dist/
 tmp/
 
-# pugins
-/plugin
+# plugins
+/plugins
 
 # zinc binary in root
 zinc
