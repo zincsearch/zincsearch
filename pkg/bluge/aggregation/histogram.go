@@ -10,10 +10,8 @@ import (
 )
 
 type HistogramAggregation struct {
-	src     search.FieldSource
-	srcType int
-	size    int
-
+	src         search.FieldSource
+	size        int
 	interval    float64
 	offset      float64
 	minDocCount int
@@ -28,10 +26,9 @@ type HistogramAggregation struct {
 // NewHistogramAggregation returns a termsAggregation
 // field use to set the field use to terms aggregation
 // valueType use to set the value type, can be diy.NumericValueSource / diy.NumericValuesSource
-func NewHistogramAggregation(field search.FieldSource, valueType int, interval, offset float64, minDocCount, size int) *HistogramAggregation {
+func NewHistogramAggregation(field search.FieldSource, interval, offset float64, minDocCount, size int) *HistogramAggregation {
 	rv := &HistogramAggregation{
 		src:         field,
-		srcType:     valueType,
 		size:        size,
 		interval:    interval,
 		offset:      offset,
@@ -58,7 +55,6 @@ func (t *HistogramAggregation) Fields() []string {
 func (t *HistogramAggregation) Calculator() search.Calculator {
 	return &HistogramCalculator{
 		src:          t.src,
-		srcType:      t.srcType,
 		size:         t.size,
 		interval:     t.interval,
 		offset:       t.offset,
@@ -78,10 +74,8 @@ func (t *HistogramAggregation) AddAggregation(name string, aggregation search.Ag
 }
 
 type HistogramCalculator struct {
-	src     interface{}
-	srcType int
-	size    int
-
+	src         interface{}
+	size        int
 	interval    float64
 	offset      float64
 	minDocCount int
@@ -101,39 +95,6 @@ type HistogramCalculator struct {
 }
 
 func (a *HistogramCalculator) Consume(d *search.DocumentMatch) {
-	switch a.srcType {
-	case NumericValueSource:
-		a.consumeNumericValueSource(d)
-	case NumericValuesSource:
-		a.consumeNumericValuesSource(d)
-	default:
-		// not supoort
-	}
-}
-
-func (a *HistogramCalculator) consumeNumericValueSource(d *search.DocumentMatch) {
-	a.total++
-	src := a.src.(search.NumericValueSource)
-	term := src.Number(d)
-	if term < a.minValue {
-		a.minValue = term
-	}
-	if term > a.maxValue {
-		a.maxValue = term
-	}
-	termStr := a.bucketKeyNumberic(term)
-	bucket, ok := a.bucketsMap[termStr]
-	if ok {
-		bucket.Consume(d)
-	} else {
-		newBucket := search.NewBucket(termStr, a.aggregations)
-		newBucket.Consume(d)
-		a.bucketsMap[termStr] = newBucket
-		a.bucketsList = append(a.bucketsList, newBucket)
-	}
-}
-
-func (a *HistogramCalculator) consumeNumericValuesSource(d *search.DocumentMatch) {
 	a.total++
 	src := a.src.(search.NumericValuesSource)
 	for _, term := range src.Numbers(d) {

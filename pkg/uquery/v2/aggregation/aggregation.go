@@ -135,7 +135,6 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			case "numeric":
 				subreq = zincaggregation.NewHistogramAggregation(
 					search.Field(agg.Histogram.Field),
-					zincaggregation.NumericValueSource,
 					agg.Histogram.Interval,
 					agg.Histogram.Offset,
 					agg.Histogram.MinDocCount,
