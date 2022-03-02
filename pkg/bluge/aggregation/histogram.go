@@ -1,6 +1,7 @@
 package aggregation
 
 import (
+	"math"
 	"sort"
 	"strconv"
 
@@ -8,10 +9,14 @@ import (
 	"github.com/blugelabs/bluge/search/aggregations"
 )
 
-type TermsAggregation struct {
+type HistogramAggregation struct {
 	src     search.FieldSource
 	srcType int
 	size    int
+
+	interval    float64
+	offset      float64
+	minDocCount int
 
 	aggregations map[string]search.Aggregation
 
@@ -20,17 +25,20 @@ type TermsAggregation struct {
 	sortFunc func(p sort.Interface)
 }
 
-// NewTermsAggregation returns a termsAggregation
+// NewHistogramAggregation returns a termsAggregation
 // field use to set the field use to terms aggregation
-// valueType use to set the value type, can be diy.TextValueSource / diy.TextValuesSource / diy.NumericValueSource / diy.NumericValuesSource
-func NewTermsAggregation(field search.FieldSource, valueType int, size int) *TermsAggregation {
-	rv := &TermsAggregation{
-		src:     field,
-		srcType: valueType,
-		size:    size,
-		desc:    true,
+// valueType use to set the value type, can be diy.NumericValueSource / diy.NumericValuesSource
+func NewHistogramAggregation(field search.FieldSource, valueType int, interval, offset float64, minDocCount, size int) *HistogramAggregation {
+	rv := &HistogramAggregation{
+		src:         field,
+		srcType:     valueType,
+		size:        size,
+		interval:    interval,
+		offset:      offset,
+		minDocCount: minDocCount,
+		desc:        false,
 		lessFunc: func(a, b *search.Bucket) bool {
-			return a.Aggregations()["count"].(search.MetricCalculator).Value() < b.Aggregations()["count"].(search.MetricCalculator).Value()
+			return a.Name() < b.Name()
 		},
 		aggregations: make(map[string]search.Aggregation),
 		sortFunc:     sort.Sort,
@@ -39,7 +47,7 @@ func NewTermsAggregation(field search.FieldSource, valueType int, size int) *Ter
 	return rv
 }
 
-func (t *TermsAggregation) Fields() []string {
+func (t *HistogramAggregation) Fields() []string {
 	rv := t.src.Fields()
 	for _, agg := range t.aggregations {
 		rv = append(rv, agg.Fields()...)
@@ -47,11 +55,16 @@ func (t *TermsAggregation) Fields() []string {
 	return rv
 }
 
-func (t *TermsAggregation) Calculator() search.Calculator {
-	return &TermsCalculator{
+func (t *HistogramAggregation) Calculator() search.Calculator {
+	return &HistogramCalculator{
 		src:          t.src,
 		srcType:      t.srcType,
 		size:         t.size,
+		interval:     t.interval,
+		offset:       t.offset,
+		minDocCount:  t.minDocCount,
+		minValue:     math.MaxFloat64,
+		maxValue:     math.SmallestNonzeroFloat64,
 		aggregations: t.aggregations,
 		desc:         t.desc,
 		lessFunc:     t.lessFunc,
@@ -60,14 +73,20 @@ func (t *TermsAggregation) Calculator() search.Calculator {
 	}
 }
 
-func (t *TermsAggregation) AddAggregation(name string, aggregation search.Aggregation) {
+func (t *HistogramAggregation) AddAggregation(name string, aggregation search.Aggregation) {
 	t.aggregations[name] = aggregation
 }
 
-type TermsCalculator struct {
+type HistogramCalculator struct {
 	src     interface{}
 	srcType int
 	size    int
+
+	interval    float64
+	offset      float64
+	minDocCount int
+	minValue    float64
+	maxValue    float64
 
 	aggregations map[string]search.Aggregation
 
@@ -81,12 +100,8 @@ type TermsCalculator struct {
 	sortFunc func(p sort.Interface)
 }
 
-func (a *TermsCalculator) Consume(d *search.DocumentMatch) {
+func (a *HistogramCalculator) Consume(d *search.DocumentMatch) {
 	switch a.srcType {
-	case TextValueSource:
-		a.consumeTextValueSource(d)
-	case TextValuesSource:
-		a.consumeTextValuesSource(d)
 	case NumericValueSource:
 		a.consumeNumericValueSource(d)
 	case NumericValuesSource:
@@ -96,44 +111,17 @@ func (a *TermsCalculator) Consume(d *search.DocumentMatch) {
 	}
 }
 
-func (a *TermsCalculator) consumeTextValueSource(d *search.DocumentMatch) {
-	a.total++
-	src := a.src.(search.TextValueSource)
-	term := src.Value(d)
-	termStr := string(term)
-	bucket, ok := a.bucketsMap[termStr]
-	if ok {
-		bucket.Consume(d)
-	} else {
-		newBucket := search.NewBucket(termStr, a.aggregations)
-		newBucket.Consume(d)
-		a.bucketsMap[termStr] = newBucket
-		a.bucketsList = append(a.bucketsList, newBucket)
-	}
-}
-
-func (a *TermsCalculator) consumeTextValuesSource(d *search.DocumentMatch) {
-	a.total++
-	src := a.src.(search.TextValuesSource)
-	for _, term := range src.Values(d) {
-		termStr := string(term)
-		bucket, ok := a.bucketsMap[termStr]
-		if ok {
-			bucket.Consume(d)
-		} else {
-			newBucket := search.NewBucket(termStr, a.aggregations)
-			newBucket.Consume(d)
-			a.bucketsMap[termStr] = newBucket
-			a.bucketsList = append(a.bucketsList, newBucket)
-		}
-	}
-}
-
-func (a *TermsCalculator) consumeNumericValueSource(d *search.DocumentMatch) {
+func (a *HistogramCalculator) consumeNumericValueSource(d *search.DocumentMatch) {
 	a.total++
 	src := a.src.(search.NumericValueSource)
 	term := src.Number(d)
-	termStr := strconv.FormatFloat(term, 'f', -1, 64)
+	if term < a.minValue {
+		a.minValue = term
+	}
+	if term > a.maxValue {
+		a.maxValue = term
+	}
+	termStr := a.bucketKeyNumberic(term)
 	bucket, ok := a.bucketsMap[termStr]
 	if ok {
 		bucket.Consume(d)
@@ -145,11 +133,17 @@ func (a *TermsCalculator) consumeNumericValueSource(d *search.DocumentMatch) {
 	}
 }
 
-func (a *TermsCalculator) consumeNumericValuesSource(d *search.DocumentMatch) {
+func (a *HistogramCalculator) consumeNumericValuesSource(d *search.DocumentMatch) {
 	a.total++
 	src := a.src.(search.NumericValuesSource)
 	for _, term := range src.Numbers(d) {
-		termStr := strconv.FormatFloat(term, 'f', -1, 64)
+		if term < a.minValue {
+			a.minValue = term
+		}
+		if term > a.maxValue {
+			a.maxValue = term
+		}
+		termStr := a.bucketKeyNumberic(term)
 		bucket, ok := a.bucketsMap[termStr]
 		if ok {
 			bucket.Consume(d)
@@ -162,8 +156,8 @@ func (a *TermsCalculator) consumeNumericValuesSource(d *search.DocumentMatch) {
 	}
 }
 
-func (a *TermsCalculator) Merge(other search.Calculator) {
-	if other, ok := other.(*TermsCalculator); ok {
+func (a *HistogramCalculator) Merge(other search.Calculator) {
+	if other, ok := other.(*HistogramCalculator); ok {
 		// first sum to the totals and others
 		a.total += other.total
 		// now, walk all of the other buckets
@@ -186,7 +180,29 @@ func (a *TermsCalculator) Merge(other search.Calculator) {
 	}
 }
 
-func (a *TermsCalculator) Finish() {
+func (a *HistogramCalculator) Finish() {
+	// check bucket
+	if a.minDocCount == 0 {
+		for value := a.minValue; value < a.maxValue; value += a.interval {
+			termStr := a.bucketKeyNumberic(value)
+			if _, ok := a.bucketsMap[termStr]; !ok {
+				a.bucketsList = append(a.bucketsList, search.NewBucket(termStr, a.aggregations))
+			}
+		}
+	} else {
+		for i := 0; i < len(a.bucketsList); i++ {
+			if a.bucketsList[i].Count() >= uint64(a.minDocCount) {
+				continue
+			}
+			if i == 0 {
+				a.bucketsList = a.bucketsList[1:]
+			} else {
+				a.bucketsList = append(a.bucketsList[:i], a.bucketsList[i+1:]...)
+			}
+			i--
+		}
+	}
+
 	// sort the buckets
 	if a.desc {
 		a.sortFunc(sort.Reverse(a))
@@ -207,22 +223,27 @@ func (a *TermsCalculator) Finish() {
 	a.other = a.total - notOther
 }
 
-func (a *TermsCalculator) Buckets() []*search.Bucket {
+func (a *HistogramCalculator) Buckets() []*search.Bucket {
 	return a.bucketsList
 }
 
-func (a *TermsCalculator) Other() int {
+func (a *HistogramCalculator) Other() int {
 	return a.other
 }
 
-func (a *TermsCalculator) Len() int {
+func (a *HistogramCalculator) Len() int {
 	return len(a.bucketsList)
 }
 
-func (a *TermsCalculator) Less(i, j int) bool {
+func (a *HistogramCalculator) Less(i, j int) bool {
 	return a.lessFunc(a.bucketsList[i], a.bucketsList[j])
 }
 
-func (a *TermsCalculator) Swap(i, j int) {
+func (a *HistogramCalculator) Swap(i, j int) {
 	a.bucketsList[i], a.bucketsList[j] = a.bucketsList[j], a.bucketsList[i]
+}
+
+func (a *HistogramCalculator) bucketKeyNumberic(value float64) string {
+	f := math.Floor((value-a.offset)/a.interval)*a.interval + a.offset
+	return strconv.FormatFloat(f, 'f', -1, 64)
 }

@@ -202,9 +202,9 @@ type Aggregations struct {
 	Terms         *AggregationsTerms        `json:"terms"`
 	Range         *AggregationRange         `json:"range"`
 	DateRange     *AggregationDateRange     `json:"date_range"`
-	IPRange       *AggregationIPRange       `json:"ip_range"`       // TODO: not implemented
-	Histogram     *AggregationHistogram     `json:"histogram"`      // TODO: not implemented
+	Histogram     *AggregationHistogram     `json:"histogram"`
 	DateHistogram *AggregationDateHistogram `json:"date_histogram"` // TODO: not implemented
+	IPRange       *AggregationIPRange       `json:"ip_range"`       // TODO: not implemented
 	Aggregations  map[string]Aggregations   `json:"aggs"`           // nested aggregations
 }
 
@@ -258,13 +258,17 @@ type IPRange struct {
 }
 
 type AggregationHistogram struct {
-	Field    string `json:"field"`
-	Interval int64  `json:"interval"`
-	Keyed    bool   `json:"keyed"`
+	Field       string  `json:"field"`
+	Size        int     `json:"size"`
+	Interval    float64 `json:"interval"`
+	Offset      float64 `json:"offset"`
+	MinDocCount int     `json:"min_doc_count"`
+	Keyed       bool    `json:"keyed"`
 }
 
 type AggregationDateHistogram struct {
 	Field            string `json:"field"`
+	Size             int    `json:"size"`
 	Format           string `json:"format"`            // format key_as_string
 	FixedInterval    string `json:"fixed_interval"`    // ms,s,m,h,d
 	CalendarInterval string `json:"calendar_interval"` // minute,hour,day,week,month,quarter,year

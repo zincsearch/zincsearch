@@ -120,12 +120,43 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			default:
 				return errors.New(errors.ErrorTypeParsingException, "[date_range] aggregation only support type datetime")
 			}
-		case agg.IPRange != nil:
-			return errors.New(errors.ErrorTypeNotImplemented, "[ip_range] aggregation doesn't support")
 		case agg.Histogram != nil:
-			return errors.New(errors.ErrorTypeNotImplemented, "[histogram] aggregation doesn't support")
+			if agg.Histogram.Size == 0 {
+				agg.Histogram.Size = startup.LoadAggregationTermsSize()
+			}
+			if agg.Histogram.Interval == 0 {
+				return errors.New(errors.ErrorTypeParsingException, "[histogram] aggregation interval must be a positive decimal")
+			}
+			if agg.Histogram.Offset >= agg.Histogram.Interval {
+				return errors.New(errors.ErrorTypeParsingException, "[histogram] aggregation offset must be in [0, interval)")
+			}
+			var subreq *zincaggregation.HistogramAggregation
+			switch mappings.Properties[agg.Histogram.Field].Type {
+			case "numeric":
+				subreq = zincaggregation.NewHistogramAggregation(
+					search.Field(agg.Histogram.Field),
+					zincaggregation.NumericValueSource,
+					agg.Histogram.Interval,
+					agg.Histogram.Offset,
+					agg.Histogram.MinDocCount,
+					agg.Histogram.Size,
+				)
+			default:
+				return errors.New(
+					errors.ErrorTypeParsingException,
+					fmt.Sprintf("[histogram] aggregation doesn't support values of type: [%s:[%v]]", agg.Histogram.Field, mappings.Properties[agg.Histogram.Field].Type),
+				)
+			}
+			if len(agg.Aggregations) > 0 {
+				if err := Request(subreq, agg.Aggregations, mappings); err != nil {
+					return err
+				}
+			}
+			req.AddAggregation(name, subreq)
 		case agg.DateHistogram != nil:
 			return errors.New(errors.ErrorTypeNotImplemented, "[date_histogram] aggregation doesn't support")
+		case agg.IPRange != nil:
+			return errors.New(errors.ErrorTypeNotImplemented, "[ip_range] aggregation doesn't support")
 		default:
 			// nothing
 		}
