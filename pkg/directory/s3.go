@@ -155,14 +155,14 @@ func (s *S3Directory) Persist(kind string, id uint64, w index.WriterTo, closeCh 
 		Body:   bytes.NewReader(buf.Bytes()),
 	}
 
-	ouput, err := s.Client.PutObject(ctx, &params)
+	output, err := s.Client.PutObject(ctx, &params)
 
 	if err != nil {
 		log.Print("Persist: failed to write object: ", err.Error())
 		return err
 	}
 
-	log.Print("Persist: s3 object "+s.Bucket+"/"+path+" written. Its md5 hash is: ", *ouput.ETag) // TODO: compare md5 hashes here to ensure successful write
+	log.Print("Persist: s3 object "+s.Bucket+"/"+path+" written. Its md5 hash is: ", *output.ETag) // TODO: compare md5 hashes here to ensure successful write
 
 	return nil
 }
