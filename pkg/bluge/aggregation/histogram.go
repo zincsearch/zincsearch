@@ -25,7 +25,6 @@ type HistogramAggregation struct {
 
 // NewHistogramAggregation returns a termsAggregation
 // field use to set the field use to terms aggregation
-// valueType use to set the value type, can be diy.NumericValueSource / diy.NumericValuesSource
 func NewHistogramAggregation(field search.FieldSource, interval, offset float64, minDocCount, size int) *HistogramAggregation {
 	rv := &HistogramAggregation{
 		src:         field,
@@ -79,8 +78,9 @@ type HistogramCalculator struct {
 	interval    float64
 	offset      float64
 	minDocCount int
-	minValue    float64
-	maxValue    float64
+
+	minValue float64
+	maxValue float64
 
 	aggregations map[string]search.Aggregation
 
@@ -104,7 +104,7 @@ func (a *HistogramCalculator) Consume(d *search.DocumentMatch) {
 		if term > a.maxValue {
 			a.maxValue = term
 		}
-		termStr := a.bucketKeyNumberic(term)
+		termStr := a.bucketKey(term)
 		bucket, ok := a.bucketsMap[termStr]
 		if ok {
 			bucket.Consume(d)
@@ -145,7 +145,7 @@ func (a *HistogramCalculator) Finish() {
 	// check bucket
 	if a.minDocCount == 0 {
 		for value := a.minValue; value < a.maxValue; value += a.interval {
-			termStr := a.bucketKeyNumberic(value)
+			termStr := a.bucketKey(value)
 			if _, ok := a.bucketsMap[termStr]; !ok {
 				a.bucketsList = append(a.bucketsList, search.NewBucket(termStr, a.aggregations))
 			}
@@ -204,7 +204,7 @@ func (a *HistogramCalculator) Swap(i, j int) {
 	a.bucketsList[i], a.bucketsList[j] = a.bucketsList[j], a.bucketsList[i]
 }
 
-func (a *HistogramCalculator) bucketKeyNumberic(value float64) string {
+func (a *HistogramCalculator) bucketKey(value float64) string {
 	f := math.Floor((value-a.offset)/a.interval)*a.interval + a.offset
 	return strconv.FormatFloat(f, 'f', -1, 64)
 }
