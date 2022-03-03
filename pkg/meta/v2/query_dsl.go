@@ -193,19 +193,20 @@ type TermsQuery map[string]interface{}
 type TermsSetQuery struct{}
 
 type Aggregations struct {
-	Avg           *AggregationMetric        `json:"avg"`
-	WeightedAvg   *AggregationMetric        `json:"weighted_avg"`
-	Max           *AggregationMetric        `json:"max"`
-	Min           *AggregationMetric        `json:"min"`
-	Sum           *AggregationMetric        `json:"sum"`
-	Count         *AggregationMetric        `json:"count"`
-	Terms         *AggregationsTerms        `json:"terms"`
-	Range         *AggregationRange         `json:"range"`
-	DateRange     *AggregationDateRange     `json:"date_range"`
-	IPRange       *AggregationIPRange       `json:"ip_range"`       // TODO: not implemented
-	Histogram     *AggregationHistogram     `json:"histogram"`      // TODO: not implemented
-	DateHistogram *AggregationDateHistogram `json:"date_histogram"` // TODO: not implemented
-	Aggregations  map[string]Aggregations   `json:"aggs"`           // nested aggregations
+	Avg               *AggregationMetric            `json:"avg"`
+	WeightedAvg       *AggregationMetric            `json:"weighted_avg"`
+	Max               *AggregationMetric            `json:"max"`
+	Min               *AggregationMetric            `json:"min"`
+	Sum               *AggregationMetric            `json:"sum"`
+	Count             *AggregationMetric            `json:"count"`
+	Terms             *AggregationsTerms            `json:"terms"`
+	Range             *AggregationRange             `json:"range"`
+	DateRange         *AggregationDateRange         `json:"date_range"`
+	Histogram         *AggregationHistogram         `json:"histogram"`
+	DateHistogram     *AggregationDateHistogram     `json:"date_histogram"`
+	AutoDateHistogram *AggregationAutoDateHistogram `json:"auto_date_histogram"`
+	IPRange           *AggregationIPRange           `json:"ip_range"` // TODO: not implemented
+	Aggregations      map[string]Aggregations       `json:"aggs"`     // nested aggregations
 }
 
 type AggregationMetric struct {
@@ -258,17 +259,32 @@ type IPRange struct {
 }
 
 type AggregationHistogram struct {
-	Field    string `json:"field"`
-	Interval int64  `json:"interval"`
-	Keyed    bool   `json:"keyed"`
+	Field       string  `json:"field"`
+	Size        int     `json:"size"`
+	Interval    float64 `json:"interval"`
+	Offset      float64 `json:"offset"`
+	MinDocCount int     `json:"min_doc_count"`
+	Keyed       bool    `json:"keyed"`
 }
 
 type AggregationDateHistogram struct {
 	Field            string `json:"field"`
-	Format           string `json:"format"`            // format key_as_string
+	Size             int    `json:"size"`
 	FixedInterval    string `json:"fixed_interval"`    // ms,s,m,h,d
 	CalendarInterval string `json:"calendar_interval"` // minute,hour,day,week,month,quarter,year
+	Format           string `json:"format"`            // format key_as_string
+	TimeZone         string `json:"time_zone"`         // time_zone
+	MinDocCount      int    `json:"min_doc_count"`
 	Keyed            bool   `json:"keyed"`
+}
+
+type AggregationAutoDateHistogram struct {
+	Field           string `json:"field"`
+	Buckets         int    `json:"buckets"`
+	MinimumInterval string `json:"minimum_interval"` // minute,hour,day,week,month,quarter,year
+	Format          string `json:"format"`           // format key_as_string
+	TimeZone        string `json:"time_zone"`        // time_zone
+	Keyed           bool   `json:"keyed"`
 }
 
 type Highlight struct {

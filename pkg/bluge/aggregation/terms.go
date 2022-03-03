@@ -8,17 +8,6 @@ import (
 	"github.com/blugelabs/bluge/search/aggregations"
 )
 
-const (
-	TextValueSource = iota
-	TextValuesSource
-	NumericValueSource
-	NumericValuesSource
-)
-
-type SearchAggregation interface {
-	AddAggregation(name string, aggregation search.Aggregation)
-}
-
 type TermsAggregation struct {
 	src     search.FieldSource
 	srcType int

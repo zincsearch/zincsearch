@@ -12,6 +12,10 @@ import (
 )
 
 func Query(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
+	if query == nil {
+		return MatchAllQuery()
+	}
+
 	var subq bluge.Query
 	var cmd string
 	var err error
@@ -55,11 +59,11 @@ func Query(query map[string]interface{}, mappings *meta.Mappings, analyzers map[
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[multi_match] failed to parse field").Cause(err)
 			}
 		case "match_all":
-			if subq, err = MatchAllQuery(v); err != nil {
+			if subq, err = MatchAllQuery(); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[match_all] failed to parse field").Cause(err)
 			}
 		case "match_none":
-			if subq, err = MatchNoneQuery(v); err != nil {
+			if subq, err = MatchNoneQuery(); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[match_none] failed to parse field").Cause(err)
 			}
 		case "combined_fields":

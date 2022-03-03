@@ -56,6 +56,7 @@ type Index struct {
 	Name            string                        `json:"name"`
 	IndexType       string                        `json:"index_type"`   // "system" or "user"
 	StorageType     string                        `json:"storage_type"` // disk, memory, s3
+	Size            float64                       `json:"size"`         // cached size of the index
 	Mappings        map[string]interface{}        `json:"mappings"`
 	Settings        *meta.IndexSettings           `json:"settings"`
 	CachedAnalyzers map[string]*analysis.Analyzer `json:"-"`

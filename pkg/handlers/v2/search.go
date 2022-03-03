@@ -38,7 +38,7 @@ func SearchIndex(c *gin.Context) {
 		}
 
 		storageType = index.StorageType
-		indexSize = core.Telemetry.GetIndexSize(indexName)
+		indexSize = index.Size
 		resp, err = index.SearchV2(query)
 	}
 
