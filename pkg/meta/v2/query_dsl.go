@@ -271,11 +271,19 @@ type AggregationDateHistogram struct {
 	Size             int    `json:"size"`
 	FixedInterval    string `json:"fixed_interval"`    // ms,s,m,h,d
 	CalendarInterval string `json:"calendar_interval"` // minute,hour,day,week,month,quarter,year
-	Offset           string `json:"offset"`            // offset to interval
 	Format           string `json:"format"`            // format key_as_string
 	TimeZone         string `json:"time_zone"`         // time_zone
 	MinDocCount      int    `json:"min_doc_count"`
 	Keyed            bool   `json:"keyed"`
+}
+
+type AggregationAutoDateHistogram struct {
+	Field           string `json:"field"`
+	Buckets         int    `json:"buckets"`
+	MinimumInterval string `json:"minimum_interval"` // minute,hour,day,week,month,quarter,year
+	Format          string `json:"format"`           // format key_as_string
+	TimeZone        string `json:"time_zone"`        // time_zone
+	Keyed           bool   `json:"keyed"`
 }
 
 type Highlight struct {

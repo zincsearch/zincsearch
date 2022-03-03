@@ -31,8 +31,7 @@ type DateHistogramAggregation struct {
 func NewDateHistogramAggregation(
 	field search.FieldSource,
 	calendarInterval string,
-	fixedInterval,
-	offset int64,
+	fixedInterval int64,
 	format string,
 	timeZone *time.Location,
 	minDocCount,
@@ -42,7 +41,7 @@ func NewDateHistogramAggregation(
 		size:             size,
 		calendarInterval: calendarInterval,
 		fixedInterval:    fixedInterval,
-		offset:           offset,
+		offset:           0,
 		minDocCount:      minDocCount,
 		format:           format,
 		timeZone:         timeZone,

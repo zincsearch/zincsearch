@@ -194,20 +194,6 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 				}
 			}
 
-			// format offset
-			var offset int64
-			if agg.DateHistogram.Offset != "" {
-				if duration, err := zutils.ParseDuration(agg.DateHistogram.Offset); err != nil {
-					return errors.New(errors.ErrorTypeParsingException, "[date_histogram] aggregation offset must be time duration, such as 1s, 1m, 1h, 1d")
-				} else {
-					offset = int64(duration)
-				}
-			}
-
-			if interval > 0 && offset >= interval {
-				return errors.New(errors.ErrorTypeParsingException, "[date_histogram] aggregation offset must be in [0, interval)")
-			}
-
 			timeZone := time.UTC
 			if agg.DateHistogram.TimeZone != "" {
 				timeZone, err = zutils.ParseTimeZone(agg.DateHistogram.TimeZone)
@@ -225,7 +211,6 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 					search.Field(agg.DateHistogram.Field),
 					agg.DateHistogram.CalendarInterval,
 					interval,
-					offset,
 					agg.DateHistogram.Format,
 					timeZone,
 					agg.DateHistogram.MinDocCount,
