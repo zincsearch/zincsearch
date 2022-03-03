@@ -22,8 +22,8 @@ func ZincAuthMiddleware(c *gin.Context) {
 	}
 }
 
-func VerifyCredentials(userId, password string) (SimpleUser, bool) {
-	user, ok := ZINC_CACHED_USERS[userId]
+func VerifyCredentials(userID, password string) (SimpleUser, bool) {
+	user, ok := ZINC_CACHED_USERS[userID]
 	if !ok {
 		return SimpleUser{}, false
 	}

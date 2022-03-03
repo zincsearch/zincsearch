@@ -12,7 +12,7 @@ import (
 
 func UpdateDocument(c *gin.Context) {
 	indexName := c.Param("target")
-	query_id := c.Param("id") // ID for the document to be updated provided in URL path
+	queryID := c.Param("id") // ID for the document to be updated provided in URL path
 
 	var doc map[string]interface{}
 	if err := c.BindJSON(&doc); err != nil {
@@ -26,8 +26,8 @@ func UpdateDocument(c *gin.Context) {
 	// If id field is present then use it, else create a new UUID and use it
 	if id, ok := doc["_id"]; ok {
 		docID = id.(string)
-	} else if query_id != "" {
-		docID = query_id
+	} else if queryID != "" {
+		docID = queryID
 	}
 	if docID == "" {
 		docID = uuid.New().String() // Generate a new ID if ID was not provided
