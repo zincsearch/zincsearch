@@ -2,7 +2,6 @@ package aggregation
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/blugelabs/bluge/search"
@@ -125,7 +124,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			if agg.Histogram.Size == 0 {
 				agg.Histogram.Size = startup.LoadAggregationTermsSize()
 			}
-			if agg.Histogram.Interval == 0 {
+			if agg.Histogram.Interval <= 0 {
 				return errors.New(errors.ErrorTypeParsingException, "[histogram] aggregation interval must be a positive decimal")
 			}
 			if agg.Histogram.Offset >= agg.Histogram.Interval {
@@ -164,8 +163,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			// format interval
 			var interval int64
 			if agg.DateHistogram.CalendarInterval != "" {
-				calendar := strings.ToLower(agg.DateHistogram.CalendarInterval)
-				switch calendar {
+				switch agg.DateHistogram.CalendarInterval {
 				case "second", "1s":
 					interval = int64(time.Second)
 					agg.DateHistogram.CalendarInterval = ""
@@ -232,6 +230,61 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 				}
 			}
 			req.AddAggregation(name, subreq)
+		case agg.AutoDateHistogram != nil:
+			if agg.AutoDateHistogram.Buckets <= 0 {
+				agg.AutoDateHistogram.Buckets = 10
+			}
+			if agg.AutoDateHistogram.MinimumInterval == "" {
+				agg.AutoDateHistogram.MinimumInterval = "second"
+			}
+			if agg.AutoDateHistogram.MinimumInterval != "" {
+				switch agg.AutoDateHistogram.MinimumInterval {
+				case "second", "minute", "hour", "day", "month", "year":
+					// calendar
+				default:
+					return errors.New(
+						errors.ErrorTypeParsingException,
+						"[auto_date_histogram] aggregation minimum_interval must be Date Calendar, such as: second, minute, hour, day, month, year",
+					)
+				}
+			}
+
+			timeZone := time.UTC
+			if agg.AutoDateHistogram.TimeZone != "" {
+				timeZone, err = zutils.ParseTimeZone(agg.AutoDateHistogram.TimeZone)
+				if err != nil {
+					return errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[auto_date_histogram] time_zone parse err %v", err))
+				}
+			}
+			if agg.AutoDateHistogram.Format == "" {
+				agg.AutoDateHistogram.Format = time.RFC3339
+			}
+			var subreq *zincaggregation.AutoDateHistogramAggregation
+			switch mappings.Properties[agg.AutoDateHistogram.Field].Type {
+			case "time":
+				subreq = zincaggregation.NewAutoDateHistogramAggregation(
+					search.Field(agg.AutoDateHistogram.Field),
+					agg.AutoDateHistogram.Buckets,
+					agg.AutoDateHistogram.MinimumInterval,
+					agg.AutoDateHistogram.Format,
+					timeZone,
+				)
+			default:
+				return errors.New(
+					errors.ErrorTypeParsingException,
+					fmt.Sprintf(
+						"[auto_date_histogram] aggregation doesn't support values of type: [%s:[%v]]",
+						agg.AutoDateHistogram.Field,
+						mappings.Properties[agg.AutoDateHistogram.Field].Type,
+					),
+				)
+			}
+			if len(agg.Aggregations) > 0 {
+				if err := Request(subreq, agg.Aggregations, mappings); err != nil {
+					return err
+				}
+			}
+			req.AddAggregation(name, subreq)
 		case agg.IPRange != nil:
 			return errors.New(errors.ErrorTypeNotImplemented, "[ip_range] aggregation doesn't support")
 		default:
@@ -268,6 +321,12 @@ func Response(bucket *search.Bucket) (map[string]meta.AggregationResponse, error
 				aggRespBuckets = append(aggRespBuckets, aggBucket)
 			}
 			aggResp.Buckets = aggRespBuckets
+
+			// hack: auto_date_histogram aggregation
+			if v, ok := aggs[name].(*zincaggregation.AutoDateHistogramCalculator); ok {
+				aggResp.Interval = v.Interval()
+			}
+
 			resp[name] = aggResp
 		default:
 			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[%s:%T] aggregation doesn't support", name, v))

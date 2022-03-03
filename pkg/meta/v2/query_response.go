@@ -41,8 +41,9 @@ type Total struct {
 }
 
 type AggregationResponse struct {
-	Value   interface{} `json:"value,omitempty"`
-	Buckets interface{} `json:"buckets,omitempty"` // slice or map
+	Value    interface{} `json:"value,omitempty"`
+	Buckets  interface{} `json:"buckets,omitempty"`  // slice or map
+	Interval string      `json:"interval,omitempty"` // support for auto_date_histogram_aggregation
 }
 
 type AggregationBucket struct {

@@ -14,7 +14,6 @@ type DateHistogramAggregation struct {
 	size             int
 	calendarInterval string
 	fixedInterval    int64 // unit: time.Nanosecond
-	offset           int64
 	minDocCount      int
 	format           string
 	timeZone         *time.Location
@@ -41,7 +40,6 @@ func NewDateHistogramAggregation(
 		size:             size,
 		calendarInterval: calendarInterval,
 		fixedInterval:    fixedInterval,
-		offset:           0,
 		minDocCount:      minDocCount,
 		format:           format,
 		timeZone:         timeZone,
@@ -70,7 +68,6 @@ func (t *DateHistogramAggregation) Calculator() search.Calculator {
 		size:             t.size,
 		calendarInterval: t.calendarInterval,
 		fixedInterval:    t.fixedInterval,
-		offset:           t.offset,
 		minDocCount:      t.minDocCount,
 		format:           t.format,
 		timeZone:         t.timeZone,
@@ -93,7 +90,6 @@ type DateHistogramCalculator struct {
 	size             int
 	calendarInterval string
 	fixedInterval    int64
-	offset           int64
 	minDocCount      int
 	format           string
 	timeZone         *time.Location
@@ -137,7 +133,7 @@ func (a *DateHistogramCalculator) Consume(d *search.DocumentMatch) {
 }
 
 func (a *DateHistogramCalculator) Merge(other search.Calculator) {
-	if other, ok := other.(*HistogramCalculator); ok {
+	if other, ok := other.(*DateHistogramCalculator); ok {
 		// first sum to the totals and others
 		a.total += other.total
 		// now, walk all of the other buckets
@@ -161,7 +157,7 @@ func (a *DateHistogramCalculator) Merge(other search.Calculator) {
 }
 
 func (a *DateHistogramCalculator) Finish() {
-	// check bucket
+	// Replenish bucket
 	if a.minDocCount == 0 {
 		if a.calendarInterval != "" {
 			for value := a.minValue; value < a.maxValue; {
@@ -169,7 +165,7 @@ func (a *DateHistogramCalculator) Finish() {
 				if _, ok := a.bucketsMap[termStr]; !ok {
 					a.bucketsList = append(a.bucketsList, search.NewBucket(termStr, a.aggregations))
 				}
-				t := time.Unix(0, value)
+				t := time.Unix(0, value).In(a.timeZone)
 				switch a.calendarInterval {
 				case "week", "1w":
 					t = time.Date(t.Year(), t.Month(), t.Day()+7, 0, 0, 0, 0, t.Location())
@@ -249,7 +245,7 @@ func (a *DateHistogramCalculator) Swap(i, j int) {
 func (a *DateHistogramCalculator) bucketKey(value int64) string {
 	var nsec int64
 	if a.calendarInterval != "" {
-		t := time.Unix(0, value)
+		t := time.Unix(0, value).In(a.timeZone)
 		switch a.calendarInterval {
 		case "week", "1w":
 			t = time.Date(t.Year(), t.Month(), t.Day()-int(t.Weekday()), 0, 0, 0, 0, t.Location())
@@ -273,7 +269,7 @@ func (a *DateHistogramCalculator) bucketKey(value int64) string {
 		}
 		nsec = t.UnixNano()
 	} else {
-		nsec = ((value-a.offset)/a.fixedInterval)*a.fixedInterval + a.offset
+		nsec = (value / a.fixedInterval) * a.fixedInterval
 	}
 
 	return time.Unix(0, nsec).In(a.timeZone).Format(a.format)

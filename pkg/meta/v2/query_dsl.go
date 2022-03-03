@@ -193,19 +193,20 @@ type TermsQuery map[string]interface{}
 type TermsSetQuery struct{}
 
 type Aggregations struct {
-	Avg           *AggregationMetric        `json:"avg"`
-	WeightedAvg   *AggregationMetric        `json:"weighted_avg"`
-	Max           *AggregationMetric        `json:"max"`
-	Min           *AggregationMetric        `json:"min"`
-	Sum           *AggregationMetric        `json:"sum"`
-	Count         *AggregationMetric        `json:"count"`
-	Terms         *AggregationsTerms        `json:"terms"`
-	Range         *AggregationRange         `json:"range"`
-	DateRange     *AggregationDateRange     `json:"date_range"`
-	Histogram     *AggregationHistogram     `json:"histogram"`
-	DateHistogram *AggregationDateHistogram `json:"date_histogram"` // TODO: not implemented
-	IPRange       *AggregationIPRange       `json:"ip_range"`       // TODO: not implemented
-	Aggregations  map[string]Aggregations   `json:"aggs"`           // nested aggregations
+	Avg               *AggregationMetric            `json:"avg"`
+	WeightedAvg       *AggregationMetric            `json:"weighted_avg"`
+	Max               *AggregationMetric            `json:"max"`
+	Min               *AggregationMetric            `json:"min"`
+	Sum               *AggregationMetric            `json:"sum"`
+	Count             *AggregationMetric            `json:"count"`
+	Terms             *AggregationsTerms            `json:"terms"`
+	Range             *AggregationRange             `json:"range"`
+	DateRange         *AggregationDateRange         `json:"date_range"`
+	Histogram         *AggregationHistogram         `json:"histogram"`
+	DateHistogram     *AggregationDateHistogram     `json:"date_histogram"`
+	AutoDateHistogram *AggregationAutoDateHistogram `json:"auto_date_histogram"`
+	IPRange           *AggregationIPRange           `json:"ip_range"` // TODO: not implemented
+	Aggregations      map[string]Aggregations       `json:"aggs"`     // nested aggregations
 }
 
 type AggregationMetric struct {
