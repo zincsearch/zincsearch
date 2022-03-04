@@ -14,6 +14,7 @@ import (
 
 func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
 	value := new(meta.MultiMatchQuery)
+	value.Boost = -1.0
 	for k, v := range query {
 		k := strings.ToLower(k)
 		switch k {
@@ -27,6 +28,8 @@ func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, anal
 					value.Fields = append(value.Fields, vvv.(string))
 				}
 			}
+		case "boost":
+			value.Boost = v.(float64)
 		case "type":
 			value.Type = v.(string)
 		case "operator":
@@ -59,6 +62,9 @@ func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, anal
 	subq := bluge.NewBooleanQuery()
 	if value.MinimumShouldMatch > 0 {
 		subq.SetMinShould(int(value.MinimumShouldMatch))
+	}
+	if value.Boost >= 0 {
+		subq.SetBoost(value.Boost)
 	}
 	for _, field := range value.Fields {
 		subqq := bluge.NewMatchQuery(value.Query).SetField(field).SetOperator(operator)

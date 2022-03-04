@@ -67,8 +67,9 @@ type MatchQuery struct {
 }
 
 type MatchBoolPrefixQuery struct {
-	Query    string `json:"query"`
-	Analyzer string `json:"analyzer"`
+	Query    string  `json:"query"`
+	Analyzer string  `json:"analyzer"`
+	Boost    float64 `json:"boost"`
 }
 
 type MatchPhraseQuery struct {
@@ -87,6 +88,7 @@ type MultiMatchQuery struct {
 	Query              string   `json:"query"`
 	Analyzer           string   `json:"analyzer"`
 	Fields             []string `json:"fields"`
+	Boost              float64  `json:"boost"`
 	Type               string   `json:"type"`     // best_fields(default), most_fields, cross_fields, phrase, phrase_prefix, bool_prefix
 	Operator           string   `json:"operator"` // or(default), and
 	MinimumShouldMatch float64  `json:"minimum_should_match"`
