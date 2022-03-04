@@ -20,6 +20,7 @@ func MatchBoolPrefixQuery(query map[string]interface{}, mappings *meta.Mappings,
 
 	field := ""
 	value := new(meta.MatchBoolPrefixQuery)
+	value.Boost = -1.0
 	for k, v := range query {
 		field = k
 		switch v := v.(type) {
@@ -33,6 +34,8 @@ func MatchBoolPrefixQuery(query map[string]interface{}, mappings *meta.Mappings,
 					value.Query = v.(string)
 				case "analyzer":
 					value.Analyzer = v.(string)
+				case "boost":
+					value.Boost = v.(float64)
 				default:
 					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[match_bool_prefix] unknown field [%s]", k))
 				}
@@ -64,6 +67,9 @@ func MatchBoolPrefixQuery(query map[string]interface{}, mappings *meta.Mappings,
 
 	tokens := zer.Analyze([]byte(value.Query))
 	subq := bluge.NewBooleanQuery()
+	if value.Boost >= 0 {
+		subq.SetBoost(value.Boost)
+	}
 	for i := 0; i < len(tokens); i++ {
 		if i == len(tokens)-1 {
 			subq.AddShould(bluge.NewPrefixQuery(string(tokens[i].Term)).SetField(field))
