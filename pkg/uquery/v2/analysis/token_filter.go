@@ -29,8 +29,8 @@ import (
 	"github.com/blugelabs/bluge/analysis/lang/tr"
 	"github.com/blugelabs/bluge/analysis/token"
 
+	"github.com/prabhatsharma/zinc/pkg/bluge/analysis/lang/chs"
 	"github.com/prabhatsharma/zinc/pkg/errors"
-	pluginanalysis "github.com/prabhatsharma/zinc/pkg/plugin/analysis"
 	zinctoken "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/token"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
@@ -128,6 +128,8 @@ func RequestTokenFilterSingle(name string, options interface{}) (analysis.TokenF
 		return token.NewUniqueTermFilter(), nil
 	case "upper_case", "uppercase":
 		return zinctoken.NewUpperCaseTokenFilter()
+	case "gse_stop":
+		return chs.NewGseStopTokenFilter(), nil
 		// language filters
 	case "ar_normalization", "arabic_normalization":
 		return ar.NormalizeFilter(), nil
@@ -200,9 +202,6 @@ func RequestTokenFilterSingle(name string, options interface{}) (analysis.TokenF
 	case "tr_stemmer", "turkish_stemmer":
 		return tr.StemmerFilter(), nil
 	default:
-		if v, ok := pluginanalysis.GetTokenFilter(name); ok {
-			return v, nil
-		}
 		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[token_filter] unkown token filter [%s]", name))
 	}
 }

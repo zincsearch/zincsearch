@@ -8,7 +8,6 @@ import (
 	"github.com/blugelabs/bluge/analysis/char"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
-	pluginanalysis "github.com/prabhatsharma/zinc/pkg/plugin/analysis"
 	zincchar "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/char"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
@@ -79,9 +78,6 @@ func RequestCharFilterSingle(name string, options interface{}) (analysis.CharFil
 	case "mapping":
 		return zincchar.NewMappingCharFilter(options)
 	default:
-		if v, ok := pluginanalysis.GetCharFilter(name); ok {
-			return v, nil
-		}
 		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] unkown character filter [%s]", name))
 	}
 }

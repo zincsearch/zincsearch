@@ -6,7 +6,6 @@ import (
 	"github.com/rs/zerolog/log"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	"github.com/prabhatsharma/zinc/pkg/plugin"
 )
 
 const (
@@ -19,9 +18,6 @@ var ZINC_INDEX_LIST map[string]*Index
 var ZINC_SYSTEM_INDEX_LIST map[string]*Index
 
 func init() {
-	// need load plugin before load index
-	plugin.Load()
-
 	var err error
 	ZINC_SYSTEM_INDEX_LIST, err = LoadZincSystemIndexes()
 	if err != nil {

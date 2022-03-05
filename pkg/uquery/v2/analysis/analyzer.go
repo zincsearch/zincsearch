@@ -27,9 +27,9 @@ import (
 	"github.com/blugelabs/bluge/analysis/lang/sv"
 	"github.com/blugelabs/bluge/analysis/lang/tr"
 
+	"github.com/prabhatsharma/zinc/pkg/bluge/analysis/lang/chs"
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	pluginanalysis "github.com/prabhatsharma/zinc/pkg/plugin/analysis"
 	zincanalyzer "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/analyzer"
 )
 
@@ -88,14 +88,6 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 				ana, err = zincanalyzer.NewStopAnalyzer(map[string]interface{}{
 					"stopwords": v.Stopwords,
 				})
-			case "whitespace":
-				ana, _ = zincanalyzer.NewWhitespaceAnalyzer()
-			case "keyword":
-				ana = analyzer.NewKeywordAnalyzer()
-			case "simple":
-				ana = analyzer.NewSimpleAnalyzer()
-			case "web":
-				ana = analyzer.NewWebAnalyzer()
 			default:
 				ana, err = QueryAnalyzer(nil, v.Type)
 				if ana == nil || err != nil {
@@ -193,6 +185,10 @@ func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.A
 		return zincanalyzer.NewStopAnalyzer(nil)
 	case "whitespace":
 		return zincanalyzer.NewWhitespaceAnalyzer()
+	case "gse_standard":
+		return chs.NewGseStandardAnalyzer(), nil
+	case "gse_search":
+		return chs.NewGseSearchAnalyzer(), nil
 		// language filters
 	case "ar", "arabic":
 		return ar.Analyzer(), nil
@@ -235,9 +231,6 @@ func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.A
 	case "tr", "turkish":
 		return tr.Analyzer(), nil
 	default:
-		if v, ok := pluginanalysis.GetAnalyzer(name); ok {
-			return v, nil
-		}
 		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] unkown analyzer [%s]", name))
 	}
 }
