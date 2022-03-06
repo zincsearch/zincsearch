@@ -39,7 +39,7 @@ export const getLocale = () => {
 
 const i18n = createI18n({
   locale: getLocale(),
-  fallbackLocale: 'en',
+  fallbackLocale: 'zh-cn',
   messages: messages
 })
 

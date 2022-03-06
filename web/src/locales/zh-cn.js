@@ -1,4 +1,12 @@
 export default {
+  search: {
+    selectIndex: '选择词库',
+    typeSearch: '请输入查询字符',
+    searchField: '查询字段',
+    maxRecords: '结果上限',
+    searchResult: '查询结果',
+    noResult: '没有结果'
+  },
   route: {
     dashboard: '首页',
     documentation: '文档',

@@ -1,4 +1,12 @@
 export default {
+  search: {
+    selectIndex: 'Select Index',
+    typeSearch: 'Type your search query here',
+    searchField: 'Search for a field',
+    maxRecords: 'Max records to return',
+    searchResult: 'Search Results',
+    noResult: 'No Result'
+  },
   route: {
     dashboard: 'Dashboard',
     documentation: 'Documentation',

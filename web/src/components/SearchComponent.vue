@@ -5,7 +5,7 @@
         <div class="col-7">
           <q-input
             v-model="search_query"
-            label="Type your search query here"
+            :label="t('search.typeSearch')"
             :dense="true"
             filled
             type="search"
@@ -23,7 +23,7 @@
         <div class="col-2">
           <q-input
             v-model="max_records_to_return"
-            label="Max records to return"
+            :label="t('search.maxRecords')"
             :dense="true"
             filled
             type="number"
@@ -34,7 +34,7 @@
         <div class="col-1">
           <q-btn
             color="secondary search-button"
-            label="Search"
+            :label="t('table.search')"
             type="submit"
             class="search-submit-button"
             @submit="searchData('querystring')"
@@ -50,7 +50,7 @@
             v-model="selectedIndex"
             use-input
             input-debounce="0"
-            label="Select Index"
+            :label="t('search.selectIndex')"
             :options="options"
             @filter="filterFn"
             @update:model-value="selectFn"
@@ -59,7 +59,7 @@
           >
             <template v-slot:no-option>
               <q-item>
-                <q-item-section class="text-grey"> No results </q-item-section>
+                <q-item-section class="text-grey"> {{ t('search.noResult') }} </q-item-section>
               </q-item>
             </template>
           </q-select>
@@ -83,7 +83,7 @@
                 dense
                 debounce="1"
                 v-model="filter_query"
-                placeholder="Search for a field"
+                :placeholder="t('search.searchField')"
               >
                 <template v-slot:append>
                   <q-icon name="search" />
@@ -97,7 +97,7 @@
           <q-table
             :rows="search_result"
             :columns="result_columns"
-            title="Search Results"
+            :title="t('search.searchResult')"
             v-model:expanded="search_result._source"
             row-key="_id"
             dense
@@ -110,7 +110,7 @@
 
             <template v-slot:header="props">
               <q-tr :props="props">
-                <q-th auto-width />
+                <!-- <q-th auto-width /> -->
                 <q-th v-for="col in props.cols" :key="col.name" :props="props">
                   {{ col.label }}
                 </q-th>
@@ -119,7 +119,7 @@
 
             <template v-slot:body="props">
               <q-tr :props="props">
-                <q-td auto-width>
+                <!-- <q-td auto-width>
                   <q-btn
                     size="sm"
                     color="accent"
@@ -128,7 +128,7 @@
                     @click="props.expand = !props.expand"
                     :icon="props.expand ? 'remove' : 'add'"
                   />
-                </q-td>
+                </q-td> -->
                 <q-td v-for="col in props.cols" :key="col.name" :props="props">
                   {{ col.value }}
                 </q-td>
@@ -159,6 +159,7 @@ import axios from "../axios";
 import { date } from "quasar";
 import { useStore } from "vuex";
 import router from "../router";
+import { useI18n } from "vue-i18n";
 
 // @ is an alias to /src
 import SyntaxGuide from "@/components/SyntaxGuide.vue";
@@ -231,6 +232,7 @@ export default {
     };
 
     const store = useStore();
+    const { t } = useI18n();
 
     const indexList = ref([]);
     const options = ref([]);
@@ -472,6 +474,7 @@ export default {
     // expose to template
     return {
       // variables
+      t,
       dateVal,
       model: ref(null),
       indexList,
