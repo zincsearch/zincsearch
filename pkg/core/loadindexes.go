@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
@@ -23,7 +24,7 @@ func LoadZincSystemIndexes() (map[string]*Index, error) {
 	indexList := make(map[string]*Index)
 	for _, index := range systemIndexList {
 		log.Info().Msgf("Loading system index... [%s:%s]", index, "disk")
-		writer, err := LoadIndexWriter(index, "disk")
+		writer, err := LoadIndexWriter(index, "disk", nil)
 		if err != nil {
 			return nil, err
 		}
@@ -84,7 +85,11 @@ func LoadZincIndexesFromMeta() (map[string]*Index, error) {
 		}
 
 		// load index data
-		index.Writer, err = LoadIndexWriter(index.Name, index.StorageType)
+		var defaultSearchAnalyzer *analysis.Analyzer
+		if index.CachedAnalyzers != nil {
+			defaultSearchAnalyzer = index.CachedAnalyzers["default"]
+		}
+		index.Writer, err = LoadIndexWriter(index.Name, index.StorageType, defaultSearchAnalyzer)
 		if err != nil {
 			log.Error().Msgf("Loading user   index... [%s:%s] error: %v", index.Name, index.StorageType, err)
 		}

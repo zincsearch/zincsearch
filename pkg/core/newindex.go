@@ -68,7 +68,7 @@ func NewIndex(name string, storageType string, useNewIndexMeta int) (*Index, err
 }
 
 // LoadIndexWriter load the index writer from the storage
-func LoadIndexWriter(name string, storageType string) (*bluge.Writer, error) {
+func LoadIndexWriter(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer) (*bluge.Writer, error) {
 	var dataPath string
 	var config bluge.Config
 	switch storageType {
@@ -81,6 +81,10 @@ func LoadIndexWriter(name string, storageType string) (*bluge.Writer, error) {
 	default:
 		dataPath = zutils.GetEnv("ZINC_DATA_PATH", "./data")
 		config = bluge.DefaultConfig(dataPath + "/" + name)
+	}
+
+	if defaultSearchAnalyzer != nil {
+		config.DefaultSearchAnalyzer = defaultSearchAnalyzer
 	}
 
 	return bluge.OpenWriter(config)

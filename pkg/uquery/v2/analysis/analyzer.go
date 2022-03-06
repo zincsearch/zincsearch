@@ -235,6 +235,7 @@ func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.A
 	}
 }
 
+// QueryAnalyzerForField returns the analyzer and searchAnalyzer for the given field.
 func QueryAnalyzerForField(data map[string]*analysis.Analyzer, mappings *meta.Mappings, field string) (*analysis.Analyzer, *analysis.Analyzer) {
 	if field == "" {
 		return nil, nil
