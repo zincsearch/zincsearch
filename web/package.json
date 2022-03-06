@@ -13,6 +13,8 @@
     "@quasar/extras": "^1.0.0",
     "axios": "^0.22.0",
     "core-js": "^3.6.5",
+    "element-plus": "^2.0.5",
+    "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "minimist": "^1.2.5",
     "node-forge": "^1.2.1",
@@ -21,6 +23,7 @@
     "quasar": "^2.0.0",
     "register-service-worker": "^1.7.1",
     "vue": "^3.0.0",
+    "vue-i18n": "^9.1.9",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
   },
