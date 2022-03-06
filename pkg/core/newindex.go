@@ -40,6 +40,10 @@ func NewIndex(
 		config = bluge.DefaultConfig(dataPath + "/" + name)
 	}
 
+	if defaultSearchAnalyzer != nil {
+		config.DefaultSearchAnalyzer = defaultSearchAnalyzer
+	}
+
 	writer, err := bluge.OpenWriter(config)
 	if err != nil {
 		return nil, err

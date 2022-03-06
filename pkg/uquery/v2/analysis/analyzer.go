@@ -90,7 +90,7 @@ func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, e
 				})
 			default:
 				ana, err = QueryAnalyzer(nil, v.Type)
-				if ana == nil || err != nil {
+				if ana == nil {
 					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] unsuported build-in analyzer [%s]", v.Type))
 				}
 			}
