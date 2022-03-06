@@ -22,7 +22,7 @@ https://github.com/go-ego/gse
 
 Go efficient multilingual NLP and text segmentation; support english, chinese, japanese and other.
 
-### Environment
+## Environment
 
 you need pass environment to enable gse support:
 
