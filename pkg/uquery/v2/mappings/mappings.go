@@ -81,6 +81,10 @@ func Request(data map[string]interface{}) (*meta.Mappings, error) {
 			}
 		}
 
+		if newProp.Highlightable {
+			newProp.Store = true
+		}
+
 		if newProp.Type != "" {
 			mappings.Properties[field] = newProp
 		}
