@@ -185,14 +185,14 @@ func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.A
 		return zincanalyzer.NewStopAnalyzer(nil)
 	case "whitespace":
 		return zincanalyzer.NewWhitespaceAnalyzer()
-	case "gse_standard":
+	case "gse_standard": // for Chinese support
 		return chs.NewGseStandardAnalyzer(), nil
-	case "gse_search":
+	case "gse_search": // for Chinese support
 		return chs.NewGseSearchAnalyzer(), nil
 		// language filters
 	case "ar", "arabic":
 		return ar.Analyzer(), nil
-	case "cjk":
+	case "cjk": // for Asia language
 		return cjk.Analyzer(), nil
 	case "ckb", "sorani":
 		return ckb.Analyzer(), nil
