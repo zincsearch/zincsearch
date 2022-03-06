@@ -64,8 +64,8 @@ PUT http://localhost:4080/api/index
 					"type": "text",
 					"index": true,
 					"highlightable": true,
-          "analyzer": "gse_search",
-          "search_analyzer": "gse_standard"
+					"analyzer": "gse_search",
+					"search_analyzer": "gse_standard"
 				},
 				"author": {
 					"type": "keyword",
