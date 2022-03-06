@@ -276,7 +276,7 @@ export default {
             search_result["@timestamp"],
             "MMM DD, YYYY HH:mm:ss.SSS UTC Z"
           ),
-        label: "@timestamp",
+        label: t('search.timestamp'),
         align: "left",
         sortable: true,
       },
@@ -284,7 +284,7 @@ export default {
         name: "_source",
         field: (search_result) =>
           JSON.stringify(search_result).substring(0, 150) + " ...",
-        label: "_source",
+        label: t('search.source'),
         align: "left",
         sortable: true,
       },

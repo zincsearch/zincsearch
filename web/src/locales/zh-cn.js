@@ -5,6 +5,8 @@ export default {
     searchField: '查询字段',
     maxRecords: '结果上限',
     searchResult: '查询结果',
+    timestamp: '时间',
+    source: '源代码',
     noResult: '没有结果'
   },
   route: {
