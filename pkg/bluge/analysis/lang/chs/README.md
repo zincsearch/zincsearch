@@ -100,7 +100,7 @@ POST http://localhost:4080/es/my-index-chs/_search
 		}
 	}
 }
-```_
+```
 
 ## custom user dictionary
 
