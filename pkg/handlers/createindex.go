@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/blugelabs/bluge/analysis"
 	"github.com/gin-gonic/gin"
 
 	"github.com/prabhatsharma/zinc/pkg/core"
@@ -48,7 +49,11 @@ func CreateIndex(c *gin.Context) {
 		return
 	}
 
-	index, err := core.NewIndex(newIndex.Name, newIndex.StorageType, core.UseNewIndexMeta)
+	var defaultSearchAnalyzer *analysis.Analyzer
+	if analyzers != nil {
+		defaultSearchAnalyzer = analyzers["default"]
+	}
+	index, err := core.NewIndex(newIndex.Name, newIndex.StorageType, core.UseNewIndexMeta, defaultSearchAnalyzer)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

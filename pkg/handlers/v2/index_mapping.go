@@ -57,7 +57,7 @@ func UpdateIndexMapping(c *gin.Context) {
 		return
 	}
 
-	index, err := core.NewIndex(indexName, newIndex.StorageType, core.UseNewIndexMeta)
+	index, err := core.NewIndex(indexName, newIndex.StorageType, core.UseNewIndexMeta, nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

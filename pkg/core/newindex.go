@@ -15,7 +15,9 @@ import (
 )
 
 // NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
-func NewIndex(name string, storageType string, useNewIndexMeta int) (*Index, error) {
+func NewIndex(
+	name string, storageType string, useNewIndexMeta int,
+	defaultSearchAnalyzer *analysis.Analyzer) (*Index, error) {
 	if name == "" {
 		return nil, fmt.Errorf("core.NewIndex: index name cannot be empty")
 	}
@@ -33,6 +35,7 @@ func NewIndex(name string, storageType string, useNewIndexMeta int) (*Index, err
 		dataPath = zutils.GetEnv("ZINC_MINIO_BUCKET", "")
 		config = directory.GetMinIOConfig(dataPath, name)
 	default:
+		storageType = "disk"
 		dataPath = zutils.GetEnv("ZINC_DATA_PATH", "./data")
 		config = bluge.DefaultConfig(dataPath + "/" + name)
 	}

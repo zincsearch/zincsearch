@@ -53,7 +53,7 @@ func LoadZincIndexesFromMeta() (map[string]*Index, error) {
 	indexList := make(map[string]*Index)
 	next, err := dmi.Next()
 	for err == nil && next != nil {
-		index := &Index{IndexType: "user"}
+		index := &Index{IndexType: "user", StorageType: "disk"}
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
 			switch field {
 			case "name":
@@ -124,7 +124,7 @@ func LoadZincIndexesFromDisk() (map[string]*Index, error) {
 			continue
 		}
 
-		tempIndex, err := NewIndex(iName, "disk", NotCompatibleNewIndexMeta)
+		tempIndex, err := NewIndex(iName, "disk", NotCompatibleNewIndexMeta, nil)
 		if err != nil {
 			log.Print("Error loading index: ", iName, " : ", err.Error()) // inform and move in to next index
 		} else {
@@ -166,7 +166,7 @@ func LoadZincIndexesFromS3() (map[string]*Index, error) {
 
 	for _, obj := range val.CommonPrefixes {
 		iName := (*obj.Prefix)[0 : len(*obj.Prefix)-1]
-		tempIndex, err := NewIndex(iName, "s3", NotCompatibleNewIndexMeta)
+		tempIndex, err := NewIndex(iName, "s3", NotCompatibleNewIndexMeta, nil)
 		if err != nil {
 			log.Print("failed to load index "+iName+" in s3: ", err.Error())
 		} else {
@@ -216,7 +216,7 @@ func LoadZincIndexesFromMinIO() (map[string]*Index, error) {
 
 	for iName := range val {
 		indexName := iName.Key[:len(iName.Key)-1]
-		tempIndex, err := NewIndex(indexName, "minio", NotCompatibleNewIndexMeta)
+		tempIndex, err := NewIndex(indexName, "minio", NotCompatibleNewIndexMeta, nil)
 		if err != nil {
 			log.Print("failed to load index "+iName.Key+" in minio: ", err.Error())
 		} else {
