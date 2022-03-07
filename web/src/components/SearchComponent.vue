@@ -173,17 +173,17 @@ export default {
     selectedFields(newVal) {
       // @timestamp should always be shown
       this.result_columns = [
-        // {
-        //   name: "@timestamp",
-        //   field: (row) =>
-        //     date.formatDate(
-        //       row["@timestamp"],
-        //       "MMM DD, YYYY HH:mm:ss.SSS UTC Z"
-        //     ),
-        //   label: "@timestamp",
-        //   align: "left",
-        //   sortable: true,
-        // },
+        {
+          name: "@timestamp",
+          field: (row) =>
+            date.formatDate(
+              row["@timestamp"],
+              "MMM DD, YYYY HH:mm:ss.SSS UTC Z"
+            ),
+          label: "@timestamp",
+          align: "left",
+          sortable: true,
+        },
       ];
 
       // add all the selected fields one by one
@@ -239,7 +239,7 @@ export default {
     const indexList = ref([]);
     const options = ref([]);
     const search_query = ref("");
-    const max_records_to_return = ref(20);
+    const max_records_to_return = ref(100);
     const resultCount = ref("");
     const search_result = ref([]);
     const selectedIndex = ref("");
@@ -257,7 +257,7 @@ export default {
 
       selectedRelativePeriod: "Minutes",
       selectedRelativeValue: 30,
-      selectedFullTime: ref(true),
+      selectedFullTime: ref(false),
     });
 
     // when the datetime filter changes then update the results
