@@ -23,4 +23,9 @@ export default {
     name: "Zinc",
     introduction: "A modern search engine.",
   },
+  login: {
+    userid: "User ID",
+    signIn: "Sign In",
+    password: "Password",
+  },
 };

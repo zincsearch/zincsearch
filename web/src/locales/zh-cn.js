@@ -23,4 +23,9 @@ export default {
     name: "Zinc",
     introduction: "一个现代化搜索引擎.",
   },
+  login: {
+    userid: "用户名",
+    signIn: "登录",
+    password: "密码",
+  },
 };

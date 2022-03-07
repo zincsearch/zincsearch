@@ -8,7 +8,9 @@
         <div class="row">
           <q-card square class="shadow-24" style="width: 300px; height: 485px">
             <q-card-section class="bg-indigo-5">
-              <h4 class="text-h5 text-white q-my-md">Zinc Search</h4>
+              <h4 class="text-h5 text-white q-my-md">
+                {{ t("menu.zincSearch") }}
+              </h4>
               <div
                 class="absolute-bottom-right q-pr-md"
                 style="transform: translateY(50%)"
@@ -16,7 +18,12 @@
             </q-card-section>
             <q-card-section>
               <!-- <q-form class="q-px-sm q-pt-xl"> -->
-              <q-input square v-model="id" type="text" label="User ID">
+              <q-input
+                square
+                v-model="id"
+                type="text"
+                :label="t('login.userid')"
+              >
                 <template v-slot:prepend>
                   <q-icon name="email" />
                 </template>
@@ -25,7 +32,7 @@
                 square
                 v-model="password"
                 type="password"
-                label="Password"
+                :label="t('login.password')"
               >
                 <template v-slot:prepend>
                   <q-icon name="lock" />
@@ -40,7 +47,7 @@
                 size="lg"
                 color="indigo-4"
                 class="full-width text-white"
-                label="Sign In"
+                :label="t('login.signIn')"
               />
             </q-card-actions>
             <!-- <q-card-section class="text-center q-pa-sm">
@@ -58,11 +65,13 @@ import { ref } from "vue";
 import { useStore } from "vuex";
 import axios from "../axios";
 import router from "../router";
+import { useI18n } from "vue-i18n";
 // import { mapMutations } from 'vuex'
 
 export default {
   name: "Login",
   setup() {
+    const { t } = useI18n();
     const store = useStore();
     const id = ref("");
     const password = ref("");
@@ -99,6 +108,7 @@ export default {
       id,
       password,
       signIn,
+      t,
     };
   },
 };
