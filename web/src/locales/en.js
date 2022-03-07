@@ -19,4 +19,8 @@ export default {
     feedback: "Feedback",
     zincSearch: "Zinc Search",
   },
+  about: {
+    name: "Zinc",
+    introduction: "A modern search engine.",
+  },
 };

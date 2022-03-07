@@ -19,4 +19,8 @@ export default {
     feedback: "反馈问题",
     zincSearch: "Zinc Search",
   },
+  about: {
+    name: "Zinc",
+    introduction: "一个现代化搜索引擎.",
+  },
 };
