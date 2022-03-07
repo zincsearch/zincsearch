@@ -9,6 +9,16 @@ export default {
     source: '_source',
     noResult: 'No Result'
   },
+  menu: {
+    about: 'About',
+    users: 'Users',
+    indexManagement: 'Index Management',
+    search: 'Search',
+    signOut: 'Sign Out',
+    account: 'Account',
+    feedback: 'Feedback',
+    zincSearch: 'Zinc Search'
+  },
   route: {
     dashboard: 'Dashboard',
     documentation: 'Documentation',

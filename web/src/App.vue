@@ -11,7 +11,7 @@
           icon="menu"
         />
 
-        <q-toolbar-title>Zinc Search</q-toolbar-title>
+        <q-toolbar-title>{{ t("menu.zincSearch") }}</q-toolbar-title>
 
         <!-- <div>Quasar v{{ $q.version }}</div> -->
         <q-btn-dropdown outline rounded icon-right="manage_accounts">
@@ -24,14 +24,14 @@
             </div>
           </template>
 
-          <q-item-label header>Account</q-item-label>
+          <q-item-label header>{{ t("menu.account") }}</q-item-label>
 
           <q-item clickable v-close-popup @click="signout">
             <q-item-section avatar>
               <q-avatar icon="exit_to_app" color="red" text-color="white" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>Sign Out</q-item-label>
+              <q-item-label>{{ t("menu.signOut") }}</q-item-label>
               <!-- <q-item-label style="font-size: 0.9rem">{{
                 loggedInUser
               }}</q-item-label>-->
@@ -55,8 +55,8 @@
             <q-icon name="manage_search" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Search</q-item-label>
-            <q-item-label caption>search</q-item-label>
+            <q-item-label>{{ t("menu.search") }}</q-item-label>
+            <q-item-label caption>{{ t("menu.search") }}</q-item-label>
           </q-item-section>
         </q-item>
 
@@ -65,8 +65,8 @@
             <q-icon name="list" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Index Management</q-item-label>
-            <q-item-label caption>Index management</q-item-label>
+            <q-item-label>{{ t("menu.indexManagement") }}</q-item-label>
+            <q-item-label caption>{{ t("menu.indexManagement") }}</q-item-label>
           </q-item-section>
         </q-item>
 
@@ -75,8 +75,8 @@
             <q-icon name="people" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Users</q-item-label>
-            <q-item-label caption>Users</q-item-label>
+            <q-item-label>{{ t("menu.users") }}</q-item-label>
+            <q-item-label caption>{{ t("menu.users") }}</q-item-label>
           </q-item-section>
         </q-item>
 
@@ -85,8 +85,8 @@
             <q-icon name="info" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>About</q-item-label>
-            <q-item-label caption>about</q-item-label>
+            <q-item-label>{{ t("menu.about") }}</q-item-label>
+            <q-item-label caption>{{ t("menu.about") }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -98,7 +98,7 @@
         <div class="feedback">
           <q-btn
             color="green"
-            label="Feedback"
+            :label="t('menu.feedback')"
             class="feedback-button"
             @click="showFeedback"
           />
@@ -115,6 +115,7 @@ import { mapState } from "vuex";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 import router from "./router";
+import { useI18n } from "vue-i18n";
 // import HelloWorld from "./components/HelloWorld.vue";
 
 export default {
@@ -133,6 +134,7 @@ export default {
     // const user = ref({});
     const store = useStore();
     const $q = useQuasar();
+    const { t } = useI18n();
 
     if (window.location.origin != "http://localhost:8080") {
       store.dispatch(
@@ -159,6 +161,7 @@ export default {
       router.push("/");
     }
     return {
+      t,
       leftDrawerOpen: ref(false),
       name,
       role,

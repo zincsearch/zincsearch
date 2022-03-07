@@ -9,6 +9,16 @@ export default {
     source: '源代码',
     noResult: '没有结果'
   },
+  menu: {
+    about: '关于',
+    users: '用户管理',
+    indexManagement: '索引管理',
+    search: '搜索',
+    signOut: '退出',
+    account: '账号管理',
+    feedback: '反馈问题',
+    zincSearch: 'Zinc Search'
+  },
   route: {
     dashboard: '首页',
     documentation: '文档',
