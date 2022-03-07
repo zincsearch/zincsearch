@@ -3,7 +3,9 @@
     <q-dialog v-model="showUserAddDialog">
       <q-card>
         <q-card-section>
-          <div class="text-h6">Add/Update User</div>
+          <div class="text-h6">
+            {{ t("user.addOrUpdate") }}
+          </div>
         </q-card-section>
 
         <q-card-section class="add-user-dialog">
@@ -15,7 +17,9 @@
     <q-dialog v-model="showUserUpdateDialog">
       <q-card>
         <q-card-section>
-          <div class="text-h6">Add/Update User</div>
+          <div class="text-h6">
+            {{ t("user.addOrUpdate") }}
+          </div>
         </q-card-section>
 
         <q-card-section class="add-user-dialog">
@@ -32,7 +36,7 @@
       :rows="users"
       row-key="UserID"
       class="users-table"
-      title="Users"
+      :title="t('user.header')"
       :pagination="pagination"
       :filter="filter_query"
       :filter-method="filter_method"
@@ -44,7 +48,7 @@
           dense
           debounce="1"
           v-model="filter_query"
-          placeholder="Search user"
+          :placeholder="t('user.search')"
           class="search-user"
         >
           <template v-slot:append>
@@ -53,7 +57,7 @@
         </q-input>
         <q-btn class="add-button" color="secondary" @click="addUser">
           <q-icon name="add" />
-          Add User
+          {{ t("user.add") }}
         </q-btn>
       </template>
 
@@ -92,6 +96,7 @@ import { useQuasar } from "quasar";
 import axios from "../axios";
 import store from "../store";
 import AddUpdateUserComponent from "./AddUpdateUserComponent";
+import { useI18n } from "vue-i18n";
 
 export default {
   components: {
@@ -107,6 +112,7 @@ export default {
     const showUserAddDialog = ref(false);
     const showUserUpdateDialog = ref(false);
     const user = ref({});
+    const { t } = useI18n();
 
     function startEditing(u) {
       console.log("startEditing", u);
@@ -213,6 +219,7 @@ export default {
       addUser() {
         showUserAddDialog.value = true;
       },
+      t,
     };
   },
 };

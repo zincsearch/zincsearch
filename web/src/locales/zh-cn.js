@@ -28,4 +28,15 @@ export default {
     signIn: "登录",
     password: "密码",
   },
+  user: {
+    header: "用户管理",
+    id: "用户名",
+    name: "名字",
+    role: "角色",
+    password: "输入密码",
+    repassword: "确认密码",
+    addOrUpdate: "添加/更新用户",
+    add: "添加用户",
+    search: "查询用户",
+  },
 };

@@ -28,4 +28,17 @@ export default {
     signIn: "Sign In",
     password: "Password",
   },
+  user: {
+    header: "Users",
+    id: "User ID",
+    name: "User name",
+    role: "Role",
+    CREATED: "CREATED",
+    UPDATED: "UPDATED",
+    password: "Password",
+    repassword: "Reconfirm Password",
+    addOrUpdate: "Add/Update User",
+    add: "Add User",
+    search: "Search User",
+  },
 };

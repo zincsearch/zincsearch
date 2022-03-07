@@ -11,7 +11,7 @@
           :disabled="beingUpdated"
           :bg-color="uidbgColor"
           type="text"
-          label="User ID"
+          :label="t('user.id')"
           class="form-field"
           :rules="[validateUserID]"
         />
@@ -23,7 +23,7 @@
           filled
           v-model="userData.name"
           type="text"
-          label="User name"
+          :label="t('user.name')"
           class="form-field"
           :rules="[validateUserName]"
         />
@@ -35,7 +35,7 @@
           borderless
           filled
           v-model="userData.role"
-          label="Role"
+          :label="t('user.role')"
           class="form-field"
           :rules="[validateUserRole]"
         />
@@ -47,7 +47,7 @@
           v-model="userData.password"
           filled
           :type="isPwd ? 'password' : 'text'"
-          label="Password"
+          :label="t('user.password')"
           class="form-field"
           :rules="[validatePassword]"
         >
@@ -67,7 +67,7 @@
           v-model="userData.confirmPassword"
           filled
           :type="isPwd ? 'password' : 'text'"
-          label="Reconfirm Password"
+          :label="t('user.repassword')"
           class="form-field"
           :rules="[validateConfirmPassword]"
         >
@@ -83,7 +83,7 @@
       <div>
         <q-btn class="add-button form-field" color="secondary" type="submit">
           <q-icon name="add" />
-          Add/Update User
+          {{ t("user.addOrUpdate") }}
         </q-btn>
       </div>
     </q-form>
@@ -94,6 +94,7 @@
 import { ref } from "vue";
 import axios from "../axios";
 // import { useStore } from "vuex";
+import { useI18n } from "vue-i18n";
 
 export default {
   emits: ["userAdded", "userUpdated"],
@@ -201,6 +202,7 @@ export default {
       confirmPassword: "",
       role: "",
     });
+    const { t } = useI18n();
 
     return {
       uidbgColor,
@@ -210,6 +212,7 @@ export default {
       userData,
       // onSubmit,
       addUserForm,
+      t,
     };
   },
 };
