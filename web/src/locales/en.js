@@ -7,7 +7,7 @@ export default {
     searchResult: "Search Results",
     timestamp: "@timestamp",
     source: "_source",
-    noResult: "No Result"
+    noResult: "No Result",
   },
   menu: {
     about: "About",
@@ -17,6 +17,6 @@ export default {
     signOut: "Sign Out",
     account: "Account",
     feedback: "Feedback",
-    zincSearch: "Zinc Search"
+    zincSearch: "Zinc Search",
   },
 };

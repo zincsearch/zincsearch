@@ -34,7 +34,7 @@
         <div class="col-1">
           <q-btn
             color="secondary search-button"
-            :label="t('table.search')"
+            :label="t('menu.search')"
             type="submit"
             class="search-submit-button"
             @submit="searchData('querystring')"
@@ -59,7 +59,9 @@
           >
             <template v-slot:no-option>
               <q-item>
-                <q-item-section class="text-grey"> {{ t('search.noResult') }} </q-item-section>
+                <q-item-section class="text-grey">
+                  {{ t("search.noResult") }}
+                </q-item-section>
               </q-item>
             </template>
           </q-select>
@@ -276,7 +278,7 @@ export default {
             search_result["@timestamp"],
             "MMM DD, YYYY HH:mm:ss.SSS UTC Z"
           ),
-        label: t('search.timestamp'),
+        label: t("search.timestamp"),
         align: "left",
         sortable: true,
       },
@@ -284,7 +286,7 @@ export default {
         name: "_source",
         field: (search_result) =>
           JSON.stringify(search_result).substring(0, 150) + " ...",
-        label: t('search.source'),
+        label: t("search.source"),
         align: "left",
         sortable: true,
       },
