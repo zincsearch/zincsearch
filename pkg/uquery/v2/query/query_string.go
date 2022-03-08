@@ -40,20 +40,39 @@ func QueryStringQuery(query map[string]interface{}, mappings *meta.Mappings, ana
 		}
 	}
 
+	options := querystr.DefaultOptions()
+
 	// TODO fields
 	// TODO default_field
 	// TODO default_operator
 	// TODO boost
 
-	var zer *analysis.Analyzer
-	if value.Analyzer != "" {
-		zer, _ = zincanalysis.QueryAnalyzer(analyzers, value.Analyzer)
-	}
+	zer, _ := zincanalysis.QueryAnalyzer(analyzers, value.Analyzer)
 	if zer == nil {
 		zer = analyzer.NewStandardAnalyzer()
 	}
-
-	options := querystr.DefaultOptions()
 	options.WithDefaultAnalyzer(zer)
+
+	if len(value.Fields) == 0 {
+		for field, prop := range mappings.Properties {
+			if prop.Type == "text" {
+				value.Fields = append(value.Fields, field)
+			}
+		}
+	}
+	for _, field := range value.Fields {
+		var zer *analysis.Analyzer
+		indexZer, searchZer := zincanalysis.QueryAnalyzerForField(analyzers, mappings, field)
+		if zer == nil && searchZer != nil {
+			zer = searchZer
+		}
+		if zer == nil && indexZer != nil {
+			zer = indexZer
+		}
+		if zer != nil {
+			options.WithAnalyzerForField(field, zer)
+		}
+	}
+
 	return querystr.ParseQueryString(value.Query, options)
 }

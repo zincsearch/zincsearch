@@ -113,7 +113,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (*BulkResponse, error)
 
 			_, exists := core.GetIndex(indexName)
 			if !exists { // If the requested indexName does not exist then create it
-				newIndex, err := core.NewIndex(indexName, "disk", core.UseNewIndexMeta)
+				newIndex, err := core.NewIndex(indexName, "disk", core.UseNewIndexMeta, nil)
 				if err != nil {
 					return bulkRes, err
 				}

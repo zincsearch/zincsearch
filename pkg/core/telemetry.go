@@ -42,15 +42,9 @@ func newTelemetry() *telemetry {
 
 func (t *telemetry) createInstanceID() string {
 	instanceID := uuid.New().String()
-	data := map[string]interface{}{
-		"_id":   "instance_id",
-		"value": instanceID,
-	}
-
-	metaIndex := ZINC_SYSTEM_INDEX_LIST["_metadata"]
-	doc, _ := metaIndex.BuildBlugeDocumentFromJSON("instance_id", &data)
-	doc.AddField(bluge.NewTextField("value", instanceID).StoreValue())
-	metaIndex.Writer.Update(doc.ID(), doc)
+	doc := bluge.NewDocument("instance_id")
+	doc.AddField(bluge.NewKeywordField("value", instanceID).StoreValue())
+	ZINC_SYSTEM_INDEX_LIST["_metadata"].Writer.Update(doc.ID(), doc)
 
 	return instanceID
 }

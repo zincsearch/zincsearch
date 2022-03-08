@@ -7,8 +7,8 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/tokenizer"
 
+	"github.com/prabhatsharma/zinc/pkg/bluge/analysis/lang/chs"
 	"github.com/prabhatsharma/zinc/pkg/errors"
-	pluginanalysis "github.com/prabhatsharma/zinc/pkg/plugin/analysis"
 	zinctokenizer "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/tokenizer"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
@@ -84,10 +84,11 @@ func RequestTokenizerSingle(name string, options interface{}) (analysis.Tokenize
 		return tokenizer.NewWebTokenizer(), nil
 	case "whitespace":
 		return tokenizer.NewWhitespaceTokenizer(), nil
+	case "gse_standard":
+		return chs.NewGseStandardTokenizer(), nil
+	case "gse_search":
+		return chs.NewGseSearchTokenizer(), nil
 	default:
-		if v, ok := pluginanalysis.GetTokenizer(name); ok {
-			return v, nil
-		}
 		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[tokenizer] unkown tokenizer [%s]", name))
 	}
 }

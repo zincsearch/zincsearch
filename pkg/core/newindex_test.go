@@ -9,7 +9,7 @@ import (
 func TestNewIndex(t *testing.T) {
 	Convey("test new index storage dick", t, func() {
 		indexName := "create.new.index"
-		index, err := NewIndex(indexName, "disk", UseNewIndexMeta)
+		index, err := NewIndex(indexName, "disk", UseNewIndexMeta, nil)
 		So(err, ShouldBeNil)
 		So(index.Name, ShouldEqual, indexName)
 	})

@@ -41,8 +41,8 @@ func Analyze(c *gin.Context) {
 				}
 			}
 		}
-		ana, err = zincanalysis.QueryAnalyzer(index.CachedAnalyzers, query.Analyzer)
-		if err != nil {
+		ana, _ = zincanalysis.QueryAnalyzer(index.CachedAnalyzers, query.Analyzer)
+		if ana == nil {
 			if query.Analyzer == "" {
 				ana = new(analysis.Analyzer)
 			} else {
@@ -52,8 +52,8 @@ func Analyze(c *gin.Context) {
 		}
 	} else {
 		// none index specified
-		ana, err = zincanalysis.QueryAnalyzer(nil, query.Analyzer)
-		if err != nil {
+		ana, _ = zincanalysis.QueryAnalyzer(nil, query.Analyzer)
+		if ana == nil {
 			if query.Analyzer == "" {
 				ana = new(analysis.Analyzer)
 			} else {
