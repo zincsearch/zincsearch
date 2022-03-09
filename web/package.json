@@ -18,7 +18,7 @@
     "node-forge": "^1.2.1",
     "nth-check": "^2.0.1",
     "postcss": "^8.4.6",
-    "quasar": "^2.4.13",
+    "quasar": "^2.5.5",
     "register-service-worker": "^1.7.1",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
