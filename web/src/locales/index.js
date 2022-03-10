@@ -1,42 +1,40 @@
-import { createI18n } from 'vue-i18n' // import from runtime only
-
-import { getLanguage } from '@/utils/cookies'
-
+import { createI18n } from "vue-i18n"; // import from runtime only
+import { getLanguage } from "@/utils/cookies";
 
 // User defined lang
-import enLocale from './en'
-import zhLocale from './zh-cn'
+import enLocale from "./en";
+import zhLocale from "./zh-cn";
 
 const messages = {
   en: {
     ...enLocale,
   },
-  'zh-cn': {
+  "zh-cn": {
     ...zhLocale,
-  }
-}
+  },
+};
 
 export const getLocale = () => {
-  const cookieLanguage = getLanguage()
+  const cookieLanguage = getLanguage();
   if (cookieLanguage) {
-    return cookieLanguage
+    return cookieLanguage;
   }
-  const language = navigator.language.toLowerCase()
-  const locales = Object.keys(messages)
+  const language = navigator.language.toLowerCase();
+  const locales = Object.keys(messages);
   for (const locale of locales) {
     if (language.indexOf(locale) > -1) {
-      return locale
+      return locale;
     }
   }
 
   // Default language is chinese
-  return 'zh'
-}
+  return "zh";
+};
 
 const i18n = createI18n({
   locale: getLocale(),
-  fallbackLocale: 'zh-cn',
-  messages: messages
-})
+  fallbackLocale: "zh-cn",
+  messages: messages,
+});
 
-export default i18n
+export default i18n;
