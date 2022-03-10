@@ -13,7 +13,6 @@
     "@quasar/extras": "^1.0.0",
     "axios": "^0.22.0",
     "core-js": "^3.6.5",
-    "element-plus": "^2.0.5",
     "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "minimist": "^1.2.5",
