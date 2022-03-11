@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -205,8 +206,9 @@ func UseTemplate(indexName string) (*meta.Template, error) {
 
 	for _, tpl := range templates {
 		for _, pattern := range tpl.IndexPatterns {
-			pattern = strings.TrimRight(pattern, "*")
-			if strings.HasPrefix(indexName, pattern) {
+			pattern := strings.TrimRight(strings.ReplaceAll(pattern, "*", ".*"), "$") + "$"
+			re := regexp.MustCompile(pattern)
+			if re.MatchString(indexName) {
 				return tpl, nil
 			}
 		}

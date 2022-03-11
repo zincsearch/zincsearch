@@ -29,9 +29,6 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] index_patterns value should be an array of string")
 			}
 			for _, pattern := range patterns {
-				if !strings.HasSuffix(pattern.(string), "*") {
-					return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] index_patterns value should suffix with *")
-				}
 				template.IndexPatterns = append(template.IndexPatterns, pattern.(string))
 			}
 		case "priority":
