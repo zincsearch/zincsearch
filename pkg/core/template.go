@@ -34,11 +34,14 @@ func ListTemplates(pattern string) ([]IndexTemplate, error) {
 	next, err := dmi.Next()
 	for err == nil && next != nil {
 		var name string
+		var timestamp time.Time
 		tpl := new(meta.Template)
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
 			switch field {
 			case "name":
 				name = string(value)
+			case "@timestamp":
+				timestamp, _ = bluge.DecodeDateTime(value)
 			case "_source":
 				json.Unmarshal(value, tpl)
 			default:
@@ -51,6 +54,7 @@ func ListTemplates(pattern string) ([]IndexTemplate, error) {
 
 		templates = append(templates, IndexTemplate{
 			Name:          name,
+			Timestamp:     timestamp,
 			IndexTemplate: tpl,
 		})
 
