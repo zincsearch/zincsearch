@@ -151,13 +151,6 @@ func (index *Index) SetSettings(settings *meta.IndexSettings) error {
 		return nil
 	}
 
-	if settings.NumberOfShards == 0 {
-		settings.NumberOfShards = 3
-	}
-	if settings.NumberOfReplicas == 0 {
-		settings.NumberOfReplicas = 1
-	}
-
 	index.Settings = settings
 
 	return nil

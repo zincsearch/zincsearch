@@ -35,7 +35,7 @@ func CreateIndex(c *gin.Context) {
 	}
 
 	if newIndex.Settings == nil {
-		newIndex.Settings = meta.NewIndexSettings()
+		newIndex.Settings = new(meta.IndexSettings)
 	}
 	analyzers, err := zincanalysis.RequestAnalyzer(newIndex.Settings.Analysis)
 	if err != nil {

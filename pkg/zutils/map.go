@@ -67,6 +67,19 @@ func GetStringSliceFromMap(m interface{}, key string) ([]string, error) {
 	return ss, nil
 }
 
+func GetMapFromMap(m interface{}, key string) (map[string]interface{}, error) {
+	v, err := GetAnyFromMap(m, key)
+	if err != nil {
+		return nil, fmt.Errorf("GetMapFromMap: key [%s] not found", key)
+	}
+	vs, ok := v.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("GetMapFromMap: value [%s] should be an object", key)
+	}
+
+	return vs, nil
+}
+
 func GetAnyFromMap(m interface{}, key string) (interface{}, error) {
 	if m == nil {
 		return nil, fmt.Errorf("GetAnyFromMap: map is nil")
