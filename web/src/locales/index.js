@@ -27,13 +27,13 @@ export const getLocale = () => {
     }
   }
 
-  // Default language is chinese
-  return "zh";
+  // Default language is English
+  return "en";
 };
 
 const i18n = createI18n({
   locale: getLocale(),
-  fallbackLocale: "zh-cn",
+  fallbackLocale: "en",
   messages: messages,
 });
 
