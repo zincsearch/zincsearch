@@ -46,7 +46,7 @@ func CreateUser(userID, name, plaintextPassword, role string) (*ZincUser, error)
 	bdoc.AddField(bluge.NewStoredOnlyField("salt", []byte(newUser.Salt)).StoreValue())
 	bdoc.AddField(bluge.NewStoredOnlyField("role", []byte(newUser.Role)).StoreValue().Aggregatable())
 	bdoc.AddField(bluge.NewDateTimeField("created_at", newUser.CreatedAt).StoreValue().Aggregatable())
-	bdoc.AddField(bluge.NewDateTimeField("updated_at", newUser.Timestamp).StoreValue().Aggregatable())
+	bdoc.AddField(bluge.NewDateTimeField("@timestamp", newUser.Timestamp).StoreValue().Aggregatable())
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
 
 	usersIndexWriter := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer
