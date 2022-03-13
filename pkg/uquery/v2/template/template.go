@@ -2,6 +2,7 @@ package template
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
@@ -23,6 +24,8 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 	for k, v := range data {
 		k = strings.ToLower(k)
 		switch k {
+		case "name":
+			// ignore
 		case "index_patterns":
 			patterns, ok := v.([]interface{})
 			if !ok {
@@ -32,11 +35,16 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 				template.IndexPatterns = append(template.IndexPatterns, pattern.(string))
 			}
 		case "priority":
-			priority, ok := v.(float64)
-			if !ok {
+			switch v := v.(type) {
+			case string:
+				template.Priority, _ = strconv.Atoi(v)
+			case float64:
+				template.Priority = int(v)
+			case int:
+				template.Priority = v
+			default:
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] priority value should be a numberic")
 			}
-			template.Priority = int(priority)
 		case "template":
 			switch v := v.(type) {
 			case string:

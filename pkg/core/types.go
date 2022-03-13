@@ -1,6 +1,8 @@
 package core
 
 import (
+	"time"
+
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/rs/zerolog/log"
@@ -62,5 +64,6 @@ type Index struct {
 
 type IndexTemplate struct {
 	Name          string         `json:"name"`
+	Timestamp     time.Time      `json:"@timestamp"`
 	IndexTemplate *meta.Template `json:"index_template"`
 }

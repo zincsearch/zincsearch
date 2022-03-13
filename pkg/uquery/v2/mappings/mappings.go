@@ -9,7 +9,7 @@ import (
 )
 
 func Request(data map[string]interface{}) (*meta.Mappings, error) {
-	if data == nil {
+	if len(data) == 0 {
 		return nil, nil
 	}
 

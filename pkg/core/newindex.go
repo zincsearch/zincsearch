@@ -100,7 +100,7 @@ func LoadIndexWriter(name string, storageType string, defaultSearchAnalyzer *ana
 // storeIndex stores the index to metadata
 func StoreIndex(index *Index) error {
 	if index.Settings == nil {
-		index.Settings = meta.NewIndexSettings()
+		index.Settings = new(meta.IndexSettings)
 	}
 	if index.CachedAnalyzers == nil {
 		index.CachedAnalyzers = make(map[string]*analysis.Analyzer)

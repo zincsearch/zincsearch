@@ -1,20 +1,22 @@
 package index
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 	"github.com/prabhatsharma/zinc/pkg/uquery/v2/mappings"
 )
 
 func Request(data map[string]interface{}) (*meta.Index, error) {
-	if data == nil {
+	if len(data) == 0 {
 		return nil, nil
 	}
 
-	index := meta.NewIndex()
+	index := new(meta.Index)
 	for k, v := range data {
 		k = strings.ToLower(k)
 		switch k {
@@ -23,17 +25,16 @@ func Request(data map[string]interface{}) (*meta.Index, error) {
 			if !ok {
 				return nil, errors.New(errors.ErrorTypeParsingException, "[index] settings should be an object")
 			}
-			for k, v := range v {
-				k = strings.ToLower(k)
-				switch k {
-				case "number_of_shards":
-					index.Settings.NumberOfShards = int(v.(float64))
-				case "number_of_replicas":
-					index.Settings.NumberOfReplicas = int(v.(float64))
-				default:
-					// ignore unknown settings
-					// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[index] settings unknown option [%s]", k))
-				}
+			vjson, _ := json.Marshal(v)
+			settings := new(meta.IndexSettings)
+			if err := json.Unmarshal(vjson, settings); err != nil {
+				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[index] settings parse error: %s", err.Error()))
+			}
+			if _, err := analysis.RequestAnalyzer(settings.Analysis); err != nil {
+				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[index] settings.analysis parse error: %s", err.Error()))
+			}
+			if settings != nil && (settings.NumberOfShards > 0 || settings.NumberOfReplicas > 0 || settings.Analysis != nil) {
+				index.Settings = settings
 			}
 		case "mappings":
 			v, ok := v.(map[string]interface{})
