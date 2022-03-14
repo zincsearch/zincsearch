@@ -51,7 +51,7 @@ func UpdateIndexMapping(c *gin.Context) {
 		return
 	}
 
-	mappings, err := mappings.Request(newIndex.Mappings)
+	mappings, err := mappings.Request(nil, newIndex.Mappings)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

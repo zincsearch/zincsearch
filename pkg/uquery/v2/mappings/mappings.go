@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/blugelabs/bluge/analysis"
+
 	"github.com/prabhatsharma/zinc/pkg/errors"
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 )
 
-func Request(data map[string]interface{}) (*meta.Mappings, error) {
+func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{}) (*meta.Mappings, error) {
 	if len(data) == 0 {
 		return nil, nil
 	}
@@ -87,6 +90,20 @@ func Request(data map[string]interface{}) (*meta.Mappings, error) {
 
 		if newProp.Type != "" {
 			mappings.Properties[field] = newProp
+		}
+
+		// check analyzer
+		if newProp.Type == "text" {
+			if newProp.Analyzer != "" {
+				if _, err := zincanalysis.QueryAnalyzer(analyzers, newProp.Analyzer); err != nil {
+					return nil, err
+				}
+			}
+			if newProp.SearchAnalyzer != "" {
+				if _, err := zincanalysis.QueryAnalyzer(analyzers, newProp.SearchAnalyzer); err != nil {
+					return nil, err
+				}
+			}
 		}
 	}
 
