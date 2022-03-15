@@ -19,7 +19,7 @@ func ListIndexes(c *gin.Context) {
 		} else {
 			item.Settings = new(meta.IndexSettings)
 		}
-		if value.Mappings != nil {
+		if value.CachedMappings != nil {
 			item.Mappings = value.CachedMappings
 		}
 		items = append(items, item)
