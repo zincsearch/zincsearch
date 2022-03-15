@@ -20,7 +20,17 @@ func ListIndexes(c *gin.Context) {
 			item.Settings = new(meta.IndexSettings)
 		}
 		if value.CachedMappings != nil {
-			item.Mappings = value.CachedMappings
+			// format mappings
+			mappings := value.CachedMappings
+			if mappings == nil {
+				mappings = meta.NewMappings()
+			}
+			for field := range mappings.Properties {
+				if field == "_id" || field == "@timestamp" {
+					delete(mappings.Properties, field)
+				}
+			}
+			item.Mappings = mappings
 		}
 		items = append(items, item)
 	}
