@@ -121,6 +121,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 		t, err := time.Parse(time.RFC3339, v.(string))
 		if err == nil && !t.IsZero() {
 			timestamp = t
+			delete(*doc, "@timestamp")
 		}
 	}
 	docByteVal, _ := json.Marshal(*doc)
