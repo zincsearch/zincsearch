@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"sort"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prabhatsharma/zinc/pkg/core"
@@ -9,7 +10,7 @@ import (
 )
 
 func ListIndexes(c *gin.Context) {
-	items := make([]*meta.Index, 0, len(core.ZINC_INDEX_LIST))
+	items := make(meta.SortIndex, 0, len(core.ZINC_INDEX_LIST))
 	for name, value := range core.ZINC_INDEX_LIST {
 		item := new(meta.Index)
 		item.Name = name
@@ -34,6 +35,8 @@ func ListIndexes(c *gin.Context) {
 		}
 		items = append(items, item)
 	}
+
+	sort.Sort(items)
 
 	c.JSON(http.StatusOK, items)
 }

@@ -22,3 +22,17 @@ type IndexAnalysis struct {
 	TokenFilter map[string]interface{} `json:"token_filter,omitempty"`
 	Filter      map[string]interface{} `json:"filter,omitempty"` // compatibility with es, alias for TokenFilter
 }
+
+type SortIndex []*Index
+
+func (t SortIndex) Len() int {
+	return len(t)
+}
+
+func (t SortIndex) Swap(i, j int) {
+	t[i], t[j] = t[j], t[i]
+}
+
+func (t SortIndex) Less(i, j int) bool {
+	return t[i].Name < t[j].Name
+}
