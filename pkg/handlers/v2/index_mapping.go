@@ -23,11 +23,6 @@ func GetIndexMapping(c *gin.Context) {
 	if mappings == nil {
 		mappings = meta.NewMappings()
 	}
-	for field := range mappings.Properties {
-		if field == "_id" || field == "@timestamp" {
-			delete(mappings.Properties, field)
-		}
-	}
 
 	c.JSON(http.StatusOK, gin.H{index.Name: gin.H{"mappings": mappings}})
 }
