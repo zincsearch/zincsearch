@@ -1,107 +1,120 @@
 <template>
-  <q-form @submit="signIn">
-    <q-page
-      class="window-height window-width row justify-center items-center"
-      style="background: gray"
-    >
-      <div class="column q-pa-lg">
-        <div class="row">
-          <q-card square class="shadow-24" style="width: 300px; height: 485px">
-            <q-card-section class="bg-indigo-5">
-              <h4 class="text-h5 text-white q-my-md">Zinc Search</h4>
-              <div
-                class="absolute-bottom-right q-pr-md"
-                style="transform: translateY(50%)"
-              ></div>
-            </q-card-section>
-            <q-card-section>
-              <!-- <q-form class="q-px-sm q-pt-xl"> -->
-              <q-input square v-model="id" type="text" label="User ID">
-                <template v-slot:prepend>
+  <q-layout view="hHh lpR fFf">
+    <q-page-container>
+      <q-page class="fullscreen bg-grey-7 flex flex-center">
+        <q-card square class="my-card shadow-24 bg-white text-white">
+          <q-card-section class="bg-primary">
+            <div class="text-h5 q-my-md">Zinc Search</div>
+          </q-card-section>
+          <q-card-section class="bg-white">
+            <q-form class="q-gutter-md" @submit="onSubmit">
+              <q-input v-model="id" label="User ID">
+                <template #prepend>
                   <q-icon name="email" />
                 </template>
               </q-input>
-              <q-input
-                square
-                v-model="password"
-                type="password"
-                label="Password"
-              >
-                <template v-slot:prepend>
+
+              <q-input v-model="password" type="password" label="Password">
+                <template #prepend>
                   <q-icon name="lock" />
                 </template>
               </q-input>
-              <!-- </q-form> -->
-            </q-card-section>
-            <q-card-actions class="q-px-lg">
-              <q-btn
-                type="submit"
-                unelevated
-                size="lg"
-                color="indigo-4"
-                class="full-width text-white"
-                label="Sign In"
-              />
-            </q-card-actions>
-            <!-- <q-card-section class="text-center q-pa-sm">
-              <p class="text-grey-6">Forgot your password?</p>
-            </q-card-section> -->
-          </q-card>
-        </div>
-      </div>
-    </q-page>
-  </q-form>
+
+              <q-card-actions class="q-px-lg q-mt-md q-mb-xl">
+                <q-btn
+                  unelevated
+                  size="lg"
+                  class="full-width"
+                  color="primary"
+                  type="submit"
+                  label="Sign In"
+                  :loading="submitting"
+                />
+              </q-card-actions>
+            </q-form>
+          </q-card-section>
+        </q-card>
+      </q-page>
+    </q-page-container>
+  </q-layout>
 </template>
 
 <script>
-import { ref } from "vue";
+import { defineComponent, ref } from "vue";
 import { useStore } from "vuex";
-import axios from "../axios";
-import router from "../router";
-// import { mapMutations } from 'vuex'
+import { useQuasar } from "quasar";
+import { Buffer } from "buffer";
+import { useRouter } from "vue-router";
+import authapi from "../services/auth";
 
-export default {
-  name: "Login",
+export default defineComponent({
+  name: "PageLogin",
+
   setup() {
     const store = useStore();
+    const router = useRouter();
+    const $q = useQuasar();
+
     const id = ref("");
     const password = ref("");
+    const submitting = ref(false);
 
-    const signIn = () => {
-      const base64encoded = btoa(id.value + ":" + password.value);
-      var creds = {
-        _id: id.value,
-        password: password.value,
-        base64encoded: base64encoded,
-      };
+    const onSubmit = () => {
+      if (id.value == "" || password.value == "") {
+        $q.notify({
+          position: "top",
+          color: "warning",
+          textColor: "white",
+          icon: "warning",
+          message: "Please input",
+        });
+      } else {
+        submitting.value = true;
+        let creds = {
+          _id: id.value,
+          password: password.value,
+          base64encoded: Buffer.from(id.value + ":" + password.value).toString(
+            "base64"
+          ),
+        };
 
-      axios.post(store.state.API_ENDPOINT + "api/login", creds).then((res) => {
-        if (res.data.validated) {
-          creds.name = res.data.user.name;
-          creds.role = res.data.user.role;
+        authapi.login(creds).then((res) => {
+          if (res.data.validated) {
+            creds.name = res.data.user.name;
+            creds.role = res.data.user.role;
 
-          store.dispatch("login", creds);
-
-          localStorage.setItem("base64encoded", base64encoded);
-          localStorage.setItem("_id", creds._id);
-          localStorage.setItem("name", creds.name);
-          localStorage.setItem("role", creds.role);
-
-          router.push({ path: "/search" });
-        } else {
-          alert("Invalid credentials");
-          store.dispatch("logout");
-        }
-      });
+            localStorage.setItem("creds", JSON.stringify(creds));
+            store.dispatch("login", creds);
+            router.replace({ path: "/search" });
+          } else {
+            $q.notify({
+              position: "bottom-right",
+              progress: true,
+              multiLine: true,
+              color: "red-5",
+              textColor: "white",
+              icon: "warning",
+              message: "Invalid credentials",
+            });
+            store.dispatch("logout");
+            submitting.value = false;
+          }
+        });
+      }
     };
 
     return {
       id,
       password,
-      signIn,
+      submitting,
+      onSubmit,
     };
   },
-};
+});
 </script>
 
-<style></style>
+<style lang="scss">
+.my-card {
+  width: 300px;
+}
+</style>
