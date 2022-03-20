@@ -17,7 +17,7 @@
             <apexchart
               ref="chartHistogram"
               width="100%"
-              height="150"
+              height="170"
               type="bar"
               :options="chartOptions"
               :series="chartOptions.series"
