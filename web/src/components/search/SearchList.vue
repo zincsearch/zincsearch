@@ -1,6 +1,5 @@
 <template>
   <div class="col column q-my-md q-ml-md">
-    <div style="display: none">histogram</div>
     <div class="search-list">
       <q-table
         v-model:expanded="searchResult._source"
@@ -12,8 +11,17 @@
         title="Search Results"
         row-key="_id"
       >
-        <template #top-right>
-          <div class="text-subtitle1">{{ resultCount }}</div>
+        <template #top>
+          <div class="chart">
+            <apexchart
+              ref="chartHistogram"
+              width="100%"
+              height="150"
+              type="bar"
+              :options="chartOptions"
+              :series="chartOptions.series"
+            ></apexchart>
+          </div>
         </template>
 
         <template #header="props">
@@ -27,7 +35,7 @@
 
         <template #body="props">
           <q-tr :props="props">
-            <q-td auto-width>
+            <q-td width="30">
               <q-btn
                 size="sm"
                 color="secondary"
@@ -37,9 +45,14 @@
                 @click="props.expand = !props.expand"
               />
             </q-td>
-            <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              {{ col.value }}
-            </q-td>
+            <template v-for="col in props.cols" :key="col.name" :props="props">
+              <q-td v-if="col.name == '@timestamp'" width="238">
+                {{ col.value }}
+              </q-td>
+              <q-td v-else>
+                {{ col.value }}
+              </q-td>
+            </template>
           </q-tr>
           <q-tr v-show="props.expand" :props="props">
             <q-td colspan="100%">
@@ -157,7 +170,38 @@ export default defineComponent({
     };
 
     // whether enable histogram or not
-    const getHistogram = true;
+    const chartKeyFormat = ref("HH:mm:ss");
+    const chartHistogram = ref(null);
+    const chartOptions = {
+      chart: {
+        id: "search-summary",
+        toolbar: {
+          show: true,
+        },
+      },
+      grid: {
+        borderColor: "#eee",
+        strokeDashArray: 5,
+      },
+      colors: ["#26A69A", "#9C27B0"],
+      series: [],
+      xaxis: {
+        type: "numeric",
+        labels: {
+          show: false,
+          rotateAlways: false,
+          rotate: 0,
+          hideOverlappingLabels: true,
+        },
+      },
+      title: {
+        text: "",
+      },
+      noData: {
+        text: "Loading...",
+      },
+    };
+
     const buildSearch = (queryData) => {
       var req = {
         query: {
@@ -172,7 +216,17 @@ export default defineComponent({
 
       var timestamps = getDateConsumableDateTime(queryData.time);
       if (timestamps.start_time || timestamps.end_time) {
-        if (!queryData.time.selectedFullTime) {
+        if (queryData.time.selectedFullTime) {
+          chartKeyFormat.value = "HH:mm:ss";
+          req.aggs = {
+            histogram: {
+              auto_date_histogram: {
+                field: "@timestamp",
+                buckets: 100,
+              },
+            },
+          };
+        } else {
           req.query.bool.must.push({
             range: {
               "@timestamp": {
@@ -181,34 +235,28 @@ export default defineComponent({
               },
             },
           });
-        }
-      }
 
-      if (getHistogram) {
-        req.aggs = {
-          histogram: {
-            date_histogram: {
-              field: "@timestamp",
-              calendar_interval: "1s",
+          req.aggs = {
+            histogram: {
+              date_histogram: {
+                field: "@timestamp",
+                calendar_interval: "1s",
+              },
             },
-          },
-        };
-        console.log(
-          timestamps.end_time,
-          timestamps.start_time,
-          timestamps.end_time - timestamps.start_time > 1000 * 60 * 60 * 24
-        );
-        if (timestamps.end_time - timestamps.start_time > 1000 * 60 * 60 * 1) {
-          req.aggs.histogram.date_histogram.calendar_interval = "1m";
-        }
-        if (timestamps.end_time - timestamps.start_time > 1000 * 60 * 60 * 24) {
-          req.aggs.histogram.date_histogram.calendar_interval = "1h";
-        }
-        if (
-          timestamps.end_time - timestamps.start_time >
-          1000 * 60 * 60 * 24 * 7
-        ) {
-          req.aggs.histogram.date_histogram.calendar_interval = "1d";
+          };
+
+          if (timestamps.end_time - timestamps.start_time >= 1000 * 60 * 30) {
+            req.aggs.histogram.date_histogram.calendar_interval = "1m";
+            chartKeyFormat.value = "HH:mm";
+          }
+          if (timestamps.end_time - timestamps.start_time >= 1000 * 3600 * 24) {
+            req.aggs.histogram.date_histogram.calendar_interval = "1h";
+            chartKeyFormat.value = "MM-DD HH:mm";
+          }
+          if (timestamps.end_time - timestamps.start_time >= 1000 * 86400 * 7) {
+            req.aggs.histogram.date_histogram.calendar_interval = "1d";
+            chartKeyFormat.value = "YYYY-MM-DD";
+          }
         }
       }
 
@@ -259,10 +307,50 @@ export default defineComponent({
             resultCount.value =
               "Found " +
               res.data.hits.total.value.toLocaleString() +
-              " records in " +
+              " hits in " +
               res.data.took +
-              " milliseconds";
+              " ms";
             searchLoading.value = false;
+
+            // rerender the chart
+            nextTick(() => {
+              const interval = res.data.aggregations.histogram["interval"];
+              if (interval) {
+                if (interval.includes("s")) {
+                  chartKeyFormat.value = "HH:mm:ss";
+                } else if (interval.includes("m")) {
+                  chartKeyFormat.value = "HH:mm";
+                } else if (interval.includes("h")) {
+                  chartKeyFormat.value = "MM-DD HH:mm";
+                } else if (interval.includes("d")) {
+                  chartKeyFormat.value = "YYYY-MM-DD";
+                }
+              }
+              chartHistogram.value.updateOptions({
+                title: {
+                  text: resultCount.value,
+                },
+                xaxis: {
+                  type: "numeric",
+                  labels: {
+                    show: res.data.hits.total.value > 0 ? true : false,
+                  },
+                },
+                series: [
+                  {
+                    name: "Count",
+                    data: res.data.aggregations.histogram.buckets.map(
+                      (bucket) => {
+                        return {
+                          x: date.formatDate(bucket.key, chartKeyFormat.value),
+                          y: parseInt(bucket.doc_count / 2, 10),
+                        };
+                      }
+                    ),
+                  },
+                ],
+              });
+            });
           });
         });
     };
@@ -298,6 +386,8 @@ export default defineComponent({
       resultCount,
       searchLoading,
       pagination,
+      chartHistogram,
+      chartOptions,
     };
   },
 });
@@ -306,14 +396,29 @@ export default defineComponent({
 <style lang="scss">
 .search-list {
   width: 100%;
+  .chart {
+    width: 100%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+  .q-table__top {
+    padding: 5px 0 0 0;
+  }
   .q-table thead tr,
   .q-table tbody td {
     height: 38px;
+    padding: 6px 12px;
   }
   .q-table__bottom {
     min-height: 40px;
     padding-top: 0;
     padding-bottom: 0;
+  }
+  .q-td {
+    word-wrap: break-word;
+    word-break: break-all;
+    .expanded {
+      margin: 0;
+    }
   }
 }
 </style>

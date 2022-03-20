@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import { Quasar, Dialog, Notify } from "quasar";
+import VueApexCharts from "vue3-apexcharts";
 
 // import quasarLang from "quasar/lang/zh-CN";
 
@@ -24,6 +25,8 @@ myApp.use(Quasar, {
   plugins: [Dialog, Notify], // import Quasar plugins and add here
   // lang: quasarLang,
 });
+
+myApp.use(VueApexCharts);
 
 // Assumes you have a <div id="app"></div> in your index.html
 myApp.use(store).use(router).mount("#app");

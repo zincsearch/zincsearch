@@ -12,12 +12,14 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
+    "apexcharts": "^3.33.2",
     "axios": "^0.22.0",
     "buffer": "^6.0.0",
     "jsoneditor": "^9.7.3",
     "quasar": "^2.0.0",
     "vue": "^3.2.25",
     "vue-router": "^4.0.0",
+    "vue3-apexcharts": "^1.4.1",
     "vuex": "^4.0.0"
   },
   "devDependencies": {
