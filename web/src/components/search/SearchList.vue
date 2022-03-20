@@ -270,6 +270,14 @@ export default defineComponent({
           hideOverlappingLabels: true,
         },
       },
+      dataLabels: {
+        enabled: false,
+      },
+      plotOptions: {
+        bar: {
+          columnWidth: "90%",
+        },
+      },
       title: {
         text: "",
       },
@@ -324,9 +332,19 @@ export default defineComponent({
           if (timestamps.end_time - timestamps.start_time >= 1000 * 60 * 5) {
             req.aggs.histogram.date_histogram.calendar_interval = "";
             req.aggs.histogram.date_histogram.fixed_interval = "5s";
-            chartKeyFormat.value = "HH:mm";
+            chartKeyFormat.value = "HH:mm:ss";
+          }
+          if (timestamps.end_time - timestamps.start_time >= 1000 * 60 * 10) {
+            req.aggs.histogram.date_histogram.calendar_interval = "";
+            req.aggs.histogram.date_histogram.fixed_interval = "10s";
+            chartKeyFormat.value = "HH:mm:ss";
           }
           if (timestamps.end_time - timestamps.start_time >= 1000 * 60 * 30) {
+            req.aggs.histogram.date_histogram.calendar_interval = "";
+            req.aggs.histogram.date_histogram.fixed_interval = "30s";
+            chartKeyFormat.value = "HH:mm:ss";
+          }
+          if (timestamps.end_time - timestamps.start_time >= 1000 * 60 * 60) {
             req.aggs.histogram.date_histogram.calendar_interval = "1m";
             req.aggs.histogram.date_histogram.fixed_interval = "";
             chartKeyFormat.value = "HH:mm";
