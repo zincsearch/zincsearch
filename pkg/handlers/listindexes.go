@@ -2,33 +2,36 @@ package handlers
 
 import (
 	"net/http"
+	"sort"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prabhatsharma/zinc/pkg/core"
+	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 )
 
 func ListIndexes(c *gin.Context) {
-	var indexListMap = make(map[string]*SimpleIndex)
+	items := make(meta.SortIndex, 0, len(core.ZINC_INDEX_LIST))
 	for name, value := range core.ZINC_INDEX_LIST {
-		mappings := make(map[string]string)
+		item := new(meta.Index)
+		item.Name = name
+		item.StorageType = value.StorageType
+		if value.Settings != nil {
+			item.Settings = value.Settings
+		} else {
+			item.Settings = new(meta.IndexSettings)
+		}
 		if value.CachedMappings != nil {
-			mappings = make(map[string]string, len(value.CachedMappings.Properties))
-			for field, prop := range value.CachedMappings.Properties {
-				if field == "_id" || field == "@timestamp" {
-					continue
-				}
-				mappings[field] = prop.Type
+			// format mappings
+			mappings := value.CachedMappings
+			if mappings == nil {
+				mappings = meta.NewMappings()
 			}
+			item.Mappings = mappings
 		}
-		indexListMap[name] = &SimpleIndex{
-			Name:     name,
-			Mappings: mappings,
-		}
+		items = append(items, item)
 	}
-	c.JSON(http.StatusOK, indexListMap)
-}
 
-type SimpleIndex struct {
-	Name     string            `json:"name"`
-	Mappings map[string]string `json:"mappings"`
+	sort.Sort(items)
+
+	c.JSON(http.StatusOK, items)
 }

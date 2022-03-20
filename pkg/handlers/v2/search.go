@@ -38,7 +38,7 @@ func SearchIndex(c *gin.Context) {
 		}
 
 		storageType = index.StorageType
-		indexSize = index.Size
+		indexSize = index.StorageSize
 		resp, err = index.SearchV2(query)
 	}
 

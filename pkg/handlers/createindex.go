@@ -43,7 +43,7 @@ func CreateIndex(c *gin.Context) {
 		return
 	}
 
-	mappings, err := mappings.Request(newIndex.Mappings)
+	mappings, err := mappings.Request(analyzers, newIndex.Mappings)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

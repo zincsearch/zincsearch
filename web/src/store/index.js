@@ -2,8 +2,7 @@ import { createStore } from "vuex";
 
 export default createStore({
   state: {
-    // API_ENDPOINT: "http://35.161.54.122:4080/",
-    API_ENDPOINT: "http://localhost:4080/",
+    API_ENDPOINT: "http://localhost:4080",
     user: {
       isLoggedIn: false,
       _id: "",
@@ -19,7 +18,7 @@ export default createStore({
       if (payload && payload._id && payload.base64encoded) {
         state.user.isLoggedIn = true;
         state.user._id = payload._id;
-        state.user.name = payload.name;
+        state.user.name = payload.name || payload._id;
         state.user.role = payload.role;
         state.user.base64encoded = payload.base64encoded;
       }

@@ -116,8 +116,16 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 		StoreIndex(index)
 	}
 
+	timestamp := time.Now()
+	if v, ok := flatDoc["@timestamp"]; ok {
+		t, err := time.Parse(time.RFC3339, v.(string))
+		if err == nil && !t.IsZero() {
+			timestamp = t
+			delete(*doc, "@timestamp")
+		}
+	}
 	docByteVal, _ := json.Marshal(*doc)
-	bdoc.AddField(bluge.NewDateTimeField("@timestamp", time.Now()).StoreValue().Sortable().Aggregatable())
+	bdoc.AddField(bluge.NewDateTimeField("@timestamp", timestamp).StoreValue().Sortable().Aggregatable())
 	bdoc.AddField(bluge.NewStoredOnlyField("_index", []byte(index.Name)))
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil)) // Add _all field that can be used for search
