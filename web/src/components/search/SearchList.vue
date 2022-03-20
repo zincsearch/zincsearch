@@ -156,6 +156,8 @@ export default defineComponent({
       }
     };
 
+    // whether enable histogram or not
+    const getHistogram = true;
     const buildSearch = (queryData) => {
       var req = {
         query: {
@@ -179,6 +181,34 @@ export default defineComponent({
               },
             },
           });
+        }
+      }
+
+      if (getHistogram) {
+        req.aggs = {
+          histogram: {
+            date_histogram: {
+              field: "@timestamp",
+              calendar_interval: "1s",
+            },
+          },
+        };
+        console.log(
+          timestamps.end_time,
+          timestamps.start_time,
+          timestamps.end_time - timestamps.start_time > 1000 * 60 * 60 * 24
+        );
+        if (timestamps.end_time - timestamps.start_time > 1000 * 60 * 60 * 1) {
+          req.aggs.histogram.date_histogram.calendar_interval = "1m";
+        }
+        if (timestamps.end_time - timestamps.start_time > 1000 * 60 * 60 * 24) {
+          req.aggs.histogram.date_histogram.calendar_interval = "1h";
+        }
+        if (
+          timestamps.end_time - timestamps.start_time >
+          1000 * 60 * 60 * 24 * 7
+        ) {
+          req.aggs.histogram.date_histogram.calendar_interval = "1d";
         }
       }
 

@@ -7,5 +7,6 @@
         "javascriptreact",
         "vue"
     ],
-    "eslint.format.enable": true
+    "eslint.format.enable": true,
+    "eslint.workingDirectories": [ "./web" ]
 }
