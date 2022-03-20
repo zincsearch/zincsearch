@@ -41,6 +41,7 @@
             filled
             borderless
             dense
+            clearable
             debounce="1"
             placeholder="Search for a field"
           >

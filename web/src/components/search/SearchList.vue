@@ -2,6 +2,7 @@
   <div class="col column q-my-md q-ml-md">
     <div class="search-list">
       <q-table
+        ref="searchTable"
         v-model:expanded="searchResult._source"
         :rows="searchResult"
         :columns="resultColumns"
@@ -62,6 +63,79 @@
             </q-td>
           </q-tr>
         </template>
+
+        <template #bottom="scope">
+          <div class="q-table__control full-width row justify-between">
+            <div class="max-result">
+              <q-input
+                v-model="maxRecordToReturn"
+                label="max records to return"
+                dense
+                filled
+                square
+                type="search"
+                class="search-field"
+              />
+            </div>
+            <div class="q-table__control">
+              <span class="q-table__bottom-item">Records per page:</span>
+              <q-select
+                v-model="pagination.rowsPerPage"
+                borderless
+                :options="perPageOptions"
+                @update:modelValue="changePagination"
+              />
+
+              <span class="q-table__bottom-item"
+                >{{
+                  (scope.pagination.page - 1) * scope.pagination.rowsPerPage +
+                  1
+                }}-{{ scope.pagination.page * scope.pagination.rowsPerPage }} of
+                {{ resultTotal }}</span
+              >
+              <q-btn
+                icon="first_page"
+                color="grey-8"
+                size="sm"
+                round
+                dense
+                flat
+                :disable="scope.isFirstPage"
+                @click="scope.firstPage"
+              />
+              <q-btn
+                icon="chevron_left"
+                color="grey-8"
+                size="sm"
+                round
+                dense
+                flat
+                :disable="scope.isFirstPage"
+                @click="scope.prevPage"
+              />
+              <q-btn
+                icon="chevron_right"
+                color="grey-8"
+                size="sm"
+                round
+                dense
+                flat
+                :disable="scope.isLastPage"
+                @click="scope.nextPage"
+              />
+              <q-btn
+                icon="last_page"
+                color="grey-8"
+                size="sm"
+                round
+                dense
+                flat
+                :disable="scope.isLastPage"
+                @click="scope.lastPage"
+              />
+            </div>
+          </div>
+        </template>
       </q-table>
     </div>
   </div>
@@ -116,8 +190,10 @@ export default defineComponent({
       ];
     };
 
+    const searchTable = ref(null);
     const searchResult = ref([]);
     const resultCount = ref("");
+    const resultTotal = ref(0);
     const resultColumns = ref(defaultColumns());
 
     // get the normalized date and time from the dateVal object
@@ -211,7 +287,7 @@ export default defineComponent({
         },
         sort: ["-@timestamp"],
         form: 0,
-        size: 100,
+        size: parseInt(maxRecordToReturn.value, 10),
       };
 
       var timestamps = getDateConsumableDateTime(queryData.time);
@@ -276,10 +352,24 @@ export default defineComponent({
       return req;
     };
 
+    const maxRecordToReturn = ref(100);
+    const selectedPerPage = ref("20");
+    const perPageOptions = [
+      { label: "5", value: 5 },
+      { label: "10", value: 10 },
+      { label: "20", value: 20 },
+      { label: "50", value: 50 },
+      { label: "100", value: 100 },
+      { label: "All", value: 0 },
+    ];
     const pagination = ref({
       rowsPerPage: 20,
-      // rowsNumber: 100,
     });
+    const changePagination = (val) => {
+      selectedPerPage.value = val.label;
+      pagination.value.rowsPerPage = val.value;
+      searchTable.value.setPagination(pagination.value);
+    };
 
     let lastIndexName = "";
     const searchLoading = ref(false);
@@ -304,6 +394,7 @@ export default defineComponent({
 
           nextTick(() => {
             searchResult.value = results;
+            resultTotal.value = results.length;
             resultCount.value =
               "Found " +
               res.data.hits.total.value.toLocaleString() +
@@ -379,13 +470,19 @@ export default defineComponent({
     };
 
     return {
+      searchTable,
       searchData,
       resetColumns,
       resultColumns,
       searchResult,
+      resultTotal,
       resultCount,
       searchLoading,
+      selectedPerPage,
+      maxRecordToReturn,
+      perPageOptions,
       pagination,
+      changePagination,
       chartHistogram,
       chartOptions,
     };
@@ -394,6 +491,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.max-result {
+  width: 170px;
+}
 .search-list {
   width: 100%;
   .chart {
@@ -407,6 +507,9 @@ export default defineComponent({
   .q-table tbody td {
     height: 38px;
     padding: 6px 12px;
+  }
+  .q-table__bottom {
+    width: 100%;
   }
   .q-table__bottom {
     min-height: 40px;
