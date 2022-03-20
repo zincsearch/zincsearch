@@ -321,16 +321,29 @@ export default defineComponent({
             },
           };
 
+          if (timestamps.end_time - timestamps.start_time >= 1000 * 60 * 5) {
+            req.aggs.histogram.date_histogram.calendar_interval = "";
+            req.aggs.histogram.date_histogram.fixed_interval = "5s";
+            chartKeyFormat.value = "HH:mm";
+          }
           if (timestamps.end_time - timestamps.start_time >= 1000 * 60 * 30) {
             req.aggs.histogram.date_histogram.calendar_interval = "1m";
+            req.aggs.histogram.date_histogram.fixed_interval = "";
             chartKeyFormat.value = "HH:mm";
+          }
+          if (timestamps.end_time - timestamps.start_time >= 1000 * 3600 * 3) {
+            req.aggs.histogram.date_histogram.calendar_interval = "";
+            req.aggs.histogram.date_histogram.fixed_interval = "5m";
+            chartKeyFormat.value = "MM-DD HH:mm";
           }
           if (timestamps.end_time - timestamps.start_time >= 1000 * 3600 * 24) {
             req.aggs.histogram.date_histogram.calendar_interval = "1h";
+            req.aggs.histogram.date_histogram.fixed_interval = "";
             chartKeyFormat.value = "MM-DD HH:mm";
           }
           if (timestamps.end_time - timestamps.start_time >= 1000 * 86400 * 7) {
             req.aggs.histogram.date_histogram.calendar_interval = "1d";
+            req.aggs.histogram.date_histogram.fixed_interval = "";
             chartKeyFormat.value = "YYYY-MM-DD";
           }
         }
