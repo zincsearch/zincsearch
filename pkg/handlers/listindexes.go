@@ -15,6 +15,8 @@ func ListIndexes(c *gin.Context) {
 		item := new(meta.Index)
 		item.Name = name
 		item.StorageType = value.StorageType
+		item.StorageSize = int64(value.StorageSize)
+		item.DocsCount = value.DocsCount
 		if value.Settings != nil {
 			item.Settings = value.Settings
 		} else {

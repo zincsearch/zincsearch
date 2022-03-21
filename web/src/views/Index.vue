@@ -117,7 +117,7 @@ export default defineComponent({
             "#": counter++,
             name: data.name,
             docs_count: data.docs_count,
-            storage_size: data.storage_size,
+            storage_size: data.storage_size + " MB",
             storage_type: data.storage_type,
             actions: {
               settings: data.settings,

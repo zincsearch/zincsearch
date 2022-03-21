@@ -94,6 +94,12 @@ func LoadZincIndexesFromMeta() (map[string]*Index, error) {
 			log.Error().Msgf("Loading user   index... [%s:%s] error: %v", index.Name, index.StorageType, err)
 		}
 
+		// load index size
+		index.StorageSize = index.LoadStorageSize()
+
+		// load index doc count
+		index.DocsCount, _ = index.LoadDocCount()
+
 		indexList[index.Name] = index
 
 		next, err = dmi.Next()

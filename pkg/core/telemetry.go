@@ -3,7 +3,6 @@ package core
 import (
 	"context"
 	"math"
-	"path/filepath"
 	"runtime"
 	"sync"
 	"time"
@@ -153,20 +152,10 @@ func (t *telemetry) TotalIndexSize() float64 {
 }
 
 func (t *telemetry) GetIndexSize(indexName string) float64 {
-	size := 0.0
-	indexType := ZINC_INDEX_LIST[indexName].IndexType
-
-	switch indexType {
-	case "s3":
-		return size // TODO: implement later
-	case "minio":
-		return size // TODO: implement later
-	default:
-		path := zutils.GetEnv("ZINC_DATA_PATH", "./data")
-		indexLocation := filepath.Join(path, indexName)
-		size, _ = zutils.DirSize(indexLocation)
-		return math.Round(size)
+	if index, ok := ZINC_INDEX_LIST[indexName]; ok {
+		return index.LoadStorageSize()
 	}
+	return 0.0
 }
 
 func (t *telemetry) HeartBeat() {

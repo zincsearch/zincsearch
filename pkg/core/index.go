@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"time"
@@ -15,6 +17,7 @@ import (
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
+	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
@@ -257,4 +260,32 @@ func (index *Index) GetStoredMapping() (*meta.Mappings, error) {
 	}
 
 	return mappings, nil
+}
+
+func (index *Index) LoadStorageSize() float64 {
+	size := 0.0
+
+	switch index.StorageType {
+	case "s3":
+		return size // TODO: implement later
+	case "minio":
+		return size // TODO: implement later
+	default:
+		path := zutils.GetEnv("ZINC_DATA_PATH", "./data")
+		indexLocation := filepath.Join(path, index.Name)
+		size, _ = zutils.DirSize(indexLocation)
+		return math.Round(size)
+	}
+}
+
+func (index *Index) LoadDocCount() (int64, error) {
+	query := bluge.NewMatchAllQuery()
+	searchRequest := bluge.NewTopNSearch(0, query).WithStandardAggregations()
+	reader, _ := index.Writer.Reader()
+	dmi, err := reader.Search(context.Background(), searchRequest)
+	if err != nil {
+		return 0, fmt.Errorf("core.index.LoadDocCount: error executing search: %s", err.Error())
+	}
+
+	return int64(dmi.Aggregations().Count()), nil
 }
