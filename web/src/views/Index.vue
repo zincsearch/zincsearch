@@ -3,6 +3,7 @@
     <q-table
       title="Indexes"
       :rows="indexes"
+      :columns="resultColumns"
       row-key="id"
       :pagination="pagination"
       :filter="filterQuery"
@@ -29,7 +30,7 @@
         />
       </template>
 
-      <template v-slot:body-cell-#="props">
+      <template #body-cell-no="props">
         <q-td :props="props" width="80">
           {{ props.value }}
         </q-td>
@@ -113,11 +114,15 @@ export default defineComponent({
       indexService.list().then((res) => {
         var counter = 1;
         indexes.value = res.data.map((data) => {
+          let storage_size = data.storage_size + " KB";
+          if (data.storage_size > 1024) {
+            storage_size = (data.storage_size / 1024).toFixed(2) + " MB";
+          }
           return {
-            "#": counter++,
+            no: counter++,
             name: data.name,
             docs_count: data.docs_count,
-            storage_size: data.storage_size + " MB",
+            storage_size: storage_size,
             storage_type: data.storage_type,
             actions: {
               settings: data.settings,
@@ -129,6 +134,51 @@ export default defineComponent({
     };
 
     getIndexes();
+
+    const resultColumns = [
+      {
+        name: "no",
+        field: (row) => row.no,
+        label: "#",
+        align: "right",
+        sortable: true,
+      },
+      {
+        name: "name",
+        field: (row) => row.name,
+        label: "NAME",
+        align: "left",
+        sortable: true,
+      },
+      {
+        name: "docs_count",
+        field: (row) => row.docs_count,
+        label: "DOCS_COUNT",
+        align: "right",
+        sortable: true,
+      },
+      {
+        name: "storage_size",
+        field: (row) => row.storage_size,
+        label: "STORAGE_SIZE",
+        align: "right",
+        sortable: true,
+      },
+      {
+        name: "storage_type",
+        field: (row) => row.storage_type,
+        label: "STORAGE_TYPE",
+        align: "left",
+        sortable: true,
+      },
+      {
+        name: "actions",
+        field: (row) => row.actions,
+        label: "ACTIONS",
+        align: "left",
+        sortable: true,
+      },
+    ];
 
     const index = ref({});
     const showAddIndexDialog = ref(false);
@@ -168,6 +218,7 @@ export default defineComponent({
     return {
       showAddIndexDialog,
       showPreviewIndexDialog,
+      resultColumns,
       index,
       indexes,
       pagination: {

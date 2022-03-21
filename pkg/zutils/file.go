@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 )
 
+// DirSize return the size of the directory (KB)
 func DirSize(path string) (float64, error) {
 	var size int64
 	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
@@ -16,9 +17,9 @@ func DirSize(path string) (float64, error) {
 		}
 		return err
 	})
-	sizeMB := float64(size) / 1024.0 / 1024.0
+	sizeKB := float64(size) / 1024.0
 
-	return sizeMB, err
+	return sizeKB, err
 }
 
 func IsExist(path string) (bool, error) {
