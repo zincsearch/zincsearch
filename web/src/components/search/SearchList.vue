@@ -552,6 +552,7 @@ export default defineComponent({
     word-break: break-all;
     .expanded {
       margin: 0;
+      white-space: pre-wrap;
       word-wrap: break-word;
       word-break: break-all;
     }
