@@ -4,8 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
+	"path/filepath"
 	"reflect"
 	"strconv"
+	"sync/atomic"
 	"time"
 
 	"github.com/blugelabs/bluge"
@@ -15,6 +18,7 @@ import (
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
+	"github.com/prabhatsharma/zinc/pkg/zutils"
 )
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
@@ -116,8 +120,16 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 		StoreIndex(index)
 	}
 
+	timestamp := time.Now()
+	if v, ok := flatDoc["@timestamp"]; ok {
+		t, err := time.Parse(time.RFC3339, v.(string))
+		if err == nil && !t.IsZero() {
+			timestamp = t
+			delete(*doc, "@timestamp")
+		}
+	}
 	docByteVal, _ := json.Marshal(*doc)
-	bdoc.AddField(bluge.NewDateTimeField("@timestamp", time.Now()).StoreValue().Sortable().Aggregatable())
+	bdoc.AddField(bluge.NewDateTimeField("@timestamp", timestamp).StoreValue().Sortable().Aggregatable())
 	bdoc.AddField(bluge.NewStoredOnlyField("_index", []byte(index.Name)))
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil)) // Add _all field that can be used for search
@@ -249,4 +261,52 @@ func (index *Index) GetStoredMapping() (*meta.Mappings, error) {
 	}
 
 	return mappings, nil
+}
+
+func (index *Index) LoadDocsCount() (int64, error) {
+	query := bluge.NewMatchAllQuery()
+	searchRequest := bluge.NewTopNSearch(0, query).WithStandardAggregations()
+	reader, _ := index.Writer.Reader()
+	dmi, err := reader.Search(context.Background(), searchRequest)
+	if err != nil {
+		return 0, fmt.Errorf("core.index.LoadDocsCount: error executing search: %s", err.Error())
+	}
+
+	return int64(dmi.Aggregations().Count()), nil
+}
+
+func (index *Index) LoadStorageSize() float64 {
+	size := 0.0
+
+	switch index.StorageType {
+	case "s3":
+		return size // TODO: implement later
+	case "minio":
+		return size // TODO: implement later
+	default:
+		path := zutils.GetEnv("ZINC_DATA_PATH", "./data")
+		indexLocation := filepath.Join(path, index.Name)
+		size, _ = zutils.DirSize(indexLocation)
+		return math.Round(size)
+	}
+}
+func (index *Index) ReLoadStorageSize() {
+	if index.StorageSizeNextTime.After(time.Now()) {
+		return // skip
+	}
+
+	index.StorageSizeNextTime = time.Now().Add(time.Minute * 10)
+	go func() {
+		index.StorageSize = index.LoadStorageSize()
+	}()
+}
+
+func (index *Index) ReduceDocsCount(n int64) {
+	atomic.AddInt64(&index.DocsCount, -n)
+	index.ReLoadStorageSize()
+}
+
+func (index *Index) GainDocsCount(n int64) {
+	atomic.AddInt64(&index.DocsCount, n)
+	index.ReLoadStorageSize()
 }

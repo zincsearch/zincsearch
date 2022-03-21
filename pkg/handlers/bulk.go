@@ -134,6 +134,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (*BulkResponse, error)
 				batch[indexName].Update(bdoc.ID(), bdoc)
 			} else {
 				batch[indexName].Insert(bdoc)
+				core.ZINC_INDEX_LIST[indexName].GainDocsCount(1)
 			}
 
 			if documentsInBatch >= batchSize {
@@ -184,6 +185,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (*BulkResponse, error)
 						batch[indexName] = index.NewBatch()
 					}
 					batch[indexName].Delete(bdoc.ID())
+					core.ZINC_INDEX_LIST[indexName].ReduceDocsCount(1)
 
 					bulkRes.Count++
 					bulkRes.Items = append(bulkRes.Items, map[string]*BulkResponseItem{

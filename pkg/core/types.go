@@ -51,15 +51,17 @@ func init() {
 }
 
 type Index struct {
-	Name            string                        `json:"name"`
-	IndexType       string                        `json:"index_type"`   // "system" or "user"
-	StorageType     string                        `json:"storage_type"` // disk, memory, s3
-	Size            float64                       `json:"size"`         // cached size of the index
-	Mappings        map[string]interface{}        `json:"mappings"`
-	Settings        *meta.IndexSettings           `json:"settings"`
-	CachedAnalyzers map[string]*analysis.Analyzer `json:"-"`
-	CachedMappings  *meta.Mappings                `json:"-"`
-	Writer          *bluge.Writer                 `json:"-"`
+	Name                string                        `json:"name"`
+	IndexType           string                        `json:"index_type"`   // "system" or "user"
+	StorageType         string                        `json:"storage_type"` // disk, memory, s3
+	DocsCount           int64                         `json:"docs_count"`   // cached docs count of the index
+	StorageSize         float64                       `json:"size"`         // cached size of the index
+	StorageSizeNextTime time.Time                     `json:"-"`            // control the update of the storage size
+	Mappings            map[string]interface{}        `json:"mappings"`
+	Settings            *meta.IndexSettings           `json:"settings"`
+	CachedAnalyzers     map[string]*analysis.Analyzer `json:"-"`
+	CachedMappings      *meta.Mappings                `json:"-"`
+	Writer              *bluge.Writer                 `json:"-"`
 }
 
 type IndexTemplate struct {

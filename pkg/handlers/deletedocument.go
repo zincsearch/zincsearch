@@ -24,6 +24,7 @@ func DeleteDocument(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 	} else {
+		core.ZINC_INDEX_LIST[indexName].ReduceDocsCount(1)
 		c.JSON(http.StatusOK, gin.H{"message": "Deleted", "index": indexName, "id": queryID})
 	}
 }

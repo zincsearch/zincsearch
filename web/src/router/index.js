@@ -1,47 +1,71 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Search from "../views/Search.vue";
-import LogIn from "../views/LogIn.vue";
-import Users from "../views/Users.vue";
-import About from "../views/About.vue";
-import IndexManagement from "../views/IndexManagement.vue";
-
 import store from "../store/index.js";
+
+import About from "../views/About.vue";
+import Index from "../views/Index.vue";
+import Login from "../views/Login.vue";
+import Search from "../views/Search.vue";
+import Template from "../views/Template.vue";
+import User from "../views/User.vue";
 
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Search,
-  },
-  {
-    path: "/search",
-    name: "Search",
-    component: Search,
+    component: () => import("../layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        name: "home",
+        redirect: (to) => {
+          return { path: "/search", query: { q: to.params.searchText } };
+        },
+      },
+      {
+        path: "search",
+        name: "search",
+        component: Search,
+        meta: {
+          keepAlive: true,
+        },
+      },
+      {
+        path: "index",
+        name: "index",
+        component: Index,
+        meta: {
+          keepAlive: true,
+        },
+      },
+      {
+        path: "template",
+        name: "template",
+        component: Template,
+        meta: {
+          keepAlive: true,
+        },
+      },
+      {
+        path: "user",
+        name: "user",
+        component: User,
+      },
+      {
+        path: "about",
+        name: "about",
+        component: About,
+      },
+    ],
   },
   {
     path: "/login",
-    name: "LogIn",
-    component: LogIn,
+    name: "login",
+    component: Login,
   },
+  // Always leave this as last one,
+  // but you can also remove it
   {
-    path: "/indexmanagement",
-    name: "IndexManagement",
-    component: IndexManagement,
-  },
-  {
-    path: "/users",
-    name: "Users",
-    component: Users,
-  },
-  {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: About,
-    component1: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
+    path: "/:catchAll(.*)*",
+    component: () => import("../views/Error404.vue"),
   },
 ];
 
