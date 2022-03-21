@@ -43,6 +43,7 @@ func SetRoutes(r *gin.Engine) {
 		log.Err(err)
 	}
 
+	HTTPCacheForUI(r)
 	r.StaticFS("/ui/", http.FS(front))
 	r.NoRoute(func(c *gin.Context) {
 		log.Error().
