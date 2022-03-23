@@ -2,6 +2,7 @@
   <q-page class="q-pa-md">
     <div class="column">
       <search-bar
+        ref="searchBar"
         :data="queryData"
         @updated="queryUpdated"
         @refresh="searchData"
@@ -47,6 +48,7 @@ export default defineComponent({
       },
     });
 
+    const searchBar = ref(null);
     const searchList = ref(null);
     const searchData = () => {
       searchList.value.searchData(indexData.value, queryData.value);
@@ -59,7 +61,7 @@ export default defineComponent({
       if (indexData.value.name != name) {
         indexData.value.name = name;
         indexData.value.columns = columns;
-        queryData.value.query = "";
+        searchBar.value.setSearchQuery("");
         searchData();
       } else {
         indexData.value.columns = columns;
@@ -75,6 +77,7 @@ export default defineComponent({
     return {
       indexData,
       queryData,
+      searchBar,
       searchList,
       searchData,
       indexUpdated,

@@ -145,6 +145,10 @@ export default defineComponent({
       });
     };
 
+    const setSearchQuery = (query) => {
+      searchQuery.value = query;
+    };
+
     return {
       searching,
       searchQuery,
@@ -155,6 +159,7 @@ export default defineComponent({
       refreshTimer,
       refreshTimeChange,
       searchData,
+      setSearchQuery,
     };
   },
   beforeUnmount() {
