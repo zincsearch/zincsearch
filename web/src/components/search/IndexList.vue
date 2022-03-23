@@ -28,6 +28,7 @@
         row-key="name"
         :filter="filterField"
         :filter-method="filterFieldFn"
+        :pagination="{ rowsPerPage: 999 }"
         dense
         hide-header
         hide-bottom
