@@ -134,8 +134,10 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (*BulkResponse, error)
 				batch[indexName].Update(bdoc.ID(), bdoc)
 			} else {
 				batch[indexName].Insert(bdoc)
-				core.ZINC_INDEX_LIST[indexName].GainDocsCount(1)
 			}
+
+			// refresh index stats
+			core.ZINC_INDEX_LIST[indexName].GainDocsCount(1)
 
 			if documentsInBatch >= batchSize {
 				for _, indexN := range indexesInThisBatch {
