@@ -61,6 +61,7 @@ export default defineComponent({
       if (indexData.value.name != name) {
         indexData.value.name = name;
         indexData.value.columns = columns;
+        queryData.value.query = "";
         searchBar.value.setSearchQuery("");
         searchData();
       } else {
