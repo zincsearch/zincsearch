@@ -32,6 +32,19 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 		if !ok {
 			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be an object", field))
 		}
+		if v, ok := prop["properties"]; ok {
+			if _, ok := v.(map[string]interface{}); !ok {
+				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be an object", field))
+			}
+			if subMappings, err := Request(analyzers, prop); err == nil {
+				for k, v := range subMappings.Properties {
+					mappings.Properties[field+"."+k] = v
+				}
+			} else {
+				return nil, err
+			}
+			continue
+		}
 		propType, ok := prop["type"]
 		if !ok {
 			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be exists", "type"))
@@ -46,13 +59,17 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 		switch propTypeStr {
 		case "text", "keyword", "numeric", "bool", "time":
 			newProp = meta.NewProperty(propTypeStr)
-		case "integer", "double", "long":
+		case "constant_keyword":
+			newProp = meta.NewProperty("keyword")
+		case "match_only_text":
+			newProp = meta.NewProperty("text")
+		case "integer", "double", "long", "short", "float":
 			newProp = meta.NewProperty("numeric")
 		case "boolean":
 			newProp = meta.NewProperty("bool")
 		case "date", "datetime":
 			newProp = meta.NewProperty("time")
-		case "flattened", "object", "match_only_text":
+		case "flattened", "object", "nested", "wildcard", "byte", "alias", "geo_point", "ip", "ip_range", "scaled_float":
 			// ignore
 		default:
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[mappings] properties [%s] doesn't support type [%s]", field, propTypeStr))
