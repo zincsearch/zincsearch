@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div class="json-editor"></div>
+    <div
+      ref="jsoneditor"
+      :class="{ 'json-editor': true, 'json-none': !loading }"
+    ></div>
     <p class="text-red-7 q-ma-none">{{ errorMessage }}</p>
   </div>
 </template>
@@ -38,6 +41,7 @@ export default {
       errorMessage: ref(""),
       jsonEditor: null,
       internalChange: false,
+      loading: ref(false),
     };
   },
   computed: {
@@ -58,13 +62,17 @@ export default {
     this.init();
   },
   unmounted() {
-    this.jsonEditor?.destroy();
-    this.jsonEditor = null;
+    this.loading = false;
+    if (this.jsonEditor) {
+      this.jsonEditor.destroy();
+      this.jsonEditor = null;
+    }
   },
   methods: {
     init() {
+      this.loading = true;
       this.jsonEditor = new JSONEditor(
-        this.$el.querySelector(".json-editor"),
+        this.$refs.jsoneditor,
         {
           name: this.name,
           mode: this.mode,
@@ -136,6 +144,9 @@ export default {
   background: rgba(0, 0, 0, 0.05);
   line-height: 1.5;
   min-height: v-bind(minHeight);
+}
+.json-none {
+  display: none;
 }
 .ace-jsoneditor,
 textarea.jsoneditor-text {

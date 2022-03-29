@@ -8,8 +8,8 @@
         @refresh="searchData"
       />
       <div class="row">
-        <index-list :data="indexData" @updated="indexUpdated" />
-        <search-list ref="searchList" />
+        <index-list ref="indexList" :data="indexData" @updated="indexUpdated" />
+        <search-list ref="searchList" @updated:fields="updateIndexFields" />
       </div>
     </div>
   </q-page>
@@ -49,6 +49,7 @@ export default defineComponent({
     });
 
     const searchBar = ref(null);
+    const indexList = ref(null);
     const searchList = ref(null);
     const searchData = () => {
       searchList.value.searchData(indexData.value, queryData.value);
@@ -69,20 +70,27 @@ export default defineComponent({
         resetColumns();
       }
     };
+
     const queryUpdated = ({ query, time }) => {
       queryData.value.query = query;
       queryData.value.time = time;
       searchData();
     };
 
+    const updateIndexFields = (fields) => {
+      indexList.value.setIndexFields(fields);
+    };
+
     return {
       indexData,
       queryData,
       searchBar,
+      indexList,
       searchList,
       searchData,
       indexUpdated,
       queryUpdated,
+      updateIndexFields,
     };
   },
 });

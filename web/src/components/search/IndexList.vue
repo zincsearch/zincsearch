@@ -21,7 +21,7 @@
         </template>
       </q-select>
     </div>
-    <div>
+    <div class="index-table">
       <q-table
         v-model:selected="selectedFields"
         :rows="indexFields"
@@ -33,6 +33,7 @@
         hide-header
         hide-bottom
         selection="multiple"
+        class="field-table"
         @row-click="clickFieldFn"
         @update:selected="selectedFieldFn"
       >
@@ -75,8 +76,12 @@ export default defineComponent({
     const selectedFields = ref(getIndexData("columns"));
     const indexList = ref([]);
     const indexFields = ref([]);
-    const mappingList = ref({});
+    const cachedFields = ref({});
     const options = ref([]);
+
+    const defaultFields = () => {
+      return [{ name: "_id" }, { name: "_index" }, { name: "_score" }];
+    };
 
     // index operation
     const filterFn = (val, update) => {
@@ -100,18 +105,23 @@ export default defineComponent({
         return;
       }
       selectedFields.value = [];
-      indexFields.value = [];
-      for (var k in mappingList.value[index.value]) {
-        if (k == "_id" || k == "@timestamp") {
-          continue;
-        }
-        indexFields.value.push({ name: k });
-      }
+      indexFields.value = defaultFields();
+      cachedFields.value = {};
 
       emit("updated", {
         name: index.value,
         columns: [],
       });
+    };
+
+    const setIndexFields = (fields) => {
+      for (var k in fields) {
+        if (cachedFields.value[fields[k]]) {
+          continue;
+        }
+        indexFields.value.push({ name: fields[k] });
+        cachedFields.value[fields[k]] = true;
+      }
     };
 
     // fields operation
@@ -154,9 +164,6 @@ export default defineComponent({
             label: item.name,
             value: item.name,
           });
-          mappingList.value[item.name] = item.mappings
-            ? item.mappings.properties
-            : [];
         });
         selectedIndex.value = indexList.value[0];
         selectFn(selectedIndex.value);
@@ -168,15 +175,16 @@ export default defineComponent({
     return {
       selectedIndex,
       selectedFields,
-      mappingList,
       options,
       filterFn,
       selectFn,
       indexFields,
+      cachedFields,
       filterField,
       filterFieldFn,
       clickFieldFn,
       selectedFieldFn,
+      setIndexFields,
     };
   },
 });
@@ -185,5 +193,11 @@ export default defineComponent({
 <style lang="scss">
 .index-menu {
   width: 220px;
+  .index-table {
+    width: 100%;
+  }
+  .field-table {
+    width: 100%;
+  }
 }
 </style>

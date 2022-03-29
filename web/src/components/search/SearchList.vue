@@ -149,7 +149,14 @@ import searchService from "../../services/search";
 
 export default defineComponent({
   name: "ComponentSearchSearchList",
-  setup() {
+  props: {
+    data: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+  emits: ["updated:fields"],
+  setup(props, { emit }) {
     // Accessing nested JavaScript objects and arrays by string path
     // https://stackoverflow.com/questions/6491463/accessing-nested-javascript-objects-and-arrays-by-string-path
     Object.byString = function (o, s) {
@@ -168,6 +175,29 @@ export default defineComponent({
         }
       }
       return o;
+    };
+
+    Object.deepKeys = function (o) {
+      if (!(o instanceof Object)) {
+        return [];
+      }
+      let results = [];
+      let keys = Object.keys(o);
+      for (var i in keys) {
+        if (o[keys[i]].length) {
+          results.push(keys[i]);
+        } else {
+          let subKeys = Object.deepKeys(o[keys[i]]);
+          if (subKeys.length > 0) {
+            subKeys.forEach((key) => {
+              results.push(keys[i] + "." + key);
+            });
+          } else {
+            results.push(keys[i]);
+          }
+        }
+      }
+      return results;
     };
 
     const defaultColumns = () => {
@@ -421,6 +451,15 @@ export default defineComponent({
           var results = [];
           if (res.data.hits.hits) {
             results = res.data.hits.hits;
+            // update index fields
+            let fields = {};
+            res.data.hits.hits.forEach((row) => {
+              let keys = Object.deepKeys(row._source);
+              for (var i in keys) {
+                fields[keys[i]] = {};
+              }
+            });
+            emit("updated:fields", Object.keys(fields));
           }
 
           nextTick(() => {
@@ -491,7 +530,13 @@ export default defineComponent({
         var newCol = {
           name: indexData.columns[i],
           label: indexData.columns[i],
-          field: (row) => Object.byString(row._source, indexData.columns[i]),
+          field: (row) => {
+            if (["_id", "_index", "_score"].includes(indexData.columns[i])) {
+              return row[indexData.columns[i]];
+            } else {
+              return Object.byString(row._source, indexData.columns[i]);
+            }
+          },
           align: "left",
           sortable: true,
         };
