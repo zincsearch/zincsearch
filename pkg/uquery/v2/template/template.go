@@ -23,7 +23,7 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 	for k, v := range data {
 		k = strings.ToLower(k)
 		switch k {
-		case "name":
+		case "name", "data_stream":
 			// ignore
 		case "index_patterns":
 			patterns, ok := v.([]interface{})

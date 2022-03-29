@@ -1,14 +1,33 @@
 package v1
 
-import "strings"
+import (
+	"regexp"
+	"strings"
 
-func NewESInfo() *ESInfo {
+	"github.com/gin-gonic/gin"
+
+	"github.com/prabhatsharma/zinc/pkg/zutils"
+)
+
+func NewESInfo(c *gin.Context) *ESInfo {
+	version := strings.TrimLeft(Version, "v")
+	userAgent := c.Request.UserAgent()
+	if strings.Contains(userAgent, "Elastic") {
+		reg := regexp.MustCompile(`([0-9]+\.[0-9]+\.[0-9]+)`)
+		matches := reg.FindAllString(userAgent, 1)
+		if len(matches) > 0 {
+			version = matches[0]
+		}
+	}
+	if v := strings.ToUpper(zutils.GetEnv("ZINC_PLUGIN_ES_VERSION", "")); v != "" {
+		version = v
+	}
 	return &ESInfo{
 		Name:        "zinc",
 		ClusterName: "N/A",
 		ClusterUUID: "N/A",
 		Version: ESInfoVersion{
-			Number:                    strings.TrimLeft(Version, "v"),
+			Number:                    version,
 			BuildFlavor:               "default",
 			BuildHash:                 CommitHash,
 			BuildDate:                 BuildDate,
@@ -21,13 +40,13 @@ func NewESInfo() *ESInfo {
 	}
 }
 
-func NewESLicense() *ESLicense {
+func NewESLicense(_ *gin.Context) *ESLicense {
 	return &ESLicense{
 		Status: "active",
 	}
 }
 
-func NewESXPack() *ESXPack {
+func NewESXPack(_ *gin.Context) *ESXPack {
 	return &ESXPack{
 		Build:    make(map[string]bool),
 		Features: make(map[string]bool),
