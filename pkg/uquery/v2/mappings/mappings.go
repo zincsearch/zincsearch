@@ -63,7 +63,7 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 			newProp = meta.NewProperty("keyword")
 		case "match_only_text":
 			newProp = meta.NewProperty("text")
-		case "integer", "double", "long", "short", "float":
+		case "integer", "double", "long", "short", "int", "float":
 			newProp = meta.NewProperty("numeric")
 		case "boolean":
 			newProp = meta.NewProperty("bool")
