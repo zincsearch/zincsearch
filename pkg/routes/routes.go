@@ -96,13 +96,13 @@ func SetRoutes(r *gin.Engine) {
 	 */
 
 	r.GET("/es/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, v1.NewESInfo())
+		c.JSON(http.StatusOK, v1.NewESInfo(c))
 	})
 	r.GET("/es/_license", func(c *gin.Context) {
-		c.JSON(http.StatusOK, v1.NewESLicense())
+		c.JSON(http.StatusOK, v1.NewESLicense(c))
 	})
 	r.GET("/es/_xpack", func(c *gin.Context) {
-		c.JSON(http.StatusOK, v1.NewESXPack())
+		c.JSON(http.StatusOK, v1.NewESXPack(c))
 	})
 
 	r.POST("/es/_search", auth.ZincAuthMiddleware, handlersV2.SearchIndex)

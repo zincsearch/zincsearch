@@ -48,7 +48,6 @@ func UpdateDocument(c *gin.Context) {
 		core.StoreIndex(index)
 	}
 
-	// doc, _ = flatten.Flatten(doc, "", flatten.DotStyle)
 	err = index.UpdateDocument(docID, &doc, mintedID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)

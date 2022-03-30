@@ -6,19 +6,18 @@ import (
 	"fmt"
 	"math"
 	"path/filepath"
-	"reflect"
 	"strconv"
 	"sync/atomic"
 	"time"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
-	"github.com/jeremywohl/flatten"
 	"github.com/rs/zerolog/log"
 
 	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
 	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
 	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/prabhatsharma/zinc/pkg/zutils/flatten"
 )
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
@@ -35,7 +34,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 
 	// Create a new bluge document
 	bdoc := bluge.NewDocument(docID)
-	flatDoc, _ := flatten.Flatten(*doc, "", flatten.DotStyle)
+	flatDoc, _ := flatten.Flatten(*doc, "")
 	// Iterate through each field and add it to the bluge document
 	for key, value := range flatDoc {
 		if value == nil {
@@ -43,20 +42,28 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 		}
 
 		if _, ok := mappings.Properties[key]; !ok {
-			// Use reflection to find the type of the value.
-			// Bluge requires the field type to be specified.
-			v := reflect.ValueOf(value)
-
 			// try to find the type of the value and use it to define default mapping
-			switch v.Type().String() {
-			case "string":
+			switch value.(type) {
+			case string:
 				mappings.Properties[key] = meta.NewProperty("text")
-			case "float64":
+			case float64:
 				mappings.Properties[key] = meta.NewProperty("numeric")
-			case "bool":
+			case bool:
 				mappings.Properties[key] = meta.NewProperty("bool")
-			case "time.Time":
-				mappings.Properties[key] = meta.NewProperty("time")
+			case []interface{}:
+				if v, ok := value.([]interface{}); ok {
+					for _, vv := range v {
+						switch vv.(type) {
+						case string:
+							mappings.Properties[key] = meta.NewProperty("text")
+						case float64:
+							mappings.Properties[key] = meta.NewProperty("numeric")
+						case bool:
+							mappings.Properties[key] = meta.NewProperty("bool")
+						}
+						break
+					}
+				}
 			}
 
 			mappingsNeedsUpdate = true
@@ -66,53 +73,18 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 			continue // not index, skip
 		}
 
-		var field *bluge.TermField
-		switch mappings.Properties[key].Type {
-		case "text":
-			field = bluge.NewTextField(key, value.(string)).SearchTermPositions()
-			fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.CachedAnalyzers, index.CachedMappings, key)
-			if fieldAnalyzer != nil {
-				field.WithAnalyzer(fieldAnalyzer)
+		switch v := value.(type) {
+		case []interface{}:
+			for _, v := range v {
+				if err := index.buildField(mappings, bdoc, key, v); err != nil {
+					return nil, err
+				}
 			}
-		case "numeric":
-			field = bluge.NewNumericField(key, value.(float64))
-		case "keyword":
-			// compatible verion <= v0.1.4
-			if v, ok := value.(bool); ok {
-				field = bluge.NewKeywordField(key, strconv.FormatBool(v))
-			} else if v, ok := value.(string); ok {
-				field = bluge.NewKeywordField(key, v)
-			} else {
-				return nil, fmt.Errorf("keyword type only support text")
-			}
-		case "bool": // found using existing index mapping
-			value := value.(bool)
-			field = bluge.NewKeywordField(key, strconv.FormatBool(value))
-		case "time":
-			format := time.RFC3339
-			if mappings.Properties[key].Format != "" {
-				format = mappings.Properties[key].Format
-			}
-			tim, err := time.Parse(format, value.(string))
-			if err != nil {
+		default:
+			if err := index.buildField(mappings, bdoc, key, v); err != nil {
 				return nil, err
 			}
-			field = bluge.NewDateTimeField(key, tim)
 		}
-
-		if mappings.Properties[key].Store {
-			field.StoreValue()
-		}
-		if mappings.Properties[key].Sortable {
-			field.Sortable()
-		}
-		if mappings.Properties[key].Aggregatable {
-			field.Aggregatable()
-		}
-		if mappings.Properties[key].Highlightable {
-			field.HighlightMatches()
-		}
-		bdoc.AddField(field)
 	}
 
 	if mappingsNeedsUpdate {
@@ -135,6 +107,58 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil)) // Add _all field that can be used for search
 
 	return bdoc, nil
+}
+
+func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, key string, value interface{}) error {
+	var field *bluge.TermField
+	switch mappings.Properties[key].Type {
+	case "text":
+		field = bluge.NewTextField(key, value.(string)).SearchTermPositions()
+		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.CachedAnalyzers, index.CachedMappings, key)
+		if fieldAnalyzer != nil {
+			field.WithAnalyzer(fieldAnalyzer)
+		}
+	case "numeric":
+		field = bluge.NewNumericField(key, value.(float64))
+	case "keyword":
+		// compatible verion <= v0.1.4
+		if v, ok := value.(bool); ok {
+			field = bluge.NewKeywordField(key, strconv.FormatBool(v))
+		} else if v, ok := value.(string); ok {
+			field = bluge.NewKeywordField(key, v)
+		} else {
+			return fmt.Errorf("keyword type only support text")
+		}
+	case "bool": // found using existing index mapping
+		value := value.(bool)
+		field = bluge.NewKeywordField(key, strconv.FormatBool(value))
+	case "time":
+		format := time.RFC3339
+		if mappings.Properties[key].Format != "" {
+			format = mappings.Properties[key].Format
+		}
+		tim, err := time.Parse(format, value.(string))
+		if err != nil {
+			return err
+		}
+		field = bluge.NewDateTimeField(key, tim)
+	}
+
+	if mappings.Properties[key].Store {
+		field.StoreValue()
+	}
+	if mappings.Properties[key].Sortable {
+		field.Sortable()
+	}
+	if mappings.Properties[key].Aggregatable {
+		field.Aggregatable()
+	}
+	if mappings.Properties[key].Highlightable {
+		field.HighlightMatches()
+	}
+	bdoc.AddField(field)
+
+	return nil
 }
 
 func (index *Index) UseTemplate() error {
