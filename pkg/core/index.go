@@ -113,13 +113,21 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 	var field *bluge.TermField
 	switch mappings.Properties[key].Type {
 	case "text":
-		field = bluge.NewTextField(key, value.(string)).SearchTermPositions()
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("field [%s] was set type to [text] but got a %T value", key, value)
+		}
+		field = bluge.NewTextField(key, v).SearchTermPositions()
 		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.CachedAnalyzers, index.CachedMappings, key)
 		if fieldAnalyzer != nil {
 			field.WithAnalyzer(fieldAnalyzer)
 		}
 	case "numeric":
-		field = bluge.NewNumericField(key, value.(float64))
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("field [%s] was set type to [numeric] but got a %T value", key, value)
+		}
+		field = bluge.NewNumericField(key, v)
 	case "keyword":
 		// compatible verion <= v0.1.4
 		if v, ok := value.(bool); ok {
