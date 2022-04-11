@@ -37,7 +37,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 	flatDoc, _ := flatten.Flatten(*doc, "")
 	// Iterate through each field and add it to the bluge document
 	for key, value := range flatDoc {
-		if value == nil {
+		if value == nil || key == "@timestamp" {
 			continue
 		}
 
