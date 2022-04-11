@@ -39,3 +39,16 @@ func FormatDuration(d time.Duration) string {
 	}
 	return strconv.FormatInt(int64(d.Seconds()), 10) + "s"
 }
+
+func Unix(n int64) time.Time {
+	if n > 1e18 {
+		return time.Unix(0, n)
+	}
+	if n > 1e15 {
+		return time.UnixMicro(n)
+	}
+	if n > 1e12 {
+		return time.UnixMilli(n)
+	}
+	return time.Unix(n, 0)
+}

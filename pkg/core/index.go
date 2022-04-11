@@ -94,10 +94,19 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 
 	timestamp := time.Now()
 	if v, ok := flatDoc["@timestamp"]; ok {
-		t, err := time.Parse(time.RFC3339, v.(string))
-		if err == nil && !t.IsZero() {
-			timestamp = t
-			delete(*doc, "@timestamp")
+		switch v := v.(type) {
+		case string:
+			if t, err := time.Parse(time.RFC3339, v); err == nil && !t.IsZero() {
+				timestamp = t
+				delete(*doc, "@timestamp")
+			}
+		case float64:
+			if t := zutils.Unix(int64(v)); !t.IsZero() {
+				timestamp = t
+				delete(*doc, "@timestamp")
+			}
+		default:
+			// noop
 		}
 	}
 	docByteVal, _ := json.Marshal(*doc)
