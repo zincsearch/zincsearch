@@ -37,7 +37,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 	flatDoc, _ := flatten.Flatten(*doc, "")
 	// Iterate through each field and add it to the bluge document
 	for key, value := range flatDoc {
-		if value == nil {
+		if value == nil || key == "@timestamp" {
 			continue
 		}
 
@@ -94,10 +94,19 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 
 	timestamp := time.Now()
 	if v, ok := flatDoc["@timestamp"]; ok {
-		t, err := time.Parse(time.RFC3339, v.(string))
-		if err == nil && !t.IsZero() {
-			timestamp = t
-			delete(*doc, "@timestamp")
+		switch v := v.(type) {
+		case string:
+			if t, err := time.Parse(time.RFC3339, v); err == nil && !t.IsZero() {
+				timestamp = t
+				delete(*doc, "@timestamp")
+			}
+		case float64:
+			if t := zutils.Unix(int64(v)); !t.IsZero() {
+				timestamp = t
+				delete(*doc, "@timestamp")
+			}
+		default:
+			// noop
 		}
 	}
 	docByteVal, _ := json.Marshal(*doc)
@@ -113,13 +122,21 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 	var field *bluge.TermField
 	switch mappings.Properties[key].Type {
 	case "text":
-		field = bluge.NewTextField(key, value.(string)).SearchTermPositions()
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("field [%s] was set type to [text] but got a %T value", key, value)
+		}
+		field = bluge.NewTextField(key, v).SearchTermPositions()
 		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.CachedAnalyzers, index.CachedMappings, key)
 		if fieldAnalyzer != nil {
 			field.WithAnalyzer(fieldAnalyzer)
 		}
 	case "numeric":
-		field = bluge.NewNumericField(key, value.(float64))
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("field [%s] was set type to [numeric] but got a %T value", key, value)
+		}
+		field = bluge.NewNumericField(key, v)
 	case "keyword":
 		// compatible verion <= v0.1.4
 		if v, ok := value.(bool); ok {
