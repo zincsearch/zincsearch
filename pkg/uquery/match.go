@@ -3,7 +3,7 @@ package uquery
 import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis/analyzer"
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
 )
 
 func MatchQuery(iQuery *v1.ZincQuery) (bluge.SearchRequest, error) {

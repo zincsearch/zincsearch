@@ -9,12 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
-	"github.com/prabhatsharma/zinc"
-	"github.com/prabhatsharma/zinc/pkg/auth"
-	"github.com/prabhatsharma/zinc/pkg/core"
-	"github.com/prabhatsharma/zinc/pkg/handlers"
-	handlersV2 "github.com/prabhatsharma/zinc/pkg/handlers/v2"
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
+	"github.com/zinclabs/zinc"
+	"github.com/zinclabs/zinc/pkg/auth"
+	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/handlers"
+	handlersV2 "github.com/zinclabs/zinc/pkg/handlers/v2"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
 )
 
 // SetRoutes sets up all gin HTTP API endpoints that can be called by front end

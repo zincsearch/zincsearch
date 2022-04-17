@@ -24,7 +24,7 @@ RUN adduser \
     --no-create-home \    
     --uid "${UID}" \    
     "${USER}"
-WORKDIR $GOPATH/src/github.com/prabhatsharma/zinc/
+WORKDIR $GOPATH/src/github.com/zinclabs/zinc/
 COPY . .
 # Fetch dependencies.
 # Using go get.
@@ -44,7 +44,7 @@ ENV VERSION=$VERSION
 ENV COMMIT_HASH=$COMMIT_HASH
 ENV BUILD_DATE=$BUILD_DATE
 
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w -X github.com/prabhatsharma/zinc/pkg/meta/v1.Version=${VERSION} -X github.com/prabhatsharma/zinc/pkg/meta/v1.CommitHash=${COMMIT_HASH} -X github.com/prabhatsharma/zinc/pkg/meta/v1.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta/v1.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta/v1.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta/v1.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
 ############################
 # STEP 2 build a small image
 ############################
@@ -58,7 +58,7 @@ COPY --from=builder /etc/group /etc/group
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 # Copy our static executable.
-COPY --from=builder  /go/src/github.com/prabhatsharma/zinc/zinc /go/bin/zinc
+COPY --from=builder  /go/src/github.com/zinclabs/zinc/zinc /go/bin/zinc
 
 # Use an unprivileged user.
 USER appuser:appuser

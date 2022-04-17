@@ -6,10 +6,10 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/gin-gonic/gin"
 
-	"github.com/prabhatsharma/zinc/pkg/core"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/mappings"
+	"github.com/zinclabs/zinc/pkg/core"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/v2/analysis"
+	"github.com/zinclabs/zinc/pkg/uquery/v2/mappings"
 )
 
 func CreateIndex(c *gin.Context) {

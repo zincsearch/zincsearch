@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/prabhatsharma/zinc/pkg/routes"
+	"github.com/zinclabs/zinc/pkg/routes"
 )
 
 var (

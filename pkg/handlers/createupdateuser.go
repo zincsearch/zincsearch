@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/prabhatsharma/zinc/pkg/auth"
+	"github.com/zinclabs/zinc/pkg/auth"
 )
 
 func CreateUpdateUser(c *gin.Context) {

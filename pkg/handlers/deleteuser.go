@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/prabhatsharma/zinc/pkg/auth"
+	"github.com/zinclabs/zinc/pkg/auth"
 )
 
 func DeleteUser(c *gin.Context) {

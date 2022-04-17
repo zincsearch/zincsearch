@@ -13,8 +13,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 
-	"github.com/prabhatsharma/zinc/pkg/core"
-	"github.com/prabhatsharma/zinc/pkg/startup"
+	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/startup"
 )
 
 func BulkHandler(c *gin.Context) {

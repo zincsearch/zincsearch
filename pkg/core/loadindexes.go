@@ -14,8 +14,8 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
 
-	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/v2/analysis"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 var systemIndexList = []string{"_index_mapping", "_index_template", "_index", "_metadata", "_users"}

@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func NewESInfo(c *gin.Context) *ESInfo {

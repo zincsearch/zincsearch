@@ -5,8 +5,8 @@ import (
 	"sort"
 
 	"github.com/gin-gonic/gin"
-	"github.com/prabhatsharma/zinc/pkg/core"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/zinclabs/zinc/pkg/core"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
 )
 
 func ListIndexes(c *gin.Context) {

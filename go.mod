@@ -1,4 +1,4 @@
-module github.com/prabhatsharma/zinc
+module github.com/zinclabs/zinc
 
 go 1.16
 

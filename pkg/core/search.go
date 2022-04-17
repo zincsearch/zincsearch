@@ -7,9 +7,9 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/rs/zerolog/log"
 
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
-	"github.com/prabhatsharma/zinc/pkg/startup"
-	"github.com/prabhatsharma/zinc/pkg/uquery"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
+	"github.com/zinclabs/zinc/pkg/startup"
+	"github.com/zinclabs/zinc/pkg/uquery"
 )
 
 func (index *Index) Search(iQuery *v1.ZincQuery) (*v1.SearchResponse, error) {

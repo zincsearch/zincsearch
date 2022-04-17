@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/prabhatsharma/zinc/pkg/core"
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
+	"github.com/zinclabs/zinc/pkg/core"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
 )
 
 // SearchIndex searches the index for the given http request from end user

@@ -6,9 +6,9 @@ import (
 	"github.com/blugelabs/bluge/search"
 	"github.com/blugelabs/bluge/search/aggregations"
 
-	zincaggregation "github.com/prabhatsharma/zinc/pkg/bluge/aggregation"
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	zincaggregation "github.com/zinclabs/zinc/pkg/bluge/aggregation"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
 )
 
 func AddAggregations(req zincaggregation.SearchAggregation, aggs map[string]v1.AggregationParams, mapping *meta.Mappings) error {

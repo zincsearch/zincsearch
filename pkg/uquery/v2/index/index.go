@@ -6,10 +6,10 @@ import (
 
 	"github.com/blugelabs/bluge/analysis"
 
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/mappings"
+	"github.com/zinclabs/zinc/pkg/errors"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/v2/analysis"
+	"github.com/zinclabs/zinc/pkg/uquery/v2/mappings"
 )
 
 func Request(data map[string]interface{}) (*meta.Index, error) {

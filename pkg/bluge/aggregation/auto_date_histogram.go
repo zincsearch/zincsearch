@@ -7,7 +7,7 @@ import (
 
 	"github.com/blugelabs/bluge/search"
 	"github.com/blugelabs/bluge/search/aggregations"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 type AutoDateHistogramAggregation struct {

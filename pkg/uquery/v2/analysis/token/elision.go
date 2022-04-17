@@ -4,7 +4,7 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/token"
 
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func NewElisionTokenFilter(options interface{}) (analysis.TokenFilter, error) {

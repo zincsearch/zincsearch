@@ -3,7 +3,7 @@ package tokenizer
 import (
 	"github.com/blugelabs/bluge/analysis"
 
-	zinctokenizer "github.com/prabhatsharma/zinc/pkg/bluge/analysis/tokenizer"
+	zinctokenizer "github.com/zinclabs/zinc/pkg/bluge/analysis/tokenizer"
 )
 
 func NewLowerCaseTokenizer() (analysis.Tokenizer, error) {

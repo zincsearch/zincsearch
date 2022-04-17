@@ -13,9 +13,9 @@ builds:
     id: zinc_binaries
     ldflags:
     - -s -w 
-    - -X github.com/prabhatsharma/zinc/pkg/meta/v1.Version={{.Version}} # https://goreleaser.com/customization/templates/
-    - "-X github.com/prabhatsharma/zinc/pkg/meta/v1.BuildDate={{.Date}}"
-    - "-X github.com/prabhatsharma/zinc/pkg/meta/v1.CommitHash={{.Commit}}"
+    - -X github.com/zinclabs/zinc/pkg/meta/v1.Version={{.Version}} # https://goreleaser.com/customization/templates/
+    - "-X github.com/zinclabs/zinc/pkg/meta/v1.BuildDate={{.Date}}"
+    - "-X github.com/zinclabs/zinc/pkg/meta/v1.CommitHash={{.Commit}}"
     env:
       - CGO_ENABLED=0
     goos:
@@ -174,11 +174,11 @@ docker_manifests:
 brews:
   - name: zinc
     tap:
-      owner: prabhatsharma
+      owner: zinclabs
       name: homebrew-tap
       # token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     folder: Formula
-    homepage: "https://github.com/prabhatsharma/zinc"
+    homepage: "https://github.com/zinclabs/zinc"
     description: |
       Zinc is a search engine that does full text indexing. It is a lightweight
       alternative to elasticsearch that requires significantly less resources. It uses

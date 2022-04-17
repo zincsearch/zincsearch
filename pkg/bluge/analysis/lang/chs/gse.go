@@ -6,10 +6,10 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/go-ego/gse"
 
-	"github.com/prabhatsharma/zinc/pkg/bluge/analysis/lang/chs/analyzer"
-	"github.com/prabhatsharma/zinc/pkg/bluge/analysis/lang/chs/token"
-	"github.com/prabhatsharma/zinc/pkg/bluge/analysis/lang/chs/tokenizer"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/bluge/analysis/lang/chs/analyzer"
+	"github.com/zinclabs/zinc/pkg/bluge/analysis/lang/chs/token"
+	"github.com/zinclabs/zinc/pkg/bluge/analysis/lang/chs/tokenizer"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func NewGseStandardAnalyzer() *analysis.Analyzer {

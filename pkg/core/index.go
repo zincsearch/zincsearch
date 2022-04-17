@@ -14,10 +14,10 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/rs/zerolog/log"
 
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
-	"github.com/prabhatsharma/zinc/pkg/zutils/flatten"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/v2/analysis"
+	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/zutils/flatten"
 )
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.

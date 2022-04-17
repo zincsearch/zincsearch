@@ -7,9 +7,9 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/gin-gonic/gin"
 
-	"github.com/prabhatsharma/zinc/pkg/core"
-	zincanalysis "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/core"
+	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/v2/analysis"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func Analyze(c *gin.Context) {

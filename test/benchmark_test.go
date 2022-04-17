@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/prabhatsharma/zinc/pkg/handlers"
+	"github.com/zinclabs/zinc/pkg/handlers"
 )
 
 func BenchmarkBulk(b *testing.B) {

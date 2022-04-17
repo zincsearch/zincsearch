@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/argon2"
 
-	"github.com/prabhatsharma/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/core"
 )
 
 func CreateUser(userID, name, plaintextPassword, role string) (*ZincUser, error) {

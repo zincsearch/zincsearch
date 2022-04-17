@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/prabhatsharma/zinc/pkg/auth"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v1"
 	. "github.com/smartystreets/goconvey/convey"
+	"github.com/zinclabs/zinc/pkg/auth"
+	meta "github.com/zinclabs/zinc/pkg/meta/v1"
 )
 
 type userLoginResponse struct {

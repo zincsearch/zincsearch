@@ -16,7 +16,7 @@ You must have follwing installed:
 ### Lets clone the repo and get started
 
 ```shell
-git clone https://github.com/prabhatsharma/zinc
+git clone https://github.com/zinclabs/zinc
 cd zinc
 ```
 
@@ -49,7 +49,7 @@ go build -o zinc cmd/zinc/main.go # will build the zinc binary
 Advanced
 
 ```shell
-CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X github.com/prabhatsharma/zinc/pkg/meta/v1.Version=${VERSION} -X github.com/prabhatsharma/zinc/pkg/meta/v1.CommitHash=${COMMIT_HASH} -X github.com/prabhatsharma/zinc/pkg/meta/v1.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
+CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta/v1.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta/v1.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta/v1.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
 ```
 
 Setting GOOS and GOARCH appropriately allows for cross platform compilation. Check [Official docs](https://go.dev/doc/install/source#environment) for all possible values and combinations. This [gist](https://gist.github.com/asukakenji/f15ba7e588ac42795f421b48b8aede63) is also great.
@@ -103,7 +103,7 @@ docker build --tag zinc:latest . -f Dockerfile.hub
 ```
 Multi-arch build
 
-In order to build multi-srach builds you will need [buildx](https://docs.docker.com/buildx/working-with-buildx/) installed. You will need to pass the platform flag for the platform that you want to build.
+In order to build multi-arch builds you will need [buildx](https://docs.docker.com/buildx/working-with-buildx/) installed. You will need to pass the platform flag for the platform that you want to build.
 
 ```shell
 docker buildx build --platform linux/amd64 --tag zinc:latest-linux-amd64 . -f Dockerfile.hub

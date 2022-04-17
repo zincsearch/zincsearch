@@ -4,7 +4,7 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/rs/zerolog/log"
 
-	"github.com/prabhatsharma/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/core"
 )
 
 func DeleteUser(userID string) bool {

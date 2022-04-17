@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/index"
+	"github.com/zinclabs/zinc/pkg/errors"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	"github.com/zinclabs/zinc/pkg/uquery/v2/index"
 )
 
 func Request(data map[string]interface{}) (*meta.Template, error) {

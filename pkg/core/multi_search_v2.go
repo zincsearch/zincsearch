@@ -10,8 +10,8 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/rs/zerolog/log"
 
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	parser "github.com/prabhatsharma/zinc/pkg/uquery/v2"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	parser "github.com/zinclabs/zinc/pkg/uquery/v2"
 )
 
 func MultiSearchV2(indexName string, query *meta.ZincQuery) (*meta.SearchResponse, error) {

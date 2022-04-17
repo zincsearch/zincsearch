@@ -7,11 +7,11 @@ import (
 	"github.com/blugelabs/bluge/search"
 	"github.com/blugelabs/bluge/search/aggregations"
 
-	zincaggregation "github.com/prabhatsharma/zinc/pkg/bluge/aggregation"
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	"github.com/prabhatsharma/zinc/pkg/startup"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	zincaggregation "github.com/zinclabs/zinc/pkg/bluge/aggregation"
+	"github.com/zinclabs/zinc/pkg/errors"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	"github.com/zinclabs/zinc/pkg/startup"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggregations, mappings *meta.Mappings) error {

@@ -3,8 +3,8 @@ package token
 import (
 	"github.com/blugelabs/bluge/analysis"
 
-	"github.com/prabhatsharma/zinc/pkg/bluge/analysis/token"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/bluge/analysis/token"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func NewStopTokenFilter(options interface{}) (analysis.TokenFilter, error) {

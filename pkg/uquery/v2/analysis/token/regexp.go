@@ -6,9 +6,9 @@ import (
 
 	"github.com/blugelabs/bluge/analysis"
 
-	"github.com/prabhatsharma/zinc/pkg/bluge/analysis/token"
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/bluge/analysis/token"
+	"github.com/zinclabs/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func NewRegexpTokenFilter(options interface{}) (analysis.TokenFilter, error) {

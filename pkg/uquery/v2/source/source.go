@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/zinclabs/zinc/pkg/errors"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
 )
 
 func Request(v interface{}) (*meta.Source, error) {

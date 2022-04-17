@@ -2,7 +2,7 @@ package uquery
 
 import (
 	"github.com/blugelabs/bluge"
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
 )
 
 // buildRequest combines the ZincQuery with the bluge Query to create a SearchRequest

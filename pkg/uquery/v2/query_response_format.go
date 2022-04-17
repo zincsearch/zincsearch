@@ -3,9 +3,9 @@ package parser
 import (
 	"github.com/blugelabs/bluge/search"
 
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/aggregation"
+	"github.com/zinclabs/zinc/pkg/errors"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	"github.com/zinclabs/zinc/pkg/uquery/v2/aggregation"
 )
 
 func FormatResponse(resp *meta.SearchResponse, q *meta.ZincQuery, buckets *search.Bucket) error {

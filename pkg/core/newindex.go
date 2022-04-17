@@ -9,9 +9,9 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
 
-	"github.com/prabhatsharma/zinc/pkg/directory"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/directory"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.

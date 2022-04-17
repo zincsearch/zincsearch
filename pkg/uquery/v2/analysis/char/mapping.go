@@ -6,9 +6,9 @@ import (
 
 	"github.com/blugelabs/bluge/analysis"
 
-	zincchar "github.com/prabhatsharma/zinc/pkg/bluge/analysis/char"
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	zincchar "github.com/zinclabs/zinc/pkg/bluge/analysis/char"
+	"github.com/zinclabs/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func NewMappingCharFilter(options interface{}) (analysis.CharFilter, error) {

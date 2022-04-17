@@ -7,8 +7,8 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/rs/zerolog/log"
 
-	"github.com/prabhatsharma/zinc/pkg/core"
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
+	"github.com/zinclabs/zinc/pkg/core"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
 )
 
 func GetAllUsersWorker() (*v1.SearchResponse, error) {

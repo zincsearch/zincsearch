@@ -7,8 +7,8 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/char"
 
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func NewRegexpCharFilter(options interface{}) (analysis.CharFilter, error) {

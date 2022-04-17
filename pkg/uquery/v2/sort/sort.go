@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/blugelabs/bluge/search"
-	"github.com/prabhatsharma/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/errors"
 )
 
 func Request(v interface{}) (search.SortOrder, error) {

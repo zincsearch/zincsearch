@@ -3,8 +3,8 @@ package tokenizer
 import (
 	"github.com/blugelabs/bluge/analysis"
 
-	zinctokenizer "github.com/prabhatsharma/zinc/pkg/bluge/analysis/tokenizer"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	zinctokenizer "github.com/zinclabs/zinc/pkg/bluge/analysis/tokenizer"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func NewPathHierarchyTokenizer(options interface{}) (analysis.Tokenizer, error) {

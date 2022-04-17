@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
 )
 
 func AccessLog(r *gin.Engine) {

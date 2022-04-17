@@ -13,8 +13,8 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
 
-	"github.com/prabhatsharma/zinc/pkg/core"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // DeleteIndex deletes a zinc index and its associated data. Be careful using thus as you ca't undo this action.

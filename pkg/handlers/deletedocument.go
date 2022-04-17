@@ -5,7 +5,7 @@ import (
 
 	"github.com/blugelabs/bluge"
 	"github.com/gin-gonic/gin"
-	"github.com/prabhatsharma/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/core"
 )
 
 func DeleteDocument(c *gin.Context) {

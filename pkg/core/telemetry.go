@@ -15,8 +15,8 @@ import (
 	"github.com/shirou/gopsutil/mem"
 	"gopkg.in/segmentio/analytics-go.v3"
 
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // Telemetry instance

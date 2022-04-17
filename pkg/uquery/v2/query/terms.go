@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/blugelabs/bluge"
-	"github.com/prabhatsharma/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/errors"
 )
 
 func TermsQuery(query map[string]interface{}) (bluge.Query, error) {

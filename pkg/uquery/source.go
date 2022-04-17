@@ -3,7 +3,7 @@ package uquery
 import (
 	"encoding/json"
 
-	v1 "github.com/prabhatsharma/zinc/pkg/meta/v1"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
 )
 
 func HandleSource(source *v1.Source, data []byte) map[string]interface{} {

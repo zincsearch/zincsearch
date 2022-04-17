@@ -4,8 +4,8 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/analyzer"
 
-	"github.com/prabhatsharma/zinc/pkg/bluge/analysis/token"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/bluge/analysis/token"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func NewStopAnalyzer(options interface{}) (*analysis.Analyzer, error) {

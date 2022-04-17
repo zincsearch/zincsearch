@@ -8,9 +8,9 @@ import (
 	"github.com/blugelabs/bluge/analysis/token"
 	"github.com/blugelabs/bluge/analysis/tokenizer"
 
-	zinctoken "github.com/prabhatsharma/zinc/pkg/bluge/analysis/token"
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	zinctoken "github.com/zinclabs/zinc/pkg/bluge/analysis/token"
+	"github.com/zinclabs/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func NewRegexpAnalyzer(options interface{}) (*analysis.Analyzer, error) {

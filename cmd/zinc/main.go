@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/prabhatsharma/zinc/pkg/routes"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/routes"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func main() {

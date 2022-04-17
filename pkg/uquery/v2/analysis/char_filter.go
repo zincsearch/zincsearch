@@ -7,9 +7,9 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/char"
 
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	zincchar "github.com/prabhatsharma/zinc/pkg/uquery/v2/analysis/char"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/errors"
+	zincchar "github.com/zinclabs/zinc/pkg/uquery/v2/analysis/char"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func RequestCharFilter(data map[string]interface{}) (map[string]analysis.CharFilter, error) {

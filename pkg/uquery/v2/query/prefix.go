@@ -6,8 +6,8 @@ import (
 
 	"github.com/blugelabs/bluge"
 
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
+	"github.com/zinclabs/zinc/pkg/errors"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
 )
 
 func PrefixQuery(query map[string]interface{}) (bluge.Query, error) {

@@ -138,6 +138,6 @@ like:
 
 ## Credit
 
-* https://github.com/prabhatsharma/zinc
+* https://github.com/zinclabs/zinc
 * https://github.com/blugelabs/bluge
 * https://github.com/go-ego/gse

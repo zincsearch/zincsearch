@@ -7,15 +7,15 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/search"
 
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	"github.com/prabhatsharma/zinc/pkg/startup"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/aggregation"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/fields"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/highlight"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/query"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/sort"
-	"github.com/prabhatsharma/zinc/pkg/uquery/v2/source"
+	"github.com/zinclabs/zinc/pkg/errors"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	"github.com/zinclabs/zinc/pkg/startup"
+	"github.com/zinclabs/zinc/pkg/uquery/v2/aggregation"
+	"github.com/zinclabs/zinc/pkg/uquery/v2/fields"
+	"github.com/zinclabs/zinc/pkg/uquery/v2/highlight"
+	"github.com/zinclabs/zinc/pkg/uquery/v2/query"
+	"github.com/zinclabs/zinc/pkg/uquery/v2/sort"
+	"github.com/zinclabs/zinc/pkg/uquery/v2/source"
 )
 
 // ParseQueryDSL parse query DSL and return searchRequest

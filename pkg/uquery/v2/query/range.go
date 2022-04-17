@@ -7,9 +7,9 @@ import (
 
 	"github.com/blugelabs/bluge"
 
-	"github.com/prabhatsharma/zinc/pkg/errors"
-	meta "github.com/prabhatsharma/zinc/pkg/meta/v2"
-	"github.com/prabhatsharma/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/errors"
+	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func RangeQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
