@@ -1,7 +1,7 @@
 package core
 
 // UpdateDocument inserts or updates a document in the zinc index
-func (index *Index) UpdateDocument(docID string, doc *map[string]interface{}, mintedID bool) error {
+func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, mintedID bool) error {
 
 	bdoc, err := index.BuildBlugeDocumentFromJSON(docID, doc)
 

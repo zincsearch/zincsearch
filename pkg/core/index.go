@@ -23,7 +23,7 @@ import (
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
 // If no mappings are found, it creates te mapping for all the encountered fields. If mapping for some fields is found but not for others
 // then it creates the mapping for the missing fields.
-func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]interface{}) (*bluge.Document, error) {
+func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]interface{}) (*bluge.Document, error) {
 	// Pick the index mapping from the cache if it already exists
 	mappings := index.CachedMappings
 	if mappings == nil {
@@ -34,7 +34,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 
 	// Create a new bluge document
 	bdoc := bluge.NewDocument(docID)
-	flatDoc, _ := flatten.Flatten(*doc, "")
+	flatDoc, _ := flatten.Flatten(doc, "")
 	// Iterate through each field and add it to the bluge document
 	for key, value := range flatDoc {
 		if value == nil || key == "@timestamp" {
@@ -98,22 +98,22 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc *map[string]int
 		case string:
 			if t, err := time.Parse(time.RFC3339, v); err == nil && !t.IsZero() {
 				timestamp = t
-				delete(*doc, "@timestamp")
+				delete(doc, "@timestamp")
 			}
 		case float64:
 			if t := zutils.Unix(int64(v)); !t.IsZero() {
 				timestamp = t
-				delete(*doc, "@timestamp")
+				delete(doc, "@timestamp")
 			}
 		default:
 			// noop
 		}
 	}
-	docByteVal, _ := json.Marshal(*doc)
+	docByteVal, _ := json.Marshal(doc)
 	bdoc.AddField(bluge.NewDateTimeField("@timestamp", timestamp).StoreValue().Sortable().Aggregatable())
 	bdoc.AddField(bluge.NewStoredOnlyField("_index", []byte(index.Name)))
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil)) // Add _all field that can be used for search
+	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", []string{"_index", "_id", "_source", "@timestamp"}))
 
 	return bdoc, nil
 }

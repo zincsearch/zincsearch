@@ -46,7 +46,7 @@ func UpdateDocument(c *gin.Context) {
 		core.StoreIndex(index)
 	}
 
-	err = index.UpdateDocument(docID, &doc, mintedID)
+	err = index.UpdateDocument(docID, doc, mintedID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

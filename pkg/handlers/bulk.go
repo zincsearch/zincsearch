@@ -3,6 +3,7 @@ package handlers
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"time"
@@ -62,23 +63,21 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (*BulkResponse, error)
 	batch := make(map[string]*index.Batch)
 	var indexesInThisBatch []string
 	var documentsInBatch int
-
+	var doc map[string]interface{}
 	for scanner.Scan() { // Read each line
-		var doc map[string]interface{}
-		err := json.Unmarshal(scanner.Bytes(), &doc) // Read each line as JSON and store it in doc
-		if err != nil {
-			log.Print(err)
+		if err := json.Unmarshal(scanner.Bytes(), &doc); err != nil {
+			log.Error().Msgf("bulk.json.Unmarshal: err %v", err)
+			continue
 		}
 
 		// This will process the data line in the request. Each data line is preceded by a metadata line.
 		// Docs at https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
 		if nextLineIsData {
+			bulkRes.Count++
 			nextLineIsData = false
-			var docID = ""
 			mintedID := false
 
-			bulkRes.Count++
-
+			var docID = ""
 			if val, ok := lastLineMetaData["_id"]; ok && val != nil {
 				docID = val.(string)
 			}
@@ -118,10 +117,12 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (*BulkResponse, error)
 					return bulkRes, err
 				}
 				// store index
-				core.StoreIndex(newIndex)
+				if err := core.StoreIndex(newIndex); err != nil {
+					return bulkRes, err
+				}
 			}
 
-			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(docID, &doc)
+			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(docID, doc)
 			if err != nil {
 				return bulkRes, err
 			}
@@ -144,7 +145,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (*BulkResponse, error)
 					// Persist the batch to the index
 					err := core.ZINC_INDEX_LIST[indexN].Writer.Batch(batch[indexN])
 					if err != nil {
-						log.Printf("Error updating batch: %v", err)
+						log.Error().Msgf("Error updating batch: %v", err)
 						return bulkRes, err
 					}
 					batch[indexN].Reset()
@@ -161,8 +162,7 @@ func BulkHandlerWorker(target string, body io.ReadCloser) (*BulkResponse, error)
 					lastLineMetaData["operation"] = k
 
 					if _, ok := v.(map[string]interface{}); !ok {
-						// return errors.New("bulk index data format error")
-						continue
+						return nil, errors.New("bulk index data format error")
 					}
 
 					if v.(map[string]interface{})["_index"] != "" { // if index is specified in metadata then it overtakes the index in the query path
