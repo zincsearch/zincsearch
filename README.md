@@ -1,4 +1,4 @@
-Note: Zinc and all its APIs are considered to be alpha stage at this time. Expect breaking changes in API contracts and data format at this stage.
+Note: Zinc and all its APIs are considered to be alpha stage at this time. Expect breaking changes in API contracts and data format at this stage. That being said let that not stop you from trying out Zinc as it works fantastically well and there are 50+ users (As of Mid April 2022) already using Zinc on a regular basis.
 # Zinc Search Engine
 
 Zinc is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs using a fraction of the resources. It uses [bluge](https://github.com/blugelabs/bluge) as the underlying indexing library.
