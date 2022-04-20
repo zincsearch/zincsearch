@@ -43,7 +43,7 @@ spec:
       # terminationGracePeriodSeconds: 0
       containers:
         - name: zinc
-          image: public.ecr.aws/prabhat/zinc:latest
+          image: public.ecr.aws/h9e2j3o7/zinc:latest
           env:
             - name: ZINC_FIRST_ADMIN_USER
               value: admin
