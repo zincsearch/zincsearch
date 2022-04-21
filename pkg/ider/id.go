@@ -6,6 +6,8 @@ import (
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/rs/zerolog/log"
+
+	"github.com/zinclabs/zinc/pkg/zutils/base62"
 )
 
 var node *snowflake.Node
@@ -24,5 +26,5 @@ func init() {
 }
 
 func Generate() string {
-	return node.Generate().String()
+	return base62.Encode(node.Generate().Int64())
 }
