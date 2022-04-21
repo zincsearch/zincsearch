@@ -77,13 +77,13 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (*v1.SearchResponse, error) {
 
 	reader, err := index.Writer.Reader()
 	if err != nil {
-		log.Printf("error accessing reader: %v", err)
+		log.Printf("error accessing reader: %s", err.Error())
 	}
 	defer reader.Close()
 
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		log.Printf("error executing search: %v", err)
+		log.Printf("error executing search: %s", err.Error())
 	}
 
 	var Hits []v1.Hit
@@ -103,11 +103,10 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (*v1.SearchResponse, error) {
 				result = uquery.HandleSource(sourceCtl, value)
 			default:
 			}
-
 			return true
 		})
 		if err != nil {
-			log.Printf("error accessing stored fields: %v", err)
+			log.Printf("error accessing stored fields: %s", err.Error())
 		}
 
 		hit := v1.Hit{
@@ -123,7 +122,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (*v1.SearchResponse, error) {
 		next, err = dmi.Next()
 	}
 	if err != nil {
-		log.Printf("error iterating results: %v", err)
+		log.Printf("error iterating results: %s", err.Error())
 	}
 
 	resp := &v1.SearchResponse{
@@ -140,7 +139,7 @@ func (index *Index) Search(iQuery *v1.ZincQuery) (*v1.SearchResponse, error) {
 	if len(iQuery.Aggregations) > 0 {
 		resp.Aggregations, err = uquery.ParseAggregations(dmi.Aggregations())
 		if err != nil {
-			log.Printf("error parse aggregation results: %v", err)
+			log.Printf("error parse aggregation results: %s", err.Error())
 		}
 		if len(resp.Aggregations) > 0 {
 			delete(resp.Aggregations, "count")

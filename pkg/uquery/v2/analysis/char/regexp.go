@@ -19,7 +19,7 @@ func NewRegexpCharFilter(options interface{}) (analysis.CharFilter, error) {
 	replacement, _ := zutils.GetStringFromMap(options, "replacement")
 	r, err := regexp.Compile(pattern)
 	if err != nil {
-		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[char_filter] regexp option [pattern] compile error: %v", err.Error()))
+		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[char_filter] regexp option [pattern] compile error: %s", err.Error()))
 	}
 
 	return char.NewRegexpCharFilter(r, []byte(replacement)), nil

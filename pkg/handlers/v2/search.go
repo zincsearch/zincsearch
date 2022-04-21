@@ -18,7 +18,7 @@ func SearchIndex(c *gin.Context) {
 
 	query := new(meta.ZincQuery)
 	if err := c.BindJSON(query); err != nil {
-		log.Printf("handlers.v2.SearchIndex: %v", err)
+		log.Printf("handlers.v2.SearchIndex: %s", err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

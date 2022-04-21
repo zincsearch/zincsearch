@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"math"
 	"path/filepath"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
+	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 
 	meta "github.com/zinclabs/zinc/pkg/meta/v2"
@@ -350,4 +350,8 @@ func (index *Index) ReduceDocsCount(n int64) {
 func (index *Index) GainDocsCount(n int64) {
 	atomic.AddInt64(&index.DocsCount, n)
 	index.ReLoadStorageSize()
+}
+
+func (index *Index) Close() error {
+	return index.Writer.Close()
 }

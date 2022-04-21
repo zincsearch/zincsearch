@@ -26,7 +26,7 @@ func NewRegexpAnalyzer(options interface{}) (*analysis.Analyzer, error) {
 
 	r, err := regexp.Compile(pattern)
 	if err != nil {
-		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] regexp option [pattern] compile error: %v", err.Error()))
+		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] regexp option [pattern] compile error: %s", err.Error()))
 	}
 
 	ana := &analysis.Analyzer{Tokenizer: tokenizer.NewRegexpTokenizer(r)}

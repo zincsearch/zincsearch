@@ -14,7 +14,7 @@ func QueryStringQuery(iQuery *v1.ZincQuery) (bluge.SearchRequest, error) {
 	options.WithDefaultAnalyzer(analyzer.NewStandardAnalyzer())
 	userQuery, err := querystr.ParseQueryString(iQuery.Query.Term, options)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing query string '%s': %v", iQuery.Query.Term, err)
+		return nil, fmt.Errorf("error parsing query string '%s': %s", iQuery.Query.Term, err.Error())
 	}
 
 	dateQuery := bluge.NewDateRangeQuery(iQuery.Query.StartTime, iQuery.Query.EndTime).SetField("@timestamp")

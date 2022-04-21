@@ -33,7 +33,7 @@ func AddAggregations(req zincaggregation.SearchAggregation, aggs map[string]v1.A
 			case "numeric":
 				subreq = zincaggregation.NewTermsAggregation(search.Field(agg.Field), zincaggregation.NumericValueSource, agg.Size)
 			default:
-				return fmt.Errorf("terms aggregation not supported type [%s:[%v]]", agg.Field, mapping.Properties[agg.Field].Type)
+				return fmt.Errorf("terms aggregation not supported type [%s:[%s]]", agg.Field, mapping.Properties[agg.Field].Type)
 			}
 			if len(agg.Aggregations) > 0 {
 				if err := AddAggregations(subreq, agg.Aggregations, mapping); err != nil {
@@ -85,7 +85,7 @@ func AddAggregations(req zincaggregation.SearchAggregation, aggs map[string]v1.A
 		case "count":
 			req.AddAggregation(name, aggregations.CountMatches())
 		default:
-			return fmt.Errorf("aggregation not supported %v", agg.AggType)
+			return fmt.Errorf("aggregation not supported %s", agg.AggType)
 		}
 	}
 

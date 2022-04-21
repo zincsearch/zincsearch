@@ -1,10 +1,10 @@
 package index
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/blugelabs/bluge/analysis"
+	"github.com/goccy/go-json"
 
 	"github.com/zinclabs/zinc/pkg/errors"
 	meta "github.com/zinclabs/zinc/pkg/meta/v2"

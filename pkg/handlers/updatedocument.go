@@ -4,17 +4,18 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/ider"
 )
 
 func UpdateDocument(c *gin.Context) {
 	indexName := c.Param("target")
 	queryID := c.Param("id") // ID for the document to be updated provided in URL path
 
+	var err error
 	var doc map[string]interface{}
-	if err := c.BindJSON(&doc); err != nil {
+	if err = c.BindJSON(&doc); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -29,11 +30,10 @@ func UpdateDocument(c *gin.Context) {
 		docID = queryID
 	}
 	if docID == "" {
-		docID = uuid.New().String() // Generate a new ID if ID was not provided
+		docID = ider.Generate()
 		mintedID = true
 	}
 
-	var err error
 	// If the index does not exist, then create it
 	index, exists := core.GetIndex(indexName)
 	if !exists {

@@ -13,7 +13,7 @@ func DeleteUser(userID string) bool {
 	usersIndexWriter := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer
 	err := usersIndexWriter.Delete(bdoc.ID())
 	if err != nil {
-		log.Printf("error deleting user: %v", err)
+		log.Printf("error deleting user: %s", err.Error())
 		return false
 	}
 

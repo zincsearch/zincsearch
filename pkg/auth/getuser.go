@@ -18,7 +18,7 @@ func GetUser(userID string) (ZincUser, bool, error) {
 	reader, _ := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer.Reader()
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		log.Printf("auth.GetUser: error executing search: %v", err)
+		log.Printf("auth.GetUser: error executing search: %s", err.Error())
 		return user, userExists, err
 	}
 
@@ -47,7 +47,7 @@ func GetUser(userID string) (ZincUser, bool, error) {
 			return true
 		})
 		if err != nil {
-			log.Printf("auth.GetUser: error accessing stored fields: %v", err)
+			log.Printf("auth.GetUser: error accessing stored fields: %s", err.Error())
 			return user, userExists, err
 		} else {
 			return user, userExists, nil

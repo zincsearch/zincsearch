@@ -4,11 +4,11 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/argon2"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/ider"
 )
 
 func CreateUser(userID, name, plaintextPassword, role string) (*ZincUser, error) {
@@ -52,7 +52,7 @@ func CreateUser(userID, name, plaintextPassword, role string) (*ZincUser, error)
 	usersIndexWriter := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer
 	err = usersIndexWriter.Update(bdoc.ID(), bdoc)
 	if err != nil {
-		log.Printf("error updating document: %v", err)
+		log.Printf("error updating document: %s", err.Error())
 		return nil, err
 	}
 
@@ -85,7 +85,7 @@ func GeneratePassword(password, salt string) string {
 }
 
 func GenerateSalt() string {
-	return uuid.New().String()
+	return ider.Generate()
 }
 
 type ZincUser struct {

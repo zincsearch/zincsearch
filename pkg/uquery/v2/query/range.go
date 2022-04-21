@@ -126,7 +126,7 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 	if value.TimeZone != "" {
 		timeZone, err = zutils.ParseTimeZone(value.TimeZone)
 		if err != nil {
-			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s time_zone parse err %v", field, err))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s time_zone parse err %s", field, err.Error()))
 		}
 	}
 
@@ -137,27 +137,27 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 	if value.GT != nil && value.GT.(string) != "" {
 		min, err = time.ParseInLocation(format, value.GT.(string), timeZone)
 		if err != nil {
-			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.gt format err %v", field, err))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.gt format err %s", field, err.Error()))
 		}
 	}
 	if value.GTE != nil && value.GTE.(string) != "" {
 		minInclusive = true
 		min, err = time.ParseInLocation(format, value.GTE.(string), timeZone)
 		if err != nil {
-			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.gte format err %v", field, err))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.gte format err %s", field, err.Error()))
 		}
 	}
 	if value.LT != nil && value.LT.(string) != "" {
 		max, err = time.ParseInLocation(format, value.LT.(string), timeZone)
 		if err != nil {
-			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.lt format err %v", field, err))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.lt format err %s", field, err.Error()))
 		}
 	}
 	if value.LTE != nil && value.LTE.(string) != "" {
 		maxInclusive = true
 		max, err = time.ParseInLocation(format, value.LTE.(string), timeZone)
 		if err != nil {
-			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.lte format err %v", field, err))
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.lte format err %s", field, err.Error()))
 		}
 	}
 	subq := bluge.NewDateRangeInclusiveQuery(min.UTC(), max.UTC(), minInclusive, maxInclusive).SetField(field)

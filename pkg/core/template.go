@@ -2,13 +2,13 @@ package core
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/blugelabs/bluge"
+	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 
 	meta "github.com/zinclabs/zinc/pkg/meta/v2"
@@ -28,7 +28,7 @@ func ListTemplates(pattern string) ([]IndexTemplate, error) {
 
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		return nil, fmt.Errorf("core.ListTemplates: error executing search: %v", err)
+		return nil, fmt.Errorf("core.ListTemplates: error executing search: %s", err.Error())
 	}
 
 	templates := make([]IndexTemplate, 0)
@@ -50,7 +50,7 @@ func ListTemplates(pattern string) ([]IndexTemplate, error) {
 			return true
 		})
 		if err != nil {
-			log.Printf("core.ListTemplates: error accessing stored fields: %v", err)
+			log.Printf("core.ListTemplates: error accessing stored fields: %s", err.Error())
 		}
 
 		templates = append(templates, IndexTemplate{
@@ -108,7 +108,7 @@ func NewTemplate(name string, template *meta.Template) error {
 	index := ZINC_SYSTEM_INDEX_LIST["_index_template"].Writer
 	err := index.Update(bdoc.ID(), bdoc)
 	if err != nil {
-		return fmt.Errorf("template: error updating document: %v", err)
+		return fmt.Errorf("template: error updating document: %s", err.Error())
 	}
 
 	return nil
@@ -127,13 +127,13 @@ func LoadTemplate(name string) (*meta.Template, bool, error) {
 
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		return nil, false, fmt.Errorf("template: error executing search: %v", err)
+		return nil, false, fmt.Errorf("template: error executing search: %s", err.Error())
 	}
 
 	tpl := new(meta.Template)
 	next, err := dmi.Next()
 	if err != nil {
-		return nil, false, fmt.Errorf("template: error accessing stored fields: %v", err)
+		return nil, false, fmt.Errorf("template: error accessing stored fields: %s", err.Error())
 	}
 	if next == nil {
 		return nil, false, nil
@@ -148,7 +148,7 @@ func LoadTemplate(name string) (*meta.Template, bool, error) {
 		return true
 	})
 	if err != nil {
-		return nil, false, fmt.Errorf("template: error accessing stored fields: %v", err)
+		return nil, false, fmt.Errorf("template: error accessing stored fields: %s", err.Error())
 	}
 
 	return tpl, true, nil
@@ -160,7 +160,7 @@ func DeleteTemplate(name string) error {
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
 	err := ZINC_SYSTEM_INDEX_LIST["_index_template"].Writer.Delete(bdoc.ID())
 	if err != nil {
-		return fmt.Errorf("template: error deleting template: %v", err)
+		return fmt.Errorf("template: error deleting template: %s", err.Error())
 	}
 
 	return nil
@@ -175,7 +175,7 @@ func UseTemplate(indexName string) (*meta.Template, error) {
 
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		return nil, fmt.Errorf("core.UseTemplate: error executing search: %v", err)
+		return nil, fmt.Errorf("core.UseTemplate: error executing search: %s", err.Error())
 	}
 
 	templates := make([]*meta.Template, 0)
@@ -189,7 +189,7 @@ func UseTemplate(indexName string) (*meta.Template, error) {
 			return true
 		})
 		if err != nil {
-			log.Printf("core.UseTemplate: error accessing stored fields: %v", err)
+			log.Printf("core.UseTemplate: error accessing stored fields: %s", err.Error())
 		}
 
 		templates = append(templates, tpl)

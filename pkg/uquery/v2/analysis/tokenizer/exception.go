@@ -21,7 +21,7 @@ func NewExceptionTokenizer(options interface{}) (analysis.Tokenizer, error) {
 	pattern := strings.Join(patterns, "|")
 	r, err := regexp.Compile(pattern)
 	if err != nil {
-		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[tokenizer] exception option [patterns] compile error: %v", err.Error()))
+		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[tokenizer] exception option [patterns] compile error: %s", err.Error()))
 	}
 
 	return tokenizer.NewExceptionsTokenizer(r, tokenizer.NewUnicodeTokenizer()), nil

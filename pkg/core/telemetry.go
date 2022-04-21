@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
-	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"gopkg.in/segmentio/analytics-go.v3"
 
+	"github.com/zinclabs/zinc/pkg/ider"
 	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
@@ -40,7 +40,7 @@ func newTelemetry() *telemetry {
 }
 
 func (t *telemetry) createInstanceID() string {
-	instanceID := uuid.New().String()
+	instanceID := ider.Generate()
 	doc := bluge.NewDocument("instance_id")
 	doc.AddField(bluge.NewKeywordField("value", instanceID).StoreValue())
 	ZINC_SYSTEM_INDEX_LIST["_metadata"].Writer.Update(doc.ID(), doc)
@@ -58,7 +58,7 @@ func (t *telemetry) getInstanceID() string {
 	reader, _ := ZINC_SYSTEM_INDEX_LIST["_metadata"].Writer.Reader()
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		log.Printf("core.Telemetry.GetInstanceID: error executing search: %v", err)
+		log.Printf("core.Telemetry.GetInstanceID: error executing search: %s", err.Error())
 	}
 
 	next, err := dmi.Next()
@@ -70,7 +70,7 @@ func (t *telemetry) getInstanceID() string {
 			return true
 		})
 		if err != nil {
-			log.Printf("core.Telemetry.GetInstanceID: error accessing stored fields: %v", err)
+			log.Printf("core.Telemetry.GetInstanceID: error accessing stored fields: %s", err.Error())
 		}
 	}
 

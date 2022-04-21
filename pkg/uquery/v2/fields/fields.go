@@ -1,10 +1,11 @@
 package fields
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/zinclabs/zinc/pkg/errors"
 	meta "github.com/zinclabs/zinc/pkg/meta/v2"

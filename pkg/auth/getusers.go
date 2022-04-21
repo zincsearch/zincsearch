@@ -19,7 +19,7 @@ func GetAllUsersWorker() (*v1.SearchResponse, error) {
 	reader, _ := usersIndex.Writer.Reader()
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		log.Printf("error executing search: %v", err)
+		log.Printf("error executing search: %s", err.Error())
 	}
 
 	var Hits []v1.Hit
@@ -48,7 +48,7 @@ func GetAllUsersWorker() (*v1.SearchResponse, error) {
 			return true
 		})
 		if err != nil {
-			log.Printf("error accessing stored fields: %v", err)
+			log.Printf("error accessing stored fields: %s", err.Error())
 		}
 
 		hit := v1.Hit{

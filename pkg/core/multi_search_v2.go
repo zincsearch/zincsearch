@@ -47,7 +47,7 @@ func MultiSearchV2(indexName string, query *meta.ZincQuery) (*meta.SearchRespons
 
 	dmi, err := bluge.MultiSearch(ctx, searchRequest, readers...)
 	if err != nil {
-		log.Printf("core.MultiSearchV2: error executing search: %v", err)
+		log.Printf("core.MultiSearchV2: error executing search: %s", err.Error())
 		if err == context.DeadlineExceeded {
 			return &meta.SearchResponse{
 				TimedOut: true,

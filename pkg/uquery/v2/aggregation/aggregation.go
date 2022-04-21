@@ -51,7 +51,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			default:
 				return errors.New(
 					errors.ErrorTypeParsingException,
-					fmt.Sprintf("[terms] aggregation doesn't support values of type: [%s:[%v]]", agg.Terms.Field, mappings.Properties[agg.Terms.Field].Type),
+					fmt.Sprintf("[terms] aggregation doesn't support values of type: [%s:[%s]]", agg.Terms.Field, mappings.Properties[agg.Terms.Field].Type),
 				)
 			}
 			if len(agg.Aggregations) > 0 {
@@ -93,7 +93,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			if agg.DateRange.TimeZone != "" {
 				timeZone, err = zutils.ParseTimeZone(agg.DateRange.TimeZone)
 				if err != nil {
-					return errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[date_range] time_zone parse err %v", err))
+					return errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[date_range] time_zone parse err %s", err.Error()))
 				}
 			}
 			switch mappings.Properties[agg.DateRange.Field].Type {
@@ -105,13 +105,13 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 					if v.From != "" {
 						from, err = time.ParseInLocation(format, v.From, timeZone)
 						if err != nil {
-							return errors.New(errors.ErrorTypeIllegalArgumentException, "[date_range] range value from parse error "+err.Error())
+							return errors.New(errors.ErrorTypeIllegalArgumentException, fmt.Sprintf("[date_range] range value from parse err %s", err.Error()))
 						}
 					}
 					if v.To != "" {
 						to, err = time.ParseInLocation(format, v.To, timeZone)
 						if err != nil {
-							return errors.New(errors.ErrorTypeIllegalArgumentException, "[date_range] range value to parse error "+err.Error())
+							return errors.New(errors.ErrorTypeIllegalArgumentException, fmt.Sprintf("[date_range] range value to parse err %s", err.Error()))
 						}
 					}
 					subreq.AddRange(aggregations.NewDateRange(from, to))
@@ -143,7 +143,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			default:
 				return errors.New(
 					errors.ErrorTypeParsingException,
-					fmt.Sprintf("[histogram] aggregation doesn't support values of type: [%s:[%v]]", agg.Histogram.Field, mappings.Properties[agg.Histogram.Field].Type),
+					fmt.Sprintf("[histogram] aggregation doesn't support values of type: [%s:[%s]]", agg.Histogram.Field, mappings.Properties[agg.Histogram.Field].Type),
 				)
 			}
 			if len(agg.Aggregations) > 0 {
@@ -196,7 +196,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			if agg.DateHistogram.TimeZone != "" {
 				timeZone, err = zutils.ParseTimeZone(agg.DateHistogram.TimeZone)
 				if err != nil {
-					return errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[date_histogram] time_zone parse err %v", err))
+					return errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[date_histogram] time_zone parse err %s", err.Error()))
 				}
 			}
 			if agg.DateHistogram.Format == "" {
@@ -218,7 +218,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 				return errors.New(
 					errors.ErrorTypeParsingException,
 					fmt.Sprintf(
-						"[date_histogram] aggregation doesn't support values of type: [%s:[%v]]",
+						"[date_histogram] aggregation doesn't support values of type: [%s:[%s]]",
 						agg.DateHistogram.Field,
 						mappings.Properties[agg.DateHistogram.Field].Type,
 					),
@@ -253,7 +253,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			if agg.AutoDateHistogram.TimeZone != "" {
 				timeZone, err = zutils.ParseTimeZone(agg.AutoDateHistogram.TimeZone)
 				if err != nil {
-					return errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[auto_date_histogram] time_zone parse err %v", err))
+					return errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[auto_date_histogram] time_zone parse err %s", err.Error()))
 				}
 			}
 			if agg.AutoDateHistogram.Format == "" {
@@ -273,7 +273,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 				return errors.New(
 					errors.ErrorTypeParsingException,
 					fmt.Sprintf(
-						"[auto_date_histogram] aggregation doesn't support values of type: [%s:[%v]]",
+						"[auto_date_histogram] aggregation doesn't support values of type: [%s:[%s]]",
 						agg.AutoDateHistogram.Field,
 						mappings.Properties[agg.AutoDateHistogram.Field].Type,
 					),

@@ -1,13 +1,13 @@
 package core
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
+	"github.com/goccy/go-json"
 
 	"github.com/zinclabs/zinc/pkg/directory"
 	meta "github.com/zinclabs/zinc/pkg/meta/v2"
@@ -15,9 +15,7 @@ import (
 )
 
 // NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
-func NewIndex(
-	name string, storageType string, useNewIndexMeta int,
-	defaultSearchAnalyzer *analysis.Analyzer) (*Index, error) {
+func NewIndex(name, storageType string, useNewIndexMeta int, defaultSearchAnalyzer *analysis.Analyzer) (*Index, error) {
 	if name == "" {
 		return nil, fmt.Errorf("core.NewIndex: index name cannot be empty")
 	}
@@ -125,7 +123,7 @@ func StoreIndex(index *Index) error {
 
 	err := ZINC_SYSTEM_INDEX_LIST["_index"].Writer.Update(bdoc.ID(), bdoc)
 	if err != nil {
-		return fmt.Errorf("core.StoreIndex: index: %s, error: %v", index.Name, err)
+		return fmt.Errorf("core.StoreIndex: index: %s, error: %s", index.Name, err.Error())
 	}
 
 	// cache index
@@ -139,7 +137,7 @@ func DeleteIndex(name string) error {
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
 	err := ZINC_SYSTEM_INDEX_LIST["_index"].Writer.Delete(bdoc.ID())
 	if err != nil {
-		return fmt.Errorf("core.DeleteIndex: error deleting template: %v", err)
+		return fmt.Errorf("core.DeleteIndex: error deleting template: %s", err.Error())
 	}
 
 	return nil

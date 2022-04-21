@@ -1,7 +1,7 @@
 package uquery
 
 import (
-	"encoding/json"
+	"github.com/goccy/go-json"
 
 	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
 )

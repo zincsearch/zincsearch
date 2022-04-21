@@ -23,7 +23,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 
 	reader, err := index.Writer.Reader()
 	if err != nil {
-		log.Printf("index.SearchV2: error accessing reader: %v", err)
+		log.Printf("index.SearchV2: error accessing reader: %s", err.Error())
 		return nil, err
 	}
 	defer reader.Close()
@@ -37,7 +37,7 @@ func (index *Index) SearchV2(query *meta.ZincQuery) (*meta.SearchResponse, error
 
 	dmi, err := reader.Search(ctx, searchRequest)
 	if err != nil {
-		log.Printf("index.SearchV2: error executing search: %v", err)
+		log.Printf("index.SearchV2: error executing search: %s", err.Error())
 		if err == context.DeadlineExceeded {
 			return &meta.SearchResponse{
 				TimedOut: true,
@@ -110,7 +110,7 @@ func searchV2(dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings 
 			return true
 		})
 		if err != nil {
-			log.Printf("core.SearchV2: error accessing stored fields: %v", err)
+			log.Printf("core.SearchV2: error accessing stored fields: %s", err.Error())
 			continue
 		}
 
@@ -129,7 +129,7 @@ func searchV2(dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings 
 		next, err = dmi.Next()
 	}
 	if err != nil {
-		log.Printf("core.SearchV2: error iterating results: %v", err)
+		log.Printf("core.SearchV2: error iterating results: %s", err.Error())
 	}
 
 	resp.Took = int(dmi.Aggregations().Duration().Milliseconds())
@@ -143,7 +143,7 @@ func searchV2(dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings 
 	}
 
 	if err := parser.FormatResponse(resp, query, dmi.Aggregations()); err != nil {
-		log.Printf("core.SearchV2: error format response: %v", err)
+		log.Printf("core.SearchV2: error format response: %s", err.Error())
 	}
 
 	return resp, nil
