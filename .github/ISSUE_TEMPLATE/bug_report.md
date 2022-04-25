@@ -21,7 +21,7 @@ assignees: ''
 
 **Security disclosures**
 
-If you think you’ve found a potential security issue, please do not post it in the Issues.  Instead, please email [Prabhat Sharma](mailto:admin+security@zinclabs.io).
+If you think you’ve found a potential security issue, please do not post it in the Issues.  Instead, please email [Zinc team](mailto:admin+security@zinclabs.io).
 
 -->
 
