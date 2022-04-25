@@ -8,15 +8,28 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
 	"github.com/zinclabs/zinc/pkg/routes"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func main() {
+
+	/******** initialize sentry **********/
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn:     "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942",
+		Release: "zinc@" + v1.Version,
+	})
+	if err != nil {
+		log.Print("sentry.Init: %s", err)
+	}
+	/******** sentry initialize complete *******/
+
 	r := gin.New()
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.
 	r.Use(gin.Recovery())

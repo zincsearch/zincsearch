@@ -1,6 +1,6 @@
 module github.com/zinclabs/zinc
 
-go 1.17
+go 1.18
 
 require (
 	github.com/aws/aws-sdk-go-v2/config v1.11.0
@@ -9,8 +9,9 @@ require (
 	github.com/blugelabs/bluge_segment_api v0.2.0
 	github.com/blugelabs/query_string v0.3.0
 	github.com/bwmarrin/snowflake v0.3.0
+	github.com/getsentry/sentry-go v0.13.0
 	github.com/gin-contrib/cors v1.3.1
-	github.com/gin-gonic/gin v1.7.4
+	github.com/gin-gonic/gin v1.7.7
 	github.com/go-ego/gse v0.70.0
 	github.com/goccy/go-json v0.9.6
 	github.com/joho/godotenv v1.4.0
@@ -21,7 +22,7 @@ require (
 	github.com/smartystreets/goconvey v1.7.2
 	github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
-	golang.org/x/text v0.3.6
+	golang.org/x/text v0.3.7
 	gopkg.in/segmentio/analytics-go.v3 v3.1.0
 )
 
@@ -70,7 +71,7 @@ require (
 	github.com/klauspost/cpuid v1.3.1 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
-	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.0 // indirect
 	github.com/minio/sha256-simd v0.1.1 // indirect
