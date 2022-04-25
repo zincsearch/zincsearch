@@ -18,12 +18,5 @@ func TestGetFrontendAssets(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(fs.Name(), ShouldEqual, "index.html")
 		})
-		Convey("manifest.json", func() {
-			ff, err := f.Open("manifest.json")
-			So(err, ShouldBeNil)
-			fs, err := ff.Stat()
-			So(err, ShouldBeNil)
-			So(fs.Name(), ShouldEqual, "manifest.json")
-		})
 	})
 }
