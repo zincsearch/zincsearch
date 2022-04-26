@@ -99,7 +99,7 @@ func (t *telemetry) initBaseInfo() {
 }
 
 func (t *telemetry) Instance() {
-	if zutils.GetEnv("ZINC_TELEMETRY", "enabled") == "disabled" {
+	if zutils.GetEnv("ZINC_TELEMETRY", "true") == "false" {
 		return
 	}
 
@@ -118,7 +118,7 @@ func (t *telemetry) Instance() {
 }
 
 func (t *telemetry) Event(event string, data map[string]interface{}) {
-	if zutils.GetEnv("ZINC_TELEMETRY", "enabled") == "disabled" {
+	if zutils.GetEnv("ZINC_TELEMETRY", "true") == "false" {
 		return
 	}
 
