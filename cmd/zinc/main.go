@@ -51,7 +51,7 @@ func main() {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 			defer cancel()
 			if err := server.Shutdown(ctx); err != nil {
-				log.Fatal().Msgf("Server Shutdown:", err)
+				log.Fatal().Msgf("Server Shutdown: %s", err.Error())
 			}
 		} else {
 			server.Close()
@@ -62,7 +62,7 @@ func main() {
 		if err == http.ErrServerClosed {
 			log.Info().Msgf("Server closed under request")
 		} else {
-			log.Fatal().Msgf("Server closed unexpect")
+			log.Fatal().Msgf("Server closed unexpect: %s", err.Error())
 		}
 	}
 
