@@ -1,8 +1,6 @@
 package chs
 
 import (
-	"strings"
-
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/go-ego/gse"
 
@@ -35,9 +33,9 @@ var seg *gse.Segmenter
 
 func init() {
 	seg = new(gse.Segmenter)
-	enable := strings.ToUpper(zutils.GetEnv("ZINC_PLUGIN_GSE_ENABLE", "FALSE"))    // false / true
-	embed := strings.ToUpper(zutils.GetEnv("ZINC_PLUGIN_GSE_DICT_EMBED", "SMALL")) // small / big
-	if enable == "TRUE" {
+	enable := zutils.GetEnvToBool("ZINC_PLUGIN_GSE_ENABLE", "FALSE")     // false / true
+	embed := zutils.GetEnvToUpper("ZINC_PLUGIN_GSE_DICT_EMBED", "SMALL") // small / big
+	if enable {
 		if embed == "BIG" {
 			seg.LoadDictEmbed("zh_s")
 			seg.LoadStopEmbed()

@@ -20,7 +20,7 @@ import (
 
 func main() {
 
-	if zutils.GetEnv("ZINC_SENTRY", "true") == "true" {
+	if zutils.GetEnvToBool("ZINC_SENTRY", "true") {
 		/******** initialize sentry **********/
 		err := sentry.Init(sentry.ClientOptions{
 			Dsn:     "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942",
