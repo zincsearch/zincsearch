@@ -165,8 +165,6 @@ export default defineComponent({
             value: item.name,
           });
         });
-        selectedIndex.value = indexList.value[0];
-        selectFn(selectedIndex.value);
       });
     };
 
