@@ -64,7 +64,8 @@
 
 <style lang="scss">
 .syntax-guide {
-  /* width: 80%; */
+  /* width: 80%;*/
+
   margin-right: 10px;
 }
 
