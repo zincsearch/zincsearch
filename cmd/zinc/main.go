@@ -35,15 +35,17 @@ import (
 
 func main() {
 
-	/******** initialize sentry **********/
-	err := sentry.Init(sentry.ClientOptions{
-		Dsn:     "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942",
-		Release: "zinc@" + v1.Version,
-	})
-	if err != nil {
-		log.Print("sentry.Init: %s", err)
+	if zutils.GetEnvToBool("ZINC_SENTRY", "true") {
+		/******** initialize sentry **********/
+		err := sentry.Init(sentry.ClientOptions{
+			Dsn:     "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942",
+			Release: "zinc@" + v1.Version,
+		})
+		if err != nil {
+			log.Print("sentry.Init: %s", err)
+		}
+		/******** sentry initialize complete *******/
 	}
-	/******** sentry initialize complete *******/
 
 	r := gin.New()
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.
