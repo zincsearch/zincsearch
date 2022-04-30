@@ -8,7 +8,7 @@
         dense
         use-input
         input-debounce="0"
-        label="Select Index"
+        label="Select Index First"
         behavior="menu"
         class="q-mt-md q-mb-sm"
         @filter="filterFn"
