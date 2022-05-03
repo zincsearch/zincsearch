@@ -1,3 +1,18 @@
+/* Copyright 2022 Zinc Labs Inc. and Contributors
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+ */
+
 package main
 
 import (
@@ -20,15 +35,17 @@ import (
 
 func main() {
 
-	/******** initialize sentry **********/
-	err := sentry.Init(sentry.ClientOptions{
-		Dsn:     "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942",
-		Release: "zinc@" + v1.Version,
-	})
-	if err != nil {
-		log.Print("sentry.Init: %s", err)
+	if zutils.GetEnvToBool("ZINC_SENTRY", "true") {
+		/******** initialize sentry **********/
+		err := sentry.Init(sentry.ClientOptions{
+			Dsn:     "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942",
+			Release: "zinc@" + v1.Version,
+		})
+		if err != nil {
+			log.Print("sentry.Init: %s", err)
+		}
+		/******** sentry initialize complete *******/
 	}
-	/******** sentry initialize complete *******/
 
 	r := gin.New()
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.
@@ -51,7 +68,7 @@ func main() {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 			defer cancel()
 			if err := server.Shutdown(ctx); err != nil {
-				log.Fatal().Msgf("Server Shutdown:", err)
+				log.Fatal().Msgf("Server Shutdown: %s", err.Error())
 			}
 		} else {
 			server.Close()
@@ -62,7 +79,7 @@ func main() {
 		if err == http.ErrServerClosed {
 			log.Info().Msgf("Server closed under request")
 		} else {
-			log.Fatal().Msgf("Server closed unexpect")
+			log.Fatal().Msgf("Server closed unexpect: %s", err.Error())
 		}
 	}
 
