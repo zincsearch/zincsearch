@@ -55,21 +55,20 @@ func UpdateIndexMapping(c *gin.Context) {
 		return
 	}
 
-	_, exists := core.GetIndex(indexName)
-	if exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index [" + indexName + "] already exists"})
-		return
+	var index *core.Index
+	index, exists := core.GetIndex(indexName)
+	if !exists {
+		index1, err := core.NewIndex(indexName, newIndex.StorageType, core.UseNewIndexMeta, nil)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		index = index1
 	}
 
 	mappings, err := mappings.Request(nil, newIndex.Mappings)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	index, err := core.NewIndex(indexName, newIndex.StorageType, core.UseNewIndexMeta, nil)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 

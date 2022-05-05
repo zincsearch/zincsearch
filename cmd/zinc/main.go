@@ -42,7 +42,7 @@ func main() {
 			Release: "zinc@" + v1.Version,
 		})
 		if err != nil {
-			log.Print("sentry.Init: %s", err)
+			log.Print("sentry.Init: ", err.Error())
 		}
 		/******** sentry initialize complete *******/
 	}

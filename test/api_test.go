@@ -189,7 +189,8 @@ func TestApiStandard(t *testing.T) {
 			resp := request("GET", "/api/index", nil)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 
-			data := make(map[string]interface{})
+			// data := make(map[string]interface{})
+			data := []interface{}{}
 			err := json.Unmarshal(resp.Body.Bytes(), &data)
 			So(err, ShouldBeNil)
 			So(len(data), ShouldBeGreaterThanOrEqualTo, 1)
@@ -628,5 +629,7 @@ func TestApiStandard(t *testing.T) {
 				So(len(data.Aggregations), ShouldBeGreaterThanOrEqualTo, 1)
 			})
 		})
+
 	})
+
 }
