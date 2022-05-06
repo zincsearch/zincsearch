@@ -1,6 +1,9 @@
 #! /bin/sh
 
-go test ./... -race -covermode=atomic -coverprofile=coverage.out
+export ZINC_FIRST_ADMIN_USER=admin  
+export ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
+
+go test -v ./... -race -covermode=atomic -coverprofile=coverage.out
 
 # make sure to set CODECOV_TOKEN env variable before doing this
 # codecov -f coverage.out

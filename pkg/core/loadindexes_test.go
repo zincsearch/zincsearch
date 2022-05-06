@@ -11,7 +11,7 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-*/
+ */
 
 package core
 
@@ -34,7 +34,7 @@ func TestLoadIndexes(t *testing.T) {
 			So(len(ZINC_SYSTEM_INDEX_LIST), ShouldEqual, len(systemIndexList))
 			So(ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Name, ShouldEqual, "_index_mapping")
 		})
-		Convey("load user inex from disk", func() {
+		Convey("load user index from disk", func() {
 			// index cann't be reopen, so need close first
 			for _, index := range ZINC_INDEX_LIST {
 				index.Writer.Close()
