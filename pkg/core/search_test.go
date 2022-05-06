@@ -163,7 +163,6 @@ func TestIndex_Search(t *testing.T) {
 					SearchType: "querystring",
 					Query: v1.QueryParams{
 						Term: "angeles",
-
 					},
 				},
 			},
