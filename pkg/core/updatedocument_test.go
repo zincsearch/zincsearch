@@ -17,37 +17,77 @@ package core
 
 import (
 	"math/rand"
+	"os"
 	"strconv"
 	"testing"
 	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
 )
 
-func TestUpdateDocument(t *testing.T) {
-	Convey("UpdateDocument", t, func() {
-		rand.Seed(time.Now().UnixNano())
-		id := rand.Intn(1000)
-		indexName := "TestUpdateDocument.index_" + strconv.Itoa(id)
+func TestIndex_UpdateDocument(t *testing.T) {
+	type fields struct {
+		Name string
+	}
+	type args struct {
+		docID    string
+		doc      map[string]interface{}
+		mintedID bool
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "UpdateDocument with generated ID",
+			args: args{
+				docID: "test1",
+				doc: map[string]interface{}{
+					"name": "Hello",
+				},
+				mintedID: true,
+			},
+		},
+		{
+			name: "UpdateDocument with provided ID",
+			args: args{
+				docID: "test2",
+				doc: map[string]interface{}{
+					"test": "Hello",
+				},
+				mintedID: false,
+			},
+		},
+	}
+	for _, tt := range tests {
+		Convey(tt.name, t, func() {
+			rand.Seed(time.Now().UnixNano())
+			id := rand.Intn(1000)
+			indexName := "TestUpdateDocument.index_" + strconv.Itoa(id)
 
-		index, _ := NewIndex(indexName, "disk", UseNewIndexMeta, nil)
-		Convey("insert with mintedID", func() {
-			err := index.UpdateDocument("doc1", map[string]interface{}{
-				"name": "doc1",
-			}, true)
-			So(err, ShouldBeNil)
-			So(index.DocsCount, ShouldEqual, 1)
+			index, _ := NewIndex(indexName, "disk", UseNewIndexMeta, nil)
+
+			err := index.UpdateDocument(tt.args.docID, tt.args.doc, tt.args.mintedID)
+
+			assert.Nil(t, err)
+
+			if err == nil {
+				query := &v1.ZincQuery{
+					SearchType: "match",
+					Query: v1.QueryParams{
+						Term: "Hello",
+					},
+				}
+				res, err := index.Search(query)
+				assert.Nil(t, err)
+				assert.Equal(t, 1, res.Hits.Total.Value)
+			}
 		})
+	}
 
-		Convey("insert with provided ID", func() {
-			err := index.UpdateDocument("doc2", map[string]interface{}{
-				"Id":   "17",
-				"name": "doc1",
-			}, false)
-			So(err, ShouldBeNil)
-			// So(index.DocsCount, ShouldEqual, 1) // TODO: fix this. search for the document with ID 17 should return 1 document
-		})
-
-	})
-
+	os.RemoveAll("data") // cleanup data folder
 }
