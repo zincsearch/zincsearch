@@ -23,8 +23,8 @@ import (
 )
 
 func TestCreateUser(t *testing.T) {
-	// os.Setenv("ZINC_FIRST_ADMIN_USER", "admin")
-	// os.Setenv("ZINC_FIRST_ADMIN_PASSWORD", "Complexpass#123")
+	os.Setenv("ZINC_FIRST_ADMIN_USER", "admin")
+	os.Setenv("ZINC_FIRST_ADMIN_PASSWORD", "Complexpass#123")
 	type args struct {
 		userID            string
 		name              string
@@ -67,5 +67,5 @@ func TestCreateUser(t *testing.T) {
 		})
 	}
 
-	os.RemoveAll("data")
+	// os.RemoveAll("data")
 }

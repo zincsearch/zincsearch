@@ -66,7 +66,7 @@ func TestGetUser(t *testing.T) {
 			assert.Equal(t, got.Role, tt.want.Role)
 			assert.Equal(t, got1, tt.want1)
 
-			os.RemoveAll("data")
+			// os.RemoveAll("data")
 		})
 	}
 }

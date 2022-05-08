@@ -16,9 +16,7 @@
 package core
 
 import (
-	"fmt"
 	"math/rand"
-	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -44,8 +42,8 @@ func TestNewIndex(t *testing.T) {
 	})
 
 	// Cleanup data folder
-	err := os.RemoveAll("data")
-	if err != nil {
-		fmt.Println(err)
-	}
+	// err := os.RemoveAll("data")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 }

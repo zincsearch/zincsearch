@@ -17,7 +17,6 @@ package core
 
 import (
 	"math/rand"
-	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -89,5 +88,5 @@ func TestIndex_UpdateDocument(t *testing.T) {
 		})
 	}
 
-	os.RemoveAll("data") // cleanup data folder
+	// os.RemoveAll("data") // cleanup data folder
 }

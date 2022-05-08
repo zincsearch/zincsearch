@@ -17,7 +17,6 @@ package core
 
 import (
 	"math/rand"
-	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -206,5 +205,5 @@ func TestIndex_Search(t *testing.T) {
 		})
 	}
 
-	os.RemoveAll("data")
+	// os.RemoveAll("data")
 }
