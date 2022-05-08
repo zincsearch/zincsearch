@@ -11,13 +11,12 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-*/
+ */
 
 package handlers
 
 import (
 	"io"
-	"os"
 	"strings"
 	"testing"
 
@@ -59,7 +58,5 @@ func TestBulkHandlerWorker(t *testing.T) {
 			assert.Equal(t, got.Items[0]["index"].Status, 200)
 			assert.Equal(t, got.Items[1]["index"].Status, 200)
 		})
-
-		os.RemoveAll("data")
 	}
 }
