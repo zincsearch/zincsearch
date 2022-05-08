@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/blugelabs/bluge/analysis"
@@ -35,18 +36,33 @@ func CreateIndex(c *gin.Context) {
 	}
 
 	indexName := c.Param("target")
+
+	err := CreateIndexWorker(&newIndex, indexName)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":      "index created",
+		"index":        newIndex.Name,
+		"storage_type": newIndex.StorageType,
+	})
+}
+
+func CreateIndexWorker(newIndex *core.Index, indexName string) error {
+
 	if newIndex.Name == "" && indexName != "" {
 		newIndex.Name = indexName
 	}
 
 	if newIndex.Name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index.name should be not empty"})
-		return
+		return errors.New("index.name should be not empty")
 	}
 
 	if _, ok := core.GetIndex(newIndex.Name); ok {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index [" + newIndex.Name + "] already exists"})
-		return
+		// c.JSON(http.StatusBadRequest, gin.H{"error": "index [" + newIndex.Name + "] already exists"})
+		return errors.New("index [" + newIndex.Name + "] already exists")
 	}
 
 	if newIndex.Settings == nil {
@@ -54,14 +70,12 @@ func CreateIndex(c *gin.Context) {
 	}
 	analyzers, err := zincanalysis.RequestAnalyzer(newIndex.Settings.Analysis)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+		return errors.New(err.Error())
 	}
 
 	mappings, err := mappings.Request(analyzers, newIndex.Mappings)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+		return errors.New(err.Error())
 	}
 
 	var defaultSearchAnalyzer *analysis.Analyzer
@@ -70,8 +84,7 @@ func CreateIndex(c *gin.Context) {
 	}
 	index, err := core.NewIndex(newIndex.Name, newIndex.StorageType, core.UseNewIndexMeta, defaultSearchAnalyzer)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		return errors.New(err.Error())
 	}
 
 	// update settings
@@ -86,13 +99,8 @@ func CreateIndex(c *gin.Context) {
 	// store index
 	err = core.StoreIndex(index)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		return errors.New(err.Error())
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":      "index created",
-		"index":        newIndex.Name,
-		"storage_type": newIndex.StorageType,
-	})
+	return nil
 }

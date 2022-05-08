@@ -16,34 +16,33 @@
 package core
 
 import (
-	"math/rand"
-	"strconv"
 	"testing"
-	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestNewIndex(t *testing.T) {
-	Convey("test new index storage - disk", t, func() {
-		rand.Seed(time.Now().UnixNano())
-		id := rand.Intn(1000)
-		indexName := "create.new.index_" + strconv.Itoa(id)
+func TestBuildBlugeDocumentFromJSON(t *testing.T) {
+	Convey("test build bluge document from json", t, func() {
+		Convey("build bluge document from json", func() {
 
-		index, err := NewIndex(indexName, "disk", UseNewIndexMeta, nil)
-		So(err, ShouldBeNil)
-		So(index.Name, ShouldEqual, indexName)
-	})
-	Convey("test new index storage s3", t, func() {
-		// TODO: support
-	})
-	Convey("test new index storage minio", t, func() {
-		// TODO: support
+			idx, _ := NewIndex("index1", "disk", 0, nil)
+			// var err error
+			// var doc *bluge.Document
+
+			doc1 := make(map[string]interface{})
+			doc1["id"] = "1"
+			doc1["name"] = "test1"
+			doc1["age"] = 10
+			doc1["address"] = map[string]interface{}{
+				"street": "447 Great Mall Dr",
+				"city":   "Milpitas",
+				"state":  "CA",
+				"zip":    "95035",
+			}
+
+			_, err := idx.BuildBlugeDocumentFromJSON("1", doc1)
+			So(err, ShouldBeNil)
+		})
 	})
 
-	// Cleanup data folder
-	// err := os.RemoveAll("data")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
 }
