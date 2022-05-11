@@ -13,7 +13,7 @@ Check the below video for a quick demo of Zinc.
 
 # Playground Server
 
-You could try it without installing at 
+You could try ZincSearch without installing using below details: 
 
 | ...| ...|
 ------|-----------------------------------------
@@ -21,7 +21,7 @@ You could try it without installing at
 | uid | admin |
 | pwd | Complexpass#123 |
 
-Do not store sensitive data on this server as its available to everyone on internet. Data will also be cleaned on this server regularly.
+Note: Do not store sensitive data on this server as its available to everyone on internet. Data will also be cleaned on this server regularly.
 # Join slack channel
 
 [![Slack](./screenshots/slack.png)](https://join.slack.com/t/zinc-nvh4832/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg)
