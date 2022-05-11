@@ -11,6 +11,18 @@ Check the below video for a quick demo of Zinc.
 
 [![Zinc Youtube](./screenshots/zinc-youtube.jpg)](https://www.youtube.com/watch?v=aZXtuVjt1ow)
 
+# Playground Server
+
+You could try ZincSearch without installing using below details: 
+
+|          |                                        |
+-----------|-----------------------------------------
+| Server   | https://playground.dev.zincsearch.com  |
+| USer ID  | admin                                  |
+| password | Complexpass#123                        |
+
+Note: Do not store sensitive data on this server as its available to everyone on internet. Data will also be cleaned on this server regularly.
+
 # Join slack channel
 
 [![Slack](./screenshots/slack.png)](https://join.slack.com/t/zinc-nvh4832/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg)
