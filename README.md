@@ -1,4 +1,4 @@
-Note: Zinc and all its APIs are considered to be alpha stage at this time. Expect breaking changes in API contracts and data format at this stage. That being said let that not stop you from trying out Zinc as it works fantastically well and there many users using Zinc regularly.
+Note: Zinc and all its APIs are considered to be alpha stage at this time. Expect breaking changes in API contracts and data format at this stage. That being said let that not stop you from trying out Zinc as it works fantastically well and there are many users using Zinc regularly. 
 # Zinc Search Engine
 
 Zinc is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs using a fraction of the resources. It uses [bluge](https://github.com/blugelabs/bluge) as the underlying indexing library.
@@ -11,7 +11,18 @@ Check the below video for a quick demo of Zinc.
 
 [![Zinc Youtube](./screenshots/zinc-youtube.jpg)](https://www.youtube.com/watch?v=aZXtuVjt1ow)
 
-Join slack channel
+# Playground Server
+
+You could try it without installing at 
+
+| ...| ...|
+------|-----------------------------------------
+| URL | https://playground.dev.zincsearch.com |
+| uid | admin |
+| pwd | Complexpass#123 |
+
+Do not store sensitive data on this server as its available to everyone on internet. Data will also be cleaned on this server regularly.
+# Join slack channel
 
 [![Slack](./screenshots/slack.png)](https://join.slack.com/t/zinc-nvh4832/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg)
 
