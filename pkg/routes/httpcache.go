@@ -28,6 +28,12 @@ func HTTPCacheForUI(r *gin.Engine) {
 			if strings.Contains(c.Request.RequestURI, "/ui/assets/") {
 				c.Writer.Header().Set("cache-control", "public, max-age=2592000")
 				c.Writer.Header().Set("expires", time.Now().Add(time.Hour*24*30).Format(time.RFC1123))
+				if strings.Contains(c.Request.RequestURI, ".js") {
+					c.Writer.Header().Set("content-type", "application/javascript")
+				}
+				if strings.Contains(c.Request.RequestURI, ".css") {
+					c.Writer.Header().Set("content-type", "text/css; charset=utf-8")
+				}
 			}
 		}
 
