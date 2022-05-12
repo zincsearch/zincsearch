@@ -29,17 +29,24 @@ import (
 	parser "github.com/zinclabs/zinc/pkg/uquery/v2"
 )
 
-func MultiSearchV2(indexName string, query *meta.ZincQuery) (*meta.SearchResponse, error) {
+func MultiSearchV2(indexNames []string, query *meta.ZincQuery) (*meta.SearchResponse, error) {
 	var mappings *meta.Mappings
 	var analyzers map[string]*analysis.Analyzer
 	var readers []*bluge.Reader
+	readerMap := make(map[string]struct{})
 	for name, index := range ZINC_INDEX_LIST {
-		if indexName == "" || (indexName != "" && strings.HasPrefix(name, indexName[:len(indexName)-1])) {
-			reader, _ := index.Writer.Reader()
-			readers = append(readers, reader)
-			if mappings == nil {
-				mappings = index.CachedMappings
-				analyzers = index.CachedAnalyzers
+		for _, indexName := range indexNames {
+			if _, ok := readerMap[name]; ok {
+				continue
+			}
+			if indexName == "" || (indexName != "" && strings.HasPrefix(name, indexName[:len(indexName)-1])) {
+				reader, _ := index.Writer.Reader()
+				readers = append(readers, reader)
+				if mappings == nil {
+					mappings = index.CachedMappings
+					analyzers = index.CachedAnalyzers
+				}
+				readerMap[name] = struct{}{}
 			}
 		}
 	}

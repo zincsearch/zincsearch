@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	DEFAULT_BATCH_SIZE             = 1000
+	DEFAULT_BATCH_SIZE             = 1024
 	DEFAULT_MAX_RESULTS            = 10000
 	DEFAULT_AGGREGATION_TERMS_SIZE = 1000
 )

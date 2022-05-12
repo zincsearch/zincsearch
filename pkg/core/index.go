@@ -11,7 +11,7 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-*/
+ */
 
 package core
 
@@ -164,12 +164,18 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 	case "bool": // found using existing index mapping
 		value := value.(bool)
 		field = bluge.NewKeywordField(key, strconv.FormatBool(value))
-	case "time":
+	case "date", "time":
 		format := time.RFC3339
 		if mappings.Properties[key].Format != "" {
 			format = mappings.Properties[key].Format
 		}
-		tim, err := time.Parse(format, value.(string))
+		var tim time.Time
+		var err error
+		if format == "epoch_millis" {
+			tim = time.UnixMilli(int64(value.(float64)))
+		} else {
+			tim, err = time.Parse(format, value.(string))
+		}
 		if err != nil {
 			return err
 		}
@@ -250,7 +256,7 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 	mappings.Properties["_id"] = meta.NewProperty("keyword")
 
 	// @timestamp need date_range/date_histogram aggregation, and mappings used for type check in aggregation
-	mappings.Properties["@timestamp"] = meta.NewProperty("time")
+	mappings.Properties["@timestamp"] = meta.NewProperty("date")
 
 	// update in the cache
 	index.CachedMappings = mappings

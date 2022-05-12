@@ -72,7 +72,7 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 		var newProp meta.Property
 		propTypeStr = strings.ToLower(propTypeStr)
 		switch propTypeStr {
-		case "text", "keyword", "numeric", "bool", "time":
+		case "text", "keyword", "numeric", "bool", "date":
 			newProp = meta.NewProperty(propTypeStr)
 		case "constant_keyword":
 			newProp = meta.NewProperty("keyword")
@@ -82,8 +82,8 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 			newProp = meta.NewProperty("numeric")
 		case "boolean":
 			newProp = meta.NewProperty("bool")
-		case "date", "datetime":
-			newProp = meta.NewProperty("time")
+		case "time", "datetime":
+			newProp = meta.NewProperty("date")
 		case "flattened", "object", "nested", "wildcard", "byte", "alias", "geo_point", "ip", "ip_range", "scaled_float":
 			// ignore
 		default:

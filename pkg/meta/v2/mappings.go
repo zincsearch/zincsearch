@@ -20,7 +20,7 @@ type Mappings struct {
 }
 
 type Property struct {
-	Type           string `json:"type"` // text, keyword, time, numeric, boolean, geo_point
+	Type           string `json:"type"` // text, keyword, date, numeric, boolean, geo_point
 	Analyzer       string `json:"analyzer,omitempty"`
 	SearchAnalyzer string `json:"search_analyzer,omitempty"`
 	Format         string `json:"format,omitempty"` // date format yyyy-MM-dd HH:mm:ss || yyyy-MM-dd || epoch_millis
@@ -45,13 +45,17 @@ func NewProperty(typ string) Property {
 		Format:         "",
 		Index:          true,
 		Store:          false,
-		Sortable:       true,
-		Aggregatable:   true,
+		Sortable:       false,
+		Aggregatable:   false,
 		Highlightable:  false,
 	}
-	if typ == "text" {
-		p.Sortable = false
-		p.Aggregatable = false
+
+	switch typ {
+	case "keyword":
+		p.Aggregatable = true
+	case "numeric", "date":
+		p.Sortable = true
+		p.Aggregatable = true
 	}
 
 	return p

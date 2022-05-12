@@ -50,6 +50,8 @@ func QueryStringQuery(query map[string]interface{}, mappings *meta.Mappings, ana
 			value.DefaultOperator = v.(string)
 		case "boost":
 			value.Boost = v.(float64)
+		case "analyze_wildcard":
+			// noop
 		default:
 			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[query_string] unsupported children %s", k))
 		}

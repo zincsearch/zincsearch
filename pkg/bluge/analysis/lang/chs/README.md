@@ -73,7 +73,7 @@ PUT http://localhost:4080/api/index
 					"store": false
 				},
 				"create_time": {
-					"type":"time"
+					"type":"date"
 				}
 			}
 		}

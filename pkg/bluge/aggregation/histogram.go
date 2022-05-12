@@ -31,6 +31,9 @@ type HistogramAggregation struct {
 	offset      float64
 	minDocCount int
 
+	extendedBounds *HistogramBound
+	hardBounds     *HistogramBound
+
 	aggregations map[string]search.Aggregation
 
 	lessFunc func(a, b *search.Bucket) bool
@@ -38,16 +41,30 @@ type HistogramAggregation struct {
 	sortFunc func(p sort.Interface)
 }
 
+type HistogramBound struct {
+	Min float64 `json:"min"` // minimum
+	Max float64 `json:"max"` // maximum
+}
+
 // NewHistogramAggregation returns a termsAggregation
 // field use to set the field use to terms aggregation
-func NewHistogramAggregation(field search.FieldSource, interval, offset float64, minDocCount, size int) *HistogramAggregation {
+func NewHistogramAggregation(
+	field search.FieldSource,
+	interval,
+	offset float64,
+	extendedBounds,
+	hardBounds *HistogramBound,
+	minDocCount,
+	size int) *HistogramAggregation {
 	rv := &HistogramAggregation{
-		src:         field,
-		size:        size,
-		interval:    interval,
-		offset:      offset,
-		minDocCount: minDocCount,
-		desc:        false,
+		src:            field,
+		size:           size,
+		interval:       interval,
+		offset:         offset,
+		minDocCount:    minDocCount,
+		extendedBounds: extendedBounds,
+		hardBounds:     hardBounds,
+		desc:           false,
 		lessFunc: func(a, b *search.Bucket) bool {
 			return a.Name() < b.Name()
 		},
@@ -68,18 +85,20 @@ func (t *HistogramAggregation) Fields() []string {
 
 func (t *HistogramAggregation) Calculator() search.Calculator {
 	return &HistogramCalculator{
-		src:          t.src,
-		size:         t.size,
-		interval:     t.interval,
-		offset:       t.offset,
-		minDocCount:  t.minDocCount,
-		minValue:     math.MaxFloat64,
-		maxValue:     math.SmallestNonzeroFloat64,
-		aggregations: t.aggregations,
-		desc:         t.desc,
-		lessFunc:     t.lessFunc,
-		sortFunc:     t.sortFunc,
-		bucketsMap:   make(map[string]*search.Bucket),
+		src:            t.src,
+		size:           t.size,
+		interval:       t.interval,
+		offset:         t.offset,
+		minDocCount:    t.minDocCount,
+		minValue:       math.MaxFloat64,
+		maxValue:       math.SmallestNonzeroFloat64,
+		extendedBounds: t.extendedBounds,
+		hardBounds:     t.hardBounds,
+		aggregations:   t.aggregations,
+		desc:           t.desc,
+		lessFunc:       t.lessFunc,
+		sortFunc:       t.sortFunc,
+		bucketsMap:     make(map[string]*search.Bucket),
 	}
 }
 
@@ -94,8 +113,10 @@ type HistogramCalculator struct {
 	offset      float64
 	minDocCount int
 
-	minValue float64
-	maxValue float64
+	minValue       float64
+	maxValue       float64
+	extendedBounds *HistogramBound
+	hardBounds     *HistogramBound
 
 	aggregations map[string]search.Aggregation
 
@@ -157,6 +178,19 @@ func (a *HistogramCalculator) Merge(other search.Calculator) {
 }
 
 func (a *HistogramCalculator) Finish() {
+	// re calculate min max
+	if a.extendedBounds != nil {
+		if a.minValue > a.extendedBounds.Min {
+			a.minValue = a.extendedBounds.Min
+		}
+		if a.maxValue < a.extendedBounds.Max {
+			a.maxValue = a.extendedBounds.Max
+		}
+	}
+	if a.hardBounds != nil {
+		a.minValue = a.hardBounds.Min
+		a.maxValue = a.hardBounds.Max
+	}
 	// check bucket
 	if a.minDocCount == 0 {
 		for value := a.minValue; value < a.maxValue; value += a.interval {

@@ -40,7 +40,7 @@ func RangeQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Qu
 		switch mappings.Properties[field].Type {
 		case "numeric":
 			return RangeQueryNumeric(field, vv, mappings)
-		case "time":
+		case "date", "time":
 			return RangeQueryTime(field, vv, mappings)
 		default:
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s only support values of [numeric, time]", field))
@@ -109,13 +109,13 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 		k := strings.ToLower(k)
 		switch k {
 		case "gt":
-			value.GT = v.(string)
+			value.GT = v
 		case "gte":
-			value.GTE = v.(string)
+			value.GTE = v
 		case "lt":
-			value.LT = v.(string)
+			value.LT = v
 		case "lte":
-			value.LTE = v.(string)
+			value.LTE = v
 		case "format":
 			value.Format = v.(string)
 		case "time_zone":
@@ -149,28 +149,44 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 	max := time.Time{}
 	minInclusive := false
 	maxInclusive := false
-	if value.GT != nil && value.GT.(string) != "" {
-		min, err = time.ParseInLocation(format, value.GT.(string), timeZone)
+	if value.GT != nil {
+		if format == "epoch_millis" {
+			min = time.UnixMilli(int64(value.GT.(float64)))
+		} else {
+			min, err = time.ParseInLocation(format, value.GT.(string), timeZone)
+		}
 		if err != nil {
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.gt format err %s", field, err.Error()))
 		}
 	}
-	if value.GTE != nil && value.GTE.(string) != "" {
+	if value.GTE != nil {
 		minInclusive = true
-		min, err = time.ParseInLocation(format, value.GTE.(string), timeZone)
+		if format == "epoch_millis" {
+			min = time.UnixMilli(int64(value.GTE.(float64)))
+		} else {
+			min, err = time.ParseInLocation(format, value.GTE.(string), timeZone)
+		}
 		if err != nil {
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.gte format err %s", field, err.Error()))
 		}
 	}
-	if value.LT != nil && value.LT.(string) != "" {
-		max, err = time.ParseInLocation(format, value.LT.(string), timeZone)
+	if value.LT != nil {
+		if format == "epoch_millis" {
+			max = time.UnixMilli(int64(value.LT.(float64)))
+		} else {
+			max, err = time.ParseInLocation(format, value.LT.(string), timeZone)
+		}
 		if err != nil {
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.lt format err %s", field, err.Error()))
 		}
 	}
-	if value.LTE != nil && value.LTE.(string) != "" {
+	if value.LTE != nil {
 		maxInclusive = true
-		max, err = time.ParseInLocation(format, value.LTE.(string), timeZone)
+		if format == "epoch_millis" {
+			max = time.UnixMilli(int64(value.LTE.(float64)))
+		} else {
+			max, err = time.ParseInLocation(format, value.LTE.(string), timeZone)
+		}
 		if err != nil {
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.lte format err %s", field, err.Error()))
 		}
