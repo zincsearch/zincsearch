@@ -18,7 +18,7 @@ You could try ZincSearch without installing using below details:
 |          |                                        |
 -----------|-----------------------------------------
 | Server   | https://playground.dev.zincsearch.com  |
-| USer ID  | admin                                  |
+| User ID  | admin                                  |
 | password | Complexpass#123                        |
 
 Note: Do not store sensitive data on this server as its available to everyone on internet. Data will also be cleaned on this server regularly.
