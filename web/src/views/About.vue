@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-lg">
     <h3 class="q-ma-none">Zinc</h3>
-    <p class="q-mt-md">A morden search engine.</p>
+    <p class="q-mt-md">A modern search engine.</p>
 
     <div class="q-pa-md">
       <div class="row items-center q-mb-md">
