@@ -8,9 +8,9 @@ export default createStore({
       _id: "",
       password: "",
       base64encoded: "",
-      name: null,
-      email: null,
-      role: null,
+      name: "",
+      email: "",
+      role: "",
     },
   },
   mutations: {

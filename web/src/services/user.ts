@@ -4,10 +4,10 @@ var user = {
   list: () => {
     return http().get("/api/users");
   },
-  update: (data) => {
+  update: (data: any) => {
     return http().put("/api/user", data);
   },
-  delete: (id) => {
+  delete: (id: string) => {
     return http().delete("/api/user/" + id);
   },
 };

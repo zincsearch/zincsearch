@@ -16,7 +16,7 @@ const routes = [
       {
         path: "",
         name: "home",
-        redirect: (to) => {
+        redirect: (to: any) => {
           return { path: "/search", query: { q: to.params.searchText } };
         },
       },
@@ -74,7 +74,7 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to: any, from: any, next: any) => {
   var isAuthenticated = store.state.user.isLoggedIn;
 
   if (to.path !== "/login" && !isAuthenticated) {
