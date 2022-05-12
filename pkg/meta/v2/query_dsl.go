@@ -15,6 +15,8 @@
 
 package v2
 
+import "github.com/zinclabs/zinc/pkg/bluge/aggregation"
+
 // ZincQuery is the query object for the zinc index. compatible ES Query DSL
 type ZincQuery struct {
 	Query          map[string]interface{}  `json:"query"`
@@ -216,6 +218,7 @@ type Aggregations struct {
 	Min               *AggregationMetric            `json:"min"`
 	Sum               *AggregationMetric            `json:"sum"`
 	Count             *AggregationMetric            `json:"count"`
+	Cardinality       *AggregationMetric            `json:"cardinality"`
 	Terms             *AggregationsTerms            `json:"terms"`
 	Range             *AggregationRange             `json:"range"`
 	DateRange         *AggregationDateRange         `json:"date_range"`
@@ -276,23 +279,28 @@ type IPRange struct {
 }
 
 type AggregationHistogram struct {
-	Field       string  `json:"field"`
-	Size        int     `json:"size"`
-	Interval    float64 `json:"interval"`
-	Offset      float64 `json:"offset"`
-	MinDocCount int     `json:"min_doc_count"`
-	Keyed       bool    `json:"keyed"`
+	Field          string                      `json:"field"`
+	Size           int                         `json:"size"`
+	Interval       float64                     `json:"interval"`
+	Offset         float64                     `json:"offset"`
+	MinDocCount    int                         `json:"min_doc_count"`
+	Keyed          bool                        `json:"keyed"`
+	ExtendedBounds *aggregation.HistogramBound `json:"extended_bounds"`
+	HardBounds     *aggregation.HistogramBound `json:"hard_bounds"`
 }
 
 type AggregationDateHistogram struct {
-	Field            string `json:"field"`
-	Size             int    `json:"size"`
-	FixedInterval    string `json:"fixed_interval"`    // ms,s,m,h,d
-	CalendarInterval string `json:"calendar_interval"` // minute,hour,day,week,month,quarter,year
-	Format           string `json:"format"`            // format key_as_string
-	TimeZone         string `json:"time_zone"`         // time_zone
-	MinDocCount      int    `json:"min_doc_count"`
-	Keyed            bool   `json:"keyed"`
+	Field            string                      `json:"field"`
+	Size             int                         `json:"size"`
+	Interval         string                      `json:"interval"`          // ms,s,m,h,d
+	FixedInterval    string                      `json:"fixed_interval"`    // ms,s,m,h,d
+	CalendarInterval string                      `json:"calendar_interval"` // minute,hour,day,week,month,quarter,year
+	Format           string                      `json:"format"`            // format key_as_string
+	TimeZone         string                      `json:"time_zone"`         // time_zone
+	MinDocCount      int                         `json:"min_doc_count"`
+	Keyed            bool                        `json:"keyed"`
+	ExtendedBounds   *aggregation.HistogramBound `json:"extended_bounds"`
+	HardBounds       *aggregation.HistogramBound `json:"hard_bounds"`
 }
 
 type AggregationAutoDateHistogram struct {

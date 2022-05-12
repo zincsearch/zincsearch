@@ -60,10 +60,3 @@ type AggregationResponse struct {
 	Buckets  interface{} `json:"buckets,omitempty"`  // slice or map
 	Interval string      `json:"interval,omitempty"` // support for auto_date_histogram_aggregation
 }
-
-type AggregationBucket struct {
-	Key          interface{}                    `json:"key"`
-	KeyAsString  string                         `json:"key_as_string,omitempty"`
-	DocCount     uint64                         `json:"doc_count"`
-	Aggregations map[string]AggregationResponse `json:"aggregations,omitempty"`
-}

@@ -77,7 +77,7 @@ func AddAggregations(req zincaggregation.SearchAggregation, aggs map[string]v1.A
 			}
 			var subreq *aggregations.DateRangeAggregation
 			switch mapping.Properties[agg.Field].Type {
-			case "time":
+			case "date", "time":
 				subreq = aggregations.DateRanges(search.Field(agg.Field))
 				// time format: 2022-01-21T09:22:50.604Z
 				for _, v := range agg.DateRanges {

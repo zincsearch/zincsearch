@@ -121,7 +121,9 @@ func SetRoutes(r *gin.Engine) {
 	})
 
 	r.POST("/es/_search", auth.ZincAuthMiddleware, handlersV2.SearchIndex)
+	r.POST("/es/_msearch", auth.ZincAuthMiddleware, handlersV2.MultipleSearch)
 	r.POST("/es/:target/_search", auth.ZincAuthMiddleware, handlersV2.SearchIndex)
+	r.POST("/es/:target/_msearch", auth.ZincAuthMiddleware, handlersV2.MultipleSearch)
 
 	r.GET("/es/_index_template", auth.ZincAuthMiddleware, handlersV2.ListIndexTemplate)
 	r.PUT("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.UpdateIndexTemplate)
