@@ -28,7 +28,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/core"
-	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
+	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/routes"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
@@ -39,7 +39,7 @@ func main() {
 		/******** initialize sentry **********/
 		err := sentry.Init(sentry.ClientOptions{
 			Dsn:     "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942",
-			Release: "zinc@" + v1.Version,
+			Release: "zinc@" + meta.Version,
 		})
 		if err != nil {
 			log.Print("sentry.Init: ", err.Error())
