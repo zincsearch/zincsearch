@@ -34,6 +34,8 @@ func TestMapping(t *testing.T) {
 
 		err = core.StoreIndex(index)
 		assert.NoError(t, err)
+		err = index.Close()
+		assert.NoError(t, err)
 	})
 
 	t.Run("set mapping", func(t *testing.T) {

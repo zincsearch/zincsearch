@@ -13,13 +13,13 @@
 * limitations under the License.
  */
 
-package test
+package benchmark
 
 import (
 	"os"
 	"testing"
 
-	"github.com/zinclabs/zinc/pkg/handlers"
+	"github.com/zinclabs/zinc/pkg/handlers/document"
 )
 
 func BenchmarkBulk(b *testing.B) {
@@ -32,7 +32,7 @@ func BenchmarkBulk(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err = handlers.BulkHandlerWorker(target, f)
+		_, err = document.BulkWorker(target, f)
 		if err != nil {
 			b.Error(err)
 		}

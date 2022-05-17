@@ -13,16 +13,17 @@
 * limitations under the License.
  */
 
-package test
+package api
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"testing"
 
+	"github.com/goccy/go-json"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -46,6 +47,7 @@ func TestAnalyze(t *testing.T) {
 		})
 
 		Convey("standard analyzer with stopwords", func() {
+			indexName := "my-index-001"
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -67,23 +69,26 @@ func TestAnalyze(t *testing.T) {
 			// create index with custom analyzer
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
-			resp := request("PUT", "/api/index/my-index-001", body)
+			resp := request("PUT", "/api/index/"+indexName, body)
+			buf, err := io.ReadAll(resp.Body)
+			fmt.Println(string(buf), err)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
-			resp = request("POST", "/api/my-index-001/_analyze", body)
+			resp = request("POST", "/api/"+indexName+"/_analyze", body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 
 			// delete index
-			request("DELETE", "/api/index/my-index-001", nil)
+			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
 		Convey("standard analyzer with stopwords and filters", func() {
+			indexName := "my-index-002"
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -113,20 +118,20 @@ func TestAnalyze(t *testing.T) {
 			// create index with custom analyzer
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
-			resp := request("PUT", "/api/index/my-index-001", body)
+			resp := request("PUT", "/api/index/"+indexName, body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
-			resp = request("POST", "/api/my-index-001/_analyze", body)
+			resp = request("POST", "/api/"+indexName+"/_analyze", body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 
 			// delete index
-			request("DELETE", "/api/index/my-index-001", nil)
+			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
 		Convey("simple analyzer", func() {
@@ -181,6 +186,7 @@ func TestAnalyze(t *testing.T) {
 		})
 
 		Convey("regexp analyzer with pattern", func() {
+			indexName := "my-index-003"
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -203,20 +209,20 @@ func TestAnalyze(t *testing.T) {
 			// create index with custom analyzer
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
-			resp := request("PUT", "/api/index/my-index-001", body)
+			resp := request("PUT", "/api/index/"+indexName, body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
-			resp = request("POST", "/api/my-index-001/_analyze", body)
+			resp = request("POST", "/api/"+indexName+"/_analyze", body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 
 			// delete index
-			request("DELETE", "/api/index/my-index-001", nil)
+			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
 		Convey("stop analyzer", func() {
@@ -237,6 +243,7 @@ func TestAnalyze(t *testing.T) {
 		})
 
 		Convey("stop analyzer with stopwords", func() {
+			indexName := "my-index-004"
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -258,20 +265,20 @@ func TestAnalyze(t *testing.T) {
 			// create index with custom analyzer
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
-			resp := request("PUT", "/api/index/my-index-001", body)
+			resp := request("PUT", "/api/index/"+indexName, body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
-			resp = request("POST", "/api/my-index-001/_analyze", body)
+			resp = request("POST", "/api/"+indexName+"/_analyze", body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 
 			// delete index
-			request("DELETE", "/api/index/my-index-001", nil)
+			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
 		Convey("whitespace analyzer", func() {
@@ -396,6 +403,7 @@ func TestAnalyze(t *testing.T) {
 		})
 
 		Convey("n-gram tokenizer with configuration", func() {
+			indexName := "my-index-005"
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -427,20 +435,20 @@ func TestAnalyze(t *testing.T) {
 			// create index with custom analyzer
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
-			resp := request("PUT", "/api/index/my-index-001", body)
+			resp := request("PUT", "/api/index/"+indexName, body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
-			resp = request("POST", "/api/my-index-001/_analyze", body)
+			resp = request("POST", "/api/"+indexName+"/_analyze", body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 
 			// delete index
-			request("DELETE", "/api/index/my-index-001", nil)
+			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
 		Convey("edge n-gram tokenizer", func() {
@@ -461,6 +469,7 @@ func TestAnalyze(t *testing.T) {
 		})
 
 		Convey("edge n-gram tokenizer with configuration", func() {
+			indexName := "my-index-006"
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -492,20 +501,20 @@ func TestAnalyze(t *testing.T) {
 			// create index with custom analyzer
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
-			resp := request("PUT", "/api/index/my-index-001", body)
+			resp := request("PUT", "/api/index/"+indexName, body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
-			resp = request("POST", "/api/my-index-001/_analyze", body)
+			resp = request("POST", "/api/"+indexName+"/_analyze", body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 
 			// delete index
-			request("DELETE", "/api/index/my-index-001", nil)
+			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
 		Convey("keyword tokenizer", func() {
@@ -561,6 +570,7 @@ func TestAnalyze(t *testing.T) {
 		})
 
 		Convey("regexp tokenizer with configuration example1", func() {
+			indexName := "my-index-007"
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -587,23 +597,24 @@ func TestAnalyze(t *testing.T) {
 			// create index with custom analyzer
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
-			resp := request("PUT", "/api/index/my-index-001", body)
+			resp := request("PUT", "/api/index/"+indexName, body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
-			resp = request("POST", "/api/my-index-001/_analyze", body)
+			resp = request("POST", "/api/"+indexName+"/_analyze", body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 
 			// delete index
-			request("DELETE", "/api/index/my-index-001", nil)
+			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
 		Convey("regexp tokenizer with configuration example2", func() {
+			indexName := "my-index-008"
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -630,20 +641,20 @@ func TestAnalyze(t *testing.T) {
 			// create index with custom analyzer
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
-			resp := request("PUT", "/api/index/my-index-001", body)
+			resp := request("PUT", "/api/index/"+indexName, body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
-			resp = request("POST", "/api/my-index-001/_analyze", body)
+			resp = request("POST", "/api/"+indexName+"/_analyze", body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 
 			// delete index
-			request("DELETE", "/api/index/my-index-001", nil)
+			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
 		Convey("character group tokenizer", func() {
@@ -688,6 +699,7 @@ func TestAnalyze(t *testing.T) {
 		})
 
 		Convey("path hierarchy tokenizer with configuration", func() {
+			indexName := "my-index-009"
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -716,20 +728,20 @@ func TestAnalyze(t *testing.T) {
 			// create index with custom analyzer
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
-			resp := request("PUT", "/api/index/my-index-001", body)
+			resp := request("PUT", "/api/index/"+indexName, body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
-			resp = request("POST", "/api/my-index-001/_analyze", body)
+			resp = request("POST", "/api/"+indexName+"/_analyze", body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 
 			// delete index
-			request("DELETE", "/api/index/my-index-001", nil)
+			request("DELETE", "/api/index/"+indexName, nil)
 		})
 	})
 
@@ -1224,6 +1236,7 @@ func TestAnalyze(t *testing.T) {
 		})
 
 		Convey("Pattern replace character filter", func() {
+			indexName := "my-index-010"
 			index := `{
 				"settings": {
 				  "analysis": {
@@ -1254,20 +1267,20 @@ func TestAnalyze(t *testing.T) {
 			// create index with custom analyzer
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
-			resp := request("PUT", "/api/index/my-index-001", body)
+			resp := request("PUT", "/api/index/"+indexName, body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
-			resp = request("POST", "/api/my-index-001/_analyze", body)
+			resp = request("POST", "/api/"+indexName+"/_analyze", body)
 			So(resp.Code, ShouldEqual, http.StatusOK)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
 			So(err, ShouldBeNil)
 			So(tokens, ShouldEqual, output)
 
 			// delete index
-			request("DELETE", "/api/index/my-index-001", nil)
+			request("DELETE", "/api/index/"+indexName, nil)
 		})
 	})
 }

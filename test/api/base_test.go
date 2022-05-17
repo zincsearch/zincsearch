@@ -13,14 +13,14 @@
 * limitations under the License.
  */
 
-package test
+package api
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/goccy/go-json"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
