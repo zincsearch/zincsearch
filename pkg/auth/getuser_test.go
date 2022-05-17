@@ -16,8 +16,6 @@
 package auth
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,7 +31,7 @@ func TestGetUser(t *testing.T) {
 		want    ZincUser
 		want1   bool
 		wantErr bool
-		input   ZincUser
+		input   *ZincUser
 	}{
 		{
 			name: "get user",
@@ -46,27 +44,38 @@ func TestGetUser(t *testing.T) {
 				Role: "admin",
 			},
 			want1: true,
-			input: ZincUser{
+			input: &ZincUser{
 				ID:       "testuser",
 				Name:     "Test User",
 				Role:     "admin",
 				Password: "testpassword",
 			},
 		},
+		{
+			name: "get user not exists",
+			args: args{
+				userID: "testuserNotExists",
+			},
+			want: ZincUser{
+				ID: "",
+			},
+			want1: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fmt.Println(os.Getwd())
-			CreateUser(tt.input.ID, tt.input.Name, tt.input.Password, tt.input.Role)
+			if tt.input != nil {
+				got, err := CreateUser(tt.input.ID, tt.input.Name, tt.input.Password, tt.input.Role)
+				assert.NoError(t, err)
+				assert.NotNil(t, got)
+			}
 			got, got1, err := GetUser(tt.args.userID)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.want.ID, got.ID)
+			assert.Equal(t, tt.want.Name, got.Name)
+			assert.Equal(t, tt.want.Role, got.Role)
+			assert.Equal(t, tt.want1, got1)
 
-			assert.Equal(t, err, nil)
-			assert.Equal(t, got.ID, tt.want.ID)
-			assert.Equal(t, got.Name, tt.want.Name)
-			assert.Equal(t, got.Role, tt.want.Role)
-			assert.Equal(t, got1, tt.want1)
-
-			// os.RemoveAll("data")
 		})
 	}
 }

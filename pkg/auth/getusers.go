@@ -23,10 +23,10 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/core"
-	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-func GetAllUsersWorker() (*v1.SearchResponse, error) {
+func GetAllUsersWorker() (*meta.SearchResponse, error) {
 	usersIndex := core.ZINC_SYSTEM_INDEX_LIST["_users"]
 
 	query := bluge.NewMatchAllQuery()
@@ -37,7 +37,7 @@ func GetAllUsersWorker() (*v1.SearchResponse, error) {
 		log.Printf("error executing search: %s", err.Error())
 	}
 
-	var Hits []v1.Hit
+	var Hits []meta.Hit
 	next, err := dmi.Next()
 	for err == nil && next != nil {
 		var user SimpleUser
@@ -66,7 +66,7 @@ func GetAllUsersWorker() (*v1.SearchResponse, error) {
 			log.Printf("error accessing stored fields: %s", err.Error())
 		}
 
-		hit := v1.Hit{
+		hit := meta.Hit{
 			Index:     usersIndex.Name,
 			Type:      usersIndex.Name,
 			ID:        user.ID,
@@ -79,10 +79,10 @@ func GetAllUsersWorker() (*v1.SearchResponse, error) {
 		next, err = dmi.Next()
 	}
 
-	resp := &v1.SearchResponse{
+	resp := &meta.SearchResponse{
 		Took: int(dmi.Aggregations().Duration().Milliseconds()),
-		Hits: v1.Hits{
-			Total: v1.Total{
+		Hits: meta.Hits{
+			Total: meta.Total{
 				Value: int(dmi.Aggregations().Count()),
 			},
 			MaxScore: dmi.Aggregations().Metric("max_score"),

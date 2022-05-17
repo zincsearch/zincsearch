@@ -24,13 +24,13 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/goccy/go-json"
 
-	"github.com/zinclabs/zinc/pkg/directory"
-	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	"github.com/zinclabs/zinc/pkg/bluge/directory"
+	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
-func NewIndex(name, storageType string, useNewIndexMeta int, defaultSearchAnalyzer *analysis.Analyzer) (*Index, error) {
+func NewIndex(name, storageType string, defaultSearchAnalyzer *analysis.Analyzer) (*Index, error) {
 	if name == "" {
 		return nil, fmt.Errorf("core.NewIndex: index name cannot be empty")
 	}
@@ -71,17 +71,6 @@ func NewIndex(name, storageType string, useNewIndexMeta int, defaultSearchAnalyz
 	// use template
 	if err = index.UseTemplate(); err != nil {
 		return nil, err
-	}
-
-	if useNewIndexMeta == NotCompatibleNewIndexMeta {
-		mappings, err := index.GetStoredMapping()
-		if err != nil {
-			return nil, err
-		}
-
-		if mappings != nil && len(mappings.Properties) > 0 {
-			index.CachedMappings = mappings
-		}
 	}
 
 	return index, nil
@@ -143,17 +132,6 @@ func StoreIndex(index *Index) error {
 
 	// cache index
 	ZINC_INDEX_LIST[index.Name] = index
-
-	return nil
-}
-
-func DeleteIndex(name string) error {
-	bdoc := bluge.NewDocument(name)
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
-	err := ZINC_SYSTEM_INDEX_LIST["_index"].Writer.Delete(bdoc.ID())
-	if err != nil {
-		return fmt.Errorf("core.DeleteIndex: error deleting template: %s", err.Error())
-	}
 
 	return nil
 }

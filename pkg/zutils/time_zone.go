@@ -25,15 +25,15 @@ func ParseTimeZone(name string) (*time.Location, error) {
 	ln := len(name)
 	if ln > 0 && (name[0] == '+' || name[0] == '-') {
 		if ln >= 3 {
-			offset = 60 * 60 * StringToInt(name[1:3])
+			offset = 60 * 60 * StringToInt(name[1:3]) // +08:00  +0800
 		}
 		if ln == 5 {
-			offset += 60 * StringToInt(name[3:5])
+			offset += 60 * StringToInt(name[3:5]) // +0830
 		}
 		if ln == 6 && name[3] == ':' {
-			offset += 60 * StringToInt(name[4:6])
+			offset += 60 * StringToInt(name[4:6]) // +08:30
 		}
-		if name[0] == '-' {
+		if name[0] == '-' { // -01:00
 			offset = -offset
 		}
 		return time.FixedZone(name, offset), nil

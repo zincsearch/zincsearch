@@ -18,50 +18,46 @@ package flatten
 import (
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFlattern(t *testing.T) {
-	Convey("zutils:flatten", t, func() {
-		data := map[string]interface{}{
-			"foo": map[string]interface{}{
-				"bar": map[string]interface{}{
-					"oxx": "cbd",
-					"xxo": "dba",
+	data := map[string]interface{}{
+		"foo": map[string]interface{}{
+			"bar": map[string]interface{}{
+				"oxx": "cbd",
+				"xxo": "dba",
+			},
+			"arr": []interface{}{"a", "b", "c"},
+			"arm": []interface{}{
+				map[string]interface{}{
+					"a1": "b1",
+					"a2": "b2",
 				},
-				"arr": []interface{}{"a", "b", "c"},
-				"arm": []interface{}{
-					map[string]interface{}{
-						"a1": "b1",
-						"a2": "b2",
-					},
-					map[string]interface{}{
-						"b1": "a1",
-						"b2": "a2",
-					},
+				map[string]interface{}{
+					"b1": "a1",
+					"b2": "a2",
 				},
 			},
-		}
-		fdata, err := Flatten(data, "")
-		So(err, ShouldBeNil)
-		So(len(fdata), ShouldEqual, 7)
-		So(fdata["foo.bar.oxx"].(string), ShouldEqual, "cbd")
-		So(fdata["foo.arm.1.b1"].(string), ShouldEqual, "a1")
-		So(len(fdata["foo.arr"].([]interface{})), ShouldEqual, 3)
-	})
+		},
+	}
+	fdata, err := Flatten(data, "")
+	assert.NoError(t, err)
+	assert.Equal(t, 7, len(fdata))
+	assert.Equal(t, "cbd", fdata["foo.bar.oxx"].(string))
+	assert.Equal(t, "a1", fdata["foo.arm.1.b1"].(string))
+	assert.Equal(t, 3, len(fdata["foo.arr"].([]interface{})))
 }
 func TestUnflatten(t *testing.T) {
-	Convey("zutils:unflatten", t, func() {
-		data := map[string]interface{}{
-			"foo.bar.coo": "abc",
-			"foo.bar.oxx": "cbd",
-			"foo.bcc.xox": "bdc",
-		}
-		undata, err := Unflatten(data)
-		So(err, ShouldBeNil)
-		So(len(undata), ShouldEqual, 1)
-		So(len(undata["foo"].(map[string]interface{})), ShouldEqual, 2)
-		So(len(undata["foo"].(map[string]interface{})["bar"].(map[string]interface{})), ShouldEqual, 2)
-		So(undata["foo"].(map[string]interface{})["bar"].(map[string]interface{})["coo"], ShouldEqual, "abc")
-	})
+	data := map[string]interface{}{
+		"foo.bar.coo": "abc",
+		"foo.bar.oxx": "cbd",
+		"foo.bcc.xox": "bdc",
+	}
+	undata, err := Unflatten(data)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(undata))
+	assert.Equal(t, 2, len(undata["foo"].(map[string]interface{})))
+	assert.Equal(t, 2, len(undata["foo"].(map[string]interface{})["bar"].(map[string]interface{})))
+	assert.Equal(t, "abc", undata["foo"].(map[string]interface{})["bar"].(map[string]interface{})["coo"])
 }

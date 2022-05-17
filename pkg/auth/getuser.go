@@ -17,6 +17,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 
 	"github.com/blugelabs/bluge"
 	"github.com/rs/zerolog/log"
@@ -27,6 +28,10 @@ import (
 func GetUser(userID string) (ZincUser, bool, error) {
 	userExists := false
 	var user ZincUser
+
+	if userID == "" {
+		return user, userExists, errors.New("user id is required")
+	}
 
 	query := bluge.NewTermQuery(userID)
 	searchRequest := bluge.NewTopNSearch(1, query)

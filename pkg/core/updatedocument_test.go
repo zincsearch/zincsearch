@@ -16,14 +16,11 @@
 package core
 
 import (
-	"math/rand"
-	"strconv"
 	"testing"
-	"time"
 
-	. "github.com/smartystreets/goconvey/convey"
 	"github.com/stretchr/testify/assert"
-	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
+
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func TestIndex_UpdateDocument(t *testing.T) {
@@ -54,39 +51,61 @@ func TestIndex_UpdateDocument(t *testing.T) {
 		{
 			name: "UpdateDocument with provided ID",
 			args: args{
-				docID: "test2",
+				docID: "test1",
 				doc: map[string]interface{}{
 					"test": "Hello",
 				},
 				mintedID: false,
 			},
 		},
+		{
+			name: "UpdateDocument with type conflict",
+			args: args{
+				docID: "test1",
+				doc: map[string]interface{}{
+					"test": true,
+				},
+				mintedID: false,
+			},
+			wantErr: true,
+		},
 	}
+
+	indexName := "TestUpdateDocument.index_1"
+	var index *Index
+	var err error
+	t.Run("prepare", func(t *testing.T) {
+		index, err = NewIndex(indexName, "disk", nil)
+		assert.NoError(t, err)
+		assert.NotNil(t, index)
+	})
+
 	for _, tt := range tests {
-		Convey(tt.name, t, func() {
-			rand.Seed(time.Now().UnixNano())
-			id := rand.Intn(1000)
-			indexName := "TestUpdateDocument.index_" + strconv.Itoa(id)
-
-			index, _ := NewIndex(indexName, "disk", UseNewIndexMeta, nil)
-
+		t.Run(tt.name, func(t *testing.T) {
 			err := index.UpdateDocument(tt.args.docID, tt.args.doc, tt.args.mintedID)
-
-			assert.Nil(t, err)
-
-			if err == nil {
-				query := &v1.ZincQuery{
-					SearchType: "match",
-					Query: v1.QueryParams{
-						Term: "Hello",
-					},
-				}
-				res, err := index.Search(query)
-				assert.Nil(t, err)
-				assert.Equal(t, 1, res.Hits.Total.Value)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
 			}
+
+			assert.NoError(t, err)
+			query := &meta.ZincQuery{
+				Query: &meta.Query{
+					Match: map[string]*meta.MatchQuery{
+						"_all": {
+							Query: "Hello",
+						},
+					},
+				},
+			}
+			res, err := index.Search(query)
+			assert.NoError(t, err)
+			assert.Equal(t, 1, res.Hits.Total.Value)
 		})
 	}
 
-	// os.RemoveAll("data") // cleanup data folder
+	t.Run("cleanup", func(t *testing.T) {
+		err = DeleteIndex(indexName)
+		assert.NoError(t, err)
+	})
 }

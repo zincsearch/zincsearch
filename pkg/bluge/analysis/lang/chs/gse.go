@@ -50,17 +50,21 @@ func init() {
 	seg = new(gse.Segmenter)
 	enable := zutils.GetEnvToBool("ZINC_PLUGIN_GSE_ENABLE", "FALSE")     // false / true
 	embed := zutils.GetEnvToUpper("ZINC_PLUGIN_GSE_DICT_EMBED", "SMALL") // small / big
+	loadDict(enable, embed)
+}
+
+func loadDict(enable bool, embed string) {
 	if enable {
 		if embed == "BIG" {
-			seg.LoadDictEmbed("zh_s")
-			seg.LoadStopEmbed()
+			_ = seg.LoadDictEmbed("zh_s")
+			_ = seg.LoadStopEmbed()
 		} else {
-			seg.LoadDictStr(_dictCHS)
-			seg.LoadStopStr(_dictStop)
+			_ = seg.LoadDictStr(_dictCHS)
+			_ = seg.LoadStopStr(_dictStop)
 		}
 	} else {
-		seg.LoadDictStr(`zinc`)
-		seg.LoadStopStr(_dictStop)
+		_ = seg.LoadDictStr(`zinc`)
+		_ = seg.LoadStopStr(_dictStop)
 	}
 	seg.Load = true
 	seg.SkipLog = true
@@ -69,10 +73,10 @@ func init() {
 	dataPath := zutils.GetEnv("ZINC_PLUGIN_GSE_DICT_PATH", "./plugins/gse/dict")
 	userDict := dataPath + "/user.txt"
 	if ok, _ := zutils.IsExist(userDict); ok {
-		seg.LoadDict(userDict)
+		_ = seg.LoadDict(userDict)
 	}
 	stopDict := dataPath + "/stop.txt"
 	if ok, _ := zutils.IsExist(stopDict); ok {
-		seg.LoadStop(stopDict)
+		_ = seg.LoadStop(stopDict)
 	}
 }

@@ -37,22 +37,36 @@ func ParseDuration(s string) (time.Duration, error) {
 }
 
 func FormatDuration(d time.Duration) string {
+	var s string
 	if d.Hours() >= 24*30*12 {
-		return strconv.FormatInt(int64(d.Hours())/24/30/12, 10) + "y"
+		t := int64(d.Hours()) / 24 / 30 / 12
+		s += strconv.FormatInt(t, 10) + "y"
+		d -= time.Hour * 24 * 30 * 12 * time.Duration(t)
 	}
 	if d.Hours() >= 24*30 {
-		return strconv.FormatInt(int64(d.Hours())/24/30, 10) + "M"
+		t := int64(d.Hours()) / 24 / 30
+		s += strconv.FormatInt(t, 10) + "M"
+		d -= time.Hour * 24 * 30 * time.Duration(t)
 	}
 	if d.Hours() >= 24 {
-		return strconv.FormatInt(int64(d.Hours())/24, 10) + "d"
+		t := int64(d.Hours()) / 24
+		s += strconv.FormatInt(t, 10) + "d"
+		d -= time.Hour * 24 * time.Duration(t)
 	}
 	if d.Hours() >= 1 {
-		return strconv.FormatInt(int64(d.Hours()), 10) + "h"
+		t := int64(d.Hours())
+		s += strconv.FormatInt(t, 10) + "h"
+		d -= time.Hour * time.Duration(t)
 	}
 	if d.Minutes() >= 1 {
-		return strconv.FormatInt(int64(d.Minutes()), 10) + "m"
+		t := int64(d.Minutes())
+		s += strconv.FormatInt(t, 10) + "m"
+		d -= time.Minute * time.Duration(t)
 	}
-	return strconv.FormatInt(int64(d.Seconds()), 10) + "s"
+	if d > 0 {
+		s += strconv.FormatInt(int64(d.Seconds()), 10) + "s"
+	}
+	return s
 }
 
 func Unix(n int64) time.Time {

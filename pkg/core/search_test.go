@@ -22,28 +22,31 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
+
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func TestIndex_Search(t *testing.T) {
-
 	type args struct {
-		iQuery *v1.ZincQuery
+		iQuery *meta.ZincQuery
 	}
 	tests := []struct {
 		name    string
 		args    args
 		data    []map[string]interface{}
-		want    *v1.SearchResponse
+		want    *meta.SearchResponse
 		wantErr bool
 	}{
 		{
 			name: "Search Query - Match",
 			args: args{
-				iQuery: &v1.ZincQuery{
-					SearchType: "match",
-					Query: v1.QueryParams{
-						Term: "Prabhat",
+				iQuery: &meta.ZincQuery{
+					Query: &meta.Query{
+						Match: map[string]*meta.MatchQuery{
+							"_all": {
+								Query: "Prabhat",
+							},
+						},
 					},
 				},
 			},
@@ -61,10 +64,13 @@ func TestIndex_Search(t *testing.T) {
 		{
 			name: "Search Query - Term",
 			args: args{
-				iQuery: &v1.ZincQuery{
-					SearchType: "term",
-					Query: v1.QueryParams{
-						Term: "angeles",
+				iQuery: &meta.ZincQuery{
+					Query: &meta.Query{
+						Term: map[string]*meta.TermQuery{
+							"_all": {
+								Value: "angeles",
+							},
+						},
 					},
 				},
 			},
@@ -90,8 +96,10 @@ func TestIndex_Search(t *testing.T) {
 		{
 			name: "Search Query - MatchAll",
 			args: args{
-				iQuery: &v1.ZincQuery{
-					SearchType: "matchall",
+				iQuery: &meta.ZincQuery{
+					Query: &meta.Query{
+						MatchAll: &meta.MatchAllQuery{},
+					},
 				},
 			},
 			data: []map[string]interface{}{
@@ -108,10 +116,13 @@ func TestIndex_Search(t *testing.T) {
 		{
 			name: "Search Query - wildcard",
 			args: args{
-				iQuery: &v1.ZincQuery{
-					SearchType: "wildcard",
-					Query: v1.QueryParams{
-						Term: "san*",
+				iQuery: &meta.ZincQuery{
+					Query: &meta.Query{
+						Wildcard: map[string]*meta.WildcardQuery{
+							"_all": {
+								Value: "san*",
+							},
+						},
 					},
 				},
 			},
@@ -129,10 +140,13 @@ func TestIndex_Search(t *testing.T) {
 		{
 			name: "Search Query - fuzzy",
 			args: args{
-				iQuery: &v1.ZincQuery{
-					SearchType: "fuzzy",
-					Query: v1.QueryParams{
-						Term: "fransisco", // note the wrong spelling
+				iQuery: &meta.ZincQuery{
+					Query: &meta.Query{
+						Fuzzy: map[string]*meta.FuzzyQuery{
+							"_all": {
+								Value: "fransisco", // note the wrong spelling
+							},
+						},
 					},
 				},
 			},
@@ -156,12 +170,90 @@ func TestIndex_Search(t *testing.T) {
 			},
 		},
 		{
-			name: "Search Query - querystring1",
+			name: "Search Query - querystring",
 			args: args{
-				iQuery: &v1.ZincQuery{
-					SearchType: "querystring",
-					Query: v1.QueryParams{
-						Term: "angeles",
+				iQuery: &meta.ZincQuery{
+					Query: &meta.Query{
+						QueryString: &meta.QueryStringQuery{
+							Query: "angeles",
+						},
+					},
+				},
+			},
+			data: []map[string]interface{}{
+				{
+					"name": "Prabhat Sharma",
+					"address": map[string]interface{}{
+						"city":  "San Francisco",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+				{
+					"name": "Leonardo DiCaprio",
+					"address": map[string]interface{}{
+						"city":  "Los angeles",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+			},
+		},
+		{
+			name: "Search Query - highlight",
+			args: args{
+				iQuery: &meta.ZincQuery{
+					Query: &meta.Query{
+						QueryString: &meta.QueryStringQuery{
+							Query: "angeles",
+						},
+					},
+					Timeout: 1,
+					Fields:  []interface{}{"address.city"},
+					Highlight: &meta.Highlight{
+						Fields: map[string]*meta.Highlight{
+							"address.city": {
+								PreTags:  []string{"<b>"},
+								PostTags: []string{"</b>"},
+							},
+						},
+					},
+				},
+			},
+			data: []map[string]interface{}{
+				{
+					"name": "Prabhat Sharma",
+					"address": map[string]interface{}{
+						"city":  "San Francisco",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+				{
+					"name": "Leonardo DiCaprio",
+					"address": map[string]interface{}{
+						"city":  "Los angeles",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+			},
+		},
+		{
+			name: "Search Query - aggs",
+			args: args{
+				iQuery: &meta.ZincQuery{
+					Query: &meta.Query{
+						MatchAll: &meta.MatchAllQuery{},
+					},
+					Timeout: 1,
+					Size:    0,
+					Aggregations: map[string]meta.Aggregations{
+						"hobby": {
+							Terms: &meta.AggregationsTerms{
+								Field: "hobby",
+							},
+						},
 					},
 				},
 			},
@@ -185,25 +277,38 @@ func TestIndex_Search(t *testing.T) {
 			},
 		},
 	}
+
+	indexName := "Search.index_1"
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			rand.Seed(time.Now().UnixNano())
-			id := rand.Intn(10000)
-			indexName := "Search.index_" + strconv.Itoa(id)
+			index, err := NewIndex(indexName, "disk", nil)
+			assert.NoError(t, err)
+			assert.NotNil(t, index)
+			err = StoreIndex(index)
+			assert.NoError(t, err)
 
-			index, _ := NewIndex(indexName, "disk", UseNewIndexMeta, nil)
+			if (index.CachedMappings) == nil {
+				index.CachedMappings = meta.NewMappings()
+			}
+			index.CachedMappings.Properties["address.city"] = meta.Property{
+				Type:          "text",
+				Index:         true,
+				Store:         true,
+				Highlightable: true,
+			}
 
 			for _, d := range tt.data {
 				rand.Seed(time.Now().UnixNano())
 				docId := rand.Intn(1000)
-				index.UpdateDocument(strconv.Itoa(docId), d, true)
+				err := index.UpdateDocument(strconv.Itoa(docId), d, true)
+				assert.NoError(t, err)
 			}
-
 			got, err := index.Search(tt.args.iQuery)
-			assert.Nil(t, err)
-			assert.Equal(t, 1, got.Hits.Total.Value)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, got.Hits.Total.Value, 1)
+
+			err = DeleteIndex(indexName)
+			assert.NoError(t, err)
 		})
 	}
-
-	// os.RemoveAll("data")
 }

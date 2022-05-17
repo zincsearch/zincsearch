@@ -21,8 +21,9 @@ const (
 	ErrorTypeParsingException         = "parsing_exception"
 	ErrorTypeXContentParseException   = "x_content_parse_exception"
 	ErrorTypeIllegalArgumentException = "illegal_argument_exception"
-	ErrorTypeNotImplemented           = "not_implemented"
 	ErrorTypeRuntimeException         = "runtime_exception"
+	ErrorTypeNotImplemented           = "not_implemented"
+	ErrorTypeInvalidArgument          = "invalid_argument"
 )
 
 type Error struct {
@@ -40,6 +41,16 @@ func (e *Error) Cause(err error) *Error {
 	return e
 }
 
+func (e *Error) MarshalJSON() ([]byte, error) {
+	if e.CausedBy != nil {
+		return []byte(fmt.Sprintf(`{"type":"%s","reason":"%s","cause":"%s"}`, e.Type, e.Reason, e.CausedBy.Error())), nil
+	}
+	return []byte(fmt.Sprintf(`{"type":"%s","reason":"%s"}`, e.Type, e.Reason)), nil
+}
+
 func (e *Error) Error() string {
-	return fmt.Sprintf("error_type: %s, reason: %s", e.Type, e.Reason)
+	if e.CausedBy != nil {
+		return fmt.Sprintf("type: %s, reason: %s, cause: %s", e.Type, e.Reason, e.CausedBy)
+	}
+	return fmt.Sprintf("type: %s, reason: %s", e.Type, e.Reason)
 }

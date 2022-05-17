@@ -92,7 +92,7 @@ func flatten(top bool, flatMap map[string]interface{}, nested interface{}, prefi
 	case map[string]interface{}:
 		for k, v := range v {
 			newKey := enkey(top, prefix, k)
-			assign(newKey, v)
+			_ = assign(newKey, v)
 		}
 	case []interface{}:
 		needFlat := true
@@ -104,7 +104,7 @@ func flatten(top bool, flatMap map[string]interface{}, nested interface{}, prefi
 		if needFlat {
 			for i, v := range v {
 				newKey := enkey(top, prefix, strconv.Itoa(i))
-				assign(newKey, v)
+				_ = assign(newKey, v)
 			}
 		} else {
 			flatMap[prefix] = v

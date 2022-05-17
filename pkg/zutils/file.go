@@ -40,7 +40,7 @@ func DirSize(path string) (float64, error) {
 func IsExist(path string) (bool, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		if os.IsExist(err) {
+		if os.IsNotExist(err) {
 			return false, nil
 		}
 		return false, err

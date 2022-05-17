@@ -21,13 +21,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
-	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func AccessLog(r *gin.Engine) {
 	r.Use(func(c *gin.Context) {
 		timeStart := time.Now()
-		c.Writer.Header().Set("Zinc", v1.Version)
+		c.Writer.Header().Set("Zinc", meta.Version)
 
 		c.Next()
 

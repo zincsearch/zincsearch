@@ -26,7 +26,7 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 
-	meta "github.com/zinclabs/zinc/pkg/meta/v2"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 // ListTemplates returns all templates
@@ -59,7 +59,7 @@ func ListTemplates(pattern string) ([]IndexTemplate, error) {
 			case "@timestamp":
 				timestamp, _ = bluge.DecodeDateTime(value)
 			case "_source":
-				json.Unmarshal(value, tpl)
+				_ = json.Unmarshal(value, tpl)
 			default:
 			}
 			return true
@@ -156,7 +156,7 @@ func LoadTemplate(name string) (*meta.Template, bool, error) {
 	err = next.VisitStoredFields(func(field string, value []byte) bool {
 		switch field {
 		case "_source":
-			json.Unmarshal(value, tpl)
+			_ = json.Unmarshal(value, tpl)
 			return true
 		default:
 		}
@@ -199,7 +199,7 @@ func UseTemplate(indexName string) (*meta.Template, error) {
 		tpl := new(meta.Template)
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
 			if field == "_source" {
-				json.Unmarshal(value, tpl)
+				_ = json.Unmarshal(value, tpl)
 			}
 			return true
 		})

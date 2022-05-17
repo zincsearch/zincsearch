@@ -16,15 +16,12 @@
 package auth
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateUser(t *testing.T) {
-	os.Setenv("ZINC_FIRST_ADMIN_USER", "admin")
-	os.Setenv("ZINC_FIRST_ADMIN_PASSWORD", "Complexpass#123")
 	type args struct {
 		userID            string
 		name              string
@@ -37,7 +34,6 @@ func TestCreateUser(t *testing.T) {
 		want    *ZincUser
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{
 			name: "create user",
 			args: args{
@@ -51,21 +47,48 @@ func TestCreateUser(t *testing.T) {
 				Name: "Test User",
 				Role: "admin",
 			},
+			wantErr: false,
+		},
+		{
+			name: "update exists user",
+			args: args{
+				userID:            "testuser",
+				name:              "Test User Updated",
+				plaintextPassword: "testpassword",
+				role:              "admin",
+			},
+			want: &ZincUser{
+				ID:   "testuser",
+				Name: "Test User Updated",
+				Role: "admin",
+			},
+			wantErr: false,
+		},
+		{
+			name: "create user with empty userID",
+			args: args{
+				userID: "",
+			},
+			want: &ZincUser{
+				ID: "",
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := CreateUser(tt.args.userID, tt.args.name, tt.args.plaintextPassword, tt.args.role)
-			assert.Equal(t, err, nil)
-			assert.Equal(t, got.ID, tt.want.ID)
-			assert.Equal(t, got.Name, tt.want.Name)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+			assert.Equal(t, tt.want.ID, got.ID)
+			assert.Equal(t, tt.want.Name, got.Name)
 
 			salt := got.Salt
 			password := GeneratePassword(tt.args.plaintextPassword, salt)
-			assert.Equal(t, got.Password, password)
-
+			assert.Equal(t, password, got.Password)
 		})
 	}
-
-	// os.RemoveAll("data")
 }

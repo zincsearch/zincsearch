@@ -16,33 +16,297 @@
 package core
 
 import (
+	"reflect"
 	"testing"
+	"time"
 
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
+	"github.com/blugelabs/bluge/analysis/analyzer"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-func TestBuildBlugeDocumentFromJSON(t *testing.T) {
-	Convey("test build bluge document from json", t, func() {
-		Convey("build bluge document from json", func() {
+func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
+	var index *Index
+	var err error
+	indexName := "TestIndex_BuildBlugeDocumentFromJSON.index_1"
 
-			idx, _ := NewIndex("index1", "disk", 0, nil)
-			// var err error
-			// var doc *bluge.Document
+	type args struct {
+		docID string
+		doc   map[string]interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		init    func()
+		want    *bluge.Document
+		wantErr bool
+	}{
+		{
+			name: "normal",
+			args: args{
+				docID: "1",
+				doc: map[string]interface{}{
+					"id":     "1",
+					"name":   "test1",
+					"age":    10,
+					"length": 3.14,
+					"dev":    true,
+					"address": map[string]interface{}{
+						"street": "447 Great Mall Dr",
+						"city":   "Milpitas",
+						"state":  "CA",
+						"zip":    95035,
+					},
+					"tag1":       []interface{}{"tag1", "tag2"},
+					"tag2":       []interface{}{3.14, 3.15},
+					"tag3":       []interface{}{true, false},
+					"@timestamp": time.Now().Format(time.RFC3339),
+					"time":       time.Now().Format(time.RFC3339),
+				},
+			},
+			init:    func() {},
+			want:    &bluge.Document{},
+			wantErr: false,
+		},
+		{
+			name: "timestamp with epoch_millis",
+			args: args{
+				docID: "2",
+				doc: map[string]interface{}{
+					"id":         "2",
+					"name":       "test1",
+					"age":        10,
+					"length":     3.14,
+					"dev":        true,
+					"@timestamp": float64(1652176732575),
+					"time":       float64(1652176732575),
+				},
+			},
+			init:    func() {},
+			want:    &bluge.Document{},
+			wantErr: false,
+		},
+		{
+			name: "timestamp with format",
+			args: args{
+				docID: "2",
+				doc: map[string]interface{}{
+					"id":         "2",
+					"name":       "test1",
+					"age":        10,
+					"length":     3.14,
+					"dev":        true,
+					"@timestamp": time.Now().Format("2006-01-02 15:04:05.000"),
+					"time":       time.Now().Format("2006-01-02 15:04:05.000"),
+				},
+			},
+			init: func() {
+				index.CachedMappings.Properties["time"] = meta.Property{
+					Type:   "time",
+					Index:  true,
+					Format: "2006-01-02 15:04:05.000",
+				}
+			},
+			want:    &bluge.Document{},
+			wantErr: false,
+		},
+		{
+			name: "with analyzer",
+			args: args{
+				docID: "3",
+				doc: map[string]interface{}{
+					"id":     "3",
+					"name":   "test",
+					"age":    "10",
+					"length": 3,
+					"dev":    true,
+				},
+			},
+			init: func() {
+				index.CachedMappings.Properties["id"] = meta.Property{
+					Type:          "keyword",
+					Index:         true,
+					Store:         true,
+					Highlightable: true,
+				}
+				index.CachedMappings.Properties["name"] = meta.Property{
+					Type:     "text",
+					Index:    true,
+					Analyzer: "analyzer_1",
+				}
+				index.CachedAnalyzers["analyzer_1"] = analyzer.NewStandardAnalyzer()
+			},
+			want:    &bluge.Document{},
+			wantErr: true,
+		},
+		{
+			name: "type conflict text",
+			args: args{
+				docID: "4",
+				doc: map[string]interface{}{
+					"id":   "4",
+					"name": 3,
+				},
+			},
+			init:    func() {},
+			want:    &bluge.Document{},
+			wantErr: true,
+		},
+		{
+			name: "type conflict numeric",
+			args: args{
+				docID: "4",
+				doc: map[string]interface{}{
+					"id":     "4",
+					"name":   "test1",
+					"age":    "10",
+					"length": 3,
+					"dev":    true,
+				},
+			},
+			init:    func() {},
+			want:    &bluge.Document{},
+			wantErr: true,
+		},
+		{
+			name: "keyword type float64",
+			args: args{
+				docID: "4",
+				doc: map[string]interface{}{
+					"id": 3.14,
+				},
+			},
+			init:    func() {},
+			want:    &bluge.Document{},
+			wantErr: false,
+		},
+		{
+			name: "keyword type int",
+			args: args{
+				docID: "4",
+				doc: map[string]interface{}{
+					"id": 3,
+				},
+			},
+			init:    func() {},
+			want:    &bluge.Document{},
+			wantErr: false,
+		},
+		{
+			name: "keyword type bool",
+			args: args{
+				docID: "4",
+				doc: map[string]interface{}{
+					"id": false,
+				},
+			},
+			init:    func() {},
+			want:    &bluge.Document{},
+			wantErr: false,
+		},
+		{
+			name: "keyword type other",
+			args: args{
+				docID: "4",
+				doc: map[string]interface{}{
+					"id": []byte("foo"),
+				},
+			},
+			init:    func() {},
+			want:    &bluge.Document{},
+			wantErr: false,
+		},
+	}
 
-			doc1 := make(map[string]interface{})
-			doc1["id"] = "1"
-			doc1["name"] = "test1"
-			doc1["age"] = 10
-			doc1["address"] = map[string]interface{}{
-				"street": "447 Great Mall Dr",
-				"city":   "Milpitas",
-				"state":  "CA",
-				"zip":    "95035",
-			}
+	t.Run("prepare", func(t *testing.T) {
+		index, err = NewIndex(indexName, "disk", nil)
+		assert.NoError(t, err)
+		assert.NotNil(t, index)
 
-			_, err := idx.BuildBlugeDocumentFromJSON("1", doc1)
-			So(err, ShouldBeNil)
-		})
+		err = StoreIndex(index)
+		assert.NoError(t, err)
+		index.CachedMappings.Properties["time"] = meta.NewProperty("time")
 	})
 
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.init()
+			got, err := index.BuildBlugeDocumentFromJSON(tt.args.docID, tt.args.doc)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NotNil(t, got)
+			wantType := reflect.TypeOf(tt.want)
+			gotType := reflect.TypeOf(got)
+			assert.Equal(t, wantType, gotType)
+		})
+	}
+
+	t.Run("cleanup", func(t *testing.T) {
+		err := DeleteIndex(indexName)
+		assert.NoError(t, err)
+	})
+}
+
+func TestIndex_Settings(t *testing.T) {
+	var index *Index
+	var err error
+	indexName := "TestIndex_Settings.index_1"
+
+	t.Run("prepare", func(t *testing.T) {
+		index, err = NewIndex(indexName, "disk", nil)
+		assert.NoError(t, err)
+		assert.NotNil(t, index)
+
+		err = StoreIndex(index)
+		assert.NoError(t, err)
+
+		index.GainDocsCount(1)
+		index.ReduceDocsCount(1)
+
+		n, err := index.LoadDocsCount()
+		assert.NoError(t, err)
+		assert.Equal(t, int64(0), n)
+
+	})
+
+	t.Run("setting", func(t *testing.T) {
+		err := index.SetSettings(&meta.IndexSettings{
+			NumberOfShards:   1,
+			NumberOfReplicas: 0,
+			Analysis: &meta.IndexAnalysis{
+				Analyzer: map[string]*meta.Analyzer{
+					"default": {
+						Type: "standard",
+					},
+				},
+			},
+		})
+		assert.NoError(t, err)
+	})
+
+	t.Run("mapping", func(t *testing.T) {
+		err := index.SetMappings(&meta.Mappings{
+			Properties: map[string]meta.Property{
+				"id": meta.NewProperty("keyword"),
+			},
+		})
+		assert.NoError(t, err)
+	})
+
+	t.Run("analyzer", func(t *testing.T) {
+		err := index.SetAnalyzers(map[string]*analysis.Analyzer{
+			"standard": analyzer.NewStandardAnalyzer(),
+		})
+		assert.NoError(t, err)
+	})
+
+	t.Run("cleanup", func(t *testing.T) {
+		err := DeleteIndex(indexName)
+		assert.NoError(t, err)
+	})
 }

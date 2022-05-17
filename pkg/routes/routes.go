@@ -25,11 +25,12 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc"
-	"github.com/zinclabs/zinc/pkg/auth"
 	"github.com/zinclabs/zinc/pkg/core"
-	"github.com/zinclabs/zinc/pkg/handlers"
-	handlersV2 "github.com/zinclabs/zinc/pkg/handlers/v2"
-	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
+	"github.com/zinclabs/zinc/pkg/handlers/auth"
+	"github.com/zinclabs/zinc/pkg/handlers/document"
+	"github.com/zinclabs/zinc/pkg/handlers/index"
+	"github.com/zinclabs/zinc/pkg/handlers/search"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 // SetRoutes sets up all gin HTTP API endpoints that can be called by front end
@@ -49,15 +50,16 @@ func SetRoutes(r *gin.Engine) {
 		AccessLog(r)
 	}
 
-	r.GET("/", v1.GUI)
-	r.GET("/version", v1.GetVersion)
-	r.GET("/healthz", v1.GetHealthz)
+	r.GET("/", meta.GUI)
+	r.GET("/version", meta.GetVersion)
+	r.GET("/healthz", meta.GetHealthz)
 
 	front, err := zinc.GetFrontendAssets()
 	if err != nil {
 		log.Err(err)
 	}
 
+	// UI
 	HTTPCacheForUI(r)
 	r.StaticFS("/ui/", http.FS(front))
 	r.NoRoute(func(c *gin.Context) {
@@ -75,81 +77,82 @@ func SetRoutes(r *gin.Engine) {
 		}
 	})
 
-	r.POST("/api/login", handlers.ValidateCredentials)
+	// auth
+	r.POST("/api/login", auth.Login)
+	r.PUT("/api/user", AuthMiddleware, auth.CreateUpdate)
+	r.DELETE("/api/user/:id", AuthMiddleware, auth.Delete)
+	r.GET("/api/user", AuthMiddleware, auth.List)
 
-	r.PUT("/api/user", auth.ZincAuthMiddleware, handlers.CreateUpdateUser)
-	r.DELETE("/api/user/:userID", auth.ZincAuthMiddleware, handlers.DeleteUser)
-	r.GET("/api/users", auth.ZincAuthMiddleware, handlers.GetUsers)
+	// index
+	r.GET("/api/index", AuthMiddleware, index.List)
+	r.PUT("/api/index", AuthMiddleware, index.Create)
+	r.PUT("/api/index/:target", AuthMiddleware, index.Create)
+	r.DELETE("/api/index/:target", AuthMiddleware, index.Delete)
+	// index settings
+	r.GET("/api/:target/_mapping", AuthMiddleware, index.GetMapping)
+	r.PUT("/api/:target/_mapping", AuthMiddleware, index.SetMapping)
+	r.GET("/api/:target/_settings", AuthMiddleware, index.GetSettings)
+	r.PUT("/api/:target/_settings", AuthMiddleware, index.SetSettings)
+	// analyze
+	r.POST("/api/_analyze", AuthMiddleware, index.Analyze)
+	r.POST("/api/:target/_analyze", AuthMiddleware, index.Analyze)
 
-	r.GET("/api/index", auth.ZincAuthMiddleware, handlers.ListIndexes)
-	r.PUT("/api/index", auth.ZincAuthMiddleware, handlers.CreateIndex)
-	r.PUT("/api/index/:target", auth.ZincAuthMiddleware, handlers.CreateIndex)
-	r.DELETE("/api/index/:target", auth.ZincAuthMiddleware, handlers.DeleteIndex)
+	// search
+	r.POST("/api/:target/_search", AuthMiddleware, search.SearchDSL)
 
-	// Bulk update/insert
-	r.POST("/api/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
-	r.POST("/api/:target/_bulk", auth.ZincAuthMiddleware, handlers.BulkHandler)
-
+	// document
+	// Document Bulk update/insert
+	r.POST("/api/_bulk", AuthMiddleware, document.Bulk)
+	r.POST("/api/:target/_bulk", AuthMiddleware, document.Bulk)
 	// Document CRUD APIs. Update is same as create.
-	r.PUT("/api/:target/document", auth.ZincAuthMiddleware, handlers.UpdateDocument)
-	r.POST("/api/:target/_doc", auth.ZincAuthMiddleware, handlers.UpdateDocument)
-	r.PUT("/api/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
-	r.POST("/api/:target/_search", auth.ZincAuthMiddleware, handlers.SearchIndex)
-	r.DELETE("/api/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
-
-	r.GET("/api/:target/_mapping", auth.ZincAuthMiddleware, handlersV2.GetIndexMapping)
-	r.PUT("/api/:target/_mapping", auth.ZincAuthMiddleware, handlersV2.UpdateIndexMapping)
-
-	r.GET("/api/:target/_settings", auth.ZincAuthMiddleware, handlersV2.GetIndexSettings)
-	r.PUT("/api/:target/_settings", auth.ZincAuthMiddleware, handlersV2.UpdateIndexSettings)
-
-	r.POST("/api/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
-	r.POST("/api/:target/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
+	r.PUT("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)
+	r.PUT("/api/:target/_doc/:id", AuthMiddleware, document.CreateUpdate)
+	r.DELETE("/api/:target/_doc/:id", AuthMiddleware, document.Delete)
 
 	/**
 	 * elastic compatible APIs
 	 */
 
 	r.GET("/es/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, v1.NewESInfo(c))
+		c.JSON(http.StatusOK, meta.NewESInfo(c))
 	})
 	r.GET("/es/_license", func(c *gin.Context) {
-		c.JSON(http.StatusOK, v1.NewESLicense(c))
+		c.JSON(http.StatusOK, meta.NewESLicense(c))
 	})
 	r.GET("/es/_xpack", func(c *gin.Context) {
-		c.JSON(http.StatusOK, v1.NewESXPack(c))
+		c.JSON(http.StatusOK, meta.NewESXPack(c))
 	})
 
-	r.POST("/es/_search", auth.ZincAuthMiddleware, handlersV2.SearchIndex)
-	r.POST("/es/_msearch", auth.ZincAuthMiddleware, handlersV2.MultipleSearch)
-	r.POST("/es/:target/_search", auth.ZincAuthMiddleware, handlersV2.SearchIndex)
-	r.POST("/es/:target/_msearch", auth.ZincAuthMiddleware, handlersV2.MultipleSearch)
+	r.POST("/es/_search", AuthMiddleware, search.SearchDSL)
+	r.POST("/es/_msearch", AuthMiddleware, search.MultipleSearch)
+	r.POST("/es/:target/_search", AuthMiddleware, search.SearchDSL)
+	r.POST("/es/:target/_msearch", AuthMiddleware, search.MultipleSearch)
 
-	r.GET("/es/_index_template", auth.ZincAuthMiddleware, handlersV2.ListIndexTemplate)
-	r.PUT("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.UpdateIndexTemplate)
-	r.GET("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.GetIndexTemplate)
-	r.HEAD("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.GetIndexTemplate)
-	r.DELETE("/es/_index_template/:target", auth.ZincAuthMiddleware, handlersV2.DeleteIndexTemplate)
+	r.GET("/es/_index_template", AuthMiddleware, index.ListTemplate)
+	r.PUT("/es/_index_template/:target", AuthMiddleware, index.UpdateTemplate)
+	r.GET("/es/_index_template/:target", AuthMiddleware, index.GetTemplate)
+	r.HEAD("/es/_index_template/:target", AuthMiddleware, index.GetTemplate)
+	r.DELETE("/es/_index_template/:target", AuthMiddleware, index.DeleteTemplate)
 
-	r.GET("/es/:target/_mapping", auth.ZincAuthMiddleware, handlersV2.GetIndexMapping)
-	r.PUT("/es/:target/_mapping", auth.ZincAuthMiddleware, handlersV2.UpdateIndexMapping)
+	r.GET("/es/:target/_mapping", AuthMiddleware, index.GetMapping)
+	r.PUT("/es/:target/_mapping", AuthMiddleware, index.SetMapping)
 
-	r.GET("/es/:target/_settings", auth.ZincAuthMiddleware, handlersV2.GetIndexSettings)
-	r.PUT("/es/:target/_settings", auth.ZincAuthMiddleware, handlersV2.UpdateIndexSettings)
+	r.GET("/es/:target/_settings", AuthMiddleware, index.GetSettings)
+	r.PUT("/es/:target/_settings", AuthMiddleware, index.SetSettings)
 
-	r.POST("/es/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
-	r.POST("/es/:target/_analyze", auth.ZincAuthMiddleware, handlersV2.Analyze)
+	r.POST("/es/_analyze", AuthMiddleware, index.Analyze)
+	r.POST("/es/:target/_analyze", AuthMiddleware, index.Analyze)
 
-	r.POST("/es/:target/_doc", auth.ZincAuthMiddleware, handlers.UpdateDocument)
-	r.PUT("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
-	r.PUT("/es/:target/_create/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
-	r.POST("/es/:target/_create/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
-	r.POST("/es/:target/_update/:id", auth.ZincAuthMiddleware, handlers.UpdateDocument)
-	r.DELETE("/es/:target/_doc/:id", auth.ZincAuthMiddleware, handlers.DeleteDocument)
-
-	// Bulk update/insert
-	r.POST("/es/_bulk", auth.ZincAuthMiddleware, handlers.ESBulkHandler)
-	r.POST("/es/:target/_bulk", auth.ZincAuthMiddleware, handlers.ESBulkHandler)
+	// ES Bulk update/insert
+	r.POST("/es/_bulk", AuthMiddleware, document.ESBulk)
+	r.POST("/es/:target/_bulk", AuthMiddleware, document.ESBulk)
+	// ES Document
+	r.POST("/es/:target/_doc", AuthMiddleware, document.CreateUpdate)
+	r.PUT("/es/:target/_doc/:id", AuthMiddleware, document.CreateUpdate)
+	r.PUT("/es/:target/_create/:id", AuthMiddleware, document.CreateUpdate)
+	r.POST("/es/:target/_create/:id", AuthMiddleware, document.CreateUpdate)
+	r.POST("/es/:target/_update/:id", AuthMiddleware, document.CreateUpdate)
+	r.DELETE("/es/:target/_doc/:id", AuthMiddleware, document.Delete)
 
 	core.Telemetry.Instance()
 	core.Telemetry.Event("server_start", nil)

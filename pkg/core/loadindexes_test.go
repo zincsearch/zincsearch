@@ -18,31 +18,56 @@ package core
 import (
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func TestLoadIndexes(t *testing.T) {
-	Convey("test load index", t, func() {
-		Convey("load system index", func() {
-			// index cann't be reopen, so need close first
-			for _, index := range ZINC_SYSTEM_INDEX_LIST {
-				index.Writer.Close()
-			}
-			var err error
-			ZINC_SYSTEM_INDEX_LIST, err = LoadZincSystemIndexes()
-			So(err, ShouldBeNil)
-			So(len(ZINC_SYSTEM_INDEX_LIST), ShouldEqual, len(systemIndexList))
-			So(ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Name, ShouldEqual, "_index_mapping")
+	t.Run("load system index", func(t *testing.T) {
+		// index cann't be reopen, so need close first
+		for _, index := range ZINC_SYSTEM_INDEX_LIST {
+			index.Writer.Close()
+		}
+		var err error
+		ZINC_SYSTEM_INDEX_LIST, err = LoadZincSystemIndexes()
+		assert.NoError(t, err)
+		assert.Equal(t, len(systemIndexList), len(ZINC_SYSTEM_INDEX_LIST))
+		assert.Equal(t, "_index_mapping", ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Name)
+	})
+
+	t.Run("create some index", func(t *testing.T) {
+		index, err := NewIndex("TestLoadIndexes.index_1", "disk", nil)
+		assert.NoError(t, err)
+		assert.NotNil(t, index)
+
+		err = index.SetSettings(&meta.IndexSettings{
+			Analysis: &meta.IndexAnalysis{
+				Analyzer: map[string]*meta.Analyzer{
+					"default": {
+						Type: "standard",
+					},
+				},
+			},
 		})
-		Convey("load user index from disk", func() {
-			// index cann't be reopen, so need close first
-			for _, index := range ZINC_INDEX_LIST {
-				index.Writer.Close()
-			}
-			var err error
-			ZINC_INDEX_LIST, err = LoadZincIndexesFromDisk()
-			So(err, ShouldBeNil)
-			So(len(ZINC_INDEX_LIST), ShouldBeGreaterThanOrEqualTo, 0)
-		})
+		assert.NoError(t, err)
+
+		err = StoreIndex(index)
+		assert.NoError(t, err)
+	})
+
+	t.Run("load user index from disk", func(t *testing.T) {
+		for _, index := range ZINC_INDEX_LIST {
+			index.Writer.Close()
+		}
+		var err error
+		ZINC_INDEX_LIST, err = LoadZincIndexesFromMeta()
+		assert.NoError(t, err)
+		assert.GreaterOrEqual(t, len(ZINC_INDEX_LIST), 0)
+	})
+
+	t.Run("cleanup", func(t *testing.T) {
+		err := DeleteIndex("TestLoadIndexes.index_1")
+		assert.NoError(t, err)
 	})
 }

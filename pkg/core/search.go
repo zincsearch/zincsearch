@@ -20,147 +20,145 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/search"
+	"github.com/blugelabs/bluge/search/highlight"
 	"github.com/rs/zerolog/log"
 
-	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
-	"github.com/zinclabs/zinc/pkg/startup"
+	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/uquery"
+	"github.com/zinclabs/zinc/pkg/uquery/fields"
+	"github.com/zinclabs/zinc/pkg/uquery/source"
 )
 
-func (index *Index) Search(iQuery *v1.ZincQuery) (*v1.SearchResponse, error) {
-	var searchRequest bluge.SearchRequest
-	if iQuery.MaxResults > startup.LoadMaxResults() {
-		iQuery.MaxResults = startup.LoadMaxResults()
-	}
-
-	sourceCtl := &v1.Source{Enable: true}
-	switch iQuery.Source.(type) {
-	case bool:
-		sourceCtl.Enable = iQuery.Source.(bool)
-	case []interface{}:
-		v := iQuery.Source.([]interface{})
-		sourceCtl.Fields = make(map[string]bool, len(v))
-		for _, field := range v {
-			if fv, ok := field.(string); ok {
-				sourceCtl.Fields[fv] = true
-			}
-		}
-	}
-
-	var err error
-	switch iQuery.SearchType {
-	case "alldocuments":
-		searchRequest, err = uquery.AllDocuments(iQuery)
-	case "wildcard":
-		searchRequest, err = uquery.WildcardQuery(iQuery)
-	case "fuzzy":
-		searchRequest, err = uquery.FuzzyQuery(iQuery)
-	case "term":
-		searchRequest, err = uquery.TermQuery(iQuery)
-	case "daterange":
-		searchRequest, err = uquery.DateRangeQuery(iQuery)
-	case "matchall":
-		searchRequest, err = uquery.MatchAllQuery(iQuery)
-	case "match":
-		searchRequest, err = uquery.MatchQuery(iQuery)
-	case "matchphrase":
-		searchRequest, err = uquery.MatchPhraseQuery(iQuery)
-	case "multiphrase":
-		searchRequest, err = uquery.MultiPhraseQuery(iQuery)
-	case "prefix":
-		searchRequest, err = uquery.PrefixQuery(iQuery)
-	case "querystring":
-		searchRequest, err = uquery.QueryStringQuery(iQuery)
-	default:
-		// default use alldocuments search
-		searchRequest, err = uquery.AllDocuments(iQuery)
-	}
-
+func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) {
+	searchRequest, err := uquery.ParseQueryDSL(query, index.CachedMappings, index.CachedAnalyzers)
 	if err != nil {
-		return &v1.SearchResponse{
-			Error: err.Error(),
-		}, err
-	}
-
-	// handle aggregations
-	err = uquery.AddAggregations(searchRequest, iQuery.Aggregations, index.CachedMappings)
-	if err != nil {
-		return &v1.SearchResponse{
-			Error: err.Error(),
-		}, err
+		return nil, err
 	}
 
 	reader, err := index.Writer.Reader()
 	if err != nil {
-		log.Printf("error accessing reader: %s", err.Error())
+		log.Printf("index.SearchV2: error accessing reader: %s", err.Error())
+		return nil, err
 	}
 	defer reader.Close()
 
-	dmi, err := reader.Search(context.Background(), searchRequest)
-	if err != nil {
-		log.Printf("error executing search: %s", err.Error())
+	ctx := context.Background()
+	var cancel context.CancelFunc
+	if query.Timeout > 0 {
+		ctx, cancel = context.WithTimeout(context.Background(), time.Duration(query.Timeout)*time.Second)
+		defer cancel()
 	}
 
-	var Hits []v1.Hit
+	dmi, err := reader.Search(ctx, searchRequest)
+	if err != nil {
+		log.Printf("index.SearchV2: error executing search: %s", err.Error())
+		if err == context.DeadlineExceeded {
+			return &meta.SearchResponse{
+				TimedOut: true,
+				Error:    err.Error(),
+				Hits:     meta.Hits{Hits: []meta.Hit{}},
+			}, nil
+		}
+		return nil, err
+	}
 
+	return searchV2(dmi, query, index.CachedMappings)
+}
+
+func searchV2(dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings *meta.Mappings) (*meta.SearchResponse, error) {
+	resp := &meta.SearchResponse{
+		Hits: meta.Hits{Hits: []meta.Hit{}},
+	}
+
+	// highlight
+	var highlighter *highlight.SimpleHighlighter
+	if query.Highlight != nil {
+		if len(query.Highlight.PreTags) > 0 && len(query.Highlight.PostTags) > 0 {
+			highlighter = highlight.NewHTMLHighlighterTags(query.Highlight.PreTags[0], query.Highlight.PostTags[0])
+		} else {
+			highlighter = highlight.NewHTMLHighlighter()
+		}
+	}
+
+	Hits := make([]meta.Hit, 0)
 	next, err := dmi.Next()
 	for err == nil && next != nil {
-		var result map[string]interface{}
 		var id string
+		var indexName string
 		var timestamp time.Time
+		var sourceData map[string]interface{}
+		var fieldsData map[string]interface{}
+		var highlightData map[string]interface{}
+		if query.Highlight != nil {
+			highlightData = make(map[string]interface{})
+		}
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
 			switch field {
 			case "_id":
 				id = string(value)
+			case "_index":
+				indexName = string(value)
 			case "@timestamp":
 				timestamp, _ = bluge.DecodeDateTime(value)
 			case "_source":
-				result = uquery.HandleSource(sourceCtl, value)
+				sourceData = source.Response(query.Source.(*meta.Source), value)
+				if query.Fields != nil {
+					fieldsData = fields.Response(query.Fields.([]*meta.Field), value, mappings)
+				}
 			default:
+				// highlight
+				if query.Highlight != nil && query.Highlight.Fields != nil {
+					if options, ok := query.Highlight.Fields[field]; ok {
+						if v, ok := next.Locations[field]; ok {
+							if len(options.PreTags) > 0 && len(options.PostTags) > 0 {
+								highlighter := highlight.NewHTMLHighlighterTags(options.PreTags[0], options.PostTags[0])
+								highlightData[field] = highlighter.BestFragments(v, value, options.NumberOfFragments)
+							} else {
+								highlightData[field] = highlighter.BestFragments(v, value, options.NumberOfFragments)
+							}
+						}
+					}
+				}
 			}
+
 			return true
 		})
 		if err != nil {
-			log.Printf("error accessing stored fields: %s", err.Error())
+			log.Printf("core.SearchV2: error accessing stored fields: %s", err.Error())
+			continue
 		}
 
-		hit := v1.Hit{
-			Index:     index.Name,
+		hit := meta.Hit{
+			Index:     indexName,
 			Type:      "_doc",
 			ID:        id,
 			Score:     next.Score,
 			Timestamp: timestamp,
-			Source:    result,
+			Source:    sourceData,
+			Fields:    fieldsData,
+			Highlight: highlightData,
 		}
 		Hits = append(Hits, hit)
 
 		next, err = dmi.Next()
 	}
 	if err != nil {
-		log.Printf("error iterating results: %s", err.Error())
+		log.Printf("core.SearchV2: error iterating results: %s", err.Error())
 	}
 
-	resp := &v1.SearchResponse{
-		Took: int(dmi.Aggregations().Duration().Milliseconds()),
-		Hits: v1.Hits{
-			Total: v1.Total{
-				Value: int(dmi.Aggregations().Count()),
-			},
-			MaxScore: dmi.Aggregations().Metric("max_score"),
-			Hits:     Hits,
+	resp.Took = int(dmi.Aggregations().Duration().Milliseconds())
+	resp.Shards = meta.Shards{Total: 1, Successful: 1}
+	resp.Hits = meta.Hits{
+		Total: meta.Total{
+			Value: int(dmi.Aggregations().Count()),
 		},
+		MaxScore: dmi.Aggregations().Metric("max_score"),
+		Hits:     Hits,
 	}
 
-	if len(iQuery.Aggregations) > 0 {
-		resp.Aggregations, err = uquery.ParseAggregations(dmi.Aggregations())
-		if err != nil {
-			log.Printf("error parse aggregation results: %s", err.Error())
-		}
-		if len(resp.Aggregations) > 0 {
-			delete(resp.Aggregations, "count")
-			delete(resp.Aggregations, "duration")
-			delete(resp.Aggregations, "max_score")
-		}
+	if err := uquery.FormatResponse(resp, query, dmi.Aggregations()); err != nil {
+		log.Printf("core.SearchV2: error format response: %s", err.Error())
 	}
 
 	return resp, nil

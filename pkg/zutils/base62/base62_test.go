@@ -18,18 +18,18 @@ package base62
 import (
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBase62(t *testing.T) {
 	n := int64(1517153236107137025)
 	s := "1O4zPvQMvmh"
-	Convey("base62:Encode", t, func() {
-		So(Encode(n), ShouldEqual, s)
+	t.Run("base62:Encode", func(t *testing.T) {
+		assert.Equal(t, s, Encode(n))
 	})
 
-	Convey("base62:Decode", t, func() {
-		So(Decode(s), ShouldEqual, n)
+	t.Run("base62:Decode", func(t *testing.T) {
+		assert.Equal(t, n, Decode(s))
 	})
 }
 

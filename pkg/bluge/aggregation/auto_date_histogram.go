@@ -22,6 +22,7 @@ import (
 
 	"github.com/blugelabs/bluge/search"
 	"github.com/blugelabs/bluge/search/aggregations"
+
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
