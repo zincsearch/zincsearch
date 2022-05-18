@@ -203,7 +203,7 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 	if mappings.Properties[key].Highlightable {
 		field.HighlightMatches()
 	}
-	if mappings.Properties[key].Searchable {
+	if mappings.Properties[key].TermPositions {
 		field.SearchTermPositions()
 	}
 	bdoc.AddField(field)

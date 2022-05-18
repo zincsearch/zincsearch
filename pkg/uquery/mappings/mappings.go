@@ -110,8 +110,8 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 				newProp.Aggregatable = v.(bool)
 			case "highlightable":
 				newProp.Highlightable = v.(bool)
-			case "searchable":
-				newProp.Searchable = v.(bool)
+			case "term_positions":
+				newProp.TermPositions = v.(bool)
 			default:
 				// ignore unknown options
 				// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] unknown option [%s]", field, k))
