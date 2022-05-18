@@ -75,7 +75,7 @@
   </q-layout>
 </template>
 
-<script>
+<script lang="ts">
 import MenuLink from "../components/MenuLink.vue";
 
 const linksList = [

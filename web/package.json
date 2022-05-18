@@ -1,40 +1,33 @@
 {
-  "name": "zinc-console",
+  "name": "zinc-search",
   "description": "A web console for Zinc",
   "productName": "Zinc Console",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint --ext .js,.vue ./src/ && stylelint **/*.vue"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
-    "apexcharts": "^3.33.2",
-    "axios": "^0.22.0",
-    "buffer": "^6.0.0",
-    "jsoneditor": "^9.7.3",
-    "quasar": "^2.0.0",
+    "@quasar/extras": "^1.13.6",
+    "axios": "^0.27.2",
+    "buffer": "^6.0.3",
+    "jsoneditor": "^9.7.4",
+    "quasar": "^2.6.6",
     "vue": "^3.2.25",
-    "vue-router": "^4.0.0",
+    "vue-router": "^4.0.15",
     "vue3-apexcharts": "^1.4.1",
-    "vuex": "^4.0.0"
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@quasar/vite-plugin": "^1.0.6",
-    "@typescript-eslint/eslint-plugin": "^5.14.0",
-    "@vitejs/plugin-vue": "^2.2.0",
-    "eslint": "^7.14.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-vue": "^7.0.0",
-    "prettier": "^2.4.1",
+    "@quasar/vite-plugin": "^1.0.9",
+    "@vitejs/plugin-vue": "^2.3.3",
     "sass": "^1.32.0",
-    "sass-loader": "^10.1.0",
-    "stylelint": "^14.1.0",
-    "stylelint-config-recommended-vue": "^1.0.0",
-    "vite": "^2.8.0"
+    "sass-loader": "^10.2.1",
+    "typescript": "^4.5.4",
+    "vite": "^2.9.9",
+    "vue-tsc": "^0.34.7"
   }
 }
