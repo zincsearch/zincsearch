@@ -27,7 +27,7 @@ import (
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 )
 
-var systemIndexList = []string{"_index_mapping", "_index_template", "_index", "_metadata", "_users"}
+var systemIndexList = []string{"_index_template", "_index", "_metadata", "_users"}
 
 func LoadZincSystemIndexes() (map[string]*Index, error) {
 	indexList := make(map[string]*Index)

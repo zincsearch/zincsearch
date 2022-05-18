@@ -33,7 +33,7 @@ func TestLoadIndexes(t *testing.T) {
 		ZINC_SYSTEM_INDEX_LIST, err = LoadZincSystemIndexes()
 		assert.NoError(t, err)
 		assert.Equal(t, len(systemIndexList), len(ZINC_SYSTEM_INDEX_LIST))
-		assert.Equal(t, "_index_mapping", ZINC_SYSTEM_INDEX_LIST["_index_mapping"].Name)
+		assert.Equal(t, "_index", ZINC_SYSTEM_INDEX_LIST["_index"].Name)
 	})
 
 	t.Run("create some index", func(t *testing.T) {
