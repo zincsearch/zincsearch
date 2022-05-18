@@ -35,7 +35,11 @@ func GetUser(userID string) (ZincUser, bool, error) {
 
 	query := bluge.NewTermQuery(userID)
 	searchRequest := bluge.NewTopNSearch(1, query)
-	reader, _ := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer.Reader()
+	reader, err := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer.Reader()
+	if err != nil {
+		return user, userExists, err
+	}
+	defer reader.Close()
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
 		log.Printf("auth.GetUser: error executing search: %s", err.Error())

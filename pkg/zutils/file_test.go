@@ -34,7 +34,7 @@ func TestDirSize(t *testing.T) {
 		{
 			name: "dir size",
 			args: args{
-				path: "../",
+				path: "./",
 			},
 			want:    float64(0),
 			wantErr: false,

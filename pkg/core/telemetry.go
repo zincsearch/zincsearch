@@ -59,7 +59,6 @@ func (t *telemetry) createInstanceID() string {
 	doc := bluge.NewDocument("instance_id")
 	doc.AddField(bluge.NewKeywordField("value", instanceID).StoreValue())
 	_ = ZINC_SYSTEM_INDEX_LIST["_metadata"].Writer.Update(doc.ID(), doc)
-
 	return instanceID
 }
 
@@ -70,10 +69,16 @@ func (t *telemetry) getInstanceID() string {
 
 	query := bluge.NewTermQuery("instance_id").SetField("_id")
 	searchRequest := bluge.NewTopNSearch(1, query)
-	reader, _ := ZINC_SYSTEM_INDEX_LIST["_metadata"].Writer.Reader()
+	reader, err := ZINC_SYSTEM_INDEX_LIST["_metadata"].Writer.Reader()
+	if err != nil {
+		log.Error().Err(err).Msg("error getting instance id from _metadata")
+		t.instanceID = t.createInstanceID()
+		return t.instanceID
+	}
+	defer reader.Close()
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		log.Printf("core.Telemetry.GetInstanceID: error executing search: %s", err.Error())
+		log.Error().Err(err).Msg("core.Telemetry.GetInstanceID: error executing search")
 	}
 
 	next, err := dmi.Next()
@@ -85,7 +90,7 @@ func (t *telemetry) getInstanceID() string {
 			return true
 		})
 		if err != nil {
-			log.Printf("core.Telemetry.GetInstanceID: error accessing stored fields: %s", err.Error())
+			log.Error().Err(err).Msg("core.Telemetry.GetInstanceID: error accessing stored fields")
 		}
 	}
 

@@ -280,7 +280,11 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 func (index *Index) LoadDocsCount() (int64, error) {
 	query := bluge.NewMatchAllQuery()
 	searchRequest := bluge.NewTopNSearch(0, query).WithStandardAggregations()
-	reader, _ := index.Writer.Reader()
+	reader, err := index.Writer.Reader()
+	if err != nil {
+		return 0, err
+	}
+	defer reader.Close()
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
 		return 0, fmt.Errorf("core.index.LoadDocsCount: error executing search: %s", err.Error())

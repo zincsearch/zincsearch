@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
-	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
@@ -31,10 +30,14 @@ func GetAllUsersWorker() (*meta.SearchResponse, error) {
 
 	query := bluge.NewMatchAllQuery()
 	searchRequest := bluge.NewTopNSearch(1000, query).WithStandardAggregations()
-	reader, _ := usersIndex.Writer.Reader()
+	reader, err := usersIndex.Writer.Reader()
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
 	dmi, err := reader.Search(context.Background(), searchRequest)
 	if err != nil {
-		log.Printf("error executing search: %s", err.Error())
+		return nil, err
 	}
 
 	var Hits []meta.Hit
@@ -63,7 +66,7 @@ func GetAllUsersWorker() (*meta.SearchResponse, error) {
 			return true
 		})
 		if err != nil {
-			log.Printf("error accessing stored fields: %s", err.Error())
+			return nil, err
 		}
 
 		hit := meta.Hit{

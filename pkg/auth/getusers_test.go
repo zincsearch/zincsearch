@@ -17,6 +17,7 @@ package auth
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -29,6 +30,8 @@ func TestGetAllUsersWorker(t *testing.T) {
 	})
 
 	t.Run("get all users", func(t *testing.T) {
+		// wait for _users prepared
+		time.Sleep(time.Second)
 		got, err := GetAllUsersWorker()
 		assert.NoError(t, err)
 		assert.GreaterOrEqual(t, got.Hits.Total.Value, 1)

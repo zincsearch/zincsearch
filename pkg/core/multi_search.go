@@ -40,7 +40,10 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 				continue
 			}
 			if indexName == "" || (indexName != "" && strings.HasPrefix(name, indexName[:len(indexName)-1])) {
-				reader, _ := index.Writer.Reader()
+				reader, err := index.Writer.Reader()
+				if err != nil {
+					return nil, err
+				}
 				readers = append(readers, reader)
 				if mappings == nil {
 					mappings = index.CachedMappings
@@ -50,6 +53,11 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 			}
 		}
 	}
+	defer func() {
+		for _, reader := range readers {
+			reader.Close()
+		}
+	}()
 
 	if len(readers) == 0 {
 		return nil, fmt.Errorf("core.MultiSearchV2: error accessing reader: no index found")
