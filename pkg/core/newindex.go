@@ -25,8 +25,8 @@ import (
 	"github.com/goccy/go-json"
 
 	"github.com/zinclabs/zinc/pkg/bluge/directory"
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
@@ -39,25 +39,25 @@ func NewIndex(name, storageType string, defaultSearchAnalyzer *analysis.Analyzer
 	}
 
 	var dataPath string
-	var config bluge.Config
+	var cfg bluge.Config
 	switch storageType {
 	case "s3":
-		dataPath = zutils.GetEnv("ZINC_S3_BUCKET", "")
-		config = directory.GetS3Config(dataPath, name)
+		dataPath = config.Global.S3.Bucket
+		cfg = directory.GetS3Config(dataPath, name)
 	case "minio":
-		dataPath = zutils.GetEnv("ZINC_MINIO_BUCKET", "")
-		config = directory.GetMinIOConfig(dataPath, name)
+		dataPath = config.Global.MinIO.Bucket
+		cfg = directory.GetMinIOConfig(dataPath, name)
 	default:
 		storageType = "disk"
-		dataPath = zutils.GetEnv("ZINC_DATA_PATH", "./data")
-		config = bluge.DefaultConfig(dataPath + "/" + name)
+		dataPath = config.Global.DataPath
+		cfg = bluge.DefaultConfig(dataPath + "/" + name)
 	}
 
 	if defaultSearchAnalyzer != nil {
-		config.DefaultSearchAnalyzer = defaultSearchAnalyzer
+		cfg.DefaultSearchAnalyzer = defaultSearchAnalyzer
 	}
 
-	writer, err := bluge.OpenWriter(config)
+	writer, err := bluge.OpenWriter(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -79,24 +79,24 @@ func NewIndex(name, storageType string, defaultSearchAnalyzer *analysis.Analyzer
 // LoadIndexWriter load the index writer from the storage
 func LoadIndexWriter(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer) (*bluge.Writer, error) {
 	var dataPath string
-	var config bluge.Config
+	var cfg bluge.Config
 	switch storageType {
 	case "s3":
-		dataPath = zutils.GetEnv("ZINC_S3_BUCKET", "")
-		config = directory.GetS3Config(dataPath, name)
+		dataPath = config.Global.S3.Bucket
+		cfg = directory.GetS3Config(dataPath, name)
 	case "minio":
-		dataPath = zutils.GetEnv("ZINC_MINIO_BUCKET", "")
-		config = directory.GetMinIOConfig(dataPath, name)
+		dataPath = config.Global.MinIO.Bucket
+		cfg = directory.GetMinIOConfig(dataPath, name)
 	default:
-		dataPath = zutils.GetEnv("ZINC_DATA_PATH", "./data")
-		config = bluge.DefaultConfig(dataPath + "/" + name)
+		dataPath = config.Global.DataPath
+		cfg = bluge.DefaultConfig(dataPath + "/" + name)
 	}
 
 	if defaultSearchAnalyzer != nil {
-		config.DefaultSearchAnalyzer = defaultSearchAnalyzer
+		cfg.DefaultSearchAnalyzer = defaultSearchAnalyzer
 	}
 
-	return bluge.OpenWriter(config)
+	return bluge.OpenWriter(cfg)
 }
 
 // storeIndex stores the index to metadata

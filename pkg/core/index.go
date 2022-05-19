@@ -28,6 +28,7 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/goccy/go-json"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/zutils"
@@ -301,7 +302,7 @@ func (index *Index) LoadStorageSize() float64 {
 	case "minio":
 		return size // TODO: implement later
 	default:
-		path := zutils.GetEnv("ZINC_DATA_PATH", "./data")
+		path := config.Global.DataPath
 		indexLocation := filepath.Join(path, index.Name)
 		size, _ = zutils.DirSize(indexLocation)
 		return math.Round(size)

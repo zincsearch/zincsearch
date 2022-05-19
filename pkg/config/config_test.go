@@ -1,3 +1,18 @@
+/* Copyright 2022 Zinc Labs Inc. and Contributors
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+ */
+
 package config
 
 import (
@@ -7,21 +22,21 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	assert.Equal(t, "1", Config.NodeID)
-	assert.Equal(t, "./data", Config.DataPath)
-	assert.Equal(t, "", Config.GinMode)
-	assert.Equal(t, true, Config.SentryEnable)
-	assert.Equal(t, true, Config.TelemetryEnable)
-	assert.Equal(t, false, Config.PrometheusEnable)
+	assert.Equal(t, "1", Global.NodeID)
+	assert.Equal(t, "./data", Global.DataPath)
+	assert.Equal(t, "", Global.GinMode)
+	assert.Equal(t, true, Global.SentryEnable)
+	assert.Equal(t, true, Global.TelemetryEnable)
+	assert.Equal(t, false, Global.PrometheusEnable)
 
-	assert.Equal(t, 1024, Config.BatchSize)
-	assert.Equal(t, 10000, Config.MaxResults)
-	assert.Equal(t, 1000, Config.AggregationTermsSize)
+	assert.Equal(t, 1024, Global.BatchSize)
+	assert.Equal(t, 10000, Global.MaxResults)
+	assert.Equal(t, 1000, Global.AggregationTermsSize)
 
-	assert.Equal(t, "", Config.S3.Bucket)
-	assert.Equal(t, "", Config.MinIO.Endpoint)
+	assert.Equal(t, "", Global.S3.Bucket)
+	assert.Equal(t, "", Global.MinIO.Endpoint)
 
-	assert.Equal(t, false, Config.Plugin.GSE.Enable)
-	assert.Equal(t, "small", Config.Plugin.GSE.DictEmbed)
-	assert.Equal(t, "./plugins/gse/dict", Config.Plugin.GSE.DictPath)
+	assert.Equal(t, false, Global.Plugin.GSE.Enable)
+	assert.Equal(t, "small", Global.Plugin.GSE.DictEmbed)
+	assert.Equal(t, "./plugins/gse/dict", Global.Plugin.GSE.DictPath)
 }

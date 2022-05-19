@@ -27,15 +27,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/routes"
-	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func main() {
 
-	if zutils.GetEnvToBool("ZINC_SENTRY", "true") {
+	if config.Global.SentryEnable {
 		/******** initialize sentry **********/
 		err := sentry.Init(sentry.ClientOptions{
 			Dsn:     "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942",
@@ -55,7 +55,7 @@ func main() {
 	routes.SetRoutes(r)     // Set up all API routes.
 
 	// Run the server
-	PORT := zutils.GetEnv("PORT", "4080")
+	PORT := config.Global.ServerPort
 	server := &http.Server{
 		Addr:    ":" + PORT,
 		Handler: r,

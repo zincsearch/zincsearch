@@ -16,12 +16,15 @@
 package chs
 
 import (
+	"strings"
+
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/go-ego/gse"
 
 	"github.com/zinclabs/zinc/pkg/bluge/analysis/lang/chs/analyzer"
 	"github.com/zinclabs/zinc/pkg/bluge/analysis/lang/chs/token"
 	"github.com/zinclabs/zinc/pkg/bluge/analysis/lang/chs/tokenizer"
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
@@ -48,8 +51,9 @@ var seg *gse.Segmenter
 
 func init() {
 	seg = new(gse.Segmenter)
-	enable := zutils.GetEnvToBool("ZINC_PLUGIN_GSE_ENABLE", "FALSE")     // false / true
-	embed := zutils.GetEnvToUpper("ZINC_PLUGIN_GSE_DICT_EMBED", "SMALL") // small / big
+	enable := config.Global.Plugin.GSE.Enable   // true / false
+	embed := config.Global.Plugin.GSE.DictEmbed // small / big
+	embed = strings.ToUpper(embed)
 	loadDict(enable, embed)
 }
 
@@ -70,7 +74,7 @@ func loadDict(enable bool, embed string) {
 	seg.SkipLog = true
 
 	// load user dict
-	dataPath := zutils.GetEnv("ZINC_PLUGIN_GSE_DICT_PATH", "./plugins/gse/dict")
+	dataPath := config.Global.Plugin.GSE.DictPath
 	userDict := dataPath + "/user.txt"
 	if ok, _ := zutils.IsExist(userDict); ok {
 		_ = seg.LoadDict(userDict)

@@ -21,7 +21,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/config"
 )
 
 func NewESInfo(c *gin.Context) *ESInfo {
@@ -34,7 +34,7 @@ func NewESInfo(c *gin.Context) *ESInfo {
 			version = matches[0]
 		}
 	}
-	if v := strings.ToUpper(zutils.GetEnv("ZINC_PLUGIN_ES_VERSION", "")); v != "" {
+	if v := strings.ToUpper(config.Global.Plugin.ES.Version); v != "" {
 		version = v
 	}
 	return &ESInfo{

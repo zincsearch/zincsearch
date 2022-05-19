@@ -20,7 +20,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/aws/aws-sdk-go-v2/config"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/blugelabs/bluge"
@@ -28,7 +28,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/config"
 )
 
 func DeleteIndex(name string) error {
@@ -46,7 +46,7 @@ func DeleteIndex(name string) error {
 
 	// 3. Physically delete the index
 	if index.StorageType == "disk" {
-		dataPath := zutils.GetEnv("ZINC_DATA_PATH", "./data")
+		dataPath := config.Global.DataPath
 		err := os.RemoveAll(dataPath + "/" + index.Name)
 		if err != nil {
 			log.Error().Msgf("failed to delete index: %s", err.Error())
@@ -73,10 +73,10 @@ func DeleteIndex(name string) error {
 }
 
 func deleteFilesForIndexFromMinIO(indexName string) error {
-	endpoint := zutils.GetEnv("ZINC_MINIO_ENDPOINT", "")
-	accessKeyID := zutils.GetEnv("ZINC_MINIO_ACCESS_KEY_ID", "")
-	secretAccessKey := zutils.GetEnv("ZINC_MINIO_SECRET_ACCESS_KEY", "")
-	minioBucket := zutils.GetEnv("ZINC_MINIO_BUCKET", "")
+	endpoint := config.Global.MinIO.Endpoint
+	accessKeyID := config.Global.MinIO.AccessKeyID
+	secretAccessKey := config.Global.MinIO.SecretAccessKey
+	minioBucket := config.Global.MinIO.Bucket
 
 	opts := minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
@@ -109,14 +109,14 @@ func deleteFilesForIndexFromMinIO(indexName string) error {
 
 func deleteFilesForIndexFromS3(indexName string) error {
 	// Load the Shared AWS Configuration (~/.aws/config)
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg, err := awsconfig.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		log.Print("Error loading AWS config: ", err)
 		return err
 	}
 	client := s3.NewFromConfig(cfg)
 
-	s3bucket := zutils.GetEnv("ZINC_S3_BUCKET", "")
+	s3bucket := config.Global.S3.Bucket
 	ctx := context.Background()
 
 	// List Objects in the bucket at prefix

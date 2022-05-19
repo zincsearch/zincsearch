@@ -32,7 +32,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/config"
 )
 
 // GetMinIOConfig returns a bluge config that will store index data in MinIO
@@ -53,9 +53,9 @@ type MinIODirectory struct {
 // NewMinIODirectory creates a new MinIODirectory instance which can be used to create MinIO backed indexes
 func NewMinIODirectory(bucket, prefix string) index.Directory {
 
-	endpoint := zutils.GetEnv("ZINC_MINIO_ENDPOINT", "")
-	accessKeyID := zutils.GetEnv("ZINC_MINIO_ACCESS_KEY_ID", "")
-	secretAccessKey := zutils.GetEnv("ZINC_MINIO_SECRET_ACCESS_KEY", "")
+	endpoint := config.Global.MinIO.Endpoint
+	accessKeyID := config.Global.MinIO.AccessKeyID
+	secretAccessKey := config.Global.MinIO.SecretAccessKey
 
 	opts := minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),

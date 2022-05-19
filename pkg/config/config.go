@@ -1,3 +1,18 @@
+/* Copyright 2022 Zinc Labs Inc. and Contributors
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+ */
+
 package config
 
 import (
@@ -12,20 +27,19 @@ import (
 )
 
 type config struct {
-	NodeID           string `env:"ZINC_NODE_ID,default=1"`
-	DataPath         string `env:"ZINC_DATA_PATH,default=./data"`
-	GinMode          string `env:"GIN_MODE"`
-	SentryEnable     bool   `env:"ZINC_SENTRY,default=true"`
-	TelemetryEnable  bool   `env:"ZINC_TELEMETRY,default=true"`
-	PrometheusEnable bool   `env:"ZINC_PROMETHEUS_ENABLE,default=false"`
-
-	BatchSize            int `env:"ZINC_BATCH_SIZE,default=1024"`
-	MaxResults           int `env:"ZINC_MAX_RESULTS,default=10000"`
-	AggregationTermsSize int `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
-
-	S3     s3
-	MinIO  minIO
-	Plugin plugin
+	GinMode              string `env:"GIN_MODE"`
+	ServerPort           string `env:"ZINC_PORT,default=4080"`
+	NodeID               string `env:"ZINC_NODE_ID,default=1"`
+	DataPath             string `env:"ZINC_DATA_PATH,default=./data"`
+	SentryEnable         bool   `env:"ZINC_SENTRY,default=true"`
+	TelemetryEnable      bool   `env:"ZINC_TELEMETRY,default=true"`
+	PrometheusEnable     bool   `env:"ZINC_PROMETHEUS_ENABLE,default=false"`
+	BatchSize            int    `env:"ZINC_BATCH_SIZE,default=1024"`
+	MaxResults           int    `env:"ZINC_MAX_RESULTS,default=10000"`
+	AggregationTermsSize int    `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
+	S3                   s3
+	MinIO                minIO
+	Plugin               plugin
 }
 
 type s3 struct {
@@ -54,12 +68,12 @@ type gse struct {
 	DictPath  string `env:"ZINC_PLUGIN_GSE_DICT_PATH,default=./plugins/gse/dict"`
 }
 
-var Config = new(config)
+var Global = new(config)
 
 func init() {
 	err := godotenv.Load()
 	fmt.Println(err)
-	rv := reflect.ValueOf(Config).Elem()
+	rv := reflect.ValueOf(Global).Elem()
 	loadConfig(rv)
 }
 

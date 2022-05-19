@@ -29,9 +29,9 @@ import (
 	"github.com/shirou/gopsutil/mem"
 	"gopkg.in/segmentio/analytics-go.v3"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // Telemetry instance
@@ -119,7 +119,7 @@ func (t *telemetry) initBaseInfo() {
 }
 
 func (t *telemetry) Instance() {
-	if !zutils.GetEnvToBool("ZINC_TELEMETRY", "true") {
+	if !config.Global.TelemetryEnable {
 		return
 	}
 
@@ -138,7 +138,7 @@ func (t *telemetry) Instance() {
 }
 
 func (t *telemetry) Event(event string, data map[string]interface{}) {
-	if !zutils.GetEnvToBool("ZINC_TELEMETRY", "true") {
+	if !config.Global.TelemetryEnable {
 		return
 	}
 
