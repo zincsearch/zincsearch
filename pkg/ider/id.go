@@ -16,12 +16,12 @@
 package ider
 
 import (
-	"os"
 	"strconv"
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/rs/zerolog/log"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/zutils/base62"
 )
 
@@ -29,7 +29,7 @@ var node *snowflake.Node
 
 func init() {
 	var err error
-	nodeID := os.Getenv("ZINC_NODE_ID")
+	nodeID := config.Global.NodeID
 	if nodeID == "" {
 		nodeID = "1"
 	}

@@ -28,9 +28,9 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/ider"
-	"github.com/zinclabs/zinc/pkg/startup"
 )
 
 func Bulk(c *gin.Context) {
@@ -67,7 +67,7 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 	scanner := bufio.NewScanner(body)
 
 	// force set batchSize
-	batchSize := startup.LoadBatchSize()
+	batchSize := config.Global.BatchSize
 
 	// Set 1 MB max per line. docs at - https://pkg.go.dev/bufio#pkg-constants
 	// This is the max size of a line in a file that we will process

@@ -16,7 +16,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"reflect"
 	"strconv"
@@ -71,8 +70,7 @@ type gse struct {
 var Global = new(config)
 
 func init() {
-	err := godotenv.Load()
-	fmt.Println(err)
+	_ = godotenv.Load()
 	rv := reflect.ValueOf(Global).Elem()
 	loadConfig(rv)
 }

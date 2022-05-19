@@ -22,7 +22,6 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 
 	"github.com/zinclabs/zinc/pkg/routes"
 )
@@ -81,7 +80,6 @@ var once sync.Once
 func server() *gin.Engine {
 	if r == nil {
 		once.Do(func() {
-			_ = godotenv.Load()
 			gin.SetMode(gin.ReleaseMode)
 			r = gin.New()
 			r.Use(gin.Recovery())

@@ -22,9 +22,9 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/search"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/startup"
 	"github.com/zinclabs/zinc/pkg/uquery/aggregation"
 	"github.com/zinclabs/zinc/pkg/uquery/fields"
 	"github.com/zinclabs/zinc/pkg/uquery/highlight"
@@ -36,11 +36,8 @@ import (
 // ParseQueryDSL parse query DSL and return searchRequest
 func ParseQueryDSL(q *meta.ZincQuery, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.SearchRequest, error) {
 	// parse size
-	// if q.Size == 0 {
-	// 	q.Size = 10
-	// }
-	if q.Size > startup.LoadMaxResults() {
-		q.Size = startup.LoadMaxResults()
+	if q.Size > config.Global.MaxResults {
+		q.Size = config.Global.MaxResults
 	}
 
 	// parse query

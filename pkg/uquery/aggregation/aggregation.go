@@ -25,9 +25,9 @@ import (
 	"github.com/blugelabs/bluge/search/aggregations"
 
 	zincaggregation "github.com/zinclabs/zinc/pkg/bluge/aggregation"
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/startup"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
@@ -59,7 +59,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			req.AddAggregation(name, aggregations.Cardinality(search.Field(agg.Cardinality.Field)))
 		case agg.Terms != nil:
 			if agg.Terms.Size == 0 {
-				agg.Terms.Size = startup.LoadAggregationTermsSize()
+				agg.Terms.Size = config.Global.AggregationTermsSize
 			}
 			var subreq *zincaggregation.TermsAggregation
 			switch mappings.Properties[agg.Terms.Field].Type {
@@ -141,7 +141,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			}
 		case agg.Histogram != nil:
 			if agg.Histogram.Size == 0 {
-				agg.Histogram.Size = startup.LoadAggregationTermsSize()
+				agg.Histogram.Size = config.Global.AggregationTermsSize
 			}
 			if agg.Histogram.Interval <= 0 {
 				return errors.New(errors.ErrorTypeParsingException, "[histogram] aggregation interval must be a positive decimal")
@@ -175,7 +175,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			req.AddAggregation(name, subreq)
 		case agg.DateHistogram != nil:
 			if agg.DateHistogram.Size == 0 {
-				agg.DateHistogram.Size = startup.LoadAggregationTermsSize()
+				agg.DateHistogram.Size = config.Global.AggregationTermsSize
 			}
 			if agg.DateHistogram.Interval != "" {
 				agg.DateHistogram.FixedInterval = agg.DateHistogram.Interval
