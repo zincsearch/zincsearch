@@ -102,6 +102,6 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
 
-replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v0.1.9-0.20220518121859-2fc6f6827d84
+replace github.com/blugelabs/bluge => ../bluge
 
-replace github.com/blugelabs/ice => github.com/zinclabs/ice v0.2.1-0.20220515034015-5e1f80d8e605
+replace github.com/blugelabs/ice => ../ice

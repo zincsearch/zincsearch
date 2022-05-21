@@ -463,10 +463,6 @@ github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.4.0/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 github.com/yusufpapurcu/wmi v1.2.2 h1:KBNDSne4vP5mbSWnJbO+51IMOXJB67QiYCSBrubbPRg=
 github.com/yusufpapurcu/wmi v1.2.2/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
-github.com/zinclabs/bluge v0.1.9-0.20220518121859-2fc6f6827d84 h1:JyQFYI+9tZOZGlnv23LERe3XOr18szBsskCfZfNWtdM=
-github.com/zinclabs/bluge v0.1.9-0.20220518121859-2fc6f6827d84/go.mod h1:krmos0IIZkhCVgytnsRAeKFDs/BIvLOubRquJKlZFdo=
-github.com/zinclabs/ice v0.2.1-0.20220515034015-5e1f80d8e605 h1:mXhz8ObmUjiyuMkExk9yzFRJJUu/ijokyNWcTy6RKhE=
-github.com/zinclabs/ice v0.2.1-0.20220515034015-5e1f80d8e605/go.mod h1:5zqcEYZJIlqtnPQwAl+fXfWVErh07MwYWi6TriGyMV4=
 github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1 h1:wEkwpwzLhU3VEZRV8kS3eeYnyps4udKe14RQOmbjsZI=
 github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1/go.mod h1:Slirjzuz8uM8Cw0jmPNqbneoqcUtY2GGjn2bEd4NRLY=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
