@@ -17,6 +17,7 @@ package core
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
 	"math"
 	"path/filepath"
@@ -129,6 +130,11 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 	bdoc.AddField(bluge.NewStoredOnlyField("_index", []byte(index.Name)))
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", []string{"_index", "_id", "_source", "@timestamp"}))
+
+	// test for add time index
+	buf := make([]byte, binary.MaxVarintLen64)
+	bufN := binary.PutUvarint(buf, uint64(timestamp.UnixNano()))
+	bdoc.AddField(bluge.NewStoredOnlyField("_timestamp", buf[:bufN]))
 
 	return bdoc, nil
 }
