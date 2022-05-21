@@ -105,3 +105,5 @@ require (
 replace github.com/blugelabs/bluge => ../bluge
 
 replace github.com/blugelabs/ice => ../ice
+
+replace github.com/blugelabs/bluge_segment_api => ../bluge_segment_api
