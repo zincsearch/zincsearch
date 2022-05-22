@@ -128,7 +128,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 	bdoc.AddField(bluge.NewDateTimeField("@timestamp", timestamp).StoreValue().Sortable().Aggregatable())
 	bdoc.AddField(bluge.NewStoredOnlyField("_index", []byte(index.Name)))
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", []string{"_index", "_id", "_source", "@timestamp"}))
+	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", []string{"_id", "_index", "_source", "@timestamp"}))
 
 	// test for add time index
 	bdoc.SetTimestamp(timestamp.UnixNano())
