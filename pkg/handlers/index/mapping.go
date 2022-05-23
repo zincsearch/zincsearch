@@ -58,7 +58,7 @@ func SetMapping(c *gin.Context) {
 	index, exists := core.GetIndex(indexName)
 	if exists {
 		// check if mapping is empty
-		if index.CachedMappings != nil && len(index.CachedMappings.Properties) > 0 {
+		if index.CachedMappings != nil && index.CachedMappings.Len() > 0 {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "index [" + indexName + "] already exists"})
 			return
 		}
@@ -77,7 +77,7 @@ func SetMapping(c *gin.Context) {
 	}
 
 	// update mappings
-	if mappings != nil && len(mappings.Properties) > 0 {
+	if mappings != nil && mappings.Len() > 0 {
 		_ = index.SetMappings(mappings)
 	}
 

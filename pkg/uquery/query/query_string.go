@@ -71,7 +71,7 @@ func QueryStringQuery(query map[string]interface{}, mappings *meta.Mappings, ana
 	options.WithDefaultAnalyzer(zer)
 
 	if len(value.Fields) == 0 {
-		for field, prop := range mappings.Properties {
+		for field, prop := range mappings.ListProperty() {
 			if prop.Type == "text" || prop.Type == "keyword" {
 				value.Fields = append(value.Fields, field)
 			}
@@ -79,7 +79,8 @@ func QueryStringQuery(query map[string]interface{}, mappings *meta.Mappings, ana
 	}
 	for _, field := range value.Fields {
 		var zer *analysis.Analyzer
-		if mappings.Properties[field].Type == "keyword" {
+		prop, _ := mappings.GetProperty(field)
+		if prop.Type == "keyword" {
 			zer = analyzer.NewKeywordAnalyzer()
 		} else {
 			indexZer, searchZer := zincanalysis.QueryAnalyzerForField(analyzers, mappings, field)

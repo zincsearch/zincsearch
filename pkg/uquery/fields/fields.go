@@ -81,8 +81,9 @@ func Response(fields []*meta.Field, data []byte, mappings *meta.Mappings) map[st
 			wildcard = true
 		}
 		if rv, ok := ret[field]; ok {
-			if (mappings.Properties[field].Type == "date" || mappings.Properties[field].Type == "time") && v.Format != "" {
-				if t, err := time.Parse(mappings.Properties[field].Format, rv.(string)); err == nil {
+			prop, _ := mappings.GetProperty(field)
+			if (prop.Type == "date" || prop.Type == "time") && v.Format != "" {
+				if t, err := time.Parse(prop.Format, rv.(string)); err == nil {
 					results[field] = []interface{}{t.Format(v.Format)}
 				} else {
 					results[field] = []interface{}{rv}
@@ -93,8 +94,9 @@ func Response(fields []*meta.Field, data []byte, mappings *meta.Mappings) map[st
 		} else if wildcard {
 			for rk, rv := range ret {
 				if strings.HasPrefix(rk, field[:len(field)-1]) {
-					if (mappings.Properties[rk].Type == "date" || mappings.Properties[rk].Type == "time") && v.Format != "" {
-						if t, err := time.Parse(mappings.Properties[rk].Format, rv.(string)); err == nil {
+					prop, _ := mappings.GetProperty(rk)
+					if (prop.Type == "date" || prop.Type == "time") && v.Format != "" {
+						if t, err := time.Parse(prop.Format, rv.(string)); err == nil {
 							results[rk] = []interface{}{t.Format(v.Format)}
 						} else {
 							results[rk] = []interface{}{rv}

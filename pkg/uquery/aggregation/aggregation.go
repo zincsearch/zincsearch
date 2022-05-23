@@ -62,7 +62,8 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 				agg.Terms.Size = config.Global.AggregationTermsSize
 			}
 			var subreq *zincaggregation.TermsAggregation
-			switch mappings.Properties[agg.Terms.Field].Type {
+			prop, _ := mappings.GetProperty(agg.Terms.Field)
+			switch prop.Type {
 			case "text", "keyword":
 				subreq = zincaggregation.NewTermsAggregation(search.Field(agg.Terms.Field), zincaggregation.TextValueSource, agg.Terms.Size)
 			case "numeric":
@@ -70,7 +71,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			default:
 				return errors.New(
 					errors.ErrorTypeParsingException,
-					fmt.Sprintf("[terms] aggregation doesn't support values of type: [%s:[%s]]", agg.Terms.Field, mappings.Properties[agg.Terms.Field].Type),
+					fmt.Sprintf("[terms] aggregation doesn't support values of type: [%s:[%s]]", agg.Terms.Field, prop.Type),
 				)
 			}
 			if len(agg.Aggregations) > 0 {
@@ -84,7 +85,8 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 				return errors.New(errors.ErrorTypeParsingException, "[range] aggregation needs ranges")
 			}
 			var subreq *aggregations.RangeAggregation
-			switch mappings.Properties[agg.Range.Field].Type {
+			prop, _ := mappings.GetProperty(agg.Range.Field)
+			switch prop.Type {
 			case "numeric":
 				subreq = aggregations.Ranges(search.Field(agg.Range.Field))
 				for _, v := range agg.Range.Ranges {
@@ -100,7 +102,8 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			}
 			var subreq *aggregations.DateRangeAggregation
 			format := time.RFC3339
-			if prop, ok := mappings.Properties[agg.DateRange.Field]; ok {
+			prop, ok := mappings.GetProperty(agg.DateRange.Field)
+			if ok {
 				if prop.Format != "" {
 					format = prop.Format
 				}
@@ -115,7 +118,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 					return errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[date_range] time_zone parse err %s", err.Error()))
 				}
 			}
-			switch mappings.Properties[agg.DateRange.Field].Type {
+			switch prop.Type {
 			case "date", "time":
 				subreq = aggregations.DateRanges(search.Field(agg.DateRange.Field))
 				for _, v := range agg.DateRange.Ranges {
@@ -150,7 +153,8 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 				return errors.New(errors.ErrorTypeParsingException, "[histogram] aggregation offset must be in [0, interval)")
 			}
 			var subreq *zincaggregation.HistogramAggregation
-			switch mappings.Properties[agg.Histogram.Field].Type {
+			prop, _ := mappings.GetProperty(agg.Histogram.Field)
+			switch prop.Type {
 			case "numeric":
 				subreq = zincaggregation.NewHistogramAggregation(
 					search.Field(agg.Histogram.Field),
@@ -164,7 +168,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			default:
 				return errors.New(
 					errors.ErrorTypeParsingException,
-					fmt.Sprintf("[histogram] aggregation doesn't support values of type: [%s:[%s]]", agg.Histogram.Field, mappings.Properties[agg.Histogram.Field].Type),
+					fmt.Sprintf("[histogram] aggregation doesn't support values of type: [%s:[%s]]", agg.Histogram.Field, prop.Type),
 				)
 			}
 			if len(agg.Aggregations) > 0 {
@@ -227,7 +231,8 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 				agg.DateHistogram.Format = time.RFC3339
 			}
 			var subreq *zincaggregation.DateHistogramAggregation
-			switch mappings.Properties[agg.DateHistogram.Field].Type {
+			prop, _ := mappings.GetProperty(agg.DateHistogram.Field)
+			switch prop.Type {
 			case "date", "time":
 				subreq = zincaggregation.NewDateHistogramAggregation(
 					search.Field(agg.DateHistogram.Field),
@@ -246,7 +251,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 					fmt.Sprintf(
 						"[date_histogram] aggregation doesn't support values of type: [%s:[%s]]",
 						agg.DateHistogram.Field,
-						mappings.Properties[agg.DateHistogram.Field].Type,
+						prop.Type,
 					),
 				)
 			}
@@ -286,7 +291,8 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 				agg.AutoDateHistogram.Format = time.RFC3339
 			}
 			var subreq *zincaggregation.AutoDateHistogramAggregation
-			switch mappings.Properties[agg.AutoDateHistogram.Field].Type {
+			prop, _ := mappings.GetProperty(agg.AutoDateHistogram.Field)
+			switch prop.Type {
 			case "date", "time":
 				subreq = zincaggregation.NewAutoDateHistogramAggregation(
 					search.Field(agg.AutoDateHistogram.Field),
@@ -301,7 +307,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 					fmt.Sprintf(
 						"[auto_date_histogram] aggregation doesn't support values of type: [%s:[%s]]",
 						agg.AutoDateHistogram.Field,
-						mappings.Properties[agg.AutoDateHistogram.Field].Type,
+						prop.Type,
 					),
 				)
 			}

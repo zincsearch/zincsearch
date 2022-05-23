@@ -56,25 +56,25 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 			continue
 		}
 
-		if _, ok := mappings.Properties[key]; !ok {
+		if _, ok := mappings.GetProperty(key); !ok {
 			// try to find the type of the value and use it to define default mapping
 			switch value.(type) {
 			case string:
-				mappings.Properties[key] = meta.NewProperty("text")
+				mappings.SetProperty(key, meta.NewProperty("text"))
 			case float64:
-				mappings.Properties[key] = meta.NewProperty("numeric")
+				mappings.SetProperty(key, meta.NewProperty("numeric"))
 			case bool:
-				mappings.Properties[key] = meta.NewProperty("bool")
+				mappings.SetProperty(key, meta.NewProperty("bool"))
 			case []interface{}:
 				if v, ok := value.([]interface{}); ok {
 					for _, vv := range v {
 						switch vv.(type) {
 						case string:
-							mappings.Properties[key] = meta.NewProperty("text")
+							mappings.SetProperty(key, meta.NewProperty("text"))
 						case float64:
-							mappings.Properties[key] = meta.NewProperty("numeric")
+							mappings.SetProperty(key, meta.NewProperty("numeric"))
 						case bool:
-							mappings.Properties[key] = meta.NewProperty("bool")
+							mappings.SetProperty(key, meta.NewProperty("bool"))
 						}
 						break
 					}
@@ -84,7 +84,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 			mappingsNeedsUpdate = true
 		}
 
-		if !mappings.Properties[key].Index {
+		if prop, ok := mappings.GetProperty(key); ok && !prop.Index {
 			continue // not index, skip
 		}
 
@@ -138,7 +138,8 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 
 func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, key string, value interface{}) error {
 	var field *bluge.TermField
-	switch mappings.Properties[key].Type {
+	prop, _ := mappings.GetProperty(key)
+	switch prop.Type {
 	case "text":
 		v, ok := value.(string)
 		if !ok {
@@ -175,8 +176,8 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 		switch v := value.(type) {
 		case string:
 			format := time.RFC3339
-			if mappings.Properties[key].Format != "" {
-				format = mappings.Properties[key].Format
+			if prop.Format != "" {
+				format = prop.Format
 			}
 			var tim time.Time
 			var err error
@@ -195,19 +196,19 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 			}
 		}
 	}
-	if mappings.Properties[key].Store {
+	if prop.Store {
 		field.StoreValue()
 	}
-	if mappings.Properties[key].Sortable {
+	if prop.Sortable {
 		field.Sortable()
 	}
-	if mappings.Properties[key].Aggregatable {
+	if prop.Aggregatable {
 		field.Aggregatable()
 	}
-	if mappings.Properties[key].Highlightable {
+	if prop.Highlightable {
 		field.HighlightMatches()
 	}
-	if mappings.Properties[key].TermPositions {
+	if prop.TermPositions {
 		field.SearchTermPositions()
 	}
 	bdoc.AddField(field)
@@ -257,22 +258,23 @@ func (index *Index) SetAnalyzers(analyzers map[string]*analysis.Analyzer) error 
 }
 
 func (index *Index) SetMappings(mappings *meta.Mappings) error {
-	if mappings == nil || len(mappings.Properties) == 0 {
+	if mappings == nil || mappings.Len() == 0 {
 		return nil
 	}
 
 	// custom analyzer just for text field
-	for _, prop := range mappings.Properties {
+	for field, prop := range mappings.ListProperty() {
 		if prop.Type != "text" {
 			prop.Analyzer = ""
 			prop.SearchAnalyzer = ""
+			mappings.SetProperty(field, prop)
 		}
 	}
 
-	mappings.Properties["_id"] = meta.NewProperty("keyword")
+	mappings.SetProperty("_id", meta.NewProperty("keyword"))
 
 	// @timestamp need date_range/date_histogram aggregation, and mappings used for type check in aggregation
-	mappings.Properties["@timestamp"] = meta.NewProperty("date")
+	mappings.SetProperty("@timestamp", meta.NewProperty("date"))
 
 	// update in the cache
 	index.CachedMappings = mappings
