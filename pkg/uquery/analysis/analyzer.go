@@ -258,8 +258,8 @@ func QueryAnalyzerForField(data map[string]*analysis.Analyzer, mappings *meta.Ma
 
 	analyzerName := ""
 	searchAnalyzerName := ""
-	if mappings != nil && len(mappings.Properties) > 0 {
-		if v, ok := mappings.Properties[field]; ok {
+	if mappings != nil && mappings.Len() > 0 {
+		if v, ok := mappings.GetProperty(field); ok {
 			if v.Type != "text" {
 				return nil, nil
 			}

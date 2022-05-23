@@ -37,7 +37,8 @@ func RangeQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Qu
 		if !ok {
 			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[range] query doesn't support values of type: %T", v))
 		}
-		switch mappings.Properties[field].Type {
+		prop, _ := mappings.GetProperty(field)
+		switch prop.Type {
 		case "numeric":
 			return RangeQueryNumeric(field, vv, mappings)
 		case "date", "time":
@@ -129,7 +130,7 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 
 	var err error
 	format := time.RFC3339
-	if prop, ok := mappings.Properties[field]; ok {
+	if prop, ok := mappings.GetProperty(field); ok {
 		if prop.Format != "" {
 			format = prop.Format
 		}

@@ -52,8 +52,8 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be an object", field))
 			}
 			if subMappings, err := Request(analyzers, prop); err == nil {
-				for k, v := range subMappings.Properties {
-					mappings.Properties[field+"."+k] = v
+				for k, v := range subMappings.ListProperty() {
+					mappings.SetProperty(field+"."+k, v)
 				}
 			} else {
 				return nil, err
@@ -123,7 +123,7 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 		}
 
 		if newProp.Type != "" {
-			mappings.Properties[field] = newProp
+			mappings.SetProperty(field, newProp)
 		}
 
 		// check analyzer

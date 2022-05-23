@@ -15,8 +15,11 @@
 
 package meta
 
+import "sync"
+
 type Mappings struct {
 	Properties map[string]Property `json:"properties,omitempty"`
+	lock       sync.RWMutex
 }
 
 type Property struct {
@@ -58,4 +61,34 @@ func NewProperty(typ string) Property {
 	}
 
 	return p
+}
+
+func (t *Mappings) Len() int {
+	t.lock.RLock()
+	n := len(t.Properties)
+	t.lock.RUnlock()
+	return n
+}
+
+func (t *Mappings) SetProperty(field string, prop Property) {
+	t.lock.Lock()
+	t.Properties[field] = prop
+	t.lock.Unlock()
+}
+
+func (t *Mappings) GetProperty(field string) (Property, bool) {
+	t.lock.RLock()
+	prop, ok := t.Properties[field]
+	t.lock.RUnlock()
+	return prop, ok
+}
+
+func (t *Mappings) ListProperty() map[string]Property {
+	m := make(map[string]Property)
+	t.lock.RLock()
+	for k, v := range t.Properties {
+		m[k] = v
+	}
+	t.lock.RUnlock()
+	return m
 }

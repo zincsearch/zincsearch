@@ -104,11 +104,11 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init: func() {
-				index.CachedMappings.Properties["time"] = meta.Property{
+				index.CachedMappings.SetProperty("time", meta.Property{
 					Type:   "time",
 					Index:  true,
 					Format: "2006-01-02 15:04:05.000",
-				}
+				})
 			},
 			want:    &bluge.Document{},
 			wantErr: false,
@@ -126,17 +126,17 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init: func() {
-				index.CachedMappings.Properties["id"] = meta.Property{
+				index.CachedMappings.SetProperty("id", meta.Property{
 					Type:          "keyword",
 					Index:         true,
 					Store:         true,
 					Highlightable: true,
-				}
-				index.CachedMappings.Properties["name"] = meta.Property{
+				})
+				index.CachedMappings.SetProperty("name", meta.Property{
 					Type:     "text",
 					Index:    true,
 					Analyzer: "analyzer_1",
-				}
+				})
 				index.CachedAnalyzers["analyzer_1"] = analyzer.NewStandardAnalyzer()
 			},
 			want:    &bluge.Document{},
@@ -228,7 +228,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 
 		err = StoreIndex(index)
 		assert.NoError(t, err)
-		index.CachedMappings.Properties["time"] = meta.NewProperty("time")
+		index.CachedMappings.SetProperty("time", meta.NewProperty("date"))
 	})
 
 	for _, tt := range tests {

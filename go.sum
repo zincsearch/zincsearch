@@ -101,8 +101,6 @@ github.com/blevesearch/snowballstem v0.9.0 h1:lMQ189YspGP6sXvZQ4WZ+MLawfV8wOmPoD
 github.com/blevesearch/snowballstem v0.9.0/go.mod h1:PivSj3JMc8WuaFkTSRDW2SlrulNWPl4ABg1tC/hlgLs=
 github.com/blevesearch/vellum v1.0.7 h1:+vn8rfyCRHxKVRgDLeR0FAXej2+6mEb5Q15aQE/XESQ=
 github.com/blevesearch/vellum v1.0.7/go.mod h1:doBZpmRhwTsASB4QdUZANlJvqVAUdUyX0ZK7QJCTeBE=
-github.com/blugelabs/bluge_segment_api v0.2.0 h1:cCX1Y2y8v0LZ7+EEJ6gH7dW6TtVTW4RhG0vp3R+N2Lo=
-github.com/blugelabs/bluge_segment_api v0.2.0/go.mod h1:95XA+ZXfRj/IXADm7gZ+iTcWOJPg5jQTY1EReIzl3LA=
 github.com/blugelabs/query_string v0.3.0 h1:/2XMd/3A0lIo33STXMUon4khLcTTybrAcyC0mBLmeA8=
 github.com/blugelabs/query_string v0.3.0/go.mod h1:H0YFWhYAf8/xcv1zoswoUC8kM/fE9L/KEfsgySsnhfs=
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 h1:DDGfHa7BWjL4YnC6+E63dPcxHo2sUxDIu8g3QgEJdRY=
@@ -463,10 +461,10 @@ github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.4.0/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 github.com/yusufpapurcu/wmi v1.2.2 h1:KBNDSne4vP5mbSWnJbO+51IMOXJB67QiYCSBrubbPRg=
 github.com/yusufpapurcu/wmi v1.2.2/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
-github.com/zinclabs/bluge v0.1.9-0.20220518121859-2fc6f6827d84 h1:JyQFYI+9tZOZGlnv23LERe3XOr18szBsskCfZfNWtdM=
-github.com/zinclabs/bluge v0.1.9-0.20220518121859-2fc6f6827d84/go.mod h1:krmos0IIZkhCVgytnsRAeKFDs/BIvLOubRquJKlZFdo=
-github.com/zinclabs/ice v0.2.1-0.20220515034015-5e1f80d8e605 h1:mXhz8ObmUjiyuMkExk9yzFRJJUu/ijokyNWcTy6RKhE=
-github.com/zinclabs/ice v0.2.1-0.20220515034015-5e1f80d8e605/go.mod h1:5zqcEYZJIlqtnPQwAl+fXfWVErh07MwYWi6TriGyMV4=
+github.com/zinclabs/bluge_segment_api v0.2.1-0.20220523030708-2e8f9721fa17 h1:6nZipqKn4MY+Jb3uHtzKvQCbHCWJWVbLy7LwoA9rZq0=
+github.com/zinclabs/bluge_segment_api v0.2.1-0.20220523030708-2e8f9721fa17/go.mod h1:w+BFZs3+UsRmNSvE/Wxl7TSsZQBcso7yEwyYQ4Ovw+M=
+github.com/zinclabs/ice v0.2.1-0.20220523154843-772e1ae38b48 h1:Ze5gzqhD2rhLsy+OUjr00Q6ZseJwcq8/Ku5JSNDnZe0=
+github.com/zinclabs/ice v0.2.1-0.20220523154843-772e1ae38b48/go.mod h1:b7FG0NtjT+8iOsP57UWzG4V4WlNVrl0VG2YnOk1o82k=
 github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1 h1:wEkwpwzLhU3VEZRV8kS3eeYnyps4udKe14RQOmbjsZI=
 github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1/go.mod h1:Slirjzuz8uM8Cw0jmPNqbneoqcUtY2GGjn2bEd4NRLY=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=

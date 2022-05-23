@@ -290,12 +290,12 @@ func TestIndex_Search(t *testing.T) {
 			if (index.CachedMappings) == nil {
 				index.CachedMappings = meta.NewMappings()
 			}
-			index.CachedMappings.Properties["address.city"] = meta.Property{
+			index.CachedMappings.SetProperty("address.city", meta.Property{
 				Type:          "text",
 				Index:         true,
 				Store:         true,
 				Highlightable: true,
-			}
+			})
 
 			for _, d := range tt.data {
 				rand.Seed(time.Now().UnixNano())
