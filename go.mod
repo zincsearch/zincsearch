@@ -39,7 +39,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 )
 
-replace github.com/blugelabs/bluge => ../bluge
+replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v0.1.9-0.20220523170406-3852d96e5fe4
 
 replace github.com/blugelabs/ice => github.com/zinclabs/ice v0.2.1-0.20220523154843-772e1ae38b48
 
