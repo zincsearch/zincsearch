@@ -14,7 +14,7 @@
           :readonly="beingUpdated"
           :disabled="beingUpdated"
           :bg-color="disableColor"
-          label="User ID"
+          :label="t('user.id')"
           :rules="[validateUserID]"
         />
         <q-input
@@ -22,7 +22,7 @@
           dense
           borderless
           filled
-          label="User Name"
+          :label="t('user.name')"
           :rules="[validateUserName]"
         />
         <q-select
@@ -31,7 +31,7 @@
           dense
           borderless
           filled
-          label="Role"
+          :label="t('user.role')"
           :rules="[validateUserRole]"
         />
         <q-input
@@ -40,7 +40,7 @@
           dense
           filled
           :type="isPwd ? 'password' : 'text'"
-          label="Password"
+          :label="t('user.password')"
           :rules="[validatePassword]"
         >
           <template #append>
@@ -57,7 +57,7 @@
           dense
           filled
           :type="isPwd ? 'password' : 'text'"
-          label="Reconfirm Password"
+          :label="t('user.repassword')"
           :rules="[validateConfirmPassword]"
         >
           <template #append>
@@ -85,6 +85,7 @@
 <script>
 import { defineComponent, ref } from "vue";
 import userService from "../../services/user";
+import { useI18n } from "vue-i18n";
 
 const defaultValue = () => {
   return {
@@ -111,6 +112,7 @@ export default defineComponent({
     const addUserForm = ref(null);
     const disableColor = ref("");
     const userData = ref(defaultValue());
+    const { t } = useI18n();
 
     return {
       disableColor,

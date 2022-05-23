@@ -1,0 +1,43 @@
+export default {
+    search: {
+      selectIndex: "选择词库",
+      typeSearch: "请输入查询字符",
+      searchField: "查询字段",
+      maxRecords: "结果上限",
+      searchResult: "查询结果",
+      timestamp: "时间",
+      source: "源代码",
+      noResult: "没有结果",
+    },
+    menu: {
+      about: "关于",
+      user: "用户管理",
+      index: "索引管理",
+      search: "搜索",
+      template:"Template",
+      signOut: "退出",
+      account: "账号管理",
+      feedback: "反馈问题",
+      zincSearch: "Zinc Search",
+    },
+    about: {
+      name: "Zinc",
+      introduction: "一个现代化搜索引擎.",
+    },
+    login: {
+      userid: "用户名",
+      signIn: "登录",
+      password: "密码",
+    },
+    user: {
+      header: "用户管理",
+      id: "用户名",
+      name: "名字",
+      role: "角色",
+      password: "输入密码",
+      repassword: "确认密码",
+      addOrUpdate: "添加/更新用户",
+      add: "添加用户",
+      search: "查询用户",
+    },
+  };
