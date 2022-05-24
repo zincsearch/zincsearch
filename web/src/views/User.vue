@@ -145,6 +145,7 @@ export default defineComponent({
     };
 
     return {
+      t,
       user,
       showAddUserDialog,
       showUpdateUserDialog,
