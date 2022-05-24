@@ -21,13 +21,40 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/auth"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func List(c *gin.Context) {
-	res, err := auth.GetAllUsersWorker()
+	users, err := auth.GetUsers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	} else {
-		c.JSON(http.StatusOK, res)
+		return
 	}
+
+	var Hits []meta.Hit
+	for _, u := range users {
+		// remove salt from response
+		u.Salt = ""
+		u.Password = ""
+		hit := meta.Hit{
+			Index:     u.Name,
+			Type:      u.Name,
+			ID:        u.ID,
+			Timestamp: u.UpdatedAt,
+			Source:    u,
+		}
+		Hits = append(Hits, hit)
+	}
+
+	resp := meta.SearchResponse{
+		Took: 0,
+		Hits: meta.Hits{
+			Total: meta.Total{
+				Value: len(users),
+			},
+			MaxScore: 0,
+			Hits:     Hits,
+		},
+	}
+	c.JSON(http.StatusOK, resp)
 }

@@ -102,7 +102,7 @@ export default defineComponent({
               "YYYY-MM-DDTHH:mm:ssZ"
             ),
             updated: date.formatDate(
-              data._source["@timestamp"],
+              data._source.updated_at,
               "YYYY-MM-DDTHH:mm:ssZ"
             ),
             actions: "",

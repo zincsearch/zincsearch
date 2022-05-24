@@ -34,22 +34,22 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 	var analyzers map[string]*analysis.Analyzer
 	var readers []*bluge.Reader
 	readerMap := make(map[string]struct{})
-	for name, index := range ZINC_INDEX_LIST {
+	for _, index := range ZINC_INDEX_LIST.List() {
 		for _, indexName := range indexNames {
-			if _, ok := readerMap[name]; ok {
+			if _, ok := readerMap[index.Name]; ok {
 				continue
 			}
-			if indexName == "" || (indexName != "" && strings.HasPrefix(name, indexName[:len(indexName)-1])) {
+			if indexName == "" || (indexName != "" && strings.HasPrefix(index.Name, indexName[:len(indexName)-1])) {
 				reader, err := index.Writer.Reader()
 				if err != nil {
 					return nil, err
 				}
 				readers = append(readers, reader)
 				if mappings == nil {
-					mappings = index.CachedMappings
+					mappings = index.Mappings
 					analyzers = index.CachedAnalyzers
 				}
-				readerMap[name] = struct{}{}
+				readerMap[index.Name] = struct{}{}
 			}
 		}
 	}

@@ -13,27 +13,26 @@
 * limitations under the License.
  */
 
-package auth
+package metadata
 
 import (
-	"testing"
-	"time"
+	"errors"
+	"strings"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/metadata/storage"
+	"github.com/zinclabs/zinc/pkg/metadata/storage/badger"
+	"github.com/zinclabs/zinc/pkg/metadata/storage/etcd"
 )
 
-func TestGetAllUsersWorker(t *testing.T) {
-	t.Run("prepare", func(t *testing.T) {
-		u, err := CreateUser("test", "test", "test", "admin")
-		assert.NoError(t, err)
-		assert.NotNil(t, u)
-	})
+var ErrorKeyNotExists = errors.New("key not exists")
 
-	t.Run("get all users", func(t *testing.T) {
-		// wait for _users prepared
-		time.Sleep(time.Second)
-		got, err := GetUsers()
-		assert.NoError(t, err)
-		assert.GreaterOrEqual(t, len(got), 1)
-	})
+var db storage.Storager
+
+func init() {
+	if strings.ToLower(config.Global.ServerMode) == "cluster" {
+		db = etcd.New("/zinc/metadata")
+	} else {
+		db = badger.New("_metadata.db")
+	}
 }

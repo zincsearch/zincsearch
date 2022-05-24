@@ -25,7 +25,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/uquery/index"
 )
 
-func Request(data map[string]interface{}) (*meta.Template, error) {
+func Request(data map[string]interface{}) (*meta.IndexTemplate, error) {
 	if data == nil {
 		return nil, nil
 	}
@@ -34,7 +34,7 @@ func Request(data map[string]interface{}) (*meta.Template, error) {
 		return nil, errors.New(errors.ErrorTypeXContentParseException, "[template] template should be defined")
 	}
 
-	template := new(meta.Template)
+	template := new(meta.IndexTemplate)
 	for k, v := range data {
 		k = strings.ToLower(k)
 		switch k {

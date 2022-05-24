@@ -13,27 +13,16 @@
 * limitations under the License.
  */
 
-package auth
+package meta
 
-import (
-	"testing"
-	"time"
+import "time"
 
-	"github.com/stretchr/testify/assert"
-)
-
-func TestGetAllUsersWorker(t *testing.T) {
-	t.Run("prepare", func(t *testing.T) {
-		u, err := CreateUser("test", "test", "test", "admin")
-		assert.NoError(t, err)
-		assert.NotNil(t, u)
-	})
-
-	t.Run("get all users", func(t *testing.T) {
-		// wait for _users prepared
-		time.Sleep(time.Second)
-		got, err := GetUsers()
-		assert.NoError(t, err)
-		assert.GreaterOrEqual(t, len(got), 1)
-	})
+type User struct {
+	ID        string    `json:"_id"`
+	Name      string    `json:"name"`
+	Role      string    `json:"role"`
+	Salt      string    `json:"salt,omitempty"`
+	Password  string    `json:"password,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

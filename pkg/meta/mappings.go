@@ -15,7 +15,11 @@
 
 package meta
 
-import "sync"
+import (
+	"bytes"
+	"encoding/json"
+	"sync"
+)
 
 type Mappings struct {
 	Properties map[string]Property `json:"properties,omitempty"`
@@ -91,4 +95,18 @@ func (t *Mappings) ListProperty() map[string]Property {
 	}
 	t.lock.RUnlock()
 	return m
+}
+
+func (t *Mappings) MarshalJSON() ([]byte, error) {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+	b := bytes.NewBuffer(nil)
+	b.WriteString(`{"properties":`)
+	p, err := json.Marshal(t.Properties)
+	if err != nil {
+		return nil, err
+	}
+	b.Write(p)
+	b.WriteByte('}')
+	return b.Bytes(), nil
 }

@@ -287,10 +287,10 @@ func TestIndex_Search(t *testing.T) {
 			err = StoreIndex(index)
 			assert.NoError(t, err)
 
-			if (index.CachedMappings) == nil {
-				index.CachedMappings = meta.NewMappings()
+			if (index.Mappings) == nil {
+				index.Mappings = meta.NewMappings()
 			}
-			index.CachedMappings.SetProperty("address.city", meta.Property{
+			index.Mappings.SetProperty("address.city", meta.Property{
 				Type:          "text",
 				Index:         true,
 				Store:         true,

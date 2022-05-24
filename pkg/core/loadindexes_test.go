@@ -24,18 +24,6 @@ import (
 )
 
 func TestLoadIndexes(t *testing.T) {
-	t.Run("load system index", func(t *testing.T) {
-		// index cann't be reopen, so need close first
-		for _, index := range ZINC_SYSTEM_INDEX_LIST {
-			index.Writer.Close()
-		}
-		var err error
-		ZINC_SYSTEM_INDEX_LIST, err = LoadZincSystemIndexes()
-		assert.NoError(t, err)
-		assert.Equal(t, len(systemIndexList), len(ZINC_SYSTEM_INDEX_LIST))
-		assert.Equal(t, "_index", ZINC_SYSTEM_INDEX_LIST["_index"].Name)
-	})
-
 	t.Run("create some index", func(t *testing.T) {
 		index, err := NewIndex("TestLoadIndexes.index_1", "disk", nil)
 		assert.NoError(t, err)
@@ -57,13 +45,10 @@ func TestLoadIndexes(t *testing.T) {
 	})
 
 	t.Run("load user index from disk", func(t *testing.T) {
-		for _, index := range ZINC_INDEX_LIST {
-			index.Writer.Close()
-		}
-		var err error
-		ZINC_INDEX_LIST, err = LoadZincIndexesFromMeta()
+		ZINC_INDEX_LIST.Close()
+		err := LoadZincIndexesFromMetadata()
 		assert.NoError(t, err)
-		assert.GreaterOrEqual(t, len(ZINC_INDEX_LIST), 0)
+		assert.GreaterOrEqual(t, ZINC_INDEX_LIST.Len(), 0)
 	})
 
 	t.Run("cleanup", func(t *testing.T) {

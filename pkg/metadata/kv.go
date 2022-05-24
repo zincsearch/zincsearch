@@ -13,27 +13,28 @@
 * limitations under the License.
  */
 
-package auth
+package metadata
 
-import (
-	"testing"
-	"time"
+type kv struct{}
 
-	"github.com/stretchr/testify/assert"
-)
+var KV = new(kv)
 
-func TestGetAllUsersWorker(t *testing.T) {
-	t.Run("prepare", func(t *testing.T) {
-		u, err := CreateUser("test", "test", "test", "admin")
-		assert.NoError(t, err)
-		assert.NotNil(t, u)
-	})
+func (t *kv) List(offset, limit int) ([][]byte, error) {
+	return db.List(t.key(""), offset, limit)
+}
 
-	t.Run("get all users", func(t *testing.T) {
-		// wait for _users prepared
-		time.Sleep(time.Second)
-		got, err := GetUsers()
-		assert.NoError(t, err)
-		assert.GreaterOrEqual(t, len(got), 1)
-	})
+func (t *kv) Get(key string) ([]byte, error) {
+	return db.Get(t.key(key))
+}
+
+func (t *kv) Set(key string, val []byte) error {
+	return db.Set(t.key(key), val)
+}
+
+func (t *kv) Delete(key string) error {
+	return db.Delete(t.key(key))
+}
+
+func (t *kv) key(key string) string {
+	return "/kv/" + key
 }

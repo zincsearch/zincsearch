@@ -28,6 +28,7 @@ import (
 type config struct {
 	GinMode              string `env:"GIN_MODE"`
 	ServerPort           string `env:"ZINC_SERVER_PORT,default=4080"`
+	ServerMode           string `env:"ZINC_SERVER_MODE,default=node"`
 	NodeID               string `env:"ZINC_NODE_ID,default=1"`
 	DataPath             string `env:"ZINC_DATA_PATH,default=./data"`
 	SentryEnable         bool   `env:"ZINC_SENTRY,default=true"`
@@ -36,9 +37,14 @@ type config struct {
 	BatchSize            int    `env:"ZINC_BATCH_SIZE,default=1024"`
 	MaxResults           int    `env:"ZINC_MAX_RESULTS,default=10000"`
 	AggregationTermsSize int    `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
+	Etcd                 etcd
 	S3                   s3
 	MinIO                minIO
 	Plugin               plugin
+}
+
+type etcd struct {
+	Endpoints []string `env:"ZINC_ETCD_ENDPOINTS"`
 }
 
 type s3 struct {
@@ -102,10 +108,9 @@ func setField(field reflect.Value, tag string) {
 	v := os.Getenv(tagColumn[0])
 	if v == "" {
 		if len(tagColumn) > 1 {
-			for _, tv := range tagColumn[1:] {
-				if strings.HasPrefix(tv, "default=") {
-					v = tv[8:]
-				}
+			tv := strings.Join(tagColumn[1:], ",")
+			if strings.HasPrefix(tv, "default=") {
+				v = tv[8:]
 			}
 		}
 	}
@@ -127,6 +132,10 @@ func setField(field reflect.Value, tag string) {
 		field.SetBool(vi)
 	case reflect.String:
 		field.SetString(v)
+	case reflect.Slice:
+		vs := strings.Split(v, ",")
+		field.Set(reflect.ValueOf(vs))
+		field.SetLen(len(vs))
 	default:
 		// noop
 	}

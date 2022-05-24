@@ -16,24 +16,37 @@
 package auth
 
 import (
-	"testing"
-	"time"
+	"sync"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-func TestGetAllUsersWorker(t *testing.T) {
-	t.Run("prepare", func(t *testing.T) {
-		u, err := CreateUser("test", "test", "test", "admin")
-		assert.NoError(t, err)
-		assert.NotNil(t, u)
-	})
+var ZINC_CACHED_USERS cachedUsers
 
-	t.Run("get all users", func(t *testing.T) {
-		// wait for _users prepared
-		time.Sleep(time.Second)
-		got, err := GetUsers()
-		assert.NoError(t, err)
-		assert.GreaterOrEqual(t, len(got), 1)
-	})
+func init() {
+	ZINC_CACHED_USERS.users = make(map[string]*meta.User)
+}
+
+type cachedUsers struct {
+	users map[string]*meta.User
+	lock  sync.RWMutex
+}
+
+func (t *cachedUsers) Get(userID string) (*meta.User, bool) {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+	user, ok := t.users[userID]
+	return user, ok
+}
+
+func (t *cachedUsers) Set(userID string, user *meta.User) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+	t.users[userID] = user
+}
+
+func (t *cachedUsers) Delete(userID string) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+	delete(t.users, userID)
 }

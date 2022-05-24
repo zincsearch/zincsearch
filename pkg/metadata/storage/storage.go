@@ -13,27 +13,12 @@
 * limitations under the License.
  */
 
-package auth
+package storage
 
-import (
-	"testing"
-	"time"
-
-	"github.com/stretchr/testify/assert"
-)
-
-func TestGetAllUsersWorker(t *testing.T) {
-	t.Run("prepare", func(t *testing.T) {
-		u, err := CreateUser("test", "test", "test", "admin")
-		assert.NoError(t, err)
-		assert.NotNil(t, u)
-	})
-
-	t.Run("get all users", func(t *testing.T) {
-		// wait for _users prepared
-		time.Sleep(time.Second)
-		got, err := GetUsers()
-		assert.NoError(t, err)
-		assert.GreaterOrEqual(t, len(got), 1)
-	})
+type Storager interface {
+	List(string, int, int) ([][]byte, error)
+	Get(string) ([]byte, error)
+	Set(string, []byte) error
+	Delete(string) error
+	Close() error
 }

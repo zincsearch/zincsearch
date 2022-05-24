@@ -15,13 +15,22 @@
 
 package meta
 
+import "time"
+
 type Index struct {
 	Name        string         `json:"name"`
-	DocsCount   int64          `json:"docs_count"`
-	StorageSize int64          `json:"storage_size"`
 	StorageType string         `json:"storage_type"`
 	Settings    *IndexSettings `json:"settings,omitempty"`
 	Mappings    *Mappings      `json:"mappings,omitempty"`
+	CreateAt    time.Time      `json:"create_at"`
+	UpdateAt    time.Time      `json:"update_at"`
+}
+
+type IndexSimple struct {
+	Name        string                 `json:"name"`
+	StorageType string                 `json:"storage_type"`
+	Settings    *IndexSettings         `json:"settings,omitempty"`
+	Mappings    map[string]interface{} `json:"mappings,omitempty"`
 }
 
 type IndexSettings struct {
