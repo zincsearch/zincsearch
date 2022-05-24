@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/goccy/go-json"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/zinclabs/zinc/pkg/auth"
 	"github.com/zinclabs/zinc/pkg/meta"
@@ -35,121 +35,121 @@ type userLoginResponse struct {
 }
 
 func TestAuth(t *testing.T) {
-	Convey("test auth api", t, func() {
+	t.Run("test auth api", func(t *testing.T) {
 		r := server()
-		Convey("check auth with auth", func() {
+		t.Run("check auth with auth", func(t *testing.T) {
 			req, _ := http.NewRequest("GET", "/api/index", nil)
 			req.SetBasicAuth(username, password)
 			resp := httptest.NewRecorder()
 			r.ServeHTTP(resp, req)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 		})
-		Convey("check auth with error password", func() {
+		t.Run("check auth with error password", func(t *testing.T) {
 			req, _ := http.NewRequest("GET", "/api/index", nil)
 			req.SetBasicAuth(username, "xxx")
 			resp := httptest.NewRecorder()
 			r.ServeHTTP(resp, req)
-			So(resp.Code, ShouldEqual, http.StatusUnauthorized)
+			assert.Equal(t, http.StatusUnauthorized, resp.Code)
 		})
-		Convey("check auth without auth", func() {
+		t.Run("check auth without auth", func(t *testing.T) {
 			req, _ := http.NewRequest("GET", "/api/index", nil)
 			resp := httptest.NewRecorder()
 			r.ServeHTTP(resp, req)
-			So(resp.Code, ShouldEqual, http.StatusUnauthorized)
+			assert.Equal(t, http.StatusUnauthorized, resp.Code)
 		})
 
-		Convey("POST /api/login", func() {
-			Convey("with username and password", func() {
+		t.Run("POST /api/login", func(t *testing.T) {
+			t.Run("with username and password", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(fmt.Sprintf(`{"_id": "%s", "password": "%s"}`, username, password))
 				resp := request("POST", "/api/login", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 
 				data := new(userLoginResponse)
 				err := json.Unmarshal(resp.Body.Bytes(), &data)
-				So(err, ShouldBeNil)
-				So(data.Validated, ShouldBeTrue)
+				assert.NoError(t, err)
+				assert.True(t, data.Validated)
 			})
-			Convey("with bad username or password", func() {
+			t.Run("with bad username or password", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(fmt.Sprintf(`{"_id": "%s", "password": "xxx"}`, username))
 				resp := request("POST", "/api/login", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 
 				data := new(userLoginResponse)
 				err := json.Unmarshal(resp.Body.Bytes(), &data)
-				So(err, ShouldBeNil)
-				So(data.Validated, ShouldBeFalse)
+				assert.NoError(t, err)
+				assert.False(t, data.Validated)
 			})
 		})
 	})
 
-	Convey("test user api", t, func() {
-		Convey("PUT /api/user", func() {
+	t.Run("test user api", func(t *testing.T) {
+		t.Run("PUT /api/user", func(t *testing.T) {
 			username := "user1"
 			password := "123456"
-			Convey("create user with payload", func() {
+			t.Run("create user with payload", func(t *testing.T) {
 				// create user
 				body := bytes.NewBuffer(nil)
 				body.WriteString(fmt.Sprintf(`{"_id":"%s","name":"%s","password":"%s","role":"admin"}`, username, username, password))
 				resp := request("PUT", "/api/user", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 
 				// login check
 				body.Reset()
 				body.WriteString(fmt.Sprintf(`{"_id":"%s","password":"%s"}`, username, password))
 				resp = request("POST", "/api/login", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 
 				data := new(userLoginResponse)
 				err := json.Unmarshal(resp.Body.Bytes(), &data)
-				So(err, ShouldBeNil)
-				So(data.Validated, ShouldBeTrue)
+				assert.NoError(t, err)
+				assert.True(t, data.Validated)
 			})
-			Convey("update user", func() {
+			t.Run("update user", func(t *testing.T) {
 				// update user
 				body := bytes.NewBuffer(nil)
 				body.WriteString(fmt.Sprintf(`{"_id":"%s","name":"%s-updated","password":"%s","role":"admin"}`, username, username, password))
 				resp := request("PUT", "/api/user", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 
 				// check updated
 				userNew, _, _ := auth.GetUser(username)
-				So(userNew.Name, ShouldEqual, fmt.Sprintf("%s-updated", username))
+				assert.Equal(t, fmt.Sprintf("%s-updated", username), userNew.Name)
 			})
-			Convey("create user with error input", func() {
+			t.Run("create user with error input", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`xxx`)
 				resp := request("PUT", "/api/user", body)
-				So(resp.Code, ShouldEqual, http.StatusBadRequest)
+				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
 		})
 
-		Convey("DELETE /api/user/:id", func() {
-			Convey("delete user with exist userid", func() {
+		t.Run("DELETE /api/user/:id", func(t *testing.T) {
+			t.Run("delete user with exist userid", func(t *testing.T) {
 				username := "user1"
 				resp := request("DELETE", "/api/user/"+username, nil)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 
 				// check user exist
 				_, exist, _ := auth.GetUser(username)
-				So(exist, ShouldBeFalse)
+				assert.False(t, exist)
 			})
-			Convey("delete user with not exist userid", func() {
+			t.Run("delete user with not exist userid", func(t *testing.T) {
 				resp := request("DELETE", "/api/user/userNotExist", nil)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
 		})
 
-		Convey("GET /api/user", func() {
+		t.Run("GET /api/user", func(t *testing.T) {
 			resp := request("GET", "/api/user", nil)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldEqual, 1)
-			So(data.Hits.Hits[0].ID, ShouldEqual, "admin")
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
+			assert.Equal(t, "admin", data.Hits.Hits[0].ID)
 		})
 	})
 }

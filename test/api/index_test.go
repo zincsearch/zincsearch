@@ -22,50 +22,50 @@ import (
 	"testing"
 
 	"github.com/goccy/go-json"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIndex(t *testing.T) {
-	Convey("PUT /api/index", t, func() {
-		Convey("create index with payload", func() {
+	t.Run("PUT /api/index", func(t *testing.T) {
+		t.Run("create index with payload", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(fmt.Sprintf(`{"name":"%s","storage_type":"disk"}`, "newindex"))
 			resp := request("PUT", "/api/index", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
-			So(resp.Body.String(), ShouldEqual, `{"index":"newindex","message":"index created","storage_type":"disk"}`)
+			assert.Equal(t, http.StatusOK, resp.Code)
+			assert.Equal(t, resp.Body.String(), `{"index":"newindex","message":"index created","storage_type":"disk"}`)
 		})
 
-		Convey("create index with error input", func() {
+		t.Run("create index with error input", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(fmt.Sprintf(`{"name":"%s","storage_type":"disk"}`, ""))
 			resp := request("PUT", "/api/index", body)
-			So(resp.Code, ShouldEqual, http.StatusBadRequest)
+			assert.Equal(t, http.StatusBadRequest, resp.Code)
 		})
 
-		Convey("GET /api/index", func() {
+		t.Run("GET /api/index", func(t *testing.T) {
 			resp := request("GET", "/api/index", nil)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// data := make(map[string]interface{})
 			data := []interface{}{}
 			err := json.Unmarshal(resp.Body.Bytes(), &data)
-			So(err, ShouldBeNil)
-			So(len(data), ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, len(data), 1)
 		})
 
-		Convey("DELETE /api/index/:indexName", func() {
-			Convey("delete index with exist indexName", func() {
+		t.Run("DELETE /api/index/:indexName", func(t *testing.T) {
+			t.Run("delete index with exist indexName", func(t *testing.T) {
 				resp := request("DELETE", "/api/index/newindex", nil)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("delete index with not exist indexName", func() {
+			t.Run("delete index with not exist indexName", func(t *testing.T) {
 				resp := request("DELETE", "/api/index/newindex", nil)
-				So(resp.Code, ShouldEqual, http.StatusBadRequest)
+				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
 		})
 
-		Convey("PUT /api/:target/_mapping", func() {
-			Convey("update mappings for index", func() {
+		t.Run("PUT /api/:target/_mapping", func(t *testing.T) {
+			t.Run("update mappings for index", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`{
 					"mappings": {
@@ -85,23 +85,23 @@ func TestIndex(t *testing.T) {
 					}
 				}`)
 				resp := request("PUT", "/api/"+indexName+"-mapping/_mapping", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
-				So(resp.Body.String(), ShouldEqual, `{"message":"ok"}`)
+				assert.Equal(t, http.StatusOK, resp.Code)
+				assert.Equal(t, `{"message":"ok"}`, resp.Body.String())
 			})
 		})
 
-		Convey("GET /api/:target/_mapping", func() {
-			Convey("get mappings from index", func() {
+		t.Run("GET /api/:target/_mapping", func(t *testing.T) {
+			t.Run("get mappings from index", func(t *testing.T) {
 				resp := request("GET", "/api/"+indexName+"/_mapping", nil)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 
 				data := make(map[string]interface{})
 				err := json.Unmarshal(resp.Body.Bytes(), &data)
-				So(err, ShouldBeNil)
-				So(data[indexName], ShouldNotBeNil)
+				assert.NoError(t, err)
+				assert.NotNil(t, data[indexName])
 				v, ok := data[indexName].(map[string]interface{})
-				So(ok, ShouldBeTrue)
-				So(v["mappings"], ShouldNotBeNil)
+				assert.True(t, ok)
+				assert.NotNil(t, v["mappings"])
 			})
 		})
 	})

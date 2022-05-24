@@ -24,12 +24,12 @@ import (
 	"testing"
 
 	"github.com/goccy/go-json"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAnalyze(t *testing.T) {
-	Convey("test analyzer", t, func() {
-		Convey("standard analyzer", func() {
+	t.Run("test analyzer", func(t *testing.T) {
+		t.Run("standard analyzer", func(t *testing.T) {
 			input := `{
 				"analyzer": "standard",
 				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
@@ -39,14 +39,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("standard analyzer with stopwords", func() {
+		t.Run("standard analyzer with stopwords", func(t *testing.T) {
 			indexName := "my-index-001"
 			index := `{
 				"settings": {
@@ -72,22 +72,22 @@ func TestAnalyze(t *testing.T) {
 			resp := request("PUT", "/api/index/"+indexName, body)
 			buf, err := io.ReadAll(resp.Body)
 			fmt.Println(string(buf), err)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
 			resp = request("POST", "/api/"+indexName+"/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 
 			// delete index
 			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
-		Convey("standard analyzer with stopwords and filters", func() {
+		t.Run("standard analyzer with stopwords and filters", func(t *testing.T) {
 			indexName := "my-index-002"
 			index := `{
 				"settings": {
@@ -119,22 +119,22 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
 			resp := request("PUT", "/api/index/"+indexName, body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
 			resp = request("POST", "/api/"+indexName+"/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 
 			// delete index
 			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
-		Convey("simple analyzer", func() {
+		t.Run("simple analyzer", func(t *testing.T) {
 			input := `{
 				"analyzer": "simple",
 				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
@@ -144,14 +144,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("keyword analyzer", func() {
+		t.Run("keyword analyzer", func(t *testing.T) {
 			input := `{
 				"analyzer": "keyword",
 				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
@@ -161,14 +161,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("regexp analyzer", func() {
+		t.Run("regexp analyzer", func(t *testing.T) {
 			input := `{
 				"analyzer": "regexp",
 				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
@@ -178,14 +178,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("regexp analyzer with pattern", func() {
+		t.Run("regexp analyzer with pattern", func(t *testing.T) {
 			indexName := "my-index-003"
 			index := `{
 				"settings": {
@@ -210,22 +210,22 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
 			resp := request("PUT", "/api/index/"+indexName, body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
 			resp = request("POST", "/api/"+indexName+"/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 
 			// delete index
 			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
-		Convey("stop analyzer", func() {
+		t.Run("stop analyzer", func(t *testing.T) {
 			input := `{
 				"analyzer": "stop",
 				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
@@ -235,14 +235,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("stop analyzer with stopwords", func() {
+		t.Run("stop analyzer with stopwords", func(t *testing.T) {
 			indexName := "my-index-004"
 			index := `{
 				"settings": {
@@ -266,22 +266,22 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
 			resp := request("PUT", "/api/index/"+indexName, body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
 			resp = request("POST", "/api/"+indexName+"/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 
 			// delete index
 			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
-		Convey("whitespace analyzer", func() {
+		t.Run("whitespace analyzer", func(t *testing.T) {
 			input := `{
 				"analyzer": "whitespace",
 				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
@@ -291,14 +291,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("web analyzer", func() {
+		t.Run("web analyzer", func(t *testing.T) {
 			input := `{
 				"analyzer": "web",
 				"text": "Hello info@blugelabs.com, i come from https://docs.zinclabs.io/"
@@ -308,16 +308,16 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 	})
 
-	Convey("test tokenizer", t, func() {
-		Convey("standard tokenizer", func() {
+	t.Run("test tokenizer", func(t *testing.T) {
+		t.Run("standard tokenizer", func(t *testing.T) {
 			input := `{
 				"tokenizer": "standard",
 				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
@@ -327,14 +327,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("letter tokenizer", func() {
+		t.Run("letter tokenizer", func(t *testing.T) {
 			input := `{
 				"tokenizer": "letter",
 				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
@@ -344,14 +344,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("lowercase tokenizer", func() {
+		t.Run("lowercase tokenizer", func(t *testing.T) {
 			input := `{
 				"tokenizer": "lowercase",
 				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
@@ -361,14 +361,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("whitespace tokenizer", func() {
+		t.Run("whitespace tokenizer", func(t *testing.T) {
 			input := `{
 				"tokenizer": "whitespace",
 				"text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
@@ -378,14 +378,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("n-gram tokenizer", func() {
+		t.Run("n-gram tokenizer", func(t *testing.T) {
 			input := `{
 				"tokenizer": "ngram",
 				"text": "Quick Fox"
@@ -395,14 +395,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("n-gram tokenizer with configuration", func() {
+		t.Run("n-gram tokenizer with configuration", func(t *testing.T) {
 			indexName := "my-index-005"
 			index := `{
 				"settings": {
@@ -436,22 +436,22 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
 			resp := request("PUT", "/api/index/"+indexName, body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
 			resp = request("POST", "/api/"+indexName+"/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 
 			// delete index
 			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
-		Convey("edge n-gram tokenizer", func() {
+		t.Run("edge n-gram tokenizer", func(t *testing.T) {
 			input := `{
 				"tokenizer": "edge_ngram",
 				"text": "Quick Fox"
@@ -461,14 +461,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("edge n-gram tokenizer with configuration", func() {
+		t.Run("edge n-gram tokenizer with configuration", func(t *testing.T) {
 			indexName := "my-index-006"
 			index := `{
 				"settings": {
@@ -502,22 +502,22 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
 			resp := request("PUT", "/api/index/"+indexName, body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
 			resp = request("POST", "/api/"+indexName+"/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 
 			// delete index
 			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
-		Convey("keyword tokenizer", func() {
+		t.Run("keyword tokenizer", func(t *testing.T) {
 			input := `{
 				"tokenizer": "keyword",
 				"text": "New York"
@@ -527,14 +527,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("keyword tokenizer with filters", func() {
+		t.Run("keyword tokenizer with filters", func(t *testing.T) {
 			input := `{
 				"tokenizer": "keyword",
 				"token_filter": [ "lowercase" ],
@@ -545,14 +545,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("regexp tokenizer", func() {
+		t.Run("regexp tokenizer", func(t *testing.T) {
 			input := `{
 				"tokenizer": "regexp",
 				"text": "The foo_bar_size's default is 5."
@@ -562,14 +562,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("regexp tokenizer with configuration example1", func() {
+		t.Run("regexp tokenizer with configuration example1", func(t *testing.T) {
 			indexName := "my-index-007"
 			index := `{
 				"settings": {
@@ -598,22 +598,22 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
 			resp := request("PUT", "/api/index/"+indexName, body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
 			resp = request("POST", "/api/"+indexName+"/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 
 			// delete index
 			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
-		Convey("regexp tokenizer with configuration example2", func() {
+		t.Run("regexp tokenizer with configuration example2", func(t *testing.T) {
 			indexName := "my-index-008"
 			index := `{
 				"settings": {
@@ -642,22 +642,22 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
 			resp := request("PUT", "/api/index/"+indexName, body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
 			resp = request("POST", "/api/"+indexName+"/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 
 			// delete index
 			request("DELETE", "/api/index/"+indexName, nil)
 		})
 
-		Convey("character group tokenizer", func() {
+		t.Run("character group tokenizer", func(t *testing.T) {
 			input := `{
 				"tokenizer": {
 				  "type": "char_group",
@@ -674,14 +674,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("path hierarchy tokenizer", func() {
+		t.Run("path hierarchy tokenizer", func(t *testing.T) {
 			input := `{
 				"tokenizer": "path_hierarchy",
 				"text": "/one/two/three"
@@ -691,14 +691,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("path hierarchy tokenizer with configuration", func() {
+		t.Run("path hierarchy tokenizer with configuration", func(t *testing.T) {
 			indexName := "my-index-009"
 			index := `{
 				"settings": {
@@ -729,24 +729,24 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
 			resp := request("PUT", "/api/index/"+indexName, body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
 			resp = request("POST", "/api/"+indexName+"/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 
 			// delete index
 			request("DELETE", "/api/index/"+indexName, nil)
 		})
 	})
 
-	Convey("test token filter", t, func() {
-		Convey("Apostrophe token filter", func() {
+	t.Run("test token filter", func(t *testing.T) {
+		t.Run("Apostrophe token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "standard",
 				"filter" : ["apostrophe"],
@@ -757,14 +757,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("CJK bigram token filter", func() {
+		t.Run("CJK bigram token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "standard",
 				"filter" : ["cjk_bigram"],
@@ -775,14 +775,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("CJK width token filter", func() {
+		t.Run("CJK width token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "standard",
 				"filter" : ["cjk_width"],
@@ -793,14 +793,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Dictionary token filter", func() {
+		t.Run("Dictionary token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer": "standard",
 				"filter": [
@@ -816,14 +816,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Edge n-gram token filter", func() {
+		t.Run("Edge n-gram token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer": "standard",
 				"filter": [
@@ -839,14 +839,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("N-gram token filter", func() {
+		t.Run("N-gram token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer": "standard",
 				"filter": [ "ngram" ],
@@ -857,14 +857,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Elision token filter", func() {
+		t.Run("Elision token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "standard",
 				"filter" : ["elision"],
@@ -875,14 +875,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Stemmer token filter", func() {
+		t.Run("Stemmer token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer": "whitespace",
 				"filter": [ "stemmer" ],
@@ -893,14 +893,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Keyword token filter", func() {
+		t.Run("Keyword token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer": "whitespace",
 				"filter": [
@@ -917,14 +917,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Length token filter", func() {
+		t.Run("Length token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer": "whitespace",
 				"filter": [
@@ -941,14 +941,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Lowercase token filter", func() {
+		t.Run("Lowercase token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "standard",
 				"filter" : ["lowercase"],
@@ -959,14 +959,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Pattern replace token filter", func() {
+		t.Run("Pattern replace token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer": "whitespace",
 				"filter": [
@@ -983,14 +983,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Reverse token filter", func() {
+		t.Run("Reverse token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "standard",
 				"filter" : ["reverse"],
@@ -1001,14 +1001,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Shingle token filter", func() {
+		t.Run("Shingle token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer": "whitespace",
 				"filter": [ "shingle" ],
@@ -1019,14 +1019,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Stop token filter", func() {
+		t.Run("Stop token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer": "standard",
 				"filter": [ "stop" ],
@@ -1037,14 +1037,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Stop token filter with configuration", func() {
+		t.Run("Stop token filter with configuration", func(t *testing.T) {
 			input := `{
 				"tokenizer": "standard",
 				"filter": [
@@ -1060,14 +1060,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Stop token filter with configuration language", func() {
+		t.Run("Stop token filter with configuration language", func(t *testing.T) {
 			input := `{
 				"tokenizer": "standard",
 				"filter": [
@@ -1083,14 +1083,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Trim token filter", func() {
+		t.Run("Trim token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "keyword",
 				"filter" : ["trim"],
@@ -1101,14 +1101,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Truncate token filter", func() {
+		t.Run("Truncate token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "whitespace",
 				"filter" : ["truncate"],
@@ -1119,14 +1119,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Unique token filter", func() {
+		t.Run("Unique token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "whitespace",
 				"filter" : ["unique"],
@@ -1137,14 +1137,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Uppercase token filter", func() {
+		t.Run("Uppercase token filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "standard",
 				"filter" : ["uppercase"],
@@ -1155,17 +1155,17 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
 	})
 
-	Convey("test character filter", t, func() {
-		Convey("ASCII folding character filter", func() {
+	t.Run("test character filter", func(t *testing.T) {
+		t.Run("ASCII folding character filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "standard",
 				"char_filter" : ["asciifolding"],
@@ -1176,14 +1176,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("HTML strip character filter", func() {
+		t.Run("HTML strip character filter", func(t *testing.T) {
 			input := `{
 				"tokenizer" : "standard",
 				"char_filter" : ["html_strip"],
@@ -1194,14 +1194,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Mapping character filter", func() {
+		t.Run("Mapping character filter", func(t *testing.T) {
 			input := `{
 				"tokenizer": "keyword",
 				"char_filter": [
@@ -1228,14 +1228,14 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
 			resp := request("POST", "/api/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 		})
 
-		Convey("Pattern replace character filter", func() {
+		t.Run("Pattern replace character filter", func(t *testing.T) {
 			indexName := "my-index-010"
 			index := `{
 				"settings": {
@@ -1268,16 +1268,16 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
 			resp := request("PUT", "/api/index/"+indexName, body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// analyze
 			body.Reset()
 			body.WriteString(input)
 			resp = request("POST", "/api/"+indexName+"/_analyze", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 			tokens, err := getTokenStrings(resp.Body.Bytes())
-			So(err, ShouldBeNil)
-			So(tokens, ShouldEqual, output)
+			assert.NoError(t, err)
+			assert.Equal(t, output, tokens)
 
 			// delete index
 			request("DELETE", "/api/index/"+indexName, nil)
