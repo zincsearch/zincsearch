@@ -27,7 +27,7 @@ import (
 
 type config struct {
 	GinMode              string `env:"GIN_MODE"`
-	ServerPort           string `env:"ZINC_PORT,default=4080"`
+	ServerPort           string `env:"ZINC_SERVER_PORT,default=4080"`
 	NodeID               string `env:"ZINC_NODE_ID,default=1"`
 	DataPath             string `env:"ZINC_DATA_PATH,default=./data"`
 	SentryEnable         bool   `env:"ZINC_SENTRY,default=true"`
