@@ -61,5 +61,5 @@ func (t *user) Delete(id string) error {
 }
 
 func (t *user) key(id string) string {
-	return "user:" + id
+	return "/user/" + id
 }

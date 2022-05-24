@@ -16,6 +16,8 @@
 package etcd
 
 import (
+	"context"
+	"errors"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -23,6 +25,8 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/metadata/storage"
 )
+
+var timeout = 30 * time.Second
 
 type etcdStorage struct {
 	prefix string
@@ -43,20 +47,45 @@ func New(dbpath string) storage.Storager {
 	}
 }
 
-func (t *etcdStorage) List(prefix string, offset, limit int) ([][]byte, error) {
-	return nil, nil
+func (t *etcdStorage) List(prefix string, _, _ int) ([][]byte, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	resp, err := t.cli.Get(ctx, t.prefix+prefix, client.WithPrefix())
+	if err != nil {
+		return nil, err
+	}
+	data := make([][]byte, 0, len(resp.Kvs))
+	for _, kv := range resp.Kvs {
+		data = append(data, kv.Value)
+	}
+	return data, nil
 }
 
 func (t *etcdStorage) Get(key string) ([]byte, error) {
-	return nil, nil
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	resp, err := t.cli.Get(ctx, t.prefix+key)
+	if err != nil {
+		return nil, err
+	}
+	if len(resp.Kvs) == 0 {
+		return nil, errors.New("key not found")
+	}
+	return resp.Kvs[0].Value, nil
 }
 
 func (t *etcdStorage) Set(key string, value []byte) error {
-	return nil
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_, err := t.cli.Put(ctx, t.prefix+key, string(value))
+	return err
 }
 
 func (t *etcdStorage) Delete(key string) error {
-	return nil
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_, err := t.cli.Delete(ctx, t.prefix+key)
+	return err
 }
 
 func (t *etcdStorage) Close() error {

@@ -52,20 +52,50 @@ func openBadgerDB(dbpath string, readOnly bool) (*badger.DB, error) {
 	return badger.Open(opt)
 }
 
-func (t *badgerStorage) List(prefix string, offset, limit int) ([][]byte, error) {
-	return nil, nil
+func (t *badgerStorage) List(prefix string, _, _ int) ([][]byte, error) {
+	data := make([][]byte, 0)
+	pre := []byte(prefix)
+	err := t.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = true
+		it := txn.NewIterator(opts)
+		defer it.Close()
+		for it.Seek(pre); it.ValidForPrefix(pre); it.Next() {
+			item := it.Item()
+			buf, err := item.ValueCopy(nil)
+			if err != nil {
+				return err
+			}
+			data = append(data, buf)
+		}
+		return nil
+	})
+	return data, err
 }
 
 func (t *badgerStorage) Get(key string) ([]byte, error) {
-	return nil, nil
+	var data []byte
+	err := t.db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(key))
+		if err != nil {
+			return err
+		}
+		data, err = item.ValueCopy(nil)
+		return err
+	})
+	return data, err
 }
 
 func (t *badgerStorage) Set(key string, value []byte) error {
-	return nil
+	return t.db.Update(func(txn *badger.Txn) error {
+		return txn.Set([]byte(key), value)
+	})
 }
 
 func (t *badgerStorage) Delete(key string) error {
-	return nil
+	return t.db.Update(func(txn *badger.Txn) error {
+		return txn.Delete([]byte(key))
+	})
 }
 
 func (t *badgerStorage) Close() error {
