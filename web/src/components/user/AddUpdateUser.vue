@@ -115,6 +115,7 @@ export default defineComponent({
     const { t } = useI18n();
 
     return {
+      t,
       disableColor,
       isPwd: ref(true),
       beingUpdated,

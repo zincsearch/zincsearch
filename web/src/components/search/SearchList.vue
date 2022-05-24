@@ -9,7 +9,7 @@
         :loading="searchLoading"
         :pagination="pagination"
         wrap-cells
-        title="Search Results"
+        :title="t('search.searchResult')"
         row-key="_id"
       >
         <template #top>
@@ -144,6 +144,7 @@
 <script>
 import { defineComponent, nextTick, ref } from "vue";
 import { date } from "quasar";
+import { useI18n } from "vue-i18n";
 
 import searchService from "../../services/search";
 
@@ -159,6 +160,7 @@ export default defineComponent({
   setup(props, { emit }) {
     // Accessing nested JavaScript objects and arrays by string path
     // https://stackoverflow.com/questions/6491463/accessing-nested-javascript-objects-and-arrays-by-string-path
+    const { t } = useI18n();
     Object.byString = function (o, s) {
       if (s == undefined) {
         return "";
@@ -206,7 +208,7 @@ export default defineComponent({
           name: "@timestamp",
           field: (row) =>
             date.formatDate(row["@timestamp"], "MMM DD, YYYY HH:mm:ss.SSS Z"),
-          label: "@timestamp",
+          label: t("search.timestamp"),
           align: "left",
           sortable: true,
         },
@@ -546,6 +548,7 @@ export default defineComponent({
     };
 
     return {
+      t,
       searchTable,
       searchData,
       resetColumns,
