@@ -11,7 +11,7 @@
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
 
-        <q-toolbar-title>Zinc Search</q-toolbar-title>
+        <q-toolbar-title>{{ t("menu.zincSearch") }}</q-toolbar-title>
 
         <div>
           <q-btn-dropdown outline rounded no-caps icon-right="manage_accounts">
@@ -19,7 +19,7 @@
               <div class="row items-center no-wrap">{{ user.name }}</div>
             </template>
             <q-list>
-              <q-item-label header>Account</q-item-label>
+              <q-item-label header>{{ t("menu.account") }}</q-item-label>
 
               <q-item v-ripple v-close-popup clickable @click="signout">
                 <q-item-section avatar>
@@ -31,7 +31,7 @@
                   />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>Sign Out</q-item-label>
+                  <q-item-label>{{ t("menu.signOut") }}</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -77,34 +77,8 @@
 
 <script lang="ts">
 import MenuLink from "../components/MenuLink.vue";
+import { useI18n } from "vue-i18n";
 
-const linksList = [
-  {
-    title: "Search",
-    icon: "manage_search",
-    link: "/search",
-  },
-  {
-    title: "Index",
-    icon: "list",
-    link: "/index",
-  },
-  {
-    title: "Template",
-    icon: "apps",
-    link: "/template",
-  },
-  {
-    title: "User",
-    icon: "people",
-    link: "/user",
-  },
-  {
-    title: "About",
-    icon: "info",
-    link: "/about",
-  },
-];
 
 import { ref } from "vue";
 import { useStore } from "vuex";
@@ -121,6 +95,35 @@ export default {
     const store = useStore();
     const router = useRouter();
 
+    const { t } = useI18n();
+
+    const linksList = [
+      {
+        title: t("menu.search"),
+        icon: "manage_search",
+        link: "/search",
+      },
+      {
+        title: t("menu.indexManagement"),
+        icon: "list",
+        link: "/index",
+      },
+      {
+        title:  t("menu.template"),
+        icon: "apps",
+        link: "/template",
+      },
+      {
+        title:  t("menu.user"),
+        icon: "people",
+        link: "/user",
+      },
+      {
+        title:  t("menu.about"),
+        icon: "info",
+        link: "/about",
+      },
+    ];
     const signout = () => {
       store.dispatch("logout");
       localStorage.setItem("creds", "");
@@ -128,6 +131,7 @@ export default {
     };
 
     return {
+      t,
       essentialLinks: linksList,
       leftDrawerOpen: ref(false),
       user: store.state.user,

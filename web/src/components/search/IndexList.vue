@@ -16,7 +16,7 @@
       >
         <template #no-option>
           <q-item>
-            <q-item-section class="text-grey"> No results </q-item-section>
+            <q-item-section class="text-grey"> {{ t("search.noResult") }}</q-item-section>
           </q-item>
         </template>
       </q-select>

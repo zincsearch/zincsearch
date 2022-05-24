@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <q-table
-      title="Users"
+      :title="t('user.header')"
       :rows="users"
       row-key="id"
       :pagination="pagination"
@@ -14,7 +14,7 @@
           filled
           borderless
           dense
-          placeholder="Search user"
+          :placeholder="t('user.search')"
         >
           <template #append>
             <q-icon name="search" class="cursor-pointer" />
@@ -24,7 +24,7 @@
           class="q-ml-sm"
           color="primary"
           icon="add"
-          label="Add User"
+          :label="t(`user.add`)"
           @click="addUser"
         />
       </template>
@@ -73,7 +73,7 @@ import { defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { useQuasar, date } from "quasar";
 import userService from "../services/user";
-
+import { useI18n } from "vue-i18n";
 import AddUpdateUser from "../components/user/AddUpdateUser.vue";
 
 export default defineComponent({
@@ -84,6 +84,7 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const $q = useQuasar();
+    const { t } = useI18n();
 
     const user = ref({});
     const users = ref([]);
@@ -144,6 +145,7 @@ export default defineComponent({
     };
 
     return {
+      t,
       user,
       showAddUserDialog,
       showUpdateUserDialog,
