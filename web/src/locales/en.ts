@@ -5,7 +5,7 @@ export default {
       searchField: "Search for a field",
       maxRecords: "Max records to return",
       searchResult: "Search Results",
-      timestamp: "@timestamp",
+      timestamp: "timestamp",
       source: "_source",
       noResult: "No Result",
     },
