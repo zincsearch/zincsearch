@@ -23,16 +23,37 @@ import (
 	"github.com/zinclabs/zinc/pkg/auth"
 )
 
+// @Summary Login
+// @Produce json
+// @Param login body LoginRequest true "Login Credentials"
+// @Success 200 {object} LoginSuccess
+// @Failure 400 {object} LoginError
+// @Router /login [post]
 func Login(c *gin.Context) {
-	var user auth.ZincUser
-	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// Read login input
+	var loginInput LoginRequest
+	if err := c.ShouldBindJSON(&loginInput); err != nil {
+		c.JSON(http.StatusBadRequest, LoginError{Error: err.Error()})
 		return
 	}
 
-	loggedInUser, validationResult := auth.VerifyCredentials(user.ID, user.Password)
-	c.JSON(http.StatusOK, gin.H{
-		"validated": validationResult,
-		"user":      loggedInUser,
+	loggedInUser, validationResult := auth.VerifyCredentials(loginInput.ID, loginInput.Password)
+	c.JSON(http.StatusOK, LoginSuccess{
+		Validated: validationResult,
+		User:      loggedInUser,
 	})
+}
+
+type LoginRequest struct {
+	ID       string `json:"_id"`
+	Password string `json:"password"`
+}
+
+type LoginError struct {
+	Error string `json:"error"`
+}
+
+type LoginSuccess struct {
+	Validated bool            `json:"validated"`
+	User      auth.SimpleUser `json:"user"`
 }

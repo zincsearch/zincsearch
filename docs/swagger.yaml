@@ -1,0 +1,68 @@
+basePath: /api
+definitions:
+  auth.LoginError:
+    properties:
+      error:
+        type: string
+    type: object
+  auth.LoginRequest:
+    properties:
+      _id:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.LoginSuccess:
+    properties:
+      user:
+        $ref: '#/definitions/auth.SimpleUser'
+      validated:
+        type: boolean
+    type: object
+  auth.SimpleUser:
+    properties:
+      '@timestamp':
+        type: string
+      _id:
+        description: this will be email
+        type: string
+      created_at:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+host: localhost:4080
+info:
+  contact: {}
+  description: Zinc Search engine API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Zinc Search engine API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      parameters:
+      - description: Login Credentials
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.LoginSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/auth.LoginError'
+      summary: Login
+swagger: "2.0"

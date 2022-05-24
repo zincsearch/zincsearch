@@ -32,6 +32,9 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/prometheus/client_golang v1.12.0 // indirect
 	github.com/segmentio/backo-go v1.0.0 // indirect
+	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
+	github.com/swaggo/gin-swagger v1.4.3
+	github.com/swaggo/swag v1.8.2
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
 	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
