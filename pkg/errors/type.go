@@ -13,27 +13,9 @@
 * limitations under the License.
  */
 
-package auth
+package errors
 
-import (
-	"net/http"
+import "errors"
 
-	"github.com/gin-gonic/gin"
-
-	"github.com/zinclabs/zinc/pkg/auth"
-	"github.com/zinclabs/zinc/pkg/meta"
-)
-
-func Login(c *gin.Context) {
-	var user meta.User
-	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	loggedInUser, validationResult := auth.VerifyCredentials(user.ID, user.Password)
-	c.JSON(http.StatusOK, gin.H{
-		"validated": validationResult,
-		"user":      loggedInUser,
-	})
-}
+var ErrKeyNotFound = errors.New("Key not found")
+var ErrEmptyKey = errors.New("Key cannot be empty")

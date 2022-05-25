@@ -15,20 +15,23 @@
 
 package metadata
 
-import "encoding/json"
+import (
+	"github.com/goccy/go-json"
+	"github.com/zinclabs/zinc/pkg/meta"
+)
 
 type user struct{}
 
 var User = new(user)
 
-func (t *user) List(offset, limit int) ([]*user, error) {
+func (t *user) List(offset, limit int) ([]*meta.User, error) {
 	data, err := db.List(t.key(""), offset, limit)
 	if err != nil {
 		return nil, err
 	}
-	users := make([]*user, 0, len(data))
+	users := make([]*meta.User, 0, len(data))
 	for _, d := range data {
-		u := new(user)
+		u := new(meta.User)
 		err = json.Unmarshal(d, u)
 		if err != nil {
 			return nil, err
@@ -38,18 +41,18 @@ func (t *user) List(offset, limit int) ([]*user, error) {
 	return users, nil
 }
 
-func (t *user) Get(id string) (*user, error) {
+func (t *user) Get(id string) (*meta.User, error) {
 	data, err := db.Get(t.key(id))
 	if err != nil {
 		return nil, err
 	}
-	u := new(user)
+	u := new(meta.User)
 	err = json.Unmarshal(data, u)
 	return u, err
 }
 
-func (t *user) Set(id string, user *user) error {
-	data, err := json.Marshal(user)
+func (t *user) Set(id string, val *meta.User) error {
+	data, err := json.Marshal(val)
 	if err != nil {
 		return err
 	}

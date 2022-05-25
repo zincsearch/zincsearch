@@ -24,6 +24,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/metadata/storage"
 )
 
@@ -47,7 +48,7 @@ func openBadgerDB(dbpath string, readOnly bool) (*badger.DB, error) {
 	opt.ZSTDCompressionLevel = 3
 	opt.BlockSize = 1024 * 128
 	opt.MetricsEnabled = false
-	// opt.Logger = nil
+	opt.Logger = nil
 	opt.ReadOnly = readOnly
 	return badger.Open(opt)
 }
@@ -83,16 +84,25 @@ func (t *badgerStorage) Get(key string) ([]byte, error) {
 		data, err = item.ValueCopy(nil)
 		return err
 	})
+	if err == badger.ErrKeyNotFound {
+		return nil, errors.ErrKeyNotFound
+	}
 	return data, err
 }
 
 func (t *badgerStorage) Set(key string, value []byte) error {
+	if key == "" {
+		return errors.ErrEmptyKey
+	}
 	return t.db.Update(func(txn *badger.Txn) error {
 		return txn.Set([]byte(key), value)
 	})
 }
 
 func (t *badgerStorage) Delete(key string) error {
+	if key == "" {
+		return errors.ErrEmptyKey
+	}
 	return t.db.Update(func(txn *badger.Txn) error {
 		return txn.Delete([]byte(key))
 	})

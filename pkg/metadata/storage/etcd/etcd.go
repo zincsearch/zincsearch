@@ -17,12 +17,12 @@ package etcd
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/rs/zerolog/log"
 	client "go.etcd.io/etcd/client/v3"
 
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/metadata/storage"
 )
 
@@ -69,12 +69,15 @@ func (t *etcdStorage) Get(key string) ([]byte, error) {
 		return nil, err
 	}
 	if len(resp.Kvs) == 0 {
-		return nil, errors.New("key not found")
+		return nil, errors.ErrKeyNotFound
 	}
 	return resp.Kvs[0].Value, nil
 }
 
 func (t *etcdStorage) Set(key string, value []byte) error {
+	if key == "" {
+		return errors.ErrEmptyKey
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	_, err := t.cli.Put(ctx, t.prefix+key, string(value))
@@ -82,6 +85,9 @@ func (t *etcdStorage) Set(key string, value []byte) error {
 }
 
 func (t *etcdStorage) Delete(key string) error {
+	if key == "" {
+		return errors.ErrEmptyKey
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	_, err := t.cli.Delete(ctx, t.prefix+key)

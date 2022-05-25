@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func TestCreateUser(t *testing.T) {
@@ -31,7 +32,7 @@ func TestCreateUser(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *ZincUser
+		want    *meta.User
 		wantErr bool
 	}{
 		{
@@ -42,7 +43,7 @@ func TestCreateUser(t *testing.T) {
 				plaintextPassword: "testpassword",
 				role:              "admin",
 			},
-			want: &ZincUser{
+			want: &meta.User{
 				ID:   "testuser",
 				Name: "Test User",
 				Role: "admin",
@@ -57,7 +58,7 @@ func TestCreateUser(t *testing.T) {
 				plaintextPassword: "testpassword",
 				role:              "admin",
 			},
-			want: &ZincUser{
+			want: &meta.User{
 				ID:   "testuser",
 				Name: "Test User Updated",
 				Role: "admin",
@@ -69,7 +70,7 @@ func TestCreateUser(t *testing.T) {
 			args: args{
 				userID: "",
 			},
-			want: &ZincUser{
+			want: &meta.User{
 				ID: "",
 			},
 			wantErr: true,

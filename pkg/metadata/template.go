@@ -14,3 +14,52 @@
  */
 
 package metadata
+
+import "github.com/goccy/go-json"
+
+type template struct{}
+
+var Template = new(template)
+
+func (t *template) List(offset, limit int) ([]*template, error) {
+	data, err := db.List(t.key(""), offset, limit)
+	if err != nil {
+		return nil, err
+	}
+	templates := make([]*template, 0, len(data))
+	for _, d := range data {
+		tpl := new(template)
+		err = json.Unmarshal(d, tpl)
+		if err != nil {
+			return nil, err
+		}
+		templates = append(templates, tpl)
+	}
+	return templates, nil
+}
+
+func (t *template) Get(id string) (*template, error) {
+	data, err := db.Get(t.key(id))
+	if err != nil {
+		return nil, err
+	}
+	tpl := new(template)
+	err = json.Unmarshal(data, tpl)
+	return tpl, err
+}
+
+func (t *template) Set(id string, val *template) error {
+	data, err := json.Marshal(val)
+	if err != nil {
+		return err
+	}
+	return db.Set(t.key(id), data)
+}
+
+func (t *template) Delete(id string) error {
+	return db.Delete(t.key(id))
+}
+
+func (t *template) key(id string) string {
+	return "/template/" + id
+}

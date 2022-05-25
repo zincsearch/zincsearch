@@ -18,56 +18,47 @@ package auth
 import (
 	"time"
 
-	"github.com/blugelabs/bluge"
-	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/argon2"
 
-	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/ider"
+	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-func CreateUser(userID, name, plaintextPassword, role string) (*ZincUser, error) {
-	var newUser *ZincUser
+func CreateUser(userID, name, plaintextPassword, role string) (*meta.User, error) {
+	var newUser *meta.User
 	existingUser, userExists, err := GetUser(userID)
 	if err != nil {
-		return nil, err
+		if err != errors.ErrKeyNotFound {
+			return nil, err
+		}
 	}
 
 	if userExists {
-		newUser = &existingUser
+		newUser = existingUser
 		if plaintextPassword != "" {
 			newUser.Salt = GenerateSalt()
 			newUser.Password = GeneratePassword(plaintextPassword, newUser.Salt)
 		}
 		newUser.Name = name
 		newUser.Role = role
-		newUser.Timestamp = time.Now()
+		newUser.UpdatedAt = time.Now()
 	} else {
-		newUser = &ZincUser{
+		newUser = &meta.User{
 			ID:        userID,
 			Name:      name,
 			Role:      role,
 			CreatedAt: time.Now(),
-			Timestamp: time.Now(),
+			UpdatedAt: time.Now(),
 		}
 
 		newUser.Salt = GenerateSalt()
 		newUser.Password = GeneratePassword(plaintextPassword, newUser.Salt)
 	}
 
-	bdoc := bluge.NewDocument(newUser.ID)
-	bdoc.AddField(bluge.NewTextField("name", newUser.Name).StoreValue())
-	bdoc.AddField(bluge.NewStoredOnlyField("password", []byte(newUser.Password)).StoreValue())
-	bdoc.AddField(bluge.NewStoredOnlyField("salt", []byte(newUser.Salt)).StoreValue())
-	bdoc.AddField(bluge.NewStoredOnlyField("role", []byte(newUser.Role)).StoreValue().Aggregatable())
-	bdoc.AddField(bluge.NewDateTimeField("created_at", newUser.CreatedAt).StoreValue().Aggregatable())
-	bdoc.AddField(bluge.NewDateTimeField("@timestamp", newUser.Timestamp).StoreValue().Aggregatable())
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
-
-	usersIndexWriter := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer
-	err = usersIndexWriter.Update(bdoc.ID(), bdoc)
+	err = metadata.User.Set(newUser.ID, newUser)
 	if err != nil {
-		log.Printf("error updating document: %s", err.Error())
 		return nil, err
 	}
 
@@ -101,16 +92,6 @@ func GeneratePassword(password, salt string) string {
 
 func GenerateSalt() string {
 	return ider.Generate()
-}
-
-type ZincUser struct {
-	ID        string    `json:"_id"`
-	Name      string    `json:"name"`
-	Role      string    `json:"role"`
-	Salt      string    `json:"salt"`
-	Password  string    `json:"password"`
-	CreatedAt time.Time `json:"created_at"`
-	Timestamp time.Time `json:"@timestamp"`
 }
 
 type Argon2Params struct {

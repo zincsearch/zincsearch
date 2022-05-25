@@ -16,79 +16,43 @@
 package auth
 
 import (
-	"context"
 	"time"
 
-	"github.com/blugelabs/bluge"
-
-	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
 func GetAllUsersWorker() (*meta.SearchResponse, error) {
-	usersIndex := core.ZINC_SYSTEM_INDEX_LIST["_users"]
-
-	query := bluge.NewMatchAllQuery()
-	searchRequest := bluge.NewTopNSearch(1000, query).WithStandardAggregations()
-	reader, err := usersIndex.Writer.Reader()
-	if err != nil {
-		return nil, err
-	}
-	defer reader.Close()
-	dmi, err := reader.Search(context.Background(), searchRequest)
+	users, err := metadata.User.List(0, 0)
 	if err != nil {
 		return nil, err
 	}
 
 	var Hits []meta.Hit
-	next, err := dmi.Next()
-	for err == nil && next != nil {
-		var user SimpleUser
-		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			switch field {
-			case "_id":
-				user.ID = string(value)
-			case "name":
-				user.Name = string(value)
-			case "role":
-				user.Role = string(value)
-			case "salt":
-				user.Salt = string(value)
-			case "password":
-				user.Password = string(value)
-			case "created_at":
-				user.CreatedAt, _ = bluge.DecodeDateTime(value)
-			case "@timestamp":
-				user.Timestamp, _ = bluge.DecodeDateTime(value)
-			default:
-			}
-
-			return true
-		})
-		if err != nil {
-			return nil, err
-		}
-
+	for _, u := range users {
 		hit := meta.Hit{
-			Index:     usersIndex.Name,
-			Type:      usersIndex.Name,
-			ID:        user.ID,
-			Score:     next.Score,
-			Timestamp: user.Timestamp,
-			Source:    user,
+			Index:     u.Name,
+			Type:      u.Name,
+			ID:        u.ID,
+			Timestamp: u.UpdatedAt,
+			Source: SimpleUser{
+				ID:        u.ID,
+				Name:      u.Name,
+				Role:      u.Role,
+				CreatedAt: u.CreatedAt,
+				Timestamp: u.UpdatedAt,
+			},
 		}
 		Hits = append(Hits, hit)
-
-		next, err = dmi.Next()
 	}
 
 	resp := &meta.SearchResponse{
-		Took: int(dmi.Aggregations().Duration().Milliseconds()),
+		Took: 0,
 		Hits: meta.Hits{
 			Total: meta.Total{
-				Value: int(dmi.Aggregations().Count()),
+				Value: len(users),
 			},
-			MaxScore: dmi.Aggregations().Metric("max_score"),
+			MaxScore: 0,
 			Hits:     Hits,
 		},
 	}

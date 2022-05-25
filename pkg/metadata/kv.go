@@ -14,3 +14,27 @@
  */
 
 package metadata
+
+type kv struct{}
+
+var KV = new(kv)
+
+func (t *kv) List(offset, limit int) ([][]byte, error) {
+	return db.List(t.key(""), offset, limit)
+}
+
+func (t *kv) Get(key string) ([]byte, error) {
+	return db.Get(t.key(key))
+}
+
+func (t *kv) Set(key string, val []byte) error {
+	return db.Set(t.key(key), val)
+}
+
+func (t *kv) Delete(key string) error {
+	return db.Delete(t.key(key))
+}
+
+func (t *kv) key(key string) string {
+	return "/kv/" + key
+}

@@ -16,6 +16,7 @@
 package metadata
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/zinclabs/zinc/pkg/config"
@@ -23,6 +24,8 @@ import (
 	"github.com/zinclabs/zinc/pkg/metadata/storage/badger"
 	"github.com/zinclabs/zinc/pkg/metadata/storage/etcd"
 )
+
+var ErrorKeyNotExists = errors.New("key not exists")
 
 var db storage.Storager
 

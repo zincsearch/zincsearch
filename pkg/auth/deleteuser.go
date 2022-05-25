@@ -16,19 +16,15 @@
 package auth
 
 import (
-	"github.com/blugelabs/bluge"
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
 func DeleteUser(userID string) bool {
-	bdoc := bluge.NewDocument(userID)
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
-	usersIndexWriter := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer
-	err := usersIndexWriter.Delete(bdoc.ID())
+	err := metadata.User.Delete(userID)
 	if err != nil {
-		log.Printf("error deleting user: %s", err.Error())
+		log.Error().Err(err).Msg("error deleting user")
 		return false
 	}
 
