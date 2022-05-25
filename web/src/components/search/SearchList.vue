@@ -69,7 +69,7 @@
             <div class="max-result">
               <q-input
                 v-model="maxRecordToReturn"
-                label="max records to return"
+                :label="t('search.maxRecords')"
                 dense
                 filled
                 square

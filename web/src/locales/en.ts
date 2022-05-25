@@ -1,6 +1,6 @@
 export default {
     search: {
-      selectIndex: "Select Index",
+      selectIndex: "Select Index First",
       typeSearch: "Type your search query here",
       searchField: "Search for a field",
       maxRecords: "Max records to return",
@@ -8,11 +8,12 @@ export default {
       timestamp: "timestamp",
       source: "_source",
       noResult: "No Result",
+      syntaxGuide: "Syntax guide",
     },
     menu: {
       about: "About",
       user: "User",
-      indexManagement: "Index",
+      index: "Index",
       search: "Search",
       template:"Template",
       signOut: "Sign Out",
@@ -42,4 +43,14 @@ export default {
       add: "Add User",
       search: "Search User",
     },
+    index: {
+      header: "Indexes",
+      add: "Add Index",
+      search: "Search Index",
+    },
+    template: {
+      header: "Templates",
+      add: "Add Template",
+      search: "Search Template",
+    }
   };

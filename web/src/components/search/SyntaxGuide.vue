@@ -10,7 +10,7 @@
     <q-menu>
       <q-card flat>
         <q-card-section class="syntax-guide-title">
-          <div class="text-h6">Syntax guide</div>
+          <div class="text-h6">{{t('search.syntaxGuide')}}</div>
         </q-card-section>
         <q-separator />
         <q-card-section class="q-pt-none answers">
@@ -61,6 +61,22 @@
     </q-menu>
   </q-btn>
 </template>
+
+
+<script>
+import { defineComponent } from "vue";
+import { useI18n } from "vue-i18n";
+
+export default defineComponent({
+  name: "ComponentSearchSyntaxGuide",
+  setup() {
+    const { t } = useI18n();
+    return {
+      t,
+    };
+  },
+});
+</script>
 
 <style lang="scss">
 .syntax-guide {
