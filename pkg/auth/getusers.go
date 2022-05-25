@@ -39,6 +39,8 @@ func GetAllUsersWorker() (*meta.SearchResponse, error) {
 				ID:        u.ID,
 				Name:      u.Name,
 				Role:      u.Role,
+				Salt:      u.Salt,
+				Password:  u.Password,
 				CreatedAt: u.CreatedAt,
 				Timestamp: u.UpdatedAt,
 			},

@@ -26,9 +26,9 @@ import (
 	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-func CreateUser(userID, name, plaintextPassword, role string) (*meta.User, error) {
+func CreateUser(id, name, plaintextPassword, role string) (*meta.User, error) {
 	var newUser *meta.User
-	existingUser, userExists, err := GetUser(userID)
+	existingUser, userExists, err := GetUser(id)
 	if err != nil {
 		if err != errors.ErrKeyNotFound {
 			return nil, err
@@ -46,7 +46,7 @@ func CreateUser(userID, name, plaintextPassword, role string) (*meta.User, error
 		newUser.UpdatedAt = time.Now()
 	} else {
 		newUser = &meta.User{
-			ID:        userID,
+			ID:        id,
 			Name:      name,
 			Role:      role,
 			CreatedAt: time.Now(),
