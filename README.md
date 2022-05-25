@@ -94,6 +94,7 @@ Check the [contributing guide](./CONTRIBUTING.md)
 # Who uses Zinc (Known users)?
 
 1. [Quadrantsec](https://quadrantsec.com/)
+2. [Accodeing to you](https://accodeing.com/)
 
 Please do raise a PR adding your details if you are using Zinc.
 
