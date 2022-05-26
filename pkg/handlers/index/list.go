@@ -26,30 +26,19 @@ import (
 )
 
 func List(c *gin.Context) {
-	items := make(meta.SortIndex, 0, core.ZINC_INDEX_LIST.Len())
-	for _, idx := range core.ZINC_INDEX_LIST.List() {
-		item := new(meta.Index)
-		item.Name = idx.Name
-		item.StorageType = idx.StorageType
-		item.StorageSize = int64(idx.StorageSize)
-		item.DocsCount = idx.DocsCount
-		if idx.Settings != nil {
-			item.Settings = idx.Settings
-		} else {
-			item.Settings = new(meta.IndexSettings)
+	items := core.ZINC_INDEX_LIST.List()
+	for _, index := range items {
+		if index.Settings == nil {
+			index.Settings = new(meta.IndexSettings)
 		}
-		if idx.Mappings != nil {
-			// format mappings
-			mappings := idx.Mappings
-			if mappings == nil {
-				mappings = meta.NewMappings()
-			}
-			item.Mappings = mappings
+		if index.Mappings == nil {
+			index.Mappings = meta.NewMappings()
 		}
-		items = append(items, item)
 	}
 
-	sort.Sort(items)
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Name < items[j].Name
+	})
 
 	c.JSON(http.StatusOK, items)
 }

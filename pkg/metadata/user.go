@@ -52,7 +52,7 @@ func (t *user) Get(id string) (*meta.User, error) {
 	return u, err
 }
 
-func (t *user) Set(id string, val *meta.User) error {
+func (t *user) Set(id string, val meta.User) error {
 	data, err := json.Marshal(val)
 	if err != nil {
 		return err

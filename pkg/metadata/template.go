@@ -52,7 +52,7 @@ func (t *template) Get(id string) (*meta.Template, error) {
 	return tpl, err
 }
 
-func (t *template) Set(id string, val *meta.Template) error {
+func (t *template) Set(id string, val meta.Template) error {
 	data, err := json.Marshal(val)
 	if err != nil {
 		return err

@@ -16,58 +16,10 @@
 package auth
 
 import (
-	"time"
-
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-func GetAllUsersWorker() (*meta.SearchResponse, error) {
-	users, err := metadata.User.List(0, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	var Hits []meta.Hit
-	for _, u := range users {
-		hit := meta.Hit{
-			Index:     u.Name,
-			Type:      u.Name,
-			ID:        u.ID,
-			Timestamp: u.UpdatedAt,
-			Source: SimpleUser{
-				ID:        u.ID,
-				Name:      u.Name,
-				Role:      u.Role,
-				Salt:      u.Salt,
-				Password:  u.Password,
-				CreatedAt: u.CreatedAt,
-				Timestamp: u.UpdatedAt,
-			},
-		}
-		Hits = append(Hits, hit)
-	}
-
-	resp := &meta.SearchResponse{
-		Took: 0,
-		Hits: meta.Hits{
-			Total: meta.Total{
-				Value: len(users),
-			},
-			MaxScore: 0,
-			Hits:     Hits,
-		},
-	}
-
-	return resp, nil
-}
-
-type SimpleUser struct {
-	ID        string    `json:"_id"` // this will be email
-	Name      string    `json:"name"`
-	Role      string    `json:"role"`
-	Salt      string    `json:"-"`
-	Password  string    `json:"-"`
-	CreatedAt time.Time `json:"created_at"`
-	Timestamp time.Time `json:"@timestamp"`
+func GetUsers() ([]*meta.User, error) {
+	return metadata.User.List(0, 0)
 }

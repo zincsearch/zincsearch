@@ -112,7 +112,7 @@ func StoreIndex(index *Index) error {
 	}
 
 	index.UpdateAt = time.Now()
-	err := metadata.Index.Set(index.Name, &index.Index)
+	err := metadata.Index.Set(index.Name, index.Index)
 	if err != nil {
 		return fmt.Errorf("core.StoreIndex: index: %s, error: %s", index.Name, err.Error())
 	}

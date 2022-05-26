@@ -19,8 +19,6 @@ import "time"
 
 type Index struct {
 	Name        string         `json:"name"`
-	DocsCount   int64          `json:"docs_count"`
-	StorageSize int64          `json:"storage_size"`
 	StorageType string         `json:"storage_type"`
 	Settings    *IndexSettings `json:"settings,omitempty"`
 	Mappings    *Mappings      `json:"mappings,omitempty"`

@@ -52,7 +52,7 @@ func (t *index) Get(id string) (*meta.Index, error) {
 	return idx, err
 }
 
-func (t *index) Set(id string, val *meta.Index) error {
+func (t *index) Set(id string, val meta.Index) error {
 	data, err := json.Marshal(val)
 	if err != nil {
 		return err

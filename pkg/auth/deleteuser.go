@@ -16,20 +16,9 @@
 package auth
 
 import (
-	"github.com/rs/zerolog/log"
-
 	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-func DeleteUser(id string) bool {
-	err := metadata.User.Delete(id)
-	if err != nil {
-		log.Error().Err(err).Msg("error deleting user")
-		return false
-	}
-
-	// delete cache
-	delete(ZINC_CACHED_USERS, id)
-
-	return true
+func DeleteUser(id string) error {
+	return metadata.User.Delete(id)
 }

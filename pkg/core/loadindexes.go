@@ -35,8 +35,6 @@ func LoadZincIndexesFromMetadata() error {
 		// cache mappings
 		index := new(Index)
 		index.Name = indexes[i].Name
-		index.DocsCount = indexes[i].DocsCount
-		index.StorageSize = indexes[i].StorageSize
 		index.StorageType = indexes[i].StorageType
 		index.Settings = indexes[i].Settings
 		index.Mappings = indexes[i].Mappings

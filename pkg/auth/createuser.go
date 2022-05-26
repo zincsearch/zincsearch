@@ -58,19 +58,13 @@ func CreateUser(id, name, plaintextPassword, role string) (*meta.User, error) {
 		newUser.Password = GeneratePassword(plaintextPassword, newUser.Salt)
 	}
 
-	err = metadata.User.Set(newUser.ID, newUser)
+	err = metadata.User.Set(newUser.ID, *newUser)
 	if err != nil {
 		return nil, err
 	}
 
 	// cache user
-	ZINC_CACHED_USERS[newUser.ID] = SimpleUser{
-		ID:       newUser.ID,
-		Name:     newUser.Name,
-		Role:     newUser.Role,
-		Salt:     newUser.Salt,
-		Password: newUser.Password,
-	}
+	ZINC_CACHED_USERS.Set(newUser.ID, newUser)
 
 	return newUser, nil
 }

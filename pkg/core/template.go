@@ -78,7 +78,7 @@ func NewTemplate(name string, template *meta.Template) error {
 
 	template.CreatedAt = time.Now()
 	template.UpdatedAt = time.Now()
-	err := metadata.Template.Set(name, template)
+	err := metadata.Template.Set(name, *template)
 	if err != nil {
 		return fmt.Errorf("template: error updating document: %s", err.Error())
 	}

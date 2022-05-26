@@ -32,8 +32,16 @@ func Login(c *gin.Context) {
 	}
 
 	loggedInUser, validationResult := auth.VerifyCredentials(user.ID, user.Password)
+	resUser := gin.H{}
+	if validationResult {
+		resUser = gin.H{
+			"_id":  loggedInUser.ID,
+			"name": loggedInUser.Name,
+			"role": loggedInUser.Role,
+		}
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"validated": validationResult,
-		"user":      loggedInUser,
+		"user":      resUser,
 	})
 }

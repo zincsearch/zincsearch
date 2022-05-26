@@ -38,6 +38,8 @@ import (
 
 type Index struct {
 	meta.Index
+	DocsCount           int64                         `json:"docs_count"`
+	StorageSize         int64                         `json:"storage_size"`
 	StorageSizeNextTime time.Time                     `json:"-"`
 	CachedAnalyzers     map[string]*analysis.Analyzer `json:"-"`
 	Writer              *bluge.Writer                 `json:"-"`
