@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <q-table
-      title="Indexes"
+      :title="t('index.header')"
       :rows="indexes"
       :columns="resultColumns"
       row-key="id"
@@ -15,7 +15,7 @@
           filled
           borderless
           dense
-          placeholder="Search index"
+          :placeholder="t('index.search')"
         >
           <template #append>
             <q-icon name="search" class="cursor-pointer" />
@@ -25,7 +25,7 @@
           class="q-ml-sm"
           color="primary"
           icon="add"
-          label="Add index"
+          :label="t('index.add')"
           @click="addIndex"
         />
       </template>
@@ -94,8 +94,9 @@
 import { defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
-import indexService from "../services/index";
+import { useI18n } from "vue-i18n";
 
+import indexService from "../services/index";
 import AddUpdateIndex from "../components/index/AddUpdateIndex.vue";
 import PreviewIndex from "../components/index/PreviewIndex.vue";
 
@@ -108,6 +109,7 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const $q = useQuasar();
+    const { t } = useI18n();
 
     const indexes = ref([]);
     const getIndexes = () => {
@@ -216,6 +218,7 @@ export default defineComponent({
     };
 
     return {
+      t,
       showAddIndexDialog,
       showPreviewIndexDialog,
       resultColumns,

@@ -13,7 +13,7 @@
 
         <q-toolbar-title>{{ t("menu.zincSearch") }}</q-toolbar-title>
 
-        <div>
+        <div class="q-mr-xs">
           <q-btn-dropdown outline rounded no-caps icon-right="manage_accounts">
             <template #label>
               <div class="row items-center no-wrap">{{ user.name }}</div>
@@ -37,6 +37,25 @@
             </q-list>
           </q-btn-dropdown>
         </div>
+
+        <div>
+          <q-btn-dropdown outline rounded no-caps icon-right="language">
+            <q-list>
+              <q-item v-ripple v-close-popup clickable @click="changeLanguage('en')">
+                <q-item-section>
+                  <q-item-label>English</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item v-ripple v-close-popup clickable @click="changeLanguage('zh-cn')">
+                <q-item-section>
+                  <q-item-label>简体中文</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+
+
       </q-toolbar>
     </q-header>
 
@@ -78,6 +97,7 @@
 <script lang="ts">
 import MenuLink from "../components/MenuLink.vue";
 import { useI18n } from "vue-i18n";
+import { setLanguage } from "../utils/cookies";
 
 
 import { ref } from "vue";
@@ -94,7 +114,6 @@ export default {
   setup() {
     const store = useStore();
     const router = useRouter();
-
     const { t } = useI18n();
 
     const linksList = [
@@ -104,7 +123,7 @@ export default {
         link: "/search",
       },
       {
-        title: t("menu.indexManagement"),
+        title: t("menu.index"),
         icon: "list",
         link: "/index",
       },
@@ -124,6 +143,10 @@ export default {
         link: "/about",
       },
     ];
+    const changeLanguage = (language: string) => {
+      setLanguage(language);
+      router.go(0);
+    };
     const signout = () => {
       store.dispatch("logout");
       localStorage.setItem("creds", "");
@@ -135,6 +158,7 @@ export default {
       essentialLinks: linksList,
       leftDrawerOpen: ref(false),
       user: store.state.user,
+      changeLanguage,
       signout,
     };
   },

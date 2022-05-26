@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <q-table
-      title="Templates"
+      :title="t('template.header')"
       :rows="templates"
       row-key="id"
       :pagination="pagination"
@@ -14,7 +14,7 @@
           filled
           borderless
           dense
-          placeholder="Search template"
+          :placeholder="t('template.search')"
         >
           <template #append>
             <q-icon name="search" class="cursor-pointer" />
@@ -24,7 +24,7 @@
           class="q-ml-sm"
           color="primary"
           icon="add"
-          label="Add template"
+          :label="t('template.add')"
           @click="addTemplate"
         />
       </template>
@@ -121,8 +121,9 @@
 import { defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { useQuasar, date } from "quasar";
-import templateService from "../services/template";
+import { useI18n } from "vue-i18n";
 
+import templateService from "../services/template";
 import AddUpdateTemplate from "../components/template/AddUpdateTemplate.vue";
 import PreviewTemplate from "../components/template/PreviewTemplate.vue";
 
@@ -135,6 +136,7 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const $q = useQuasar();
+    const { t } = useI18n();
 
     const templates = ref([]);
     const getTemplates = () => {
@@ -190,6 +192,7 @@ export default defineComponent({
     };
 
     return {
+      t,
       showAddTemplateDialog,
       showUpdateTemplateDialog,
       showPreviewTemplateDialog,
