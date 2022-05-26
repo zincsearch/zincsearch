@@ -23,100 +23,100 @@ import (
 	"time"
 
 	"github.com/goccy/go-json"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func TestSearch(t *testing.T) {
 
-	Convey("init data for search", t, func() {
+	t.Run("init data for search", func(t *testing.T) {
 		body := bytes.NewBuffer(nil)
 		body.WriteString(indexData)
 		resp := request("PUT", "/api/"+indexName+"/_doc", body)
-		So(resp.Code, ShouldEqual, http.StatusOK)
+		assert.Equal(t, http.StatusOK, resp.Code)
 	})
 
-	Convey("POST /api/:target/_search", t, func() {
-		Convey("search document with not exist indexName", func() {
+	t.Run("POST /api/:target/_search", func(t *testing.T) {
+		t.Run("search document with not exist indexName", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{}`)
 			resp := request("POST", "/api/notExistSearch/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusBadRequest)
+			assert.Equal(t, http.StatusBadRequest, resp.Code)
 		})
-		Convey("search document with exist indexName", func() {
+		t.Run("search document with exist indexName", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"match_all":{}}}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 		})
-		Convey("search document with not exist term", func() {
+		t.Run("search document with not exist term", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"match": {"_all": "xxxx"}}}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldEqual, 0)
+			assert.NoError(t, err)
+			assert.Equal(t, 0, data.Hits.Total.Value)
 		})
-		Convey("search document with exist term", func() {
+		t.Run("search document with exist term", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"match": {"_all": "DEMTSCHENKO"}}}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
 		})
-		Convey("search document type: match_all", func() {
+		t.Run("search document type: match_all", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"match_all": {}}}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
 		})
-		Convey("search document type: wildcard", func() {
+		t.Run("search document type: wildcard", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"wildcard": {"_all": "dem*"}}}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
 		})
-		Convey("search document type: fuzzy", func() {
+		t.Run("search document type: fuzzy", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"fuzzy": {"Athlete": "demtschenk"}}}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
 		})
-		Convey("search document type: term", func() {
+		t.Run("search document type: term", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"term": {"City": "turin"}}}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
 		})
-		Convey("search document type: daterange", func() {
+		t.Run("search document type: daterange", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(
 				fmt.Sprintf(`{"query": {"range": {"@timestamp": { "gte": "%s", "lt": "%s"}}}}`,
@@ -124,61 +124,61 @@ func TestSearch(t *testing.T) {
 					time.Now().UTC().Format("2006-01-02T15:04:05Z"),
 				))
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
 		})
-		Convey("search document type: match", func() {
+		t.Run("search document type: match", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"match": {"_all": "DEMTSCHENKO"}}}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
 		})
-		Convey("search document type: matchphrase", func() {
+		t.Run("search document type: matchphrase", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"match_phrase": {"_all": "DEMTSCHENKO"}}}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
 		})
-		Convey("search document type: prefix", func() {
+		t.Run("search document type: prefix", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"prefix": {"_all": "dem"}}}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
 		})
-		Convey("search document type: querystring", func() {
+		t.Run("search document type: querystring", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"query_string": {"query": "DEMTSCHENKO"}}}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
 		})
 	})
 
-	Convey("POST /api/:target/_search with aggregations", t, func() {
-		Convey("terms aggregation", func() {
+	t.Run("POST /api/:target/_search with aggregations", func(t *testing.T) {
+		t.Run("terms aggregation", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{
 				"query": {"match_all":{}}, 
@@ -189,15 +189,15 @@ func TestSearch(t *testing.T) {
 				}
 			}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(len(data.Aggregations), ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, len(data.Aggregations), 1)
 		})
 
-		Convey("metric aggregation", func() {
+		t.Run("metric aggregation", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{
 				"query": {"match_all":{}}, 
@@ -214,17 +214,12 @@ func TestSearch(t *testing.T) {
 				}
 			}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
-			So(err, ShouldBeNil)
-			So(len(data.Aggregations), ShouldBeGreaterThanOrEqualTo, 1)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, len(data.Aggregations), 1)
 		})
 	})
-
-	// Convey("cleanup", t, func() {
-	// 	resp := request("DELETE", "/api/index/"+indexName, nil)
-	// 	So(resp.Code, ShouldEqual, http.StatusOK)
-	// })
 }

@@ -1,0 +1,56 @@
+export default {
+    search: {
+      selectIndex: "Select Index First",
+      typeSearch: "Type your search query here",
+      searchField: "Search for a field",
+      maxRecords: "Max records to return",
+      searchResult: "Search Results",
+      timestamp: "timestamp",
+      source: "_source",
+      noResult: "No Result",
+      syntaxGuide: "Syntax guide",
+    },
+    menu: {
+      about: "About",
+      user: "User",
+      index: "Index",
+      search: "Search",
+      template:"Template",
+      signOut: "Sign Out",
+      account: "Account",
+      feedback: "Feedback",
+      zincSearch: "Zinc Search",
+    },
+    about: {
+      name: "Zinc",
+      introduction: "A modern search engine.",
+    },
+    login: {
+      userid: "User ID",
+      signIn: "Sign In",
+      password: "Password",
+    },
+    user: {
+      header: "Users",
+      id: "User ID",
+      name: "User name",
+      role: "Role",
+      CREATED: "CREATED",
+      UPDATED: "UPDATED",
+      password: "Password",
+      repassword: "Reconfirm Password",
+      addOrUpdate: "Add/Update User",
+      add: "Add User",
+      search: "Search User",
+    },
+    index: {
+      header: "Indexes",
+      add: "Add Index",
+      search: "Search Index",
+    },
+    template: {
+      header: "Templates",
+      add: "Add Template",
+      search: "Search Template",
+    }
+  };

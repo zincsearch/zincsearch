@@ -21,48 +21,48 @@ import (
 	"testing"
 
 	"github.com/goccy/go-json"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestApiBase(t *testing.T) {
-	Convey("test base api", t, func() {
+	t.Run("test base api", func(t *testing.T) {
 		r := server()
-		Convey("/", func() {
+		t.Run("/", func(t *testing.T) {
 			req, _ := http.NewRequest("GET", "/", nil)
 			resp := httptest.NewRecorder()
 			r.ServeHTTP(resp, req)
-			So(resp.Code, ShouldEqual, http.StatusFound)
+			assert.Equal(t, http.StatusFound, resp.Code)
 		})
-		Convey("/version", func() {
+		t.Run("/version", func(t *testing.T) {
 			req, _ := http.NewRequest("GET", "/version", nil)
 			resp := httptest.NewRecorder()
 			r.ServeHTTP(resp, req)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := make(map[string]interface{})
 			err := json.Unmarshal(resp.Body.Bytes(), &data)
-			So(err, ShouldBeNil)
+			assert.NoError(t, err)
 			_, ok := data["Version"]
-			So(ok, ShouldBeTrue)
+			assert.True(t, ok)
 		})
-		Convey("/healthz", func() {
+		t.Run("/healthz", func(t *testing.T) {
 			req, _ := http.NewRequest("GET", "/healthz", nil)
 			resp := httptest.NewRecorder()
 			r.ServeHTTP(resp, req)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 
 			data := make(map[string]interface{})
 			err := json.Unmarshal(resp.Body.Bytes(), &data)
-			So(err, ShouldBeNil)
+			assert.NoError(t, err)
 			status, ok := data["status"]
-			So(ok, ShouldBeTrue)
-			So(status, ShouldEqual, "ok")
+			assert.True(t, ok)
+			assert.Equal(t, "ok", status)
 		})
-		Convey("/ui", func() {
+		t.Run("/ui", func(t *testing.T) {
 			req, _ := http.NewRequest("GET", "/ui/", nil)
 			resp := httptest.NewRecorder()
 			r.ServeHTTP(resp, req)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 		})
 	})
 }

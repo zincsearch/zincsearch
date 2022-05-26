@@ -14,7 +14,7 @@
                 </template>
               </q-input>
 
-              <q-input v-model="password" type="password" label="Password">
+              <q-input v-model="password" type="password" :label="t('login.password')">
                 <template #prepend>
                   <q-icon name="lock" />
                 </template>
@@ -27,7 +27,7 @@
                   class="full-width"
                   color="primary"
                   type="submit"
-                  label="Sign In"
+                  :label="t('login.signIn')"
                   :loading="submitting"
                 />
               </q-card-actions>
@@ -46,6 +46,7 @@ import { useQuasar } from "quasar";
 import { Buffer } from "buffer";
 import { useRouter } from "vue-router";
 import authapi from "../services/auth";
+import { useI18n } from "vue-i18n";
 
 export default defineComponent({
   name: "PageLogin",
@@ -54,7 +55,7 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
     const $q = useQuasar();
-
+    const { t } = useI18n();
     const id = ref("");
     const password = ref("");
     const submitting = ref(false);
@@ -104,6 +105,7 @@ export default defineComponent({
     };
 
     return {
+      t,
       id,
       password,
       submitting,

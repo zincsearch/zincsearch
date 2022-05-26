@@ -8,7 +8,7 @@
         dense
         use-input
         input-debounce="0"
-        label="Select Index First"
+        :label="t('search.selectIndex')"
         behavior="menu"
         class="q-mt-md q-mb-sm"
         @filter="filterFn"
@@ -16,7 +16,7 @@
       >
         <template #no-option>
           <q-item>
-            <q-item-section class="text-grey"> No results </q-item-section>
+            <q-item-section class="text-grey"> {{ t("search.noResult") }}</q-item-section>
           </q-item>
         </template>
       </q-select>
@@ -45,7 +45,7 @@
             dense
             clearable
             debounce="1"
-            placeholder="Search for a field"
+            :placeholder="t('search.searchField')"
           >
             <template #append>
               <q-icon name="search" />
@@ -59,6 +59,7 @@
 
 <script>
 import { defineComponent, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import indexService from "../../services/index";
 
 export default defineComponent({
@@ -71,6 +72,7 @@ export default defineComponent({
   },
   emits: ["updated"],
   setup(props, { emit }) {
+    const { t } = useI18n();
     const getIndexData = (field) => props.data[field];
     const selectedIndex = ref(getIndexData("name"));
     const selectedFields = ref(getIndexData("columns"));
@@ -171,6 +173,7 @@ export default defineComponent({
     getIndexList();
 
     return {
+      t,
       selectedIndex,
       selectedFields,
       options,

@@ -4,7 +4,7 @@
       <div class="col">
         <q-input
           v-model="searchQuery"
-          placeholder="Type your search query here"
+          :placeholder="t('search.typeSearch')"
           dense
           filled
           type="search"
@@ -58,6 +58,7 @@
 
 <script>
 import { defineComponent, nextTick, watch, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 import DateTime from "./DateTime.vue";
 import SyntaxGuide from "./SyntaxGuide.vue";
@@ -79,6 +80,7 @@ export default defineComponent({
     const searching = ref(false);
     const refreshIcon = ref("refresh");
     const refreshTime = ref("Off");
+    const { t } = useI18n();
     const refreshTimes = [
       { label: "Off", value: 0 },
       { label: "5s", value: 5 },
@@ -150,6 +152,7 @@ export default defineComponent({
     };
 
     return {
+      t,
       searching,
       searchQuery,
       dateVal,
