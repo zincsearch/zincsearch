@@ -15,20 +15,24 @@
 
 package metadata
 
-import "github.com/goccy/go-json"
+import (
+	"github.com/goccy/go-json"
+
+	"github.com/zinclabs/zinc/pkg/meta"
+)
 
 type index struct{}
 
 var Index = new(index)
 
-func (t *index) List(offset, limit int) ([]*index, error) {
+func (t *index) List(offset, limit int) ([]*meta.Index, error) {
 	data, err := db.List(t.key(""), offset, limit)
 	if err != nil {
 		return nil, err
 	}
-	indexes := make([]*index, 0, len(data))
+	indexes := make([]*meta.Index, 0, len(data))
 	for _, d := range data {
-		idx := new(index)
+		idx := new(meta.Index)
 		err = json.Unmarshal(d, idx)
 		if err != nil {
 			return nil, err
@@ -38,17 +42,17 @@ func (t *index) List(offset, limit int) ([]*index, error) {
 	return indexes, nil
 }
 
-func (t *index) Get(id string) (*index, error) {
+func (t *index) Get(id string) (*meta.Index, error) {
 	data, err := db.Get(t.key(id))
 	if err != nil {
 		return nil, err
 	}
-	idx := new(index)
+	idx := new(meta.Index)
 	err = json.Unmarshal(data, idx)
 	return idx, err
 }
 
-func (t *index) Set(id string, val *index) error {
+func (t *index) Set(id string, val *meta.Index) error {
 	data, err := json.Marshal(val)
 	if err != nil {
 		return err

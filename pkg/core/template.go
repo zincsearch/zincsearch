@@ -16,67 +16,35 @@
 package core
 
 import (
-	"context"
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 
-	"github.com/blugelabs/bluge"
-	"github.com/goccy/go-json"
-	"github.com/rs/zerolog/log"
-
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
 // ListTemplates returns all templates
-func ListTemplates(pattern string) ([]IndexTemplate, error) {
-	var query bluge.Query
-	if pattern != "" {
-		query = bluge.NewBooleanQuery().AddMust(bluge.NewTermQuery(pattern).SetField("index_pattern"))
-	} else {
-		query = bluge.NewMatchAllQuery()
-	}
-	searchRequest := bluge.NewTopNSearch(1000, query).SortBy([]string{"name"})
-	reader, _ := ZINC_SYSTEM_INDEX_LIST["_index_template"].Writer.Reader()
-	defer reader.Close()
-
-	dmi, err := reader.Search(context.Background(), searchRequest)
+func ListTemplates(pattern string) ([]*meta.Template, error) {
+	templates, err := metadata.Template.List(0, 0)
 	if err != nil {
-		return nil, fmt.Errorf("core.ListTemplates: error executing search: %s", err.Error())
+		return nil, err
 	}
-
-	templates := make([]IndexTemplate, 0)
-	next, err := dmi.Next()
-	for err == nil && next != nil {
-		var name string
-		var timestamp time.Time
-		tpl := new(meta.Template)
-		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			switch field {
-			case "name":
-				name = string(value)
-			case "@timestamp":
-				timestamp, _ = bluge.DecodeDateTime(value)
-			case "_source":
-				_ = json.Unmarshal(value, tpl)
-			default:
+	if pattern != "" {
+		oldTpls := templates[:]
+		templates = templates[:0]
+		for _, tpl := range oldTpls {
+			for i := range tpl.IndexPatterns {
+				if tpl.IndexPatterns[i] == pattern {
+					templates = append(templates, tpl)
+					break
+				}
 			}
-			return true
-		})
-		if err != nil {
-			log.Printf("core.ListTemplates: error accessing stored fields: %s", err.Error())
 		}
-
-		templates = append(templates, IndexTemplate{
-			Name:          name,
-			Timestamp:     timestamp,
-			IndexTemplate: tpl,
-		})
-
-		next, err = dmi.Next()
 	}
-
 	return templates, nil
 }
 
@@ -85,6 +53,7 @@ func NewTemplate(name string, template *meta.Template) error {
 	if name == "" || template == nil {
 		return nil
 	}
+	template.Name = name
 
 	// check pattern is exists
 	for _, pattern := range template.IndexPatterns {
@@ -93,35 +62,23 @@ func NewTemplate(name string, template *meta.Template) error {
 			if result.Name == name {
 				continue
 			}
-			if result.IndexTemplate.Priority == template.Priority {
+			if result.Priority == template.Priority {
 				return fmt.Errorf("index template [%s] has index patterns %s "+
 					"matching patterns from existing templates [%s] with patterns (%s => %s) "+
 					"that have the same priority [%d], multiple index templates may not match during index creation, "+
 					"please use a different priority",
 					name, template.IndexPatterns,
 					result.Name,
-					result.Name, result.IndexTemplate.IndexPatterns,
+					result.Name, result.IndexPatterns,
 					template.Priority,
 				)
 			}
 		}
 	}
 
-	bdoc := bluge.NewDocument(name)
-	bdoc.AddField(bluge.NewKeywordField("name", name).StoreValue().Sortable())
-	bdoc.AddField(bluge.NewNumericField("priority", float64(template.Priority)).StoreValue().Sortable().Aggregatable())
-	for i := 0; i < len(template.IndexPatterns); i++ {
-		bdoc.AddField(bluge.NewKeywordField("index_pattern", template.IndexPatterns[i]).StoreValue())
-		bdoc.AddField(bluge.NewKeywordField("index_prefix", string(template.IndexPatterns[i][0:1])).StoreValue())
-	}
-
-	docByteVal, _ := json.Marshal(*template)
-	bdoc.AddField(bluge.NewDateTimeField("@timestamp", time.Now()).StoreValue().Sortable().Aggregatable())
-	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil)) // Add _all field that can be used for search
-
-	index := ZINC_SYSTEM_INDEX_LIST["_index_template"].Writer
-	err := index.Update(bdoc.ID(), bdoc)
+	template.CreatedAt = time.Now()
+	template.UpdatedAt = time.Now()
+	err := metadata.Template.Set(name, template)
 	if err != nil {
 		return fmt.Errorf("template: error updating document: %s", err.Error())
 	}
@@ -135,91 +92,48 @@ func LoadTemplate(name string) (*meta.Template, bool, error) {
 		return nil, false, nil
 	}
 
-	query := bluge.NewTermQuery(name).SetField("_id")
-	searchRequest := bluge.NewTopNSearch(1, query)
-	reader, _ := ZINC_SYSTEM_INDEX_LIST["_index_template"].Writer.Reader()
-	defer reader.Close()
-
-	dmi, err := reader.Search(context.Background(), searchRequest)
+	tpl, err := metadata.Template.Get(name)
 	if err != nil {
-		return nil, false, fmt.Errorf("template: error executing search: %s", err.Error())
-	}
-
-	tpl := new(meta.Template)
-	next, err := dmi.Next()
-	if err != nil {
-		return nil, false, fmt.Errorf("template: error accessing stored fields: %s", err.Error())
-	}
-	if next == nil {
-		return nil, false, nil
-	}
-	err = next.VisitStoredFields(func(field string, value []byte) bool {
-		switch field {
-		case "_source":
-			_ = json.Unmarshal(value, tpl)
-			return true
-		default:
+		if err == errors.ErrKeyNotFound {
+			return nil, false, nil
 		}
-		return true
-	})
-	if err != nil {
-		return nil, false, fmt.Errorf("template: error accessing stored fields: %s", err.Error())
+		return nil, false, err
 	}
-
 	return tpl, true, nil
 }
 
 // DeleteTemplate delete a template from local
 func DeleteTemplate(name string) error {
-	bdoc := bluge.NewDocument(name)
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
-	err := ZINC_SYSTEM_INDEX_LIST["_index_template"].Writer.Delete(bdoc.ID())
-	if err != nil {
-		return fmt.Errorf("template: error deleting template: %s", err.Error())
-	}
-
-	return nil
+	return metadata.Template.Delete(name)
 }
 
 // UseTemplate use a specific template for new index
 func UseTemplate(indexName string) (*meta.Template, error) {
-	query := bluge.NewTermQuery(string(indexName[0:1])).SetField("index_prefix")
-	searchRequest := bluge.NewTopNSearch(1000, query).SortBy([]string{"-priority"})
-	reader, _ := ZINC_SYSTEM_INDEX_LIST["_index_template"].Writer.Reader()
-	defer reader.Close()
-
-	dmi, err := reader.Search(context.Background(), searchRequest)
-	if err != nil {
-		return nil, fmt.Errorf("core.UseTemplate: error executing search: %s", err.Error())
-	}
-
-	templates := make([]*meta.Template, 0)
-	next, err := dmi.Next()
-	for err == nil && next != nil {
-		tpl := new(meta.Template)
-		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			if field == "_source" {
-				_ = json.Unmarshal(value, tpl)
-			}
-			return true
-		})
-		if err != nil {
-			log.Printf("core.UseTemplate: error accessing stored fields: %s", err.Error())
-		}
-
-		templates = append(templates, tpl)
-		next, err = dmi.Next()
-	}
-
+	templates, err := ListTemplates("")
 	if err != nil {
 		return nil, err
 	}
-
 	if len(templates) == 0 {
 		return nil, nil
 	}
 
-	for _, tpl := range templates {
+	// sort by priority
+	sort.Slice(templates, func(i, j int) bool {
+		return templates[i].Priority > templates[j].Priority
+	})
+
+	// filter by first character
+	var filteredTemplates []*meta.Template
+	for i := range templates {
+		for j := range templates[i].IndexPatterns {
+			if strings.HasPrefix(indexName, templates[i].IndexPatterns[j][:1]) {
+				filteredTemplates = append(filteredTemplates, templates[i])
+				break
+			}
+		}
+	}
+
+	for _, tpl := range filteredTemplates {
 		for _, pattern := range tpl.IndexPatterns {
 			pattern := strings.TrimRight(strings.ReplaceAll(pattern, "*", ".*"), "$") + "$"
 			re := regexp.MustCompile(pattern)

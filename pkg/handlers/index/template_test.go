@@ -163,7 +163,7 @@ func TestTemplate(t *testing.T) {
 				args: args{
 					code:   http.StatusOK,
 					target: "TestTemplate.index_1",
-					result: `{"index_patterns":`,
+					result: `"index_patterns":`,
 				},
 				wantErr: false,
 			},
@@ -213,7 +213,7 @@ func TestTemplate(t *testing.T) {
 				args: args{
 					code:   http.StatusOK,
 					target: "log-*",
-					result: `{"index_patterns":`,
+					result: `"index_patterns":`,
 				},
 				wantErr: false,
 			},
@@ -222,7 +222,7 @@ func TestTemplate(t *testing.T) {
 				args: args{
 					code:   http.StatusOK,
 					target: "",
-					result: `{"index_patterns":`,
+					result: `"index_patterns":`,
 				},
 				wantErr: false,
 			},

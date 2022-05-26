@@ -46,8 +46,8 @@ func Analyze(c *gin.Context) {
 			return
 		}
 		if query.Filed != "" && query.Analyzer == "" {
-			if index.CachedMappings != nil && index.CachedMappings.Len() > 0 {
-				if prop, ok := index.CachedMappings.GetProperty(query.Filed); ok {
+			if index.Mappings != nil && index.Mappings.Len() > 0 {
+				if prop, ok := index.Mappings.GetProperty(query.Filed); ok {
 					if query.Analyzer == "" && prop.SearchAnalyzer != "" {
 						query.Analyzer = prop.SearchAnalyzer
 					}

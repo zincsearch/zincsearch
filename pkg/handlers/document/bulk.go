@@ -144,7 +144,8 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 				batch[indexName] = index.NewBatch()
 			}
 
-			bdoc, err := core.ZINC_INDEX_LIST[indexName].BuildBlugeDocumentFromJSON(docID, doc)
+			index, _ := core.GetIndex(indexName)
+			bdoc, err := index.BuildBlugeDocumentFromJSON(docID, doc)
 			if err != nil {
 				return bulkRes, err
 			}
@@ -160,12 +161,12 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 			documentsInBatch++
 
 			// refresh index stats
-			core.ZINC_INDEX_LIST[indexName].GainDocsCount(1)
+			index.GainDocsCount(1)
 
 			if documentsInBatch >= batchSize {
 				for _, indexName := range indexesInThisBatch {
 					// Persist the batch to the index
-					if err := core.ZINC_INDEX_LIST[indexName].Writer.Batch(batch[indexName]); err != nil {
+					if err := index.Writer.Batch(batch[indexName]); err != nil {
 						log.Error().Msgf("bulk: index updating batch err %s", err.Error())
 						return bulkRes, err
 					}
@@ -218,7 +219,8 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 						batch[indexName] = index.NewBatch()
 					}
 					batch[indexName].Delete(bdoc.ID())
-					core.ZINC_INDEX_LIST[indexName].ReduceDocsCount(1)
+					index, _ := core.GetIndex(indexName)
+					index.ReduceDocsCount(1)
 
 					bulkRes.Count++
 					bulkRes.Items = append(bulkRes.Items, map[string]*BulkResponseItem{
@@ -235,7 +237,8 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 
 	for _, indexName := range indexesInThisBatch {
 		// Persist the batch to the index
-		if err := core.ZINC_INDEX_LIST[indexName].Writer.Batch(batch[indexName]); err != nil {
+		index, _ := core.GetIndex(indexName)
+		if err := index.Writer.Batch(batch[indexName]); err != nil {
 			log.Printf("bulk: index updating batch err %s", err.Error())
 			return bulkRes, err
 		}
