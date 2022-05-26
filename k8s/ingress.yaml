@@ -20,6 +20,16 @@ spec:
             port:
               number: 4080
         path: /
+  # - host: playground.dev.zincsearch.com
+  #   http:
+  #     paths:
+  #     - pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: z-dummy
+  #           port:
+  #             number: 4080
+  #       path: /api/users
   tls:
   - hosts:
     - playground.dev.zincsearch.com
