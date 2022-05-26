@@ -25,7 +25,6 @@ import (
 )
 
 func LoadZincIndexesFromMetadata() error {
-	ZINC_INDEX_LIST.Indexes = make(map[string]*Index)
 	indexes, err := metadata.Index.List(0, 0)
 	if err != nil {
 		return err
