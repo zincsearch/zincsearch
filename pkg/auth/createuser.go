@@ -16,6 +16,7 @@
 package auth
 
 import (
+	"encoding/base64"
 	"time"
 
 	"golang.org/x/crypto/argon2"
@@ -84,10 +85,8 @@ func GeneratePassword(password, salt string) string {
 		Time:        1,
 		Threads:     1,
 	}
-
 	hash := argon2.IDKey([]byte(password), []byte(salt), params.Time, params.Memory, params.Threads, params.KeyLength)
-
-	return string(hash)
+	return base64.StdEncoding.EncodeToString(hash)
 }
 
 func GenerateSalt() string {
