@@ -33,12 +33,15 @@ func ListTemplates(pattern string) ([]*meta.Template, error) {
 	if err != nil {
 		return nil, err
 	}
+	if templates == nil {
+		templates = make([]*meta.Template, 0)
+	}
 	if pattern != "" {
 		oldTpls := templates[:]
 		templates = templates[:0]
 		for _, tpl := range oldTpls {
-			for i := range tpl.IndexPatterns {
-				if tpl.IndexPatterns[i] == pattern {
+			for i := range tpl.IndexTemplate.IndexPatterns {
+				if tpl.IndexTemplate.IndexPatterns[i] == pattern {
 					templates = append(templates, tpl)
 					break
 				}
@@ -49,11 +52,10 @@ func ListTemplates(pattern string) ([]*meta.Template, error) {
 }
 
 // NewTemplate create a template and store in local
-func NewTemplate(name string, template *meta.Template) error {
+func NewTemplate(name string, template *meta.IndexTemplate) error {
 	if name == "" || template == nil {
 		return nil
 	}
-	template.Name = name
 
 	// check pattern is exists
 	for _, pattern := range template.IndexPatterns {
@@ -62,14 +64,14 @@ func NewTemplate(name string, template *meta.Template) error {
 			if result.Name == name {
 				continue
 			}
-			if result.Priority == template.Priority {
+			if result.IndexTemplate.Priority == template.Priority {
 				return fmt.Errorf("index template [%s] has index patterns %s "+
 					"matching patterns from existing templates [%s] with patterns (%s => %s) "+
 					"that have the same priority [%d], multiple index templates may not match during index creation, "+
 					"please use a different priority",
 					name, template.IndexPatterns,
 					result.Name,
-					result.Name, result.IndexPatterns,
+					result.Name, result.IndexTemplate.IndexPatterns,
 					template.Priority,
 				)
 			}
@@ -78,7 +80,11 @@ func NewTemplate(name string, template *meta.Template) error {
 
 	template.CreatedAt = time.Now()
 	template.UpdatedAt = time.Now()
-	err := metadata.Template.Set(name, *template)
+	tpl := meta.Template{
+		Name:          name,
+		IndexTemplate: template,
+	}
+	err := metadata.Template.Set(name, tpl)
 	if err != nil {
 		return fmt.Errorf("template: error updating document: %s", err.Error())
 	}
@@ -87,7 +93,7 @@ func NewTemplate(name string, template *meta.Template) error {
 }
 
 // LoadTemplate load a specific template from local
-func LoadTemplate(name string) (*meta.Template, bool, error) {
+func LoadTemplate(name string) (*meta.IndexTemplate, bool, error) {
 	if name == "" {
 		return nil, false, nil
 	}
@@ -99,7 +105,7 @@ func LoadTemplate(name string) (*meta.Template, bool, error) {
 		}
 		return nil, false, err
 	}
-	return tpl, true, nil
+	return tpl.IndexTemplate, true, nil
 }
 
 // DeleteTemplate delete a template from local
@@ -108,7 +114,7 @@ func DeleteTemplate(name string) error {
 }
 
 // UseTemplate use a specific template for new index
-func UseTemplate(indexName string) (*meta.Template, error) {
+func UseTemplate(indexName string) (*meta.IndexTemplate, error) {
 	templates, err := ListTemplates("")
 	if err != nil {
 		return nil, err
@@ -119,14 +125,14 @@ func UseTemplate(indexName string) (*meta.Template, error) {
 
 	// sort by priority
 	sort.Slice(templates, func(i, j int) bool {
-		return templates[i].Priority > templates[j].Priority
+		return templates[i].IndexTemplate.Priority > templates[j].IndexTemplate.Priority
 	})
 
 	// filter by first character
 	var filteredTemplates []*meta.Template
 	for i := range templates {
-		for j := range templates[i].IndexPatterns {
-			if strings.HasPrefix(indexName, templates[i].IndexPatterns[j][:1]) {
+		for j := range templates[i].IndexTemplate.IndexPatterns {
+			if strings.HasPrefix(indexName, templates[i].IndexTemplate.IndexPatterns[j][:1]) {
 				filteredTemplates = append(filteredTemplates, templates[i])
 				break
 			}
@@ -134,11 +140,11 @@ func UseTemplate(indexName string) (*meta.Template, error) {
 	}
 
 	for _, tpl := range filteredTemplates {
-		for _, pattern := range tpl.IndexPatterns {
+		for _, pattern := range tpl.IndexTemplate.IndexPatterns {
 			pattern := strings.TrimRight(strings.ReplaceAll(pattern, "*", ".*"), "$") + "$"
 			re := regexp.MustCompile(pattern)
 			if re.MatchString(indexName) {
-				return tpl, nil
+				return tpl.IndexTemplate, nil
 			}
 		}
 	}

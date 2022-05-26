@@ -68,7 +68,7 @@ func (t *IndexList) Len() int {
 
 func (t *IndexList) List() []*Index {
 	t.lock.RLock()
-	var indexes []*Index
+	indexes := make([]*Index, 0, len(t.Indexes))
 	for _, index := range t.Indexes {
 		indexes = append(indexes, index)
 	}

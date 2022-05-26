@@ -18,7 +18,11 @@ package meta
 import "time"
 
 type Template struct {
-	Name          string           `json:"name"`
+	Name          string         `json:"name"`
+	IndexTemplate *IndexTemplate `json:"index_template"`
+}
+
+type IndexTemplate struct {
 	IndexPatterns []string         `json:"index_patterns"`
 	Priority      int              `json:"priority"` // highest priority is chosen
 	Template      TemplateTemplate `json:"template"`
