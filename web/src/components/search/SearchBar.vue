@@ -4,7 +4,7 @@
       <div class="col">
         <q-input
           v-model="searchQuery"
-          :placeholder="t('search.maxRecords')"
+          :placeholder="t('search.typeSearch')"
           dense
           filled
           type="search"
@@ -58,10 +58,10 @@
 
 <script>
 import { defineComponent, nextTick, watch, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 import DateTime from "./DateTime.vue";
 import SyntaxGuide from "./SyntaxGuide.vue";
-import { useI18n } from "vue-i18n";
 
 export default defineComponent({
   name: "ComponentSearchSearchBar",
