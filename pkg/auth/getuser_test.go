@@ -24,7 +24,7 @@ import (
 
 func TestGetUser(t *testing.T) {
 	type args struct {
-		userID string
+		id string
 	}
 	tests := []struct {
 		name    string
@@ -37,7 +37,7 @@ func TestGetUser(t *testing.T) {
 		{
 			name: "get user",
 			args: args{
-				userID: "testuser",
+				id: "testuser",
 			},
 			want: &meta.User{
 				ID:   "testuser",
@@ -55,7 +55,7 @@ func TestGetUser(t *testing.T) {
 		{
 			name: "get user not exists",
 			args: args{
-				userID: "testuserNotExists",
+				id: "testuserNotExists",
 			},
 			want1:   false,
 			wantErr: true,
@@ -68,7 +68,7 @@ func TestGetUser(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, got)
 			}
-			got, got1, err := GetUser(tt.args.userID)
+			got, got1, err := GetUser(tt.args.id)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return

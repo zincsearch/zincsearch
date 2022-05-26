@@ -24,7 +24,7 @@ import (
 
 func TestCreateUser(t *testing.T) {
 	type args struct {
-		userID            string
+		id                string
 		name              string
 		plaintextPassword string
 		role              string
@@ -38,7 +38,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			name: "create user",
 			args: args{
-				userID:            "testuser",
+				id:                "testuser",
 				name:              "Test User",
 				plaintextPassword: "testpassword",
 				role:              "admin",
@@ -53,7 +53,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			name: "update exists user",
 			args: args{
-				userID:            "testuser",
+				id:                "testuser",
 				name:              "Test User Updated",
 				plaintextPassword: "testpassword",
 				role:              "admin",
@@ -66,9 +66,9 @@ func TestCreateUser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "create user with empty userID",
+			name: "create user with empty id",
 			args: args{
-				userID: "",
+				id: "",
 			},
 			want: &meta.User{
 				ID: "",
@@ -78,7 +78,7 @@ func TestCreateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := CreateUser(tt.args.userID, tt.args.name, tt.args.plaintextPassword, tt.args.role)
+			got, err := CreateUser(tt.args.id, tt.args.name, tt.args.plaintextPassword, tt.args.role)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return

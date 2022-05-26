@@ -21,15 +21,15 @@ import (
 	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-func DeleteUser(userID string) bool {
-	err := metadata.User.Delete(userID)
+func DeleteUser(id string) bool {
+	err := metadata.User.Delete(id)
 	if err != nil {
 		log.Error().Err(err).Msg("error deleting user")
 		return false
 	}
 
 	// delete cache
-	delete(ZINC_CACHED_USERS, userID)
+	delete(ZINC_CACHED_USERS, id)
 
 	return true
 }

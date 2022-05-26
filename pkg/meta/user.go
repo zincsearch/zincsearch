@@ -18,7 +18,7 @@ package meta
 import "time"
 
 type User struct {
-	ID        string    `json:"id"`
+	ID        string    `json:"_id"`
 	Name      string    `json:"name"`
 	Role      string    `json:"role"`
 	Salt      string    `json:"salt"`

@@ -19,7 +19,16 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zinclabs/zinc/pkg/config"
 )
+
+func TestMain(m *testing.M) {
+	if config.Global.Etcd.Endpoints == nil {
+		return
+	}
+	m.Run()
+}
 
 func Test_etcdStorage_List(t *testing.T) {
 	type args struct {

@@ -21,11 +21,11 @@ import (
 	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-func GetUser(userID string) (*meta.User, bool, error) {
-	if userID == "" {
+func GetUser(id string) (*meta.User, bool, error) {
+	if id == "" {
 		return nil, false, errors.New(errors.ErrorTypeInvalidArgument, "user id is required")
 	}
-	user, err := metadata.User.Get(userID)
+	user, err := metadata.User.Get(id)
 	if err != nil {
 		return nil, false, err
 	}

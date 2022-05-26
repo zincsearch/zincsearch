@@ -148,7 +148,7 @@ func TestAuth(t *testing.T) {
 			data := new(meta.SearchResponse)
 			err := json.Unmarshal(resp.Body.Bytes(), data)
 			So(err, ShouldBeNil)
-			So(data.Hits.Total.Value, ShouldEqual, 1)
+			So(data.Hits.Total.Value, ShouldBeGreaterThanOrEqualTo, 1)
 			So(data.Hits.Hits[0].ID, ShouldEqual, "admin")
 		})
 	})

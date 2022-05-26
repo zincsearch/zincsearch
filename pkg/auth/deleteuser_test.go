@@ -19,7 +19,7 @@ import "testing"
 
 func TestDeleteUser(t *testing.T) {
 	type args struct {
-		userID string
+		id string
 	}
 	tests := []struct {
 		name string
@@ -29,28 +29,28 @@ func TestDeleteUser(t *testing.T) {
 		{
 			name: "delete user testuser",
 			args: args{
-				userID: "testuser",
+				id: "testuser",
 			},
 			want: true,
 		},
 		{
 			name: "delete user not exists user",
 			args: args{
-				userID: "testuserNotExists",
+				id: "testuserNotExists",
 			},
 			want: true,
 		},
 		{
 			name: "delete user empty",
 			args: args{
-				userID: "",
+				id: "",
 			},
 			want: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := DeleteUser(tt.args.userID); got != tt.want {
+			if got := DeleteUser(tt.args.id); got != tt.want {
 				t.Errorf("DeleteUser() = %v, want %v", got, tt.want)
 			}
 		})
