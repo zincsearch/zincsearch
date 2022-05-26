@@ -21,6 +21,10 @@ import (
 
 var ZINC_INDEX_LIST IndexList
 
+func init() {
+	ZINC_INDEX_LIST.Indexes = make(map[string]*Index)
+}
+
 type IndexList struct {
 	Indexes map[string]*Index
 	lock    sync.RWMutex
@@ -48,17 +52,6 @@ func (t *IndexList) Delete(name string) {
 	t.lock.Unlock()
 }
 
-func (t *IndexList) Close() error {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-	for _, index := range t.Indexes {
-		if err := index.Close(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (t *IndexList) Len() int {
 	t.lock.RLock()
 	n := len(t.Indexes)
@@ -74,4 +67,15 @@ func (t *IndexList) List() []*Index {
 	}
 	t.lock.RUnlock()
 	return indexes
+}
+
+func (t *IndexList) Close() error {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+	for _, index := range t.Indexes {
+		if err := index.Close(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
