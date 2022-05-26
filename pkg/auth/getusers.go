@@ -16,92 +16,10 @@
 package auth
 
 import (
-	"context"
-	"time"
-
-	"github.com/blugelabs/bluge"
-
-	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-func GetAllUsersWorker() (*meta.SearchResponse, error) {
-	usersIndex := core.ZINC_SYSTEM_INDEX_LIST["_users"]
-
-	query := bluge.NewMatchAllQuery()
-	searchRequest := bluge.NewTopNSearch(1000, query).WithStandardAggregations()
-	reader, err := usersIndex.Writer.Reader()
-	if err != nil {
-		return nil, err
-	}
-	defer reader.Close()
-	dmi, err := reader.Search(context.Background(), searchRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	var Hits []meta.Hit
-	next, err := dmi.Next()
-	for err == nil && next != nil {
-		var user SimpleUser
-		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			switch field {
-			case "_id":
-				user.ID = string(value)
-			case "name":
-				user.Name = string(value)
-			case "role":
-				user.Role = string(value)
-			case "salt":
-				user.Salt = string(value)
-			case "password":
-				user.Password = string(value)
-			case "created_at":
-				user.CreatedAt, _ = bluge.DecodeDateTime(value)
-			case "@timestamp":
-				user.Timestamp, _ = bluge.DecodeDateTime(value)
-			default:
-			}
-
-			return true
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		hit := meta.Hit{
-			Index:     usersIndex.Name,
-			Type:      usersIndex.Name,
-			ID:        user.ID,
-			Score:     next.Score,
-			Timestamp: user.Timestamp,
-			Source:    user,
-		}
-		Hits = append(Hits, hit)
-
-		next, err = dmi.Next()
-	}
-
-	resp := &meta.SearchResponse{
-		Took: int(dmi.Aggregations().Duration().Milliseconds()),
-		Hits: meta.Hits{
-			Total: meta.Total{
-				Value: int(dmi.Aggregations().Count()),
-			},
-			MaxScore: dmi.Aggregations().Metric("max_score"),
-			Hits:     Hits,
-		},
-	}
-
-	return resp, nil
-}
-
-type SimpleUser struct {
-	ID        string    `json:"_id"` // this will be email
-	Name      string    `json:"name"`
-	Role      string    `json:"role"`
-	Salt      string    `json:"-"`
-	Password  string    `json:"-"`
-	CreatedAt time.Time `json:"created_at"`
-	Timestamp time.Time `json:"@timestamp"`
+func GetUsers() ([]*meta.User, error) {
+	return metadata.User.List(0, 0)
 }

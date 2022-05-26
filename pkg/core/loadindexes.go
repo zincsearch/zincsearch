@@ -16,80 +16,35 @@
 package core
 
 import (
-	"context"
-	"fmt"
-
-	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
-	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 
+	"github.com/zinclabs/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/metadata"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 )
 
-var systemIndexList = []string{"_index_template", "_index", "_metadata", "_users"}
-
-func LoadZincSystemIndexes() (map[string]*Index, error) {
-	indexList := make(map[string]*Index)
-	for _, index := range systemIndexList {
-		log.Info().Msgf("Loading system index... [%s:%s]", index, "disk")
-		writer, err := LoadIndexWriter(index, "disk", nil)
-		if err != nil {
-			return nil, err
-		}
-		indexList[index] = &Index{
-			Name:        index,
-			IndexType:   "system",
-			StorageType: "disk",
-			Writer:      writer,
-		}
-	}
-
-	return indexList, nil
-}
-
-func LoadZincIndexesFromMeta() (map[string]*Index, error) {
-	query := bluge.NewMatchAllQuery()
-	searchRequest := bluge.NewAllMatches(query).WithStandardAggregations()
-	reader, _ := ZINC_SYSTEM_INDEX_LIST["_index"].Writer.Reader()
-	defer reader.Close()
-
-	dmi, err := reader.Search(context.Background(), searchRequest)
+func LoadZincIndexesFromMetadata() error {
+	indexes, err := metadata.Index.List(0, 0)
 	if err != nil {
-		return nil, fmt.Errorf("core.LoadZincIndexesFromMeta: error executing search: %s", err.Error())
+		return err
 	}
 
-	indexList := make(map[string]*Index)
-	next, err := dmi.Next()
-	for err == nil && next != nil {
-		index := &Index{IndexType: "user", StorageType: "disk"}
-		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			switch field {
-			case "name":
-				index.Name = string(value)
-			case "index_type":
-				index.IndexType = string(value)
-			case "storage_type":
-				index.StorageType = string(value)
-			case "settings":
-				_ = json.Unmarshal(value, &index.Settings)
-			case "mappings":
-				_ = json.Unmarshal(value, &index.CachedMappings)
-			default:
-			}
-			return true
-		})
-
-		log.Info().Msgf("Loading user   index... [%s:%s]", index.Name, index.StorageType)
-		if err != nil {
-			log.Printf("core.LoadZincIndexesFromMeta: error accessing stored fields: %s", err.Error())
-		}
+	for i := range indexes {
+		// cache mappings
+		index := new(Index)
+		index.Name = indexes[i].Name
+		index.StorageType = indexes[i].StorageType
+		index.Settings = indexes[i].Settings
+		index.Mappings = indexes[i].Mappings
+		index.Mappings = indexes[i].Mappings
+		log.Info().Msgf("Loading index... [%s:%s]", index.Name, index.StorageType)
 
 		// load index analysis
 		if index.Settings != nil && index.Settings.Analysis != nil {
 			index.CachedAnalyzers, err = zincanalysis.RequestAnalyzer(index.Settings.Analysis)
 			if err != nil {
-				log.Printf("core.LoadZincIndexesFromMeta: error parse stored analysis: %s", err.Error())
+				return errors.New(errors.ErrorTypeRuntimeException, "parse stored analysis error").Cause(err)
 			}
 		}
 
@@ -100,7 +55,7 @@ func LoadZincIndexesFromMeta() (map[string]*Index, error) {
 		}
 		index.Writer, err = LoadIndexWriter(index.Name, index.StorageType, defaultSearchAnalyzer)
 		if err != nil {
-			log.Error().Msgf("Loading user   index... [%s:%s] index writer error: %s", index.Name, index.StorageType, err.Error())
+			return errors.New(errors.ErrorTypeRuntimeException, "load index writer error").Cause(err)
 		}
 
 		// load index docs count
@@ -108,20 +63,9 @@ func LoadZincIndexesFromMeta() (map[string]*Index, error) {
 
 		// load index size
 		index.ReLoadStorageSize()
-
-		indexList[index.Name] = index
-
-		next, err = dmi.Next()
+		// load in memory
+		ZINC_INDEX_LIST.Add(index)
 	}
 
-	return indexList, nil
-}
-
-func CloseIndexes() {
-	for _, index := range ZINC_INDEX_LIST {
-		_ = index.Close()
-	}
-	for _, index := range ZINC_SYSTEM_INDEX_LIST {
-		_ = index.Close()
-	}
+	return nil
 }

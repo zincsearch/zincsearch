@@ -72,8 +72,9 @@
 import { defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { useQuasar, date } from "quasar";
-import userService from "../services/user";
 import { useI18n } from "vue-i18n";
+
+import userService from "../services/user";
 import AddUpdateUser from "../components/user/AddUpdateUser.vue";
 
 export default defineComponent({
@@ -102,7 +103,7 @@ export default defineComponent({
               "YYYY-MM-DDTHH:mm:ssZ"
             ),
             updated: date.formatDate(
-              data._source["@timestamp"],
+              data._source.updated_at,
               "YYYY-MM-DDTHH:mm:ssZ"
             ),
             actions: "",

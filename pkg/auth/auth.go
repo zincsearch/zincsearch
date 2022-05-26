@@ -15,10 +15,14 @@
 
 package auth
 
-func VerifyCredentials(userID, password string) (SimpleUser, bool) {
-	user, ok := ZINC_CACHED_USERS[userID]
+import (
+	"github.com/zinclabs/zinc/pkg/meta"
+)
+
+func VerifyCredentials(userID, password string) (*meta.User, bool) {
+	user, ok := ZINC_CACHED_USERS.Get(userID)
 	if !ok {
-		return SimpleUser{}, false
+		return user, false
 	}
 
 	incomingEncryptedPassword := GeneratePassword(password, user.Salt)
@@ -26,5 +30,5 @@ func VerifyCredentials(userID, password string) (SimpleUser, bool) {
 		return user, true
 	}
 
-	return SimpleUser{}, false
+	return user, false
 }

@@ -30,8 +30,8 @@ import (
 )
 
 type userLoginResponse struct {
-	User      auth.ZincUser `json:"user"`
-	Validated bool          `json:"validated"`
+	User      meta.User `json:"user"`
+	Validated bool      `json:"validated"`
 }
 
 func TestAuth(t *testing.T) {

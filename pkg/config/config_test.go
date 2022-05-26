@@ -22,9 +22,11 @@ import (
 )
 
 func TestConfig(t *testing.T) {
+	assert.Equal(t, "", Global.GinMode)
+	assert.Equal(t, "4080", Global.ServerPort)
+	// assert.Equal(t, "node", Global.ServerMode)
 	assert.Equal(t, "1", Global.NodeID)
 	assert.Equal(t, "./data", Global.DataPath)
-	assert.Equal(t, "", Global.GinMode)
 	assert.Equal(t, true, Global.SentryEnable)
 	assert.Equal(t, true, Global.TelemetryEnable)
 	assert.Equal(t, false, Global.PrometheusEnable)
@@ -32,6 +34,8 @@ func TestConfig(t *testing.T) {
 	assert.Equal(t, 1024, Global.BatchSize)
 	assert.Equal(t, 10000, Global.MaxResults)
 	assert.Equal(t, 1000, Global.AggregationTermsSize)
+
+	// assert.Equal(t, []string(nil), Global.Etcd.Endpoints)
 
 	assert.Equal(t, "", Global.S3.Bucket)
 	assert.Equal(t, "", Global.MinIO.Endpoint)

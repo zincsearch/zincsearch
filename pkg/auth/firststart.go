@@ -22,12 +22,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var ZINC_CACHED_USERS map[string]SimpleUser
-
 func init() {
-	// initialize cache
-	ZINC_CACHED_USERS = make(map[string]SimpleUser)
-
 	firstStart, err := isFirstStart()
 	if err != nil {
 		log.Print(err)
@@ -40,18 +35,18 @@ func init() {
 }
 
 func isFirstStart() (bool, error) {
-	userList, err := GetAllUsersWorker()
+	users, err := GetUsers()
 	if err != nil {
 		return true, err
 	}
 
-	if userList.Hits.Total.Value == 0 {
+	if len(users) == 0 {
 		return true, nil
 	}
 
 	// cache users
-	for _, user := range userList.Hits.Hits {
-		ZINC_CACHED_USERS[user.ID] = user.Source.(SimpleUser)
+	for _, user := range users {
+		ZINC_CACHED_USERS.Set(user.ID, user)
 	}
 
 	return false, nil

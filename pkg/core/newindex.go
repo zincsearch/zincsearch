@@ -22,11 +22,11 @@ import (
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
-	"github.com/goccy/go-json"
 
 	"github.com/zinclabs/zinc/pkg/bluge/directory"
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
 // NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
@@ -62,11 +62,11 @@ func NewIndex(name, storageType string, defaultSearchAnalyzer *analysis.Analyzer
 		return nil, err
 	}
 
-	index := &Index{
-		Name:        name,
-		Writer:      writer,
-		StorageType: storageType,
-	}
+	index := new(Index)
+	index.Name = name
+	index.StorageType = storageType
+	index.Writer = writer
+	index.CreateAt = time.Now()
 
 	// use template
 	if err = index.UseTemplate(); err != nil {
@@ -107,36 +107,22 @@ func StoreIndex(index *Index) error {
 	if index.CachedAnalyzers == nil {
 		index.CachedAnalyzers = make(map[string]*analysis.Analyzer)
 	}
-	if index.CachedMappings == nil {
-		index.CachedMappings = meta.NewMappings()
+	if index.Mappings == nil {
+		index.Mappings = meta.NewMappings()
 	}
 
-	bdoc := bluge.NewDocument(index.Name)
-	bdoc.AddField(bluge.NewKeywordField("name", index.Name).StoreValue().Sortable())
-	bdoc.AddField(bluge.NewKeywordField("index_type", index.IndexType).StoreValue().Sortable())
-	bdoc.AddField(bluge.NewKeywordField("storage_type", index.StorageType).StoreValue().Sortable())
-
-	settingByteVal, _ := json.Marshal(&index.Settings)
-	bdoc.AddField(bluge.NewStoredOnlyField("settings", settingByteVal))
-	mappingsByteVal, _ := json.Marshal(&index.CachedMappings)
-	bdoc.AddField(bluge.NewStoredOnlyField("mappings", mappingsByteVal))
-
-	bdoc.AddField(bluge.NewDateTimeField("@timestamp", time.Now()).StoreValue().Sortable().Aggregatable())
-	bdoc.AddField(bluge.NewStoredOnlyField("_source", nil))
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil)) // Add _all field that can be used for search
-
-	err := ZINC_SYSTEM_INDEX_LIST["_index"].Writer.Update(bdoc.ID(), bdoc)
+	index.UpdateAt = time.Now()
+	err := metadata.Index.Set(index.Name, index.Index)
 	if err != nil {
 		return fmt.Errorf("core.StoreIndex: index: %s, error: %s", index.Name, err.Error())
 	}
 
 	// cache index
-	ZINC_INDEX_LIST[index.Name] = index
+	ZINC_INDEX_LIST.Add(index)
 
 	return nil
 }
 
 func GetIndex(name string) (*Index, bool) {
-	index, ok := ZINC_INDEX_LIST[name]
-	return index, ok
+	return ZINC_INDEX_LIST.Get(name)
 }
