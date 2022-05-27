@@ -86,10 +86,7 @@ func loadConfig(rv reflect.Value) {
 	for i := 0; i < rt.NumField(); i++ {
 		fv := rv.Field(i)
 		ft := rt.Field(i)
-		if ft.Type.Kind() == reflect.Ptr {
-			loadConfig(fv.Elem())
-			continue
-		} else if ft.Type.Kind() == reflect.Struct {
+		if ft.Type.Kind() == reflect.Struct {
 			loadConfig(fv)
 			continue
 		}
@@ -136,7 +133,5 @@ func setField(field reflect.Value, tag string) {
 		vs := strings.Split(v, ",")
 		field.Set(reflect.ValueOf(vs))
 		field.SetLen(len(vs))
-	default:
-		// noop
 	}
 }

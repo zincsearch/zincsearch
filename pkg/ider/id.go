@@ -30,9 +30,6 @@ var node *snowflake.Node
 func init() {
 	var err error
 	nodeID := config.Global.NodeID
-	if nodeID == "" {
-		nodeID = "1"
-	}
 	id, _ := strconv.ParseInt(nodeID, 10, 64)
 	node, err = snowflake.NewNode(id)
 	if err != nil {

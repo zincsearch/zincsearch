@@ -23,6 +23,8 @@ import (
 
 func TestDeleteIndex(t *testing.T) {
 	var indexName = "TestDeleteIndex.index_1"
+	var indexNameS3 = "TestDeleteIndex.index_s3"
+	var indexNameMinIO = "TestDeleteIndex.index_minio"
 	type args struct {
 		name string
 	}
@@ -45,6 +47,20 @@ func TestDeleteIndex(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "s3",
+			args: args{
+				name: indexNameS3,
+			},
+			wantErr: true,
+		},
+		{
+			name: "minio",
+			args: args{
+				name: indexNameMinIO,
+			},
+			wantErr: true,
+		},
 	}
 
 	t.Run("prepare", func(t *testing.T) {
@@ -53,52 +69,26 @@ func TestDeleteIndex(t *testing.T) {
 		assert.NotNil(t, index)
 		err = StoreIndex(index)
 		assert.NoError(t, err)
+
+		indexS3, err := NewIndex(indexNameS3, "disk", nil)
+		assert.NoError(t, err)
+		assert.NotNil(t, indexS3)
+		err = StoreIndex(indexS3)
+		assert.NoError(t, err)
+		indexS3.StorageType = "s3"
+
+		indexMinio, err := NewIndex(indexNameMinIO, "disk", nil)
+		assert.NoError(t, err)
+		assert.NotNil(t, indexMinio)
+		err = StoreIndex(indexMinio)
+		assert.NoError(t, err)
+		indexMinio.StorageType = "minio"
 	})
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := DeleteIndex(tt.args.name); (err != nil) != tt.wantErr {
 				t.Errorf("DeleteIndex() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func Test_deleteFilesForIndexFromMinIO(t *testing.T) {
-	type args struct {
-		indexName string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := deleteFilesForIndexFromMinIO(tt.args.indexName); (err != nil) != tt.wantErr {
-				t.Errorf("deleteFilesForIndexFromMinIO() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func Test_deleteFilesForIndexFromS3(t *testing.T) {
-	type args struct {
-		indexName string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := deleteFilesForIndexFromS3(tt.args.indexName); (err != nil) != tt.wantErr {
-				t.Errorf("deleteFilesForIndexFromS3() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

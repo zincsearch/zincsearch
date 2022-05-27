@@ -41,7 +41,7 @@ func TestSearchDSL(t *testing.T) {
 			name: "normal",
 			args: args{
 				code:   http.StatusOK,
-				data:   `{"query":{"match_all":{}}}`,
+				data:   `{"query":{"match_all":{}},"size":10}`,
 				params: map[string]string{"target": indexName},
 				result: "successful",
 			},
@@ -50,7 +50,7 @@ func TestSearchDSL(t *testing.T) {
 			name: "multiple index",
 			args: args{
 				code:   http.StatusOK,
-				data:   `{"query":{"match_all":{}}}`,
+				data:   `{"query":{"match_all":{}},"size":10}`,
 				result: "successful",
 			},
 		},
@@ -58,7 +58,7 @@ func TestSearchDSL(t *testing.T) {
 			name: "index not found",
 			args: args{
 				code:   http.StatusBadRequest,
-				data:   `{"query":{"match_all":{}}}`,
+				data:   `{"query":{"match_all":{}},"size":10}`,
 				params: map[string]string{"target": "NotExist" + indexName},
 				result: "does not exists",
 			},
@@ -67,7 +67,7 @@ func TestSearchDSL(t *testing.T) {
 			name: "query jsone error",
 			args: args{
 				code:   http.StatusBadRequest,
-				data:   `{"query":{"match_all":{x}}}`,
+				data:   `{"query":{"match_all":{x}},"size":10}`,
 				params: map[string]string{"target": "olympics"},
 				result: "invalid character",
 			},

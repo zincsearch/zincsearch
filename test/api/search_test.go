@@ -46,13 +46,13 @@ func TestSearch(t *testing.T) {
 		})
 		t.Run("search document with exist indexName", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(`{"query": {"match_all":{}}}`)
+			body.WriteString(`{"query": {"match_all":{}}, "size":10}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 		})
 		t.Run("search document with not exist term", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(`{"query": {"match": {"_all": "xxxx"}}}`)
+			body.WriteString(`{"query": {"match": {"_all": "xxxx"}}, "size":10}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -63,7 +63,7 @@ func TestSearch(t *testing.T) {
 		})
 		t.Run("search document with exist term", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(`{"query": {"match": {"_all": "DEMTSCHENKO"}}}`)
+			body.WriteString(`{"query": {"match": {"_all": "DEMTSCHENKO"}}, "size":10}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -74,7 +74,7 @@ func TestSearch(t *testing.T) {
 		})
 		t.Run("search document type: match_all", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(`{"query": {"match_all": {}}}`)
+			body.WriteString(`{"query": {"match_all": {}}, "size":10}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -85,7 +85,7 @@ func TestSearch(t *testing.T) {
 		})
 		t.Run("search document type: wildcard", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(`{"query": {"wildcard": {"_all": "dem*"}}}`)
+			body.WriteString(`{"query": {"wildcard": {"_all": "dem*"}}, "size":10}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -96,7 +96,7 @@ func TestSearch(t *testing.T) {
 		})
 		t.Run("search document type: fuzzy", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(`{"query": {"fuzzy": {"Athlete": "demtschenk"}}}`)
+			body.WriteString(`{"query": {"fuzzy": {"Athlete": "demtschenk"}}, "size":10}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -107,7 +107,7 @@ func TestSearch(t *testing.T) {
 		})
 		t.Run("search document type: term", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(`{"query": {"term": {"City": "turin"}}}`)
+			body.WriteString(`{"query": {"term": {"City": "turin"}}, "size":10}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -119,7 +119,7 @@ func TestSearch(t *testing.T) {
 		t.Run("search document type: daterange", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(
-				fmt.Sprintf(`{"query": {"range": {"@timestamp": { "gte": "%s", "lt": "%s"}}}}`,
+				fmt.Sprintf(`{"query": {"range": {"@timestamp": { "gte": "%s", "lt": "%s"}}}, "size":10}`,
 					time.Now().UTC().Add(time.Hour*-24).Format("2006-01-02T15:04:05Z"),
 					time.Now().UTC().Format("2006-01-02T15:04:05Z"),
 				))
@@ -133,7 +133,7 @@ func TestSearch(t *testing.T) {
 		})
 		t.Run("search document type: match", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(`{"query": {"match": {"_all": "DEMTSCHENKO"}}}`)
+			body.WriteString(`{"query": {"match": {"_all": "DEMTSCHENKO"}}, "size":10}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -144,7 +144,7 @@ func TestSearch(t *testing.T) {
 		})
 		t.Run("search document type: matchphrase", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(`{"query": {"match_phrase": {"_all": "DEMTSCHENKO"}}}`)
+			body.WriteString(`{"query": {"match_phrase": {"_all": "DEMTSCHENKO"}}, "size":10}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -155,7 +155,7 @@ func TestSearch(t *testing.T) {
 		})
 		t.Run("search document type: prefix", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(`{"query": {"prefix": {"_all": "dem"}}}`)
+			body.WriteString(`{"query": {"prefix": {"_all": "dem"}}, "size":10}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -166,7 +166,7 @@ func TestSearch(t *testing.T) {
 		})
 		t.Run("search document type: querystring", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(`{"query": {"query_string": {"query": "DEMTSCHENKO"}}}`)
+			body.WriteString(`{"query": {"query_string": {"query": "DEMTSCHENKO"}}, "size":10}`)
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -182,6 +182,7 @@ func TestSearch(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{
 				"query": {"match_all":{}}, 
+				"size": 0,
 				"aggs": {
 					"my-agg-term": {
 						"terms": {"field": "City"}
@@ -201,6 +202,7 @@ func TestSearch(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{
 				"query": {"match_all":{}}, 
+				"size": 0,
 				"aggs": {
 					"my-agg-max": {
 						"max": {"field": "Year"}

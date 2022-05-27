@@ -52,13 +52,13 @@ func DeleteIndex(name string) error {
 	} else if index.StorageType == "s3" {
 		err := deleteFilesForIndexFromS3(index.Name)
 		if err != nil {
-			log.Error().Msgf("failed to delete index: %s", err.Error())
+			log.Error().Msgf("failed to delete index from S3: %s", err.Error())
 			return err
 		}
 	} else if index.StorageType == "minio" {
 		err := deleteFilesForIndexFromMinIO(index.Name)
 		if err != nil {
-			log.Error().Msgf("failed to delete index: %s", err.Error())
+			log.Error().Msgf("failed to delete index from minIO: %s", err.Error())
 			return err
 		}
 	}
@@ -81,7 +81,7 @@ func deleteFilesForIndexFromMinIO(indexName string) error {
 	// Initialize minio client object.
 	minioClient, err := minio.New(endpoint, &opts)
 	if err != nil {
-		log.Print(err)
+		return err
 	}
 
 	listOpts := minio.ListObjectsOptions{
@@ -93,10 +93,6 @@ func deleteFilesForIndexFromMinIO(indexName string) error {
 
 	for object := range objects {
 		log.Print("Deleting: ", object.Key)
-
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
