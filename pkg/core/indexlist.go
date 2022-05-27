@@ -17,17 +17,22 @@ package core
 
 import (
 	"sync"
+
+	"github.com/rs/zerolog/log"
 )
 
 var ZINC_INDEX_LIST IndexList
 
-func init() {
-	ZINC_INDEX_LIST.Indexes = make(map[string]*Index)
-}
-
 type IndexList struct {
 	Indexes map[string]*Index
 	lock    sync.RWMutex
+}
+
+func init() {
+	ZINC_INDEX_LIST.Indexes = make(map[string]*Index)
+	if err := LoadZincIndexesFromMetadata(); err != nil {
+		log.Error().Err(err).Msgf("Error loading index")
+	}
 }
 
 func (t *IndexList) Add(index *Index) {

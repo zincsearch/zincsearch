@@ -23,10 +23,6 @@ import (
 
 var ZINC_CACHED_USERS cachedUsers
 
-func init() {
-	ZINC_CACHED_USERS.users = make(map[string]*meta.User)
-}
-
 type cachedUsers struct {
 	users map[string]*meta.User
 	lock  sync.RWMutex

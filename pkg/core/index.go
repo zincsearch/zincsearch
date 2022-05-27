@@ -27,7 +27,6 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/goccy/go-json"
-	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/meta"
@@ -43,12 +42,6 @@ type Index struct {
 	StorageSizeNextTime time.Time                     `json:"-"`
 	CachedAnalyzers     map[string]*analysis.Analyzer `json:"-"`
 	Writer              *bluge.Writer                 `json:"-"`
-}
-
-func init() {
-	if err := LoadZincIndexesFromMetadata(); err != nil {
-		log.Error().Err(err).Msgf("Error loading index")
-	}
 }
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.

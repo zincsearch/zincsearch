@@ -20,9 +20,14 @@ import (
 	"os"
 
 	"github.com/rs/zerolog/log"
+
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func init() {
+	// init cache users
+	ZINC_CACHED_USERS.users = make(map[string]*meta.User)
+	// init first start
 	firstStart, err := isFirstStart()
 	if err != nil {
 		log.Print(err)
@@ -44,7 +49,6 @@ func isFirstStart() (bool, error) {
 		return true, nil
 	}
 
-	// cache users
 	for _, user := range users {
 		ZINC_CACHED_USERS.Set(user.ID, user)
 	}
