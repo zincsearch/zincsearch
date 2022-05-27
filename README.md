@@ -42,10 +42,10 @@ Note: Do not store sensitive data on this server as its available to everyone on
 8. aggregation support
 
 # Roadmap items:
-1. High Availability
-1. Distributed reads and writes
-1. Geosptial search
-1. Raise an issue if you are looking for something.
+
+Public roadmap is available at https://github.com/orgs/zinclabs/projects/3/views/1
+
+Please create an issue if you would like something to be added to the roadmap.
 
 # Screenshots
 
