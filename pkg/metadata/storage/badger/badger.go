@@ -42,11 +42,11 @@ func New(dbpath string) storage.Storager {
 
 func openBadgerDB(dbpath string, readOnly bool) (*badger.DB, error) {
 	opt := badger.DefaultOptions(dbpath)
-	opt.NumGoroutines = runtime.NumGoroutine() * 8
-	opt.MemTableSize = 32 << 20
+	opt.NumGoroutines = runtime.NumGoroutine() * 4
+	opt.MemTableSize = 1 << 26 // 64MB
 	opt.Compression = options.ZSTD
 	opt.ZSTDCompressionLevel = 3
-	opt.BlockSize = 1024 * 128
+	opt.BlockSize = 4096 // 4KB
 	opt.MetricsEnabled = false
 	opt.Logger = nil
 	opt.ReadOnly = readOnly
