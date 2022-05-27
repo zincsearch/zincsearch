@@ -38,6 +38,7 @@ require (
 	go.etcd.io/etcd/client/v3 v3.5.4
 	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
+	gopkg.in/yaml.v3 v3.0.0 // indirect
 )
 
 replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v0.1.9-0.20220524053411-c8b04226b347
