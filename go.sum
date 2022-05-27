@@ -498,8 +498,8 @@ github.com/zinclabs/bluge v0.1.9-0.20220524053411-c8b04226b347 h1:YEoLOO0hGDfxwP
 github.com/zinclabs/bluge v0.1.9-0.20220524053411-c8b04226b347/go.mod h1:Ys8JAWRrbzKs57ZZJ9tm+PnxMbwN1NaeST91fy2H0fA=
 github.com/zinclabs/bluge_segment_api v0.2.1-0.20220523030708-2e8f9721fa17 h1:6nZipqKn4MY+Jb3uHtzKvQCbHCWJWVbLy7LwoA9rZq0=
 github.com/zinclabs/bluge_segment_api v0.2.1-0.20220523030708-2e8f9721fa17/go.mod h1:w+BFZs3+UsRmNSvE/Wxl7TSsZQBcso7yEwyYQ4Ovw+M=
-github.com/zinclabs/ice v0.2.1-0.20220527063317-50a14dc5425f h1:U+7ZjxFNHGSAtG9VGnRyadm7HOxEBPYimjJ4a95OBEg=
-github.com/zinclabs/ice v0.2.1-0.20220527063317-50a14dc5425f/go.mod h1:b7FG0NtjT+8iOsP57UWzG4V4WlNVrl0VG2YnOk1o82k=
+github.com/zinclabs/ice v0.2.1-0.20220527165419-d0fa1a0a265f h1:ZSJt8ADwq1dv7oBUKSHElAFtWD7nOn8LWnzy5ujUlUo=
+github.com/zinclabs/ice v0.2.1-0.20220527165419-d0fa1a0a265f/go.mod h1:b7FG0NtjT+8iOsP57UWzG4V4WlNVrl0VG2YnOk1o82k=
 github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1 h1:wEkwpwzLhU3VEZRV8kS3eeYnyps4udKe14RQOmbjsZI=
 github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1/go.mod h1:Slirjzuz8uM8Cw0jmPNqbneoqcUtY2GGjn2bEd4NRLY=
 go.etcd.io/etcd/api/v3 v3.5.4 h1:OHVyt3TopwtUQ2GKdd5wu3PmmipR4FTwCqoEjSyRdIc=

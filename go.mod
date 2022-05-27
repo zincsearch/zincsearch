@@ -42,6 +42,6 @@ require (
 
 replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v0.1.9-0.20220524053411-c8b04226b347
 
-replace github.com/blugelabs/ice => github.com/zinclabs/ice v0.2.1-0.20220527063317-50a14dc5425f
+replace github.com/blugelabs/ice => github.com/zinclabs/ice v0.2.1-0.20220527165419-d0fa1a0a265f
 
 replace github.com/blugelabs/bluge_segment_api => github.com/zinclabs/bluge_segment_api v0.2.1-0.20220523030708-2e8f9721fa17
