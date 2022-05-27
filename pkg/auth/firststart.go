@@ -34,7 +34,7 @@ func init() {
 	}
 	if firstStart {
 		if err := initFirstUser(); err != nil {
-			log.Panic().Msg(err.Error())
+			log.Fatal().Msg(err.Error())
 		}
 	}
 }
