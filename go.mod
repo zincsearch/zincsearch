@@ -36,13 +36,12 @@ require (
 	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.4
-	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	gopkg.in/yaml.v3 v3.0.0 // indirect
 )
 
 replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v0.1.9-0.20220524053411-c8b04226b347
 
-replace github.com/blugelabs/ice => github.com/zinclabs/ice v0.2.1-0.20220524053204-7ce9a711413e
+replace github.com/blugelabs/ice => github.com/zinclabs/ice v0.2.1-0.20220527063317-50a14dc5425f
 
 replace github.com/blugelabs/bluge_segment_api => github.com/zinclabs/bluge_segment_api v0.2.1-0.20220523030708-2e8f9721fa17

@@ -498,8 +498,8 @@ github.com/zinclabs/bluge v0.1.9-0.20220524053411-c8b04226b347 h1:YEoLOO0hGDfxwP
 github.com/zinclabs/bluge v0.1.9-0.20220524053411-c8b04226b347/go.mod h1:Ys8JAWRrbzKs57ZZJ9tm+PnxMbwN1NaeST91fy2H0fA=
 github.com/zinclabs/bluge_segment_api v0.2.1-0.20220523030708-2e8f9721fa17 h1:6nZipqKn4MY+Jb3uHtzKvQCbHCWJWVbLy7LwoA9rZq0=
 github.com/zinclabs/bluge_segment_api v0.2.1-0.20220523030708-2e8f9721fa17/go.mod h1:w+BFZs3+UsRmNSvE/Wxl7TSsZQBcso7yEwyYQ4Ovw+M=
-github.com/zinclabs/ice v0.2.1-0.20220524053204-7ce9a711413e h1:l/Kop+Q7vgSpIPe5nufgTHnQf0PDVygDFkAEeOXAu+E=
-github.com/zinclabs/ice v0.2.1-0.20220524053204-7ce9a711413e/go.mod h1:b7FG0NtjT+8iOsP57UWzG4V4WlNVrl0VG2YnOk1o82k=
+github.com/zinclabs/ice v0.2.1-0.20220527063317-50a14dc5425f h1:U+7ZjxFNHGSAtG9VGnRyadm7HOxEBPYimjJ4a95OBEg=
+github.com/zinclabs/ice v0.2.1-0.20220527063317-50a14dc5425f/go.mod h1:b7FG0NtjT+8iOsP57UWzG4V4WlNVrl0VG2YnOk1o82k=
 github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1 h1:wEkwpwzLhU3VEZRV8kS3eeYnyps4udKe14RQOmbjsZI=
 github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1/go.mod h1:Slirjzuz8uM8Cw0jmPNqbneoqcUtY2GGjn2bEd4NRLY=
 go.etcd.io/etcd/api/v3 v3.5.4 h1:OHVyt3TopwtUQ2GKdd5wu3PmmipR4FTwCqoEjSyRdIc=
@@ -680,9 +680,8 @@ golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20210816074244-15123e1e1f71/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 h1:XfKQ4OlFl8okEOr5UvAqFRVj8pY/4yfcXrddB8qAbU0=
 golang.org/x/sys v0.0.0-20220114195835-da31bd327af9/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 h1:nonptSpoQ4vQjyraW20DXPAglgQfVnM9ZC6MmNLMR60=
-golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201117132131-f5c789dd3221/go.mod h1:Nr5EML6q2oocZ2LXRh80K7BxOlk5/8JxuGnuhpl+muw=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/text v0.0.0-20170915032832-14c0d48ead0c/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
