@@ -86,6 +86,9 @@ Check [syslog-ng ingestion docs](https://docs.zinclabs.io/ingestion/syslog-ng/)
 
 Check [Zinc API docs](https://docs.zinclabs.io/API%20Reference/)
 
+# Releases
+
+ZincSearch currently has most of its API contrcts frozen. It's data format may still experience changes as we improve things. Currently ZincSearch is in beta. Data format should become highly stable when we move to GA (version 1).
 
 # How to develop and contribute to Zinc
 
