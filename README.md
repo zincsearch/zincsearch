@@ -61,30 +61,30 @@ Please create an issue if you would like something to be added to the roadmap.
 
 ## Download / Installation / Run
 
-Check installation [installation docs](https://docs.zinclabs.io/04_installation/)
+Check installation [installation docs](https://docs.zincsearch.com/04_installation/)
 
 
 ## Data ingestion
 
 ### Single record
 
-Check [single record ingestion docs](https://docs.zinclabs.io/ingestion/single-record/)
+Check [single record ingestion docs](https://docs.zincsearch.com/ingestion/single-record/)
 
 ### Bulk ingestion
 
-Check [bulk ingestion docs](https://docs.zinclabs.io/ingestion/bulk-ingestion/#bulk-ingestion)
+Check [bulk ingestion docs](https://docs.zincsearch.com/ingestion/bulk-ingestion/#bulk-ingestion)
 
 ### Fluent bit
 
-Check [fluet-bit ingestion docs](https://docs.zinclabs.io/ingestion/fluent-bit/)
+Check [fluet-bit ingestion docs](https://docs.zincsearch.com/ingestion/fluent-bit/)
 
 ### Syslog-ng
 
-Check [syslog-ng ingestion docs](https://docs.zinclabs.io/ingestion/syslog-ng/)
+Check [syslog-ng ingestion docs](https://docs.zincsearch.com/ingestion/syslog-ng/)
 
 ## API Reference
 
-Check [Zinc API docs](https://docs.zinclabs.io/API%20Reference/)
+Check [Zinc API docs](https://docs.zincsearch.com/API%20Reference/)
 
 # Releases
 

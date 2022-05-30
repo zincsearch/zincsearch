@@ -301,9 +301,9 @@ func TestAnalyze(t *testing.T) {
 		t.Run("web analyzer", func(t *testing.T) {
 			input := `{
 				"analyzer": "web",
-				"text": "Hello info@blugelabs.com, i come from https://docs.zinclabs.io/"
+				"text": "Hello info@blugelabs.com, i come from https://docs.zincsearch.com/"
 			  }`
-			output := `[hello info@blugelabs.com come https://docs.zinclabs.io/]`
+			output := `[hello info@blugelabs.com come https://docs.zincsearch.com/]`
 
 			body := bytes.NewBuffer(nil)
 			body.WriteString(input)
