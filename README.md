@@ -92,7 +92,7 @@ ZincSearch currently has most of its API contracts frozen. It's data format may 
 
 # How to develop and contribute to Zinc
 
-Check the [contributing guide](./CONTRIBUTING.md)
+Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap items](https://github.com/orgs/zinclabs/projects/3)
 
 # Who uses Zinc (Known users)?
 
