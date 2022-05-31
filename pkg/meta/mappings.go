@@ -36,7 +36,6 @@ type Property struct {
 	Sortable       bool   `json:"sortable"`
 	Aggregatable   bool   `json:"aggregatable"`
 	Highlightable  bool   `json:"highlightable"`
-	TermPositions  bool   `json:"term_positions"` // SearchTermPositions
 }
 
 func NewMappings() *Mappings {
@@ -56,14 +55,13 @@ func NewProperty(typ string) Property {
 		Sortable:       true,
 		Aggregatable:   true,
 		Highlightable:  false,
-		TermPositions:  false,
 	}
 	if typ == "text" {
-		p.TermPositions = true
 		p.Sortable = false
 		p.Aggregatable = false
+		p.Store = true
+		p.Highlightable = true
 	}
-
 	return p
 }
 

@@ -205,20 +205,17 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 			}
 		}
 	}
-	if prop.Store {
+	if prop.Store || prop.Highlightable {
 		field.StoreValue()
+	}
+	if prop.Highlightable {
+		field.HighlightMatches()
 	}
 	if prop.Sortable {
 		field.Sortable()
 	}
 	if prop.Aggregatable {
 		field.Aggregatable()
-	}
-	if prop.Highlightable {
-		field.HighlightMatches()
-	}
-	if prop.TermPositions {
-		field.SearchTermPositions()
 	}
 	bdoc.AddField(field)
 
