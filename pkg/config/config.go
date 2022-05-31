@@ -45,6 +45,8 @@ type config struct {
 
 type etcd struct {
 	Endpoints []string `env:"ZINC_ETCD_ENDPOINTS"`
+	Username  string   `env:"ZINC_ETCD_USERNAME"`
+	Password  string   `env:"ZINC_ETCD_PASSWORD"`
 }
 
 type s3 struct {

@@ -22,6 +22,7 @@ import (
 	"github.com/rs/zerolog/log"
 	client "go.etcd.io/etcd/client/v3"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/metadata/storage"
 )
@@ -35,8 +36,10 @@ type etcdStorage struct {
 
 func New(dbpath string) storage.Storager {
 	cli, err := client.New(client.Config{
-		Endpoints:   []string{"localhost:2379"},
+		Endpoints:   config.Global.Etcd.Endpoints,
 		DialTimeout: 5 * time.Second,
+		Username:    config.Global.Etcd.Username,
+		Password:    config.Global.Etcd.Password,
 	})
 	if err != nil {
 		log.Fatal().Err(err).Msg("open etcd for metadata failed")
