@@ -44,7 +44,7 @@ ENV VERSION=$VERSION
 ENV COMMIT_HASH=$COMMIT_HASH
 ENV BUILD_DATE=$BUILD_DATE
 
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta/v1.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta/v1.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta/v1.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
 ############################
 # STEP 2 build a small image
 ############################

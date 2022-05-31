@@ -13,9 +13,9 @@ builds:
     id: zinc_binaries
     ldflags:
     - -s -w 
-    - -X github.com/zinclabs/zinc/pkg/meta/v1.Version={{.Version}} # https://goreleaser.com/customization/templates/
-    - "-X github.com/zinclabs/zinc/pkg/meta/v1.BuildDate={{.Date}}"
-    - "-X github.com/zinclabs/zinc/pkg/meta/v1.CommitHash={{.Commit}}"
+    - -X github.com/zinclabs/zinc/pkg/meta.Version={{.Version}} # https://goreleaser.com/customization/templates/
+    - "-X github.com/zinclabs/zinc/pkg/meta.BuildDate={{.Date}}"
+    - "-X github.com/zinclabs/zinc/pkg/meta.CommitHash={{.Commit}}"
     env:
       - CGO_ENABLED=0
     goos:

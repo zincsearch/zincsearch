@@ -49,7 +49,7 @@ go build -o zinc cmd/zinc/main.go # will build the zinc binary
 Advanced
 
 ```shell
-CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta/v1.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta/v1.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta/v1.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
+CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
 ```
 
 Setting GOOS and GOARCH appropriately allows for cross platform compilation. Check [Official docs](https://go.dev/doc/install/source#environment) for all possible values and combinations. This [gist](https://gist.github.com/asukakenji/f15ba7e588ac42795f421b48b8aede63) is also great.
