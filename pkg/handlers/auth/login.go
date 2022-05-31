@@ -21,27 +21,53 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/auth"
-	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// @Summary Login
+// @Produce json
+// @Param login body LoginRequest true "Login Credentials"
+// @Success 200 {object} LoginResponse
+// @Failure 400 {object} LoginError
+// @Router /login [post]
 func Login(c *gin.Context) {
-	var user meta.User
-	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// Read login input
+	var loginInput LoginRequest
+	if err := c.ShouldBindJSON(&loginInput); err != nil {
+		c.JSON(http.StatusBadRequest, LoginError{Error: err.Error()})
 		return
 	}
 
-	loggedInUser, validationResult := auth.VerifyCredentials(user.ID, user.Password)
-	resUser := gin.H{}
+	loggedInUser, validationResult := auth.VerifyCredentials(loginInput.ID, loginInput.Password)
+	var resUser LoginUser
 	if validationResult {
-		resUser = gin.H{
-			"_id":  loggedInUser.ID,
-			"name": loggedInUser.Name,
-			"role": loggedInUser.Role,
+		resUser = LoginUser{
+			ID:   loggedInUser.ID,
+			Name: loggedInUser.Name,
+			Role: loggedInUser.Role,
 		}
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"validated": validationResult,
-		"user":      resUser,
+	c.JSON(http.StatusOK, LoginResponse{
+		Validated: validationResult,
+		User:      resUser,
 	})
+}
+
+type LoginUser struct {
+	ID   string `json:"_id"`
+	Name string `json:"name"`
+	Role string `json:"role"`
+}
+
+type LoginRequest struct {
+	ID       string `json:"_id"`
+	Password string `json:"password"`
+}
+
+type LoginError struct {
+	Error string `json:"error"`
+}
+
+type LoginResponse struct {
+	Validated bool      `json:"validated"`
+	User      LoginUser `json:"user"`
 }

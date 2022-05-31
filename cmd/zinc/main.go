@@ -33,6 +33,16 @@ import (
 	"github.com/zinclabs/zinc/pkg/routes"
 )
 
+// @title           Zinc Search engine API
+// @version         1.0
+// @description     Zinc Search engine API
+// @termsOfService  http://swagger.io/terms/
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:4080
+// @BasePath  /api
 func main() {
 
 	if config.Global.SentryEnable {
