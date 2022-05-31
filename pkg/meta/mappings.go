@@ -59,8 +59,6 @@ func NewProperty(typ string) Property {
 	if typ == "text" {
 		p.Sortable = false
 		p.Aggregatable = false
-		p.Store = true
-		p.Highlightable = true
 	}
 	return p
 }
