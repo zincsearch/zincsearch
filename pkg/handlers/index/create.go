@@ -29,14 +29,13 @@ import (
 )
 
 func Create(c *gin.Context) {
-	var newIndex core.Index
+	var newIndex meta.IndexSimple
 	if err := c.BindJSON(&newIndex); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	indexName := c.Param("target")
-
 	err := CreateIndexWorker(&newIndex, indexName)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -50,8 +49,7 @@ func Create(c *gin.Context) {
 	})
 }
 
-func CreateIndexWorker(newIndex *core.Index, indexName string) error {
-
+func CreateIndexWorker(newIndex *meta.IndexSimple, indexName string) error {
 	if newIndex.Name == "" && indexName != "" {
 		newIndex.Name = indexName
 	}

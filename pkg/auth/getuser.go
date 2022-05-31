@@ -16,67 +16,18 @@
 package auth
 
 import (
-	"context"
-	"errors"
-
-	"github.com/blugelabs/bluge"
-	"github.com/rs/zerolog/log"
-
-	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-func GetUser(userID string) (ZincUser, bool, error) {
-	userExists := false
-	var user ZincUser
-
-	if userID == "" {
-		return user, userExists, errors.New("user id is required")
+func GetUser(id string) (*meta.User, bool, error) {
+	if id == "" {
+		return nil, false, errors.New(errors.ErrorTypeInvalidArgument, "user id is required")
 	}
-
-	query := bluge.NewTermQuery(userID)
-	searchRequest := bluge.NewTopNSearch(1, query)
-	reader, err := core.ZINC_SYSTEM_INDEX_LIST["_users"].Writer.Reader()
+	user, err := metadata.User.Get(id)
 	if err != nil {
-		return user, userExists, err
+		return nil, false, err
 	}
-	defer reader.Close()
-	dmi, err := reader.Search(context.Background(), searchRequest)
-	if err != nil {
-		log.Printf("auth.GetUser: error executing search: %s", err.Error())
-		return user, userExists, err
-	}
-
-	next, err := dmi.Next()
-	for err == nil && next != nil {
-		userExists = true
-		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			switch field {
-			case "_id":
-				user.ID = string(value)
-			case "name":
-				user.Name = string(value)
-			case "salt":
-				user.Salt = string(value)
-			case "password":
-				user.Password = string(value)
-			case "role":
-				user.Role = string(value)
-			case "created_at":
-				user.CreatedAt, _ = bluge.DecodeDateTime(value)
-			case "@timestamp":
-				user.Timestamp, _ = bluge.DecodeDateTime(value)
-			default:
-			}
-
-			return true
-		})
-		if err != nil {
-			log.Printf("auth.GetUser: error accessing stored fields: %s", err.Error())
-			return user, userExists, err
-		} else {
-			return user, userExists, nil
-		}
-	}
-
-	return user, userExists, nil
+	return user, true, nil
 }

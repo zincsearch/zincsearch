@@ -22,64 +22,64 @@ import (
 	"testing"
 
 	"github.com/goccy/go-json"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDocumentBulk(t *testing.T) {
 
-	Convey("POST /api/_bulk", t, func() {
-		Convey("bulk documents", func() {
+	t.Run("POST /api/_bulk", func(t *testing.T) {
+		t.Run("bulk documents", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(bulkData)
 			resp := request("POST", "/api/_bulk", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 		})
-		Convey("bulk documents with delete", func() {
+		t.Run("bulk documents with delete", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(bulkDataWithDelete)
 			resp := request("POST", "/api/_bulk", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 		})
-		Convey("bulk with error input", func() {
+		t.Run("bulk with error input", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"index":{}}`)
 			resp := request("POST", "/api/_bulk", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 		})
 	})
 
-	Convey("POST /api/:target/_bulk", t, func() {
-		Convey("bulk create documents with not exist indexName", func() {
+	t.Run("POST /api/:target/_bulk", func(t *testing.T) {
+		t.Run("bulk create documents with not exist indexName", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			data := strings.ReplaceAll(bulkData, `"_index": "games3"`, `"_index": ""`)
 			body.WriteString(data)
 			resp := request("POST", "/api/notExistIndex/_bulk", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 		})
-		Convey("bulk create documents with exist indexName", func() {
+		t.Run("bulk create documents with exist indexName", func(t *testing.T) {
 			// create index
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"name": "` + indexName + `", "storage_type": "disk"}`)
 			resp := request("PUT", "/api/index", body)
-			So(resp.Code, ShouldEqual, http.StatusBadRequest)
+			assert.Equal(t, http.StatusBadRequest, resp.Code)
 
 			respData := make(map[string]string)
 			err := json.Unmarshal(resp.Body.Bytes(), &respData)
-			So(err, ShouldBeNil)
-			So(respData["error"], ShouldEqual, "index ["+indexName+"] already exists")
+			assert.NoError(t, err)
+			assert.Equal(t, "index ["+indexName+"] already exists", respData["error"])
 
 			// check bulk
 			body.Reset()
 			data := strings.ReplaceAll(bulkData, `"_index": "games3"`, `"_index": ""`)
 			body.WriteString(data)
 			resp = request("POST", "/api/"+indexName+"/_bulk", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 		})
-		Convey("bulk with error input", func() {
+		t.Run("bulk with error input", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"index":{}}`)
 			resp := request("POST", "/api/"+indexName+"/_bulk", body)
-			So(resp.Code, ShouldEqual, http.StatusOK)
+			assert.Equal(t, http.StatusOK, resp.Code)
 		})
 	})
 

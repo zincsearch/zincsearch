@@ -11,15 +11,15 @@
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
 
-        <q-toolbar-title>Zinc Search</q-toolbar-title>
+        <q-toolbar-title>{{ t("menu.zincSearch") }}</q-toolbar-title>
 
-        <div>
+        <div class="q-mr-xs">
           <q-btn-dropdown outline rounded no-caps icon-right="manage_accounts">
             <template #label>
               <div class="row items-center no-wrap">{{ user.name }}</div>
             </template>
             <q-list>
-              <q-item-label header>Account</q-item-label>
+              <q-item-label header>{{ t("menu.account") }}</q-item-label>
 
               <q-item v-ripple v-close-popup clickable @click="signout">
                 <q-item-section avatar>
@@ -31,12 +31,31 @@
                   />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>Sign Out</q-item-label>
+                  <q-item-label>{{ t("menu.signOut") }}</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
           </q-btn-dropdown>
         </div>
+
+        <div>
+          <q-btn-dropdown outline rounded no-caps icon-right="language">
+            <q-list>
+              <q-item v-ripple v-close-popup clickable @click="changeLanguage('en')">
+                <q-item-section>
+                  <q-item-label>English</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item v-ripple v-close-popup clickable @click="changeLanguage('zh-cn')">
+                <q-item-section>
+                  <q-item-label>简体中文</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+
+
       </q-toolbar>
     </q-header>
 
@@ -77,34 +96,9 @@
 
 <script lang="ts">
 import MenuLink from "../components/MenuLink.vue";
+import { useI18n } from "vue-i18n";
+import { setLanguage } from "../utils/cookies";
 
-const linksList = [
-  {
-    title: "Search",
-    icon: "manage_search",
-    link: "/search",
-  },
-  {
-    title: "Index",
-    icon: "list",
-    link: "/index",
-  },
-  {
-    title: "Template",
-    icon: "apps",
-    link: "/template",
-  },
-  {
-    title: "User",
-    icon: "people",
-    link: "/user",
-  },
-  {
-    title: "About",
-    icon: "info",
-    link: "/about",
-  },
-];
 
 import { ref } from "vue";
 import { useStore } from "vuex";
@@ -120,7 +114,39 @@ export default {
   setup() {
     const store = useStore();
     const router = useRouter();
+    const { t } = useI18n();
 
+    const linksList = [
+      {
+        title: t("menu.search"),
+        icon: "manage_search",
+        link: "/search",
+      },
+      {
+        title: t("menu.index"),
+        icon: "list",
+        link: "/index",
+      },
+      {
+        title:  t("menu.template"),
+        icon: "apps",
+        link: "/template",
+      },
+      {
+        title:  t("menu.user"),
+        icon: "people",
+        link: "/user",
+      },
+      {
+        title:  t("menu.about"),
+        icon: "info",
+        link: "/about",
+      },
+    ];
+    const changeLanguage = (language: string) => {
+      setLanguage(language);
+      router.go(0);
+    };
     const signout = () => {
       store.dispatch("logout");
       localStorage.setItem("creds", "");
@@ -128,9 +154,11 @@ export default {
     };
 
     return {
+      t,
       essentialLinks: linksList,
       leftDrawerOpen: ref(false),
       user: store.state.user,
+      changeLanguage,
       signout,
     };
   },

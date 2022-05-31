@@ -21,10 +21,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/auth"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func CreateUpdate(c *gin.Context) {
-	var user auth.ZincUser
+	var user meta.User
 	if err := c.BindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

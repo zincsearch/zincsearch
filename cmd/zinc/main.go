@@ -72,7 +72,7 @@ func main() {
 	}
 
 	shutdown(func(grace bool) {
-		core.CloseIndexes() // close all indexes
+		core.ZINC_INDEX_LIST.Close() // close all indexes
 		log.Info().Msgf("Index closed")
 		if grace {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)

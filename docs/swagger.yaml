@@ -12,21 +12,16 @@ definitions:
       password:
         type: string
     type: object
-  auth.LoginSuccess:
+  auth.LoginResponse:
     properties:
       user:
-        $ref: '#/definitions/auth.SimpleUser'
+        $ref: '#/definitions/auth.LoginUser'
       validated:
         type: boolean
     type: object
-  auth.SimpleUser:
+  auth.LoginUser:
     properties:
-      '@timestamp':
-        type: string
       _id:
-        description: this will be email
-        type: string
-      created_at:
         type: string
       name:
         type: string
@@ -59,7 +54,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.LoginSuccess'
+            $ref: '#/definitions/auth.LoginResponse'
         "400":
           description: Bad Request
           schema:

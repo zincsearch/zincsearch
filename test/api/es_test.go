@@ -22,252 +22,252 @@ import (
 	"testing"
 
 	"github.com/goccy/go-json"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestApiES(t *testing.T) {
-	Convey("test es api", t, func() {
-		Convey("POST /es/_bulk", func() {
-			Convey("bulk documents", func() {
+	t.Run("test es api", func(t *testing.T) {
+		t.Run("POST /es/_bulk", func(t *testing.T) {
+			t.Run("bulk documents", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(bulkData)
 				resp := request("POST", "/es/_bulk", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("bulk documents with delete", func() {
+			t.Run("bulk documents with delete", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(bulkDataWithDelete)
 				resp := request("POST", "/es/_bulk", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("bulk with error input", func() {
+			t.Run("bulk with error input", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`{"index":{}}`)
 				resp := request("POST", "/es/_bulk", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
 		})
 
-		Convey("POST /es/:target/_bulk", func() {
-			Convey("bulk create documents with not exist indexName", func() {
+		t.Run("POST /es/:target/_bulk", func(t *testing.T) {
+			t.Run("bulk create documents with not exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				data := strings.ReplaceAll(bulkData, `"_index": "games3"`, `"_index": ""`)
 				body.WriteString(data)
 				resp := request("POST", "/es/notExistIndex/_bulk", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("bulk create documents with exist indexName", func() {
+			t.Run("bulk create documents with exist indexName", func(t *testing.T) {
 				// create index
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`{"name": "` + indexName + `", "storage_type": "disk"}`)
 				resp := request("PUT", "/api/index", body)
-				So(resp.Code, ShouldEqual, http.StatusBadRequest)
+				assert.Equal(t, http.StatusBadRequest, resp.Code)
 
 				respData := make(map[string]string)
 				err := json.Unmarshal(resp.Body.Bytes(), &respData)
-				So(err, ShouldBeNil)
-				So(respData["error"], ShouldEqual, "index ["+indexName+"] already exists")
+				assert.NoError(t, err)
+				assert.Equal(t, "index ["+indexName+"] already exists", respData["error"])
 
 				// check bulk
 				body.Reset()
 				data := strings.ReplaceAll(bulkData, `"_index": "games3"`, `"_index": ""`)
 				body.WriteString(data)
 				resp = request("POST", "/es/"+indexName+"/_bulk", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("bulk with error input", func() {
+			t.Run("bulk with error input", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`{"index":{}}`)
 				resp := request("POST", "/es/"+indexName+"/_bulk", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
 		})
 
-		Convey("POST /es/:target/_doc", func() {
+		t.Run("POST /es/:target/_doc", func(t *testing.T) {
 			_id := ""
-			Convey("create document with not exist indexName", func() {
+			t.Run("create document with not exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/notExistIndex/_doc", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("create document with exist indexName", func() {
+			t.Run("create document with exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/"+indexName+"/_doc", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("create document with exist indexName not exist id", func() {
+			t.Run("create document with exist indexName not exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/"+indexName+"/_doc", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 
 				data := make(map[string]string)
 				err := json.Unmarshal(resp.Body.Bytes(), &data)
-				So(err, ShouldBeNil)
-				So(data["id"], ShouldNotEqual, "")
+				assert.NoError(t, err)
+				assert.NotEqual(t, "", data["id"])
 				_id = data["id"]
 			})
-			Convey("update document with exist indexName and exist id", func() {
+			t.Run("update document with exist indexName and exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				data := strings.Replace(indexData, "{", "{\"_id\": \""+_id+"\",", 1)
 				body.WriteString(data)
 				resp := request("POST", "/es/"+indexName+"/_doc", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("create document with error input", func() {
+			t.Run("create document with error input", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`data`)
 				resp := request("POST", "/es/"+indexName+"/_doc", body)
-				So(resp.Code, ShouldEqual, http.StatusBadRequest)
+				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
 		})
 
-		Convey("PUT /es/:target/_doc/:id", func() {
-			Convey("update document with not exist indexName", func() {
+		t.Run("PUT /es/:target/_doc/:id", func(t *testing.T) {
+			t.Run("update document with not exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("PUT", "/es/notExistIndex/_doc/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with exist indexName", func() {
+			t.Run("update document with exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("PUT", "/es/"+indexName+"/_doc/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("create document with exist indexName not exist id", func() {
+			t.Run("create document with exist indexName not exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("PUT", "/es/"+indexName+"/_doc/notexist", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with exist indexName and exist id", func() {
+			t.Run("update document with exist indexName and exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("PUT", "/es/"+indexName+"/_doc/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with error input", func() {
+			t.Run("update document with error input", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`xxx`)
 				resp := request("PUT", "/es/"+indexName+"/_doc/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusBadRequest)
+				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
 		})
 
-		Convey("DELETE /es/:target/_doc/:id", func() {
-			Convey("delete document with not exist indexName", func() {
+		t.Run("DELETE /es/:target/_doc/:id", func(t *testing.T) {
+			t.Run("delete document with not exist indexName", func(t *testing.T) {
 				resp := request("DELETE", "/es/notExistIndexDelete/_doc/1111", nil)
-				So(resp.Code, ShouldEqual, http.StatusBadRequest)
+				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
-			Convey("delete document with exist indexName not exist id", func() {
+			t.Run("delete document with exist indexName not exist id", func(t *testing.T) {
 				resp := request("DELETE", "/es/"+indexName+"/_doc/notexist", nil)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("delete document with exist indexName and exist id", func() {
+			t.Run("delete document with exist indexName and exist id", func(t *testing.T) {
 				resp := request("DELETE", "/es/"+indexName+"/_doc/1111", nil)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
 		})
 
-		Convey("PUT /es/:target/_create/:id", func() {
-			Convey("update document with not exist indexName", func() {
+		t.Run("PUT /es/:target/_create/:id", func(t *testing.T) {
+			t.Run("update document with not exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("PUT", "/es/notExistIndexCreate/_create/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with exist indexName", func() {
+			t.Run("update document with exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("PUT", "/es/"+indexName+"/_create/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with exist indexName not exist id", func() {
+			t.Run("update document with exist indexName not exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("PUT", "/es/"+indexName+"/_create/notexistCreate", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with exist indexName and exist id", func() {
+			t.Run("update document with exist indexName and exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("PUT", "/es/"+indexName+"/_create/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with error input", func() {
+			t.Run("update document with error input", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`xxx`)
 				resp := request("PUT", "/es/"+indexName+"/_create/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusBadRequest)
+				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
 		})
 
-		Convey("POST /es/:target/_create/:id", func() {
-			Convey("update document with not exist indexName", func() {
+		t.Run("POST /es/:target/_create/:id", func(t *testing.T) {
+			t.Run("update document with not exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/notExistIndexCreate/_create/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with exist indexName", func() {
+			t.Run("update document with exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/"+indexName+"/_create/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with exist indexName not exist id", func() {
+			t.Run("update document with exist indexName not exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/"+indexName+"/_create/notexistCreate", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with exist indexName and exist id", func() {
+			t.Run("update document with exist indexName and exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/"+indexName+"/_create/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with error input", func() {
+			t.Run("update document with error input", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`xxx`)
 				resp := request("POST", "/es/"+indexName+"/_create/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusBadRequest)
+				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
 		})
 
-		Convey("POST /es/:target/_update/:id", func() {
-			Convey("update document with not exist indexName", func() {
+		t.Run("POST /es/:target/_update/:id", func(t *testing.T) {
+			t.Run("update document with not exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/notExistIndexCreate/_update/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with exist indexName", func() {
+			t.Run("update document with exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/"+indexName+"/_update/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with exist indexName not exist id", func() {
+			t.Run("update document with exist indexName not exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/"+indexName+"/_update/notexistCreate", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with exist indexName and exist id", func() {
+			t.Run("update document with exist indexName and exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/"+indexName+"/_update/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusOK)
+				assert.Equal(t, http.StatusOK, resp.Code)
 			})
-			Convey("update document with error input", func() {
+			t.Run("update document with error input", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`xxx`)
 				resp := request("POST", "/es/"+indexName+"/_update/1111", body)
-				So(resp.Code, ShouldEqual, http.StatusBadRequest)
+				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
 		})
 

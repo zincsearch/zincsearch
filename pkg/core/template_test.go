@@ -70,7 +70,7 @@ func TestListTemplates(t *testing.T) {
 		},
 	}
 
-	templates := map[string]*meta.Template{
+	templates := map[string]*meta.IndexTemplate{
 		"log": {
 			IndexPatterns: []string{"TestListTemplates-log-*"},
 			Priority:      100,
@@ -119,7 +119,7 @@ func TestListTemplates(t *testing.T) {
 func TestNewTemplate(t *testing.T) {
 	type args struct {
 		name     string
-		template *meta.Template
+		template *meta.IndexTemplate
 	}
 	tests := []struct {
 		name    string
@@ -130,7 +130,7 @@ func TestNewTemplate(t *testing.T) {
 			name: "log",
 			args: args{
 				name: "log",
-				template: &meta.Template{
+				template: &meta.IndexTemplate{
 					IndexPatterns: []string{"TestNewTemplate-log-*"},
 					Priority:      100,
 				},
@@ -140,7 +140,7 @@ func TestNewTemplate(t *testing.T) {
 			name: "error",
 			args: args{
 				name: "error",
-				template: &meta.Template{
+				template: &meta.IndexTemplate{
 					IndexPatterns: []string{"TestNewTemplate-error-*", "TestNewTemplate-log-error-*"},
 					Priority:      100,
 				},
@@ -150,7 +150,7 @@ func TestNewTemplate(t *testing.T) {
 			name: "with same name",
 			args: args{
 				name: "error",
-				template: &meta.Template{
+				template: &meta.IndexTemplate{
 					IndexPatterns: []string{"TestNewTemplate-error-*"},
 					Priority:      199,
 				},
@@ -161,7 +161,7 @@ func TestNewTemplate(t *testing.T) {
 			name: "with different priority",
 			args: args{
 				name: "error3",
-				template: &meta.Template{
+				template: &meta.IndexTemplate{
 					IndexPatterns: []string{"TestNewTemplate-error-*"},
 					Priority:      199,
 				},
@@ -172,7 +172,7 @@ func TestNewTemplate(t *testing.T) {
 			name: "with same priority",
 			args: args{
 				name: "error4",
-				template: &meta.Template{
+				template: &meta.IndexTemplate{
 					IndexPatterns: []string{"TestNewTemplate-error-*"},
 					Priority:      199,
 				},
@@ -241,7 +241,7 @@ func TestLoadTemplate(t *testing.T) {
 		},
 	}
 
-	templates := map[string]*meta.Template{
+	templates := map[string]*meta.IndexTemplate{
 		"log": {
 			IndexPatterns: []string{"TestLoadTemplate-log-*"},
 			Priority:      100,
@@ -367,7 +367,7 @@ func TestUseTemplate(t *testing.T) {
 		},
 	}
 
-	templates := map[string]*meta.Template{
+	templates := map[string]*meta.IndexTemplate{
 		"log": {
 			IndexPatterns: []string{"TestUseTemplate-log-*"},
 			Priority:      100,

@@ -16,13 +16,11 @@
 package core
 
 import (
-	"context"
 	"math"
 	"runtime"
 	"sync"
 	"time"
 
-	"github.com/blugelabs/bluge"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/shirou/gopsutil/cpu"
@@ -30,8 +28,10 @@ import (
 	"gopkg.in/segmentio/analytics-go.v3"
 
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
 // Telemetry instance
@@ -56,9 +56,7 @@ func newTelemetry() *telemetry {
 
 func (t *telemetry) createInstanceID() string {
 	instanceID := ider.Generate()
-	doc := bluge.NewDocument("instance_id")
-	doc.AddField(bluge.NewKeywordField("value", instanceID).StoreValue())
-	_ = ZINC_SYSTEM_INDEX_LIST["_metadata"].Writer.Update(doc.ID(), doc)
+	_ = metadata.KV.Set("instance_id", []byte(instanceID))
 	return instanceID
 }
 
@@ -67,37 +65,18 @@ func (t *telemetry) getInstanceID() string {
 		return t.instanceID
 	}
 
-	query := bluge.NewTermQuery("instance_id").SetField("_id")
-	searchRequest := bluge.NewTopNSearch(1, query)
-	reader, err := ZINC_SYSTEM_INDEX_LIST["_metadata"].Writer.Reader()
+	val, err := metadata.KV.Get("instance_id")
 	if err != nil {
-		log.Error().Err(err).Msg("error getting instance id from _metadata")
-		t.instanceID = t.createInstanceID()
-		return t.instanceID
-	}
-	defer reader.Close()
-	dmi, err := reader.Search(context.Background(), searchRequest)
-	if err != nil {
-		log.Error().Err(err).Msg("core.Telemetry.GetInstanceID: error executing search")
-	}
-
-	next, err := dmi.Next()
-	if err == nil && next != nil {
-		err = next.VisitStoredFields(func(field string, value []byte) bool {
-			if field == "value" {
-				t.instanceID = string(value)
-			}
-			return true
-		})
-		if err != nil {
+		if err != errors.ErrKeyNotFound {
 			log.Error().Err(err).Msg("core.Telemetry.GetInstanceID: error accessing stored fields")
 		}
 	}
-
+	if val != nil {
+		t.instanceID = string(val)
+	}
 	if t.instanceID == "" {
 		t.instanceID = t.createInstanceID()
 	}
-
 	return t.instanceID
 }
 
@@ -124,7 +103,7 @@ func (t *telemetry) Instance() {
 	}
 
 	traits := analytics.NewTraits().
-		Set("index_count", len(ZINC_INDEX_LIST)).
+		Set("index_count", ZINC_INDEX_LIST.Len()).
 		Set("total_index_size_mb", t.TotalIndexSize())
 
 	for k, v := range t.baseInfo {
@@ -165,14 +144,14 @@ func (t *telemetry) runEvents() {
 
 func (t *telemetry) TotalIndexSize() float64 {
 	TotalIndexSize := 0.0
-	for k := range ZINC_INDEX_LIST {
-		TotalIndexSize += t.GetIndexSize(k)
+	for _, idx := range ZINC_INDEX_LIST.List() {
+		TotalIndexSize += t.GetIndexSize(idx.Name)
 	}
 	return math.Round(TotalIndexSize)
 }
 
 func (t *telemetry) GetIndexSize(indexName string) float64 {
-	if index, ok := ZINC_INDEX_LIST[indexName]; ok {
+	if index, ok := ZINC_INDEX_LIST.Get(indexName); ok {
 		return index.LoadStorageSize()
 	}
 	return 0.0
@@ -181,7 +160,7 @@ func (t *telemetry) GetIndexSize(indexName string) float64 {
 func (t *telemetry) HeartBeat() {
 	m, _ := mem.VirtualMemory()
 	data := make(map[string]interface{})
-	data["index_count"] = len(ZINC_INDEX_LIST)
+	data["index_count"] = ZINC_INDEX_LIST.Len()
 	data["total_index_size_mb"] = t.TotalIndexSize()
 	data["memory_used_percent"] = m.UsedPercent
 	t.Event("heartbeat", data)

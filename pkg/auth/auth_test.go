@@ -19,6 +19,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func TestVerifyCredentials(t *testing.T) {
@@ -29,7 +31,7 @@ func TestVerifyCredentials(t *testing.T) {
 	tests := []struct {
 		name  string
 		args  args
-		want  SimpleUser
+		want  meta.User
 		want1 bool
 	}{
 		{
@@ -38,7 +40,7 @@ func TestVerifyCredentials(t *testing.T) {
 				userID:   "admin",
 				password: "Complexpass#123",
 			},
-			want: SimpleUser{
+			want: meta.User{
 				ID: "admin",
 			},
 			want1: true,
@@ -49,7 +51,7 @@ func TestVerifyCredentials(t *testing.T) {
 				userID:   "admin",
 				password: "xxxxxxxx",
 			},
-			want: SimpleUser{
+			want: meta.User{
 				ID: "",
 			},
 			want1: false,
@@ -60,7 +62,7 @@ func TestVerifyCredentials(t *testing.T) {
 				userID:   "xxxxxxxx",
 				password: "xxxxxxxx",
 			},
-			want: SimpleUser{
+			want: meta.User{
 				ID: "",
 			},
 			want1: false,
@@ -69,8 +71,10 @@ func TestVerifyCredentials(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, got1 := VerifyCredentials(tt.args.userID, tt.args.password)
-			assert.Equal(t, tt.want.ID, got.ID)
 			assert.Equal(t, tt.want1, got1)
+			if tt.want1 {
+				assert.Equal(t, tt.want.ID, got.ID)
+			}
 		})
 	}
 }

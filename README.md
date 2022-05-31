@@ -42,10 +42,10 @@ Note: Do not store sensitive data on this server as its available to everyone on
 8. aggregation support
 
 # Roadmap items:
-1. High Availability
-1. Distributed reads and writes
-1. Geosptial search
-1. Raise an issue if you are looking for something.
+
+Public roadmap is available at https://github.com/orgs/zinclabs/projects/3/views/1
+
+Please create an issue if you would like something to be added to the roadmap.
 
 # Screenshots
 
@@ -61,39 +61,43 @@ Note: Do not store sensitive data on this server as its available to everyone on
 
 ## Download / Installation / Run
 
-Check installation [installation docs](https://docs.zinclabs.io/04_installation/)
+Check installation [installation docs](https://docs.zincsearch.com/04_installation/)
 
 
 ## Data ingestion
 
 ### Single record
 
-Check [single record ingestion docs](https://docs.zinclabs.io/ingestion/single-record/)
+Check [single record ingestion docs](https://docs.zincsearch.com/ingestion/single-record/)
 
 ### Bulk ingestion
 
-Check [bulk ingestion docs](https://docs.zinclabs.io/ingestion/bulk-ingestion/#bulk-ingestion)
+Check [bulk ingestion docs](https://docs.zincsearch.com/ingestion/bulk-ingestion/#bulk-ingestion)
 
 ### Fluent bit
 
-Check [fluet-bit ingestion docs](https://docs.zinclabs.io/ingestion/fluent-bit/)
+Check [fluet-bit ingestion docs](https://docs.zincsearch.com/ingestion/fluent-bit/)
 
 ### Syslog-ng
 
-Check [syslog-ng ingestion docs](https://docs.zinclabs.io/ingestion/syslog-ng/)
+Check [syslog-ng ingestion docs](https://docs.zincsearch.com/ingestion/syslog-ng/)
 
 ## API Reference
 
-Check [Zinc API docs](https://docs.zinclabs.io/API%20Reference/)
+Check [Zinc API docs](https://docs.zincsearch.com/API%20Reference/)
 
+# Releases
+
+ZincSearch currently has most of its API contracts frozen. It's data format may still experience changes as we improve things. Currently ZincSearch is in beta. Data format should become highly stable when we move to GA (version 1).
 
 # How to develop and contribute to Zinc
 
-Check the [contributing guide](./CONTRIBUTING.md)
+Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap items](https://github.com/orgs/zinclabs/projects/3)
 
 # Who uses Zinc (Known users)?
 
 1. [Quadrantsec](https://quadrantsec.com/)
+2. [Accodeing to you](https://accodeing.com/)
 
 Please do raise a PR adding your details if you are using Zinc.
 

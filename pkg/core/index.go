@@ -35,12 +35,21 @@ import (
 	"github.com/zinclabs/zinc/pkg/zutils/flatten"
 )
 
+type Index struct {
+	meta.Index
+	DocsCount           int64                         `json:"docs_count"`
+	StorageSize         int64                         `json:"storage_size"`
+	StorageSizeNextTime time.Time                     `json:"-"`
+	CachedAnalyzers     map[string]*analysis.Analyzer `json:"-"`
+	Writer              *bluge.Writer                 `json:"-"`
+}
+
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
 // If no mappings are found, it creates te mapping for all the encountered fields. If mapping for some fields is found but not for others
 // then it creates the mapping for the missing fields.
 func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]interface{}) (*bluge.Document, error) {
 	// Pick the index mapping from the cache if it already exists
-	mappings := index.CachedMappings
+	mappings := index.Mappings
 	if mappings == nil {
 		mappings = meta.NewMappings()
 	}
@@ -146,7 +155,7 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 			return fmt.Errorf("field [%s] was set type to [text] but got a %T value", key, value)
 		}
 		field = bluge.NewTextField(key, v).SearchTermPositions()
-		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.CachedAnalyzers, index.CachedMappings, key)
+		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.CachedAnalyzers, index.Mappings, key)
 		if fieldAnalyzer != nil {
 			field.WithAnalyzer(fieldAnalyzer)
 		}
@@ -196,20 +205,17 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 			}
 		}
 	}
-	if prop.Store {
+	if prop.Store || prop.Highlightable {
 		field.StoreValue()
+	}
+	if prop.Highlightable {
+		field.HighlightMatches()
 	}
 	if prop.Sortable {
 		field.Sortable()
 	}
 	if prop.Aggregatable {
 		field.Aggregatable()
-	}
-	if prop.Highlightable {
-		field.HighlightMatches()
-	}
-	if prop.TermPositions {
-		field.SearchTermPositions()
 	}
 	bdoc.AddField(field)
 
@@ -277,8 +283,7 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 	mappings.SetProperty("@timestamp", meta.NewProperty("date"))
 
 	// update in the cache
-	index.CachedMappings = mappings
-	index.Mappings = nil
+	index.Mappings = mappings
 
 	return nil
 }
@@ -321,7 +326,7 @@ func (index *Index) ReLoadStorageSize() {
 
 	index.StorageSizeNextTime = time.Now().Add(time.Minute * 10)
 	go func() {
-		index.StorageSize = index.LoadStorageSize()
+		atomic.StoreInt64(&index.StorageSize, int64(index.LoadStorageSize()))
 	}()
 }
 

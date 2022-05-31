@@ -32,8 +32,8 @@ func TestGetAllUsersWorker(t *testing.T) {
 	t.Run("get all users", func(t *testing.T) {
 		// wait for _users prepared
 		time.Sleep(time.Second)
-		got, err := GetAllUsersWorker()
+		got, err := GetUsers()
 		assert.NoError(t, err)
-		assert.GreaterOrEqual(t, got.Hits.Total.Value, 1)
+		assert.GreaterOrEqual(t, len(got), 1)
 	})
 }

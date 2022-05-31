@@ -24,10 +24,5 @@ import (
 var embedFrontend embed.FS
 
 func GetFrontendAssets() (fs.FS, error) {
-	f, err := fs.Sub(embedFrontend, "web/dist")
-	if err != nil {
-		return nil, err
-	}
-
-	return f, nil
+	return fs.Sub(embedFrontend, "web/dist")
 }

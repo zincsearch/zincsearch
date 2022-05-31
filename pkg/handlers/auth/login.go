@@ -26,7 +26,7 @@ import (
 // @Summary Login
 // @Produce json
 // @Param login body LoginRequest true "Login Credentials"
-// @Success 200 {object} LoginSuccess
+// @Success 200 {object} LoginResponse
 // @Failure 400 {object} LoginError
 // @Router /login [post]
 func Login(c *gin.Context) {
@@ -38,10 +38,24 @@ func Login(c *gin.Context) {
 	}
 
 	loggedInUser, validationResult := auth.VerifyCredentials(loginInput.ID, loginInput.Password)
-	c.JSON(http.StatusOK, LoginSuccess{
+	var resUser LoginUser
+	if validationResult {
+		resUser = LoginUser{
+			ID:   loggedInUser.ID,
+			Name: loggedInUser.Name,
+			Role: loggedInUser.Role,
+		}
+	}
+	c.JSON(http.StatusOK, LoginResponse{
 		Validated: validationResult,
-		User:      loggedInUser,
+		User:      resUser,
 	})
+}
+
+type LoginUser struct {
+	ID   string `json:"_id"`
+	Name string `json:"name"`
+	Role string `json:"role"`
 }
 
 type LoginRequest struct {
@@ -53,7 +67,7 @@ type LoginError struct {
 	Error string `json:"error"`
 }
 
-type LoginSuccess struct {
-	Validated bool            `json:"validated"`
-	User      auth.SimpleUser `json:"user"`
+type LoginResponse struct {
+	Validated bool      `json:"validated"`
+	User      LoginUser `json:"user"`
 }

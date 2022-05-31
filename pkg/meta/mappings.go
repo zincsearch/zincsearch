@@ -15,7 +15,11 @@
 
 package meta
 
-import "sync"
+import (
+	"bytes"
+	"encoding/json"
+	"sync"
+)
 
 type Mappings struct {
 	Properties map[string]Property `json:"properties,omitempty"`
@@ -32,7 +36,6 @@ type Property struct {
 	Sortable       bool   `json:"sortable"`
 	Aggregatable   bool   `json:"aggregatable"`
 	Highlightable  bool   `json:"highlightable"`
-	TermPositions  bool   `json:"term_positions"` // SearchTermPositions
 }
 
 func NewMappings() *Mappings {
@@ -52,14 +55,11 @@ func NewProperty(typ string) Property {
 		Sortable:       true,
 		Aggregatable:   true,
 		Highlightable:  false,
-		TermPositions:  false,
 	}
 	if typ == "text" {
-		p.TermPositions = true
 		p.Sortable = false
 		p.Aggregatable = false
 	}
-
 	return p
 }
 
@@ -91,4 +91,18 @@ func (t *Mappings) ListProperty() map[string]Property {
 	}
 	t.lock.RUnlock()
 	return m
+}
+
+func (t *Mappings) MarshalJSON() ([]byte, error) {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+	b := bytes.NewBuffer(nil)
+	b.WriteString(`{"properties":`)
+	p, err := json.Marshal(t.Properties)
+	if err != nil {
+		return nil, err
+	}
+	b.Write(p)
+	b.WriteByte('}')
+	return b.Bytes(), nil
 }

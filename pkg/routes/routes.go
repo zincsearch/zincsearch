@@ -105,7 +105,7 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/api/:target/_analyze", AuthMiddleware, index.Analyze)
 
 	// search
-	r.POST("/api/:target/_search", AuthMiddleware, search.SearchDSL)
+	r.POST("/api/:target/_search", AuthMiddleware, search.SearchV1)
 
 	// document
 	// Document Bulk update/insert

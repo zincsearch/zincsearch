@@ -15,43 +15,50 @@
 
 package auth
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestDeleteUser(t *testing.T) {
 	type args struct {
-		userID string
+		id string
 	}
 	tests := []struct {
-		name string
-		args args
-		want bool
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "delete user testuser",
 			args: args{
-				userID: "testuser",
+				id: "testuser",
 			},
-			want: true,
+			wantErr: false,
 		},
 		{
 			name: "delete user not exists user",
 			args: args{
-				userID: "testuserNotExists",
+				id: "testuserNotExists",
 			},
-			want: true,
+			wantErr: false,
 		},
 		{
 			name: "delete user empty",
 			args: args{
-				userID: "",
+				id: "",
 			},
-			want: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := DeleteUser(tt.args.userID); got != tt.want {
-				t.Errorf("DeleteUser() = %v, want %v", got, tt.want)
+			err := DeleteUser(tt.args.id)
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}

@@ -18,20 +18,20 @@ package zinc
 import (
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetFrontendAssets(t *testing.T) {
-	Convey("embed::GetFrontendAssets", t, func() {
+	t.Run("embed::GetFrontendAssets", func(t *testing.T) {
 		f, err := GetFrontendAssets()
-		So(err, ShouldBeNil)
-		So(f, ShouldNotBeNil)
-		Convey("index.html", func() {
+		assert.NoError(t, err)
+		assert.NotNil(t, f)
+		t.Run("index.html", func(t *testing.T) {
 			ff, err := f.Open("index.html")
-			So(err, ShouldBeNil)
+			assert.NoError(t, err)
 			fs, err := ff.Stat()
-			So(err, ShouldBeNil)
-			So(fs.Name(), ShouldEqual, "index.html")
+			assert.NoError(t, err)
+			assert.Equal(t, "index.html", fs.Name())
 		})
 	})
 }

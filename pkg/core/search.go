@@ -31,7 +31,7 @@ import (
 )
 
 func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) {
-	searchRequest, err := uquery.ParseQueryDSL(query, index.CachedMappings, index.CachedAnalyzers)
+	searchRequest, err := uquery.ParseQueryDSL(query, index.Mappings, index.CachedAnalyzers)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) 
 		return nil, err
 	}
 
-	return searchV2(dmi, query, index.CachedMappings)
+	return searchV2(dmi, query, index.Mappings)
 }
 
 func searchV2(dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings *meta.Mappings) (*meta.SearchResponse, error) {

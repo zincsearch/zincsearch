@@ -23,26 +23,23 @@ import (
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/blugelabs/bluge"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
 func DeleteIndex(name string) error {
-	// 0. Check if index exists and Get the index storage type - disk, s3 or memory
+	// 1. Check if index exists
 	index, exists := GetIndex(name)
 	if !exists {
 		return errors.New("index " + name + " does not exists")
 	}
 
-	// 1. Close the index
-	_ = index.Close()
-
-	// 2. Delete from the cache
-	delete(ZINC_INDEX_LIST, index.Name)
+	// 2. Close and Delete from cache
+	ZINC_INDEX_LIST.Delete(name)
 
 	// 3. Physically delete the index
 	if index.StorageType == "disk" {
@@ -55,21 +52,19 @@ func DeleteIndex(name string) error {
 	} else if index.StorageType == "s3" {
 		err := deleteFilesForIndexFromS3(index.Name)
 		if err != nil {
-			log.Error().Msgf("failed to delete index: %s", err.Error())
+			log.Error().Msgf("failed to delete index from S3: %s", err.Error())
 			return err
 		}
 	} else if index.StorageType == "minio" {
 		err := deleteFilesForIndexFromMinIO(index.Name)
 		if err != nil {
-			log.Error().Msgf("failed to delete index: %s", err.Error())
+			log.Error().Msgf("failed to delete index from minIO: %s", err.Error())
 			return err
 		}
 	}
 
-	// 4. Delete metadata
-	bdoc := bluge.NewDocument(name)
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", nil))
-	return ZINC_SYSTEM_INDEX_LIST["_index"].Writer.Delete(bdoc.ID())
+	// 4. Delete form metadata
+	return metadata.Index.Delete(name)
 }
 
 func deleteFilesForIndexFromMinIO(indexName string) error {
@@ -86,7 +81,7 @@ func deleteFilesForIndexFromMinIO(indexName string) error {
 	// Initialize minio client object.
 	minioClient, err := minio.New(endpoint, &opts)
 	if err != nil {
-		log.Print(err)
+		return err
 	}
 
 	listOpts := minio.ListObjectsOptions{
@@ -98,10 +93,6 @@ func deleteFilesForIndexFromMinIO(indexName string) error {
 
 	for object := range objects {
 		log.Print("Deleting: ", object.Key)
-
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil

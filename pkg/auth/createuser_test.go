@@ -19,11 +19,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func TestCreateUser(t *testing.T) {
 	type args struct {
-		userID            string
+		id                string
 		name              string
 		plaintextPassword string
 		role              string
@@ -31,18 +32,18 @@ func TestCreateUser(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *ZincUser
+		want    *meta.User
 		wantErr bool
 	}{
 		{
 			name: "create user",
 			args: args{
-				userID:            "testuser",
+				id:                "testuser",
 				name:              "Test User",
 				plaintextPassword: "testpassword",
 				role:              "admin",
 			},
-			want: &ZincUser{
+			want: &meta.User{
 				ID:   "testuser",
 				Name: "Test User",
 				Role: "admin",
@@ -52,12 +53,12 @@ func TestCreateUser(t *testing.T) {
 		{
 			name: "update exists user",
 			args: args{
-				userID:            "testuser",
+				id:                "testuser",
 				name:              "Test User Updated",
 				plaintextPassword: "testpassword",
 				role:              "admin",
 			},
-			want: &ZincUser{
+			want: &meta.User{
 				ID:   "testuser",
 				Name: "Test User Updated",
 				Role: "admin",
@@ -65,11 +66,11 @@ func TestCreateUser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "create user with empty userID",
+			name: "create user with empty id",
 			args: args{
-				userID: "",
+				id: "",
 			},
-			want: &ZincUser{
+			want: &meta.User{
 				ID: "",
 			},
 			wantErr: true,
@@ -77,7 +78,7 @@ func TestCreateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := CreateUser(tt.args.userID, tt.args.name, tt.args.plaintextPassword, tt.args.role)
+			got, err := CreateUser(tt.args.id, tt.args.name, tt.args.plaintextPassword, tt.args.role)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return

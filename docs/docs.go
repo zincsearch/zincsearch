@@ -42,7 +42,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.LoginSuccess"
+                            "$ref": "#/definitions/auth.LoginResponse"
                         }
                     },
                     "400": {
@@ -75,28 +75,21 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.LoginSuccess": {
+        "auth.LoginResponse": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/auth.SimpleUser"
+                    "$ref": "#/definitions/auth.LoginUser"
                 },
                 "validated": {
                     "type": "boolean"
                 }
             }
         },
-        "auth.SimpleUser": {
+        "auth.LoginUser": {
             "type": "object",
             "properties": {
-                "@timestamp": {
-                    "type": "string"
-                },
                 "_id": {
-                    "description": "this will be email",
-                    "type": "string"
-                },
-                "created_at": {
                     "type": "string"
                 },
                 "name": {

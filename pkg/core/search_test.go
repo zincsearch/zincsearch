@@ -48,6 +48,7 @@ func TestIndex_Search(t *testing.T) {
 							},
 						},
 					},
+					Size: 10,
 				},
 			},
 			data: []map[string]interface{}{
@@ -72,6 +73,7 @@ func TestIndex_Search(t *testing.T) {
 							},
 						},
 					},
+					Size: 10,
 				},
 			},
 			data: []map[string]interface{}{
@@ -100,6 +102,7 @@ func TestIndex_Search(t *testing.T) {
 					Query: &meta.Query{
 						MatchAll: &meta.MatchAllQuery{},
 					},
+					Size: 10,
 				},
 			},
 			data: []map[string]interface{}{
@@ -124,6 +127,7 @@ func TestIndex_Search(t *testing.T) {
 							},
 						},
 					},
+					Size: 10,
 				},
 			},
 			data: []map[string]interface{}{
@@ -148,6 +152,7 @@ func TestIndex_Search(t *testing.T) {
 							},
 						},
 					},
+					Size: 10,
 				},
 			},
 			data: []map[string]interface{}{
@@ -178,6 +183,7 @@ func TestIndex_Search(t *testing.T) {
 							Query: "angeles",
 						},
 					},
+					Size: 10,
 				},
 			},
 			data: []map[string]interface{}{
@@ -209,6 +215,7 @@ func TestIndex_Search(t *testing.T) {
 						},
 					},
 					Timeout: 1,
+					Size:    10,
 					Fields:  []interface{}{"address.city"},
 					Highlight: &meta.Highlight{
 						Fields: map[string]*meta.Highlight{
@@ -287,10 +294,10 @@ func TestIndex_Search(t *testing.T) {
 			err = StoreIndex(index)
 			assert.NoError(t, err)
 
-			if (index.CachedMappings) == nil {
-				index.CachedMappings = meta.NewMappings()
+			if (index.Mappings) == nil {
+				index.Mappings = meta.NewMappings()
 			}
-			index.CachedMappings.SetProperty("address.city", meta.Property{
+			index.Mappings.SetProperty("address.city", meta.Property{
 				Type:          "text",
 				Index:         true,
 				Store:         true,

@@ -19,32 +19,33 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func TestGetUser(t *testing.T) {
 	type args struct {
-		userID string
+		id string
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    ZincUser
+		want    *meta.User
 		want1   bool
 		wantErr bool
-		input   *ZincUser
+		input   *meta.User
 	}{
 		{
 			name: "get user",
 			args: args{
-				userID: "testuser",
+				id: "testuser",
 			},
-			want: ZincUser{
+			want: &meta.User{
 				ID:   "testuser",
 				Name: "Test User",
 				Role: "admin",
 			},
 			want1: true,
-			input: &ZincUser{
+			input: &meta.User{
 				ID:       "testuser",
 				Name:     "Test User",
 				Role:     "admin",
@@ -54,12 +55,10 @@ func TestGetUser(t *testing.T) {
 		{
 			name: "get user not exists",
 			args: args{
-				userID: "testuserNotExists",
+				id: "testuserNotExists",
 			},
-			want: ZincUser{
-				ID: "",
-			},
-			want1: false,
+			want1:   false,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -69,7 +68,11 @@ func TestGetUser(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, got)
 			}
-			got, got1, err := GetUser(tt.args.userID)
+			got, got1, err := GetUser(tt.args.id)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
 			assert.NoError(t, err)
 			assert.Equal(t, tt.want.ID, got.ID)
 			assert.Equal(t, tt.want.Name, got.Name)

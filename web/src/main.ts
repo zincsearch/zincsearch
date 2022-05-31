@@ -10,7 +10,7 @@ import "@quasar/extras/material-icons/material-icons.css";
 
 // Import Quasar css
 import "quasar/src/css/index.sass";
-
+import i18n from "./locales";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
@@ -19,7 +19,7 @@ const myApp = createApp(App);
 
 myApp.use(Quasar, {
   plugins: [Dialog, Notify], // import Quasar plugins and add here
-});
+}).use(i18n);
 
 myApp.use(VueApexCharts);
 
