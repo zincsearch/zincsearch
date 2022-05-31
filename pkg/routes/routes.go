@@ -79,12 +79,14 @@ func SetRoutes(r *gin.Engine) {
 
 	// auth
 	r.POST("/api/login", auth.Login)
+	r.POST("/api/user", AuthMiddleware, auth.CreateUpdate)
 	r.PUT("/api/user", AuthMiddleware, auth.CreateUpdate)
 	r.DELETE("/api/user/:id", AuthMiddleware, auth.Delete)
 	r.GET("/api/user", AuthMiddleware, auth.List)
 
 	// index
 	r.GET("/api/index", AuthMiddleware, index.List)
+	r.POST("/api/index", AuthMiddleware, index.Create)
 	r.PUT("/api/index", AuthMiddleware, index.Create)
 	r.PUT("/api/index/:target", AuthMiddleware, index.Create)
 	r.DELETE("/api/index/:target", AuthMiddleware, index.Delete)
@@ -105,6 +107,7 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/api/_bulk", AuthMiddleware, document.Bulk)
 	r.POST("/api/:target/_bulk", AuthMiddleware, document.Bulk)
 	// Document CRUD APIs. Update is same as create.
+	r.POST("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)
 	r.PUT("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)
 	r.PUT("/api/:target/_doc/:id", AuthMiddleware, document.CreateUpdate)
 	r.DELETE("/api/:target/_doc/:id", AuthMiddleware, document.Delete)
