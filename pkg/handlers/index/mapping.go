@@ -55,25 +55,35 @@ func SetMapping(c *gin.Context) {
 		return
 	}
 
-	index, exists := core.GetIndex(indexName)
-	if exists {
-		// check if mapping is empty
-		if index.Mappings != nil && index.Mappings.Len() > 0 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "index [" + indexName + "] already exists"})
-			return
-		}
-	}
-
 	mappings, err := mappings.Request(nil, newIndex.Mappings)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	index, err = core.NewIndex(indexName, newIndex.StorageType, nil)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+	index, exists := core.GetIndex(indexName)
+	if exists {
+		// check if mapping field is exists
+		if index.Mappings != nil && index.Mappings.Len() > 0 {
+			for field := range mappings.ListProperty() {
+				if _, ok := index.Mappings.GetProperty(field); ok {
+					c.JSON(http.StatusBadRequest, gin.H{"error": "index [" + indexName + "] already exists mapping of field [" + field + "]"})
+					return
+				}
+			}
+		}
+		// add mappings
+		for field, prop := range mappings.ListProperty() {
+			index.Mappings.SetProperty(field, prop)
+		}
+		mappings = index.Mappings
+	} else {
+		// create index
+		index, err = core.NewIndex(indexName, newIndex.StorageType, nil)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 	}
 
 	// update mappings
