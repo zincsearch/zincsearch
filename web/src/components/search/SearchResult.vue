@@ -515,6 +515,10 @@ export default defineComponent({
               });
             });
           });
+        })
+        .catch((err) => { // handle the errors so as to continue using the applications
+          console.log(err.message);
+          searchLoading.value = false;
         });
     };
 

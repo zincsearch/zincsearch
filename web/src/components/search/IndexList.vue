@@ -160,6 +160,7 @@ export default defineComponent({
 
     // get the list of indices from server when the component is mounted
     const getIndexList = () => {
+      indexList.value = [];
       indexService.list().then((res) => {
         res.data.map((item) => {
           indexList.value.push({
@@ -180,6 +181,7 @@ export default defineComponent({
       filterFn,
       selectFn,
       indexFields,
+      getIndexList,
       cachedFields,
       filterField,
       filterFieldFn,

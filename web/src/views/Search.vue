@@ -8,28 +8,33 @@
         @refresh="searchData"
       />
       <div class="row">
-        <index-list ref="indexList" :data="indexData" @updated="indexUpdated" />
-        <search-list ref="searchList" @updated:fields="updateIndexFields" />
+        <index-list ref="indexListRef" :data="indexData" @updated="indexUpdated" />
+        <search-result ref="searchResultRef" @updated:fields="updateIndexFields" />
       </div>
     </div>
   </q-page>
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, onUpdated, ref } from "vue";
 
 import SearchBar from "../components/search/SearchBar.vue";
 import IndexList from "../components/search/IndexList.vue";
-import SearchList from "../components/search/SearchList.vue";
+import SearchResult from "../components/search/SearchResult.vue";
 
 export default defineComponent({
   name: "PageSearch",
   components: {
     SearchBar,
     IndexList,
-    SearchList,
+    SearchResult,
   },
+
   setup() {
+    onUpdated(() => {
+      updateIndexList(); // update the index list without hard page refresh whenever the page is updated
+    });
+
     const indexData = ref({
       name: "",
       columns: [],
@@ -49,13 +54,19 @@ export default defineComponent({
     });
 
     const searchBar = ref(null);
-    const indexList = ref(null);
-    const searchList = ref(null);
+    const indexListRef = ref(null);
+    const searchResultRef = ref(null);
     const searchData = () => {
-      searchList.value.searchData(indexData.value, queryData.value);
+      searchResultRef.value.searchData(indexData.value, queryData.value);
     };
+
+    const updateIndexList = () => {
+      indexListRef.value.getIndexList();
+    };
+
+
     const resetColumns = () => {
-      searchList.value.resetColumns(indexData.value);
+      searchResultRef.value.resetColumns(indexData.value);
     };
 
     const indexUpdated = ({ name, columns }) => {
@@ -78,15 +89,15 @@ export default defineComponent({
     };
 
     const updateIndexFields = (fields) => {
-      indexList.value.setIndexFields(fields);
+      indexListRef.value.setIndexFields(fields);
     };
 
     return {
       indexData,
       queryData,
       searchBar,
-      indexList,
-      searchList,
+      indexListRef,
+      searchResultRef,
       searchData,
       indexUpdated,
       queryUpdated,
