@@ -45,10 +45,10 @@ import (
 // @BasePath  /api
 func main() {
 
-	if config.Global.SentryEnable {
+	if config.Global.SentryEnable && config.Global.SentryDSN != "" {
 		/******** initialize sentry **********/
 		err := sentry.Init(sentry.ClientOptions{
-			Dsn:     "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942",
+			Dsn:     config.Global.SentryDSN,
 			Release: "zinc@" + meta.Version,
 		})
 		if err != nil {

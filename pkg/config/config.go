@@ -32,6 +32,7 @@ type config struct {
 	NodeID               string `env:"ZINC_NODE_ID,default=1"`
 	DataPath             string `env:"ZINC_DATA_PATH,default=./data"`
 	SentryEnable         bool   `env:"ZINC_SENTRY,default=true"`
+	SentryDSN            string `env:"ZINC_SENTRY_DSN,default=https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942"`
 	TelemetryEnable      bool   `env:"ZINC_TELEMETRY,default=true"`
 	PrometheusEnable     bool   `env:"ZINC_PROMETHEUS_ENABLE,default=false"`
 	BatchSize            int    `env:"ZINC_BATCH_SIZE,default=1024"`

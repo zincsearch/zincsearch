@@ -41,6 +41,7 @@ func TestConfig(t *testing.T) {
 		assert.Equal(t, "x", c.NodeID)
 		assert.Equal(t, "./data", c.DataPath)
 		assert.Equal(t, true, c.SentryEnable)
+		assert.Equal(t, "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942", c.SentryDSN) // Add check for default value
 		assert.Equal(t, true, c.TelemetryEnable)
 		assert.Equal(t, false, c.PrometheusEnable)
 
@@ -56,5 +57,21 @@ func TestConfig(t *testing.T) {
 		assert.Equal(t, false, c.Plugin.GSE.Enable)
 		assert.Equal(t, "small", c.Plugin.GSE.DictEmbed)
 		assert.Equal(t, "./plugins/gse/dict", c.Plugin.GSE.DictPath)
+	})
+}
+
+func TestSentryDSNOverride(t *testing.T) {
+	customDSN := "https://secretToken.my.sentry.com/1234"
+
+	t.Run("prepare", func(t *testing.T) {
+		os.Setenv("ZINC_SENTRY_DSN", customDSN)
+	})
+
+	t.Run("check", func(t *testing.T) {
+		c := new(config)
+		rv := reflect.ValueOf(c).Elem()
+		loadConfig(rv)
+
+		assert.Equal(t, customDSN, c.SentryDSN)
 	})
 }
