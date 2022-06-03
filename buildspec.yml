@@ -21,9 +21,9 @@ phases:
 
       # - Install Go
       - cd /root/.goenv/plugins/go-build/../.. && git pull && cd -
-      - goenv install 1.17.6
+      - goenv install 1.18.3
       - goenv rehash
-      - goenv global 1.17.6
+      - goenv global 1.18.3
 
       - export DOCKER_CLI_EXPERIMENTAL=enabled
       # - export DOCKER_BUILDKIT=1
