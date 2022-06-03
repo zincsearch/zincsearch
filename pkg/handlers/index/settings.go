@@ -49,18 +49,18 @@ func SetSettings(c *gin.Context) {
 		return
 	}
 
-	var newIndex core.Index
-	if err := c.BindJSON(&newIndex); err != nil {
+	var settings *meta.IndexSettings
+	if err := c.BindJSON(&settings); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if newIndex.Settings == nil {
+	if settings == nil {
 		c.JSON(http.StatusOK, gin.H{"message": "ok"})
 		return
 	}
 
-	analyzers, err := zincanalysis.RequestAnalyzer(newIndex.Settings.Analysis)
+	analyzers, err := zincanalysis.RequestAnalyzer(settings.Analysis)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -69,10 +69,10 @@ func SetSettings(c *gin.Context) {
 	index, exists := core.GetIndex(indexName)
 	if exists {
 		// it can only change settings.NumberOfReplicas when index exists
-		if newIndex.Settings.NumberOfReplicas > 0 {
-			index.Settings.NumberOfReplicas = newIndex.Settings.NumberOfReplicas
+		if settings.NumberOfReplicas > 0 {
+			index.Settings.NumberOfReplicas = settings.NumberOfReplicas
 		}
-		if newIndex.Settings.Analysis != nil && len(newIndex.Settings.Analysis.Analyzer) > 0 {
+		if settings.Analysis != nil && len(settings.Analysis.Analyzer) > 0 {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "can't update analyzer for existing index"})
 			return
 		}
@@ -90,14 +90,14 @@ func SetSettings(c *gin.Context) {
 	if analyzers != nil {
 		defaultSearchAnalyzer = analyzers["default"]
 	}
-	index, err = core.NewIndex(indexName, newIndex.StorageType, defaultSearchAnalyzer)
+	index, err = core.NewIndex(indexName, "", defaultSearchAnalyzer)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	// update settings
-	_ = index.SetSettings(newIndex.Settings)
+	_ = index.SetSettings(settings)
 
 	// update analyzers
 	_ = index.SetAnalyzers(analyzers)

@@ -49,13 +49,13 @@ func SetMapping(c *gin.Context) {
 		return
 	}
 
-	var newIndex meta.IndexSimple
-	if err := c.BindJSON(&newIndex); err != nil {
+	var mappingRequest map[string]interface{}
+	if err := c.BindJSON(&mappingRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	mappings, err := mappings.Request(nil, newIndex.Mappings)
+	mappings, err := mappings.Request(nil, mappingRequest)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -79,7 +79,7 @@ func SetMapping(c *gin.Context) {
 		mappings = index.Mappings
 	} else {
 		// create index
-		index, err = core.NewIndex(indexName, newIndex.StorageType, nil)
+		index, err = core.NewIndex(indexName, "", nil)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
