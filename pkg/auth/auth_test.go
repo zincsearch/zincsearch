@@ -67,6 +67,17 @@ func TestVerifyCredentials(t *testing.T) {
 			},
 			want1: false,
 		},
+		{
+			name: "test with case insensitive user id",
+			args: args{
+				userID:   "Admin",
+				password: "Complexpass#123",
+			},
+			want: meta.User{
+				ID: "admin",
+			},
+			want1: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

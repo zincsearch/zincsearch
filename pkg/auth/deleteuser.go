@@ -16,9 +16,12 @@
 package auth
 
 import (
+	"strings"
+
 	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
 func DeleteUser(id string) error {
+	id = strings.ToLower(id)
 	return metadata.User.Delete(id)
 }

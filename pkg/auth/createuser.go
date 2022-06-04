@@ -17,6 +17,7 @@ package auth
 
 import (
 	"encoding/base64"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/argon2"
@@ -28,6 +29,7 @@ import (
 )
 
 func CreateUser(id, name, plaintextPassword, role string) (*meta.User, error) {
+	id = strings.ToLower(id)
 	var newUser *meta.User
 	existingUser, userExists, err := GetUser(id)
 	if err != nil {

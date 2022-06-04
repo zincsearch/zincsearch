@@ -16,10 +16,13 @@
 package auth
 
 import (
+	"strings"
+
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func VerifyCredentials(userID, password string) (*meta.User, bool) {
+	userID = strings.ToLower(userID)
 	user, ok := ZINC_CACHED_USERS.Get(userID)
 	if !ok {
 		return user, false
