@@ -602,6 +602,7 @@ export default defineComponent({
   .q-td {
     word-wrap: break-word;
     word-break: break-all;
+    white-space: pre-wrap;
     .expanded {
       margin: 0;
       white-space: pre-wrap;
