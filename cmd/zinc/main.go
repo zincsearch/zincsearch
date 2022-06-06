@@ -62,7 +62,7 @@ func main() {
 	/****** Coninuous profiling config start ******/
 
 	if config.Global.ProfilerEnable && config.Global.ProfilerServer != "" {
-		ProfileID := os.Getenv("ZINC_PROFILER_FRIENDLY_PROFILE_ID")
+		ProfileID := config.Global.ProfilerFriendlyProfileID
 
 		if ProfileID == "" {
 			ProfileID = strings.ToLower(core.Telemetry.GetInstanceID())
@@ -72,7 +72,7 @@ func main() {
 			ApplicationName: "zincsearch-" + ProfileID,
 
 			// replace this with the address of pyroscope server
-			ServerAddress: os.Getenv("ZINC_PROFILER_SERVER"),
+			ServerAddress: config.Global.ProfilerServer,
 
 			// you can disable logging by setting this to nil
 			// Logger: pyroscope.StandardLogger,
@@ -80,7 +80,7 @@ func main() {
 
 			// optionally, if authentication is enabled, specify the API key:
 			// AuthToken: os.Getenv("PYROSCOPE_AUTH_TOKEN"),
-			AuthToken: os.Getenv("ZINC_PROFILER_API_KEY"),
+			AuthToken: config.Global.ProfilerAPIKey,
 
 			// by default all profilers are enabled,
 			// but you can select the ones you want to use:
