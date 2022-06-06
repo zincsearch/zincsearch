@@ -20,11 +20,13 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
+	"github.com/pyroscope-io/client/pyroscope"
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/config"
@@ -56,6 +58,43 @@ func main() {
 		}
 		/******** sentry initialize complete *******/
 	}
+
+	/****** Coninuous profiling config start ******/
+
+	if config.Global.ProfilerEnable && config.Global.ProfilerServer != "" {
+		ProfileID := os.Getenv("ZINC_PROFILER_FRIENDLY_PROFILE_ID")
+
+		if ProfileID == "" {
+			ProfileID = strings.ToLower(core.Telemetry.GetInstanceID())
+		}
+
+		pyroscope.Start(pyroscope.Config{
+			ApplicationName: "zincsearch-" + ProfileID,
+
+			// replace this with the address of pyroscope server
+			ServerAddress: os.Getenv("ZINC_PROFILER_SERVER"),
+
+			// you can disable logging by setting this to nil
+			// Logger: pyroscope.StandardLogger,
+			Logger: nil,
+
+			// optionally, if authentication is enabled, specify the API key:
+			// AuthToken: os.Getenv("PYROSCOPE_AUTH_TOKEN"),
+			AuthToken: os.Getenv("ZINC_PROFILER_API_KEY"),
+
+			// by default all profilers are enabled,
+			// but you can select the ones you want to use:
+			ProfileTypes: []pyroscope.ProfileType{
+				pyroscope.ProfileCPU,
+				pyroscope.ProfileAllocObjects,
+				pyroscope.ProfileAllocSpace,
+				pyroscope.ProfileInuseObjects,
+				pyroscope.ProfileInuseSpace,
+			},
+		})
+	}
+
+	/****** Coninuous profiling config end ******/
 
 	r := gin.New()
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.

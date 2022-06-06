@@ -29,9 +29,11 @@ require (
 require (
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.2
+	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/prometheus/client_golang v1.12.0 // indirect
+	github.com/pyroscope-io/client v0.2.3
 	github.com/segmentio/backo-go v1.0.0 // indirect
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
 	github.com/swaggo/gin-swagger v1.4.3
@@ -40,7 +42,9 @@ require (
 	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.4
+	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
+	google.golang.org/genproto v0.0.0-20220518221133-4f43b3371335 // indirect
 	gopkg.in/yaml.v3 v3.0.0 // indirect
 )
 
