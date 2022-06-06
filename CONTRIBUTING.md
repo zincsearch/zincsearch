@@ -85,7 +85,7 @@ environment variables ZINC_FIRST_ADMIN_USER and ZINC_FIRST_ADMIN_PASSWORD are re
 ```shell
 cd web
 npm install
-npm run serve
+npm run dev
 ```
 
 This will start UI server on port 8080
