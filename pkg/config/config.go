@@ -26,22 +26,26 @@ import (
 )
 
 type config struct {
-	GinMode              string `env:"GIN_MODE"`
-	ServerPort           string `env:"ZINC_SERVER_PORT,default=4080"`
-	ServerMode           string `env:"ZINC_SERVER_MODE,default=node"`
-	NodeID               string `env:"ZINC_NODE_ID,default=1"`
-	DataPath             string `env:"ZINC_DATA_PATH,default=./data"`
-	SentryEnable         bool   `env:"ZINC_SENTRY,default=true"`
-	SentryDSN            string `env:"ZINC_SENTRY_DSN,default=https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942"`
-	TelemetryEnable      bool   `env:"ZINC_TELEMETRY,default=true"`
-	PrometheusEnable     bool   `env:"ZINC_PROMETHEUS_ENABLE,default=false"`
-	BatchSize            int    `env:"ZINC_BATCH_SIZE,default=1024"`
-	MaxResults           int    `env:"ZINC_MAX_RESULTS,default=10000"`
-	AggregationTermsSize int    `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
-	Etcd                 etcd
-	S3                   s3
-	MinIO                minIO
-	Plugin               plugin
+	GinMode                   string `env:"GIN_MODE"`
+	ServerPort                string `env:"ZINC_SERVER_PORT,default=4080"`
+	ServerMode                string `env:"ZINC_SERVER_MODE,default=node"`
+	NodeID                    string `env:"ZINC_NODE_ID,default=1"`
+	DataPath                  string `env:"ZINC_DATA_PATH,default=./data"`
+	SentryEnable              bool   `env:"ZINC_SENTRY,default=true"`
+	ProfilerEnable            bool   `env:"ZINC_PROFILER,default=false"`
+	ProfilerServer            string `env:"ZINC_PROFILER_SERVER,default=https://pyroscope.dev.zincsearch.com"`
+	ProfilerAPIKey            string `env:"ZINC_PROFILER_API_KEY,default=psx-AfPbC5Bh6gI4dHkCMpoxM2Qd7Xblsqhip5nlwvHdhAE1"`
+	ProfilerFriendlyProfileID string `env:"ZINC_PROFILER_FRIENDLY_PROFILE_ID"`
+	SentryDSN                 string `env:"ZINC_SENTRY_DSN,default=https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942"`
+	TelemetryEnable           bool   `env:"ZINC_TELEMETRY,default=true"`
+	PrometheusEnable          bool   `env:"ZINC_PROMETHEUS_ENABLE,default=false"`
+	BatchSize                 int    `env:"ZINC_BATCH_SIZE,default=1024"`
+	MaxResults                int    `env:"ZINC_MAX_RESULTS,default=10000"`
+	AggregationTermsSize      int    `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
+	Etcd                      etcd
+	S3                        s3
+	MinIO                     minIO
+	Plugin                    plugin
 }
 
 type etcd struct {

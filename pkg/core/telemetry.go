@@ -60,7 +60,7 @@ func (t *telemetry) createInstanceID() string {
 	return instanceID
 }
 
-func (t *telemetry) getInstanceID() string {
+func (t *telemetry) GetInstanceID() string {
 	if t.instanceID != "" {
 		return t.instanceID
 	}
@@ -111,7 +111,7 @@ func (t *telemetry) Instance() {
 	}
 
 	_ = meta.SEGMENT_CLIENT.Enqueue(analytics.Identify{
-		UserId: t.getInstanceID(),
+		UserId: t.GetInstanceID(),
 		Traits: traits,
 	})
 }
@@ -130,7 +130,7 @@ func (t *telemetry) Event(event string, data map[string]interface{}) {
 	}
 
 	t.events <- analytics.Track{
-		UserId:     t.getInstanceID(),
+		UserId:     t.GetInstanceID(),
 		Event:      event,
 		Properties: props,
 	}
