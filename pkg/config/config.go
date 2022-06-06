@@ -23,6 +23,8 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
+
+	"github.com/blugelabs/ice/compress"
 )
 
 type config struct {
@@ -31,6 +33,7 @@ type config struct {
 	ServerMode                string `env:"ZINC_SERVER_MODE,default=node"`
 	NodeID                    string `env:"ZINC_NODE_ID,default=1"`
 	DataPath                  string `env:"ZINC_DATA_PATH,default=./data"`
+	IceCompressor             string `env:"ZINC_ICE_COMPRESSOR"`
 	SentryEnable              bool   `env:"ZINC_SENTRY,default=true"`
 	ProfilerEnable            bool   `env:"ZINC_PROFILER,default=false"`
 	ProfilerServer            string `env:"ZINC_PROFILER_SERVER,default=https://pyroscope.dev.zincsearch.com"`
@@ -86,6 +89,11 @@ func init() {
 	_ = godotenv.Load()
 	rv := reflect.ValueOf(Global).Elem()
 	loadConfig(rv)
+
+	// configure ice
+	if strings.ToUpper(Global.IceCompressor) == "ZSTD" {
+		compress.Algorithm = compress.ZSTD
+	}
 }
 
 func loadConfig(rv reflect.Value) {

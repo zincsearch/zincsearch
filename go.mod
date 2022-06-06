@@ -27,6 +27,7 @@ require (
 )
 
 require (
+	github.com/blugelabs/ice v1.0.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.2
 	github.com/google/go-cmp v0.5.8 // indirect
@@ -48,8 +49,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.0 // indirect
 )
 
-replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v1.1.0
+replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v1.1.3
 
-replace github.com/blugelabs/ice => github.com/zinclabs/ice v1.1.1
+replace github.com/blugelabs/ice => github.com/zinclabs/ice v1.1.2
 
 replace github.com/blugelabs/bluge_segment_api => github.com/zinclabs/bluge_segment_api v1.0.0

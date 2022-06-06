@@ -550,12 +550,12 @@ github.com/yuin/goldmark v1.4.0/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1
 github.com/yuin/goldmark v1.4.1/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 github.com/yusufpapurcu/wmi v1.2.2 h1:KBNDSne4vP5mbSWnJbO+51IMOXJB67QiYCSBrubbPRg=
 github.com/yusufpapurcu/wmi v1.2.2/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
-github.com/zinclabs/bluge v1.1.0 h1:o5aKzDyqr0LtaQxdqtLg7UhDS2fpY3BJQp5K2bzv2lA=
-github.com/zinclabs/bluge v1.1.0/go.mod h1:IG9JlDUzUGRIxylWmLyF7e1QwMdRWu9FkNSivJ4VB+E=
+github.com/zinclabs/bluge v1.1.3 h1:1Lb3YcX5nET5hhUBXqC2+Ud9cQgLl37GqE4JlWSchzA=
+github.com/zinclabs/bluge v1.1.3/go.mod h1:IG9JlDUzUGRIxylWmLyF7e1QwMdRWu9FkNSivJ4VB+E=
 github.com/zinclabs/bluge_segment_api v1.0.0 h1:GJvPxdzR7KjwdxmcKleQLvtIYi/J7Q7ehRlZqgGayzg=
 github.com/zinclabs/bluge_segment_api v1.0.0/go.mod h1:mYfPVUdXLZ4iXsicXMER+RcI/avwphjMOi8nhN9HDLA=
-github.com/zinclabs/ice v1.1.1 h1:pm4M5+kLDotDLuDHrWJ73o0U54D9uNnKWYWUzqasJKU=
-github.com/zinclabs/ice v1.1.1/go.mod h1:wTwGEe30mQnSLaR1ezxu4E80GcwO6EyOww67KpJtIiw=
+github.com/zinclabs/ice v1.1.2 h1:tMASIouUaTaMXfgfyvJSIsc4buDnFktRJmueYlzpqnY=
+github.com/zinclabs/ice v1.1.2/go.mod h1:wTwGEe30mQnSLaR1ezxu4E80GcwO6EyOww67KpJtIiw=
 github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1 h1:wEkwpwzLhU3VEZRV8kS3eeYnyps4udKe14RQOmbjsZI=
 github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1/go.mod h1:Slirjzuz8uM8Cw0jmPNqbneoqcUtY2GGjn2bEd4NRLY=
 go.etcd.io/etcd/api/v3 v3.5.4 h1:OHVyt3TopwtUQ2GKdd5wu3PmmipR4FTwCqoEjSyRdIc=
