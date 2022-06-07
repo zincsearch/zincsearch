@@ -104,8 +104,8 @@ func StoreIndex(index *Index) error {
 	if index.Settings == nil {
 		index.Settings = new(meta.IndexSettings)
 	}
-	if index.CachedAnalyzers == nil {
-		index.CachedAnalyzers = make(map[string]*analysis.Analyzer)
+	if index.Analyzers == nil {
+		index.Analyzers = make(map[string]*analysis.Analyzer)
 	}
 	if index.Mappings == nil {
 		index.Mappings = meta.NewMappings()

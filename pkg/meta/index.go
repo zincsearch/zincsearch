@@ -20,6 +20,8 @@ import "time"
 type Index struct {
 	Name        string         `json:"name"`
 	StorageType string         `json:"storage_type"`
+	StorageSize uint64         `json:"storage_size"`
+	DocNum      uint64         `json:"doc_num"`
 	Settings    *IndexSettings `json:"settings,omitempty"`
 	Mappings    *Mappings      `json:"mappings,omitempty"`
 	CreateAt    time.Time      `json:"create_at"`

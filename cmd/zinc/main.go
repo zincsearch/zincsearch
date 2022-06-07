@@ -32,6 +32,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 	"github.com/zinclabs/zinc/pkg/routes"
 )
 
@@ -111,13 +112,17 @@ func main() {
 	}
 
 	shutdown(func(grace bool) {
-		core.ZINC_INDEX_LIST.Close() // close all indexes
-		log.Info().Msgf("Index closed")
+		// close indexes
+		err := core.ZINC_INDEX_LIST.Close()
+		log.Info().Err(err).Msgf("Index closed")
+		// close metadata
+		err = metadata.Close()
+		log.Info().Err(err).Msgf("Metadata closed")
 		if grace {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 			defer cancel()
 			if err := server.Shutdown(ctx); err != nil {
-				log.Fatal().Msgf("Server Shutdown: %s", err.Error())
+				log.Fatal().Err(err).Msg("Server Shutdown")
 			}
 		} else {
 			server.Close()
@@ -126,13 +131,13 @@ func main() {
 
 	if err := server.ListenAndServe(); err != nil {
 		if err == http.ErrServerClosed {
-			log.Info().Msgf("Server closed under request")
+			log.Info().Msg("Server closed under request")
 		} else {
-			log.Fatal().Msgf("Server closed unexpect: %s", err.Error())
+			log.Fatal().Err(err).Msg("Server closed unexpect")
 		}
 	}
 
-	log.Info().Msgf("Server shutdown ok")
+	log.Info().Msg("Server shutdown ok")
 }
 
 //shutdown support twice signal must exit

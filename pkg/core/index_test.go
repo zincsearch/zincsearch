@@ -137,7 +137,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 					Index:    true,
 					Analyzer: "analyzer_1",
 				})
-				index.CachedAnalyzers["analyzer_1"] = analyzer.NewStandardAnalyzer()
+				index.Analyzers["analyzer_1"] = analyzer.NewStandardAnalyzer()
 			},
 			want:    &bluge.Document{},
 			wantErr: true,
@@ -265,13 +265,7 @@ func TestIndex_Settings(t *testing.T) {
 		err = StoreIndex(index)
 		assert.NoError(t, err)
 
-		index.GainDocsCount(1)
-		index.ReduceDocsCount(1)
-
-		n, err := index.LoadDocsCount()
-		assert.NoError(t, err)
-		assert.Equal(t, int64(0), n)
-
+		index.UpdateMetadata()
 	})
 
 	t.Run("setting", func(t *testing.T) {

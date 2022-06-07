@@ -28,7 +28,6 @@ func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, min
 		err = writer.Update(bdoc.ID(), bdoc)
 	} else {
 		err = writer.Insert(bdoc)
-		index.GainDocsCount(1)
 	}
 	return err
 }

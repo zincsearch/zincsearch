@@ -31,7 +31,7 @@ import (
 )
 
 func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) {
-	searchRequest, err := uquery.ParseQueryDSL(query, index.Mappings, index.CachedAnalyzers)
+	searchRequest, err := uquery.ParseQueryDSL(query, index.Mappings, index.Analyzers)
 	if err != nil {
 		return nil, err
 	}
