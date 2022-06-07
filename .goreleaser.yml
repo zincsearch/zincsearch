@@ -4,6 +4,7 @@ project_name: zinc
 before:
   hooks:
     # You may remove this if you don't use go modules.
+    - go clean -modcache
     - go mod tidy
     # you may remove this if you don't need go generate
     # - go generate ./...
