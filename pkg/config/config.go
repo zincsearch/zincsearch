@@ -90,8 +90,13 @@ func init() {
 	rv := reflect.ValueOf(Global).Elem()
 	loadConfig(rv)
 
-	// configure ice
-	if strings.ToUpper(Global.IceCompressor) == "ZSTD" {
+	// configure ice compress algorithm
+	switch strings.ToUpper(Global.IceCompressor) {
+	case "SNAPPY":
+		compress.Algorithm = compress.SNAPPY
+	case "S2":
+		compress.Algorithm = compress.S2
+	case "ZSTD":
 		compress.Algorithm = compress.ZSTD
 	}
 }
