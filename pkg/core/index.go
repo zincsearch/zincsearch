@@ -16,19 +16,14 @@
 package core
 
 import (
-	"context"
 	"fmt"
-	"math"
-	"path/filepath"
 	"strconv"
-	"sync/atomic"
 	"time"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/goccy/go-json"
 
-	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/zutils"
@@ -37,11 +32,8 @@ import (
 
 type Index struct {
 	meta.Index
-	DocsCount           int64                         `json:"docs_count"`
-	StorageSize         int64                         `json:"storage_size"`
-	StorageSizeNextTime time.Time                     `json:"-"`
-	CachedAnalyzers     map[string]*analysis.Analyzer `json:"-"`
-	Writer              *bluge.Writer                 `json:"-"`
+	Analyzers map[string]*analysis.Analyzer `json:"-"`
+	Writer    *bluge.Writer                 `json:"-"`
 }
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
@@ -155,7 +147,7 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 			return fmt.Errorf("field [%s] was set type to [text] but got a %T value", key, value)
 		}
 		field = bluge.NewTextField(key, v).SearchTermPositions()
-		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.CachedAnalyzers, index.Mappings, key)
+		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.Analyzers, index.Mappings, key)
 		if fieldAnalyzer != nil {
 			field.WithAnalyzer(fieldAnalyzer)
 		}
@@ -258,7 +250,7 @@ func (index *Index) SetAnalyzers(analyzers map[string]*analysis.Analyzer) error 
 		return nil
 	}
 
-	index.CachedAnalyzers = analyzers
+	index.Analyzers = analyzers
 
 	return nil
 }
@@ -288,58 +280,30 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 	return nil
 }
 
-func (index *Index) LoadDocsCount() (int64, error) {
-	query := bluge.NewMatchAllQuery()
-	searchRequest := bluge.NewTopNSearch(0, query).WithStandardAggregations()
-	reader, err := index.Writer.Reader()
-	if err != nil {
-		return 0, err
+func (index *Index) UpdateMetadata() {
+	w := index.Writer
+	if w == nil {
+		return
 	}
-	defer reader.Close()
-	dmi, err := reader.Search(context.Background(), searchRequest)
-	if err != nil {
-		return 0, fmt.Errorf("core.index.LoadDocsCount: error executing search: %s", err.Error())
+	_, index.StorageSize = w.DirectoryStats()
+
+	if r, err := w.Reader(); err == nil {
+		if n, err := r.Count(); err == nil {
+			index.DocNum = n
+		}
 	}
-
-	return int64(dmi.Aggregations().Count()), nil
-}
-
-func (index *Index) LoadStorageSize() float64 {
-	size := 0.0
-	switch index.StorageType {
-	case "s3":
-		return size // TODO: implement later
-	case "minio":
-		return size // TODO: implement later
-	default:
-		path := config.Global.DataPath
-		indexLocation := filepath.Join(path, index.Name)
-		size, _ = zutils.DirSize(indexLocation)
-		return math.Round(size)
-	}
-}
-
-func (index *Index) ReLoadStorageSize() {
-	if index.StorageSizeNextTime.After(time.Now()) {
-		return // skip
-	}
-
-	index.StorageSizeNextTime = time.Now().Add(time.Minute * 10)
-	go func() {
-		atomic.StoreInt64(&index.StorageSize, int64(index.LoadStorageSize()))
-	}()
-}
-
-func (index *Index) ReduceDocsCount(n int64) {
-	atomic.AddInt64(&index.DocsCount, -n)
-	index.ReLoadStorageSize()
-}
-
-func (index *Index) GainDocsCount(n int64) {
-	atomic.AddInt64(&index.DocsCount, n)
-	index.ReLoadStorageSize()
 }
 
 func (index *Index) Close() error {
-	return index.Writer.Close()
+	if index.Writer == nil {
+		return nil
+	}
+	// update metadata before close
+	index.UpdateMetadata()
+	// close writer
+	if err := index.Writer.Close(); err != nil {
+		return err
+	}
+	index.Writer = nil
+	return nil
 }

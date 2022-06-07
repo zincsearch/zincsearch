@@ -47,7 +47,7 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 				readers = append(readers, reader)
 				if mappings == nil {
 					mappings = index.Mappings
-					analyzers = index.CachedAnalyzers
+					analyzers = index.Analyzers
 				}
 				readerMap[index.Name] = struct{}{}
 			}

@@ -42,7 +42,7 @@ func LoadZincIndexesFromMetadata() error {
 
 		// load index analysis
 		if index.Settings != nil && index.Settings.Analysis != nil {
-			index.CachedAnalyzers, err = zincanalysis.RequestAnalyzer(index.Settings.Analysis)
+			index.Analyzers, err = zincanalysis.RequestAnalyzer(index.Settings.Analysis)
 			if err != nil {
 				return errors.New(errors.ErrorTypeRuntimeException, "parse stored analysis error").Cause(err)
 			}
@@ -50,19 +50,14 @@ func LoadZincIndexesFromMetadata() error {
 
 		// load index data
 		var defaultSearchAnalyzer *analysis.Analyzer
-		if index.CachedAnalyzers != nil {
-			defaultSearchAnalyzer = index.CachedAnalyzers["default"]
+		if index.Analyzers != nil {
+			defaultSearchAnalyzer = index.Analyzers["default"]
 		}
 		index.Writer, err = LoadIndexWriter(index.Name, index.StorageType, defaultSearchAnalyzer)
 		if err != nil {
 			return errors.New(errors.ErrorTypeRuntimeException, "load index writer error").Cause(err)
 		}
 
-		// load index docs count
-		index.DocsCount, _ = index.LoadDocsCount()
-
-		// load index size
-		index.ReLoadStorageSize()
 		// load in memory
 		ZINC_INDEX_LIST.Add(index)
 	}

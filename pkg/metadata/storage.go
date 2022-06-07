@@ -36,3 +36,7 @@ func init() {
 		db = badger.New("_metadata.db")
 	}
 }
+
+func Close() error {
+	return db.Close()
+}

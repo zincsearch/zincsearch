@@ -68,20 +68,18 @@ func TestIndex(t *testing.T) {
 			t.Run("update mappings for index", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`{
-					"mappings": {
-						"properties":{
-							"Athlete": {"type": "text"},
-							"City": {"type": "keyword"},
-							"Country": {"type": "keyword"},
-							"Discipline": {"type": "text"},
-							"Event": {"type": "keyword"},
-							"Gender": {"type": "keyword"},
-							"Medal": {"type": "keyword"},
-							"Season": {"type": "keyword"},
-							"Sport": {"type": "keyword"},
-							"Year": {"type": "numeric"},
-							"Date": {"type": "time"}
-						}
+					"properties":{
+						"Athlete": {"type": "text"},
+						"City": {"type": "keyword"},
+						"Country": {"type": "keyword"},
+						"Discipline": {"type": "text"},
+						"Event": {"type": "keyword"},
+						"Gender": {"type": "keyword"},
+						"Medal": {"type": "keyword"},
+						"Season": {"type": "keyword"},
+						"Sport": {"type": "keyword"},
+						"Year": {"type": "numeric"},
+						"Date": {"type": "time"}
 					}
 				}`)
 				resp := request("PUT", "/api/"+indexName+"-mapping/_mapping", body)

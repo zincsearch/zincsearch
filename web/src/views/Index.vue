@@ -116,14 +116,14 @@ export default defineComponent({
       indexService.list().then((res) => {
         var counter = 1;
         indexes.value = res.data.map((data) => {
-          let storage_size = data.storage_size + " KB";
-          if (data.storage_size > 1024) {
-            storage_size = (data.storage_size / 1024).toFixed(2) + " MB";
+          let storage_size = (data.storage_size / 1024).toFixed(2) + " KB";
+          if (data.storage_size > 1024 * 1024) {
+            storage_size = (data.storage_size / 1024 / 1024).toFixed(2) + " MB";
           }
           return {
             no: counter++,
             name: data.name,
-            docs_count: data.docs_count,
+            doc_num: data.doc_num,
             storage_size: storage_size,
             storage_type: data.storage_type,
             actions: {
@@ -153,9 +153,9 @@ export default defineComponent({
         sortable: true,
       },
       {
-        name: "docs_count",
-        field: (row) => row.docs_count,
-        label: "DOCS_COUNT",
+        name: "doc_num",
+        field: (row) => row.doc_num,
+        label: "DOC_NUM",
         align: "right",
         sortable: true,
       },
@@ -192,7 +192,7 @@ export default defineComponent({
     const previewIndex = (props) => {
       index.value = {
         name: props.row.name,
-        docs_count: props.row.docs_count,
+        doc_num: props.row.doc_num,
         storage_size: props.row.storage_size,
         storage_type: props.row.storage_type,
         settings: props.row.actions.settings,

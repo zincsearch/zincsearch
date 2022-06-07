@@ -40,6 +40,5 @@ func Delete(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	index.ReduceDocsCount(1)
 	c.JSON(http.StatusOK, gin.H{"message": "deleted", "index": indexName, "id": docID})
 }

@@ -56,40 +56,38 @@ func TestMapping(t *testing.T) {
 				args: args{
 					code: http.StatusOK,
 					data: map[string]interface{}{
-						"mappings": map[string]interface{}{
-							"properties": map[string]interface{}{
-								"Athlete": map[string]interface{}{
-									"type":          "text",
-									"index":         true,
-									"store":         false,
-									"sortable":      false,
-									"aggregatable":  false,
-									"highlightable": false,
-								},
-								"City": map[string]interface{}{
-									"type":          "keyword",
-									"index":         true,
-									"store":         false,
-									"sortable":      false,
-									"aggregatable":  true,
-									"highlightable": false,
-								},
-								"Gender": map[string]interface{}{
-									"type":          "bool",
-									"index":         true,
-									"store":         false,
-									"sortable":      false,
-									"aggregatable":  true,
-									"highlightable": false,
-								},
-								"time": map[string]interface{}{
-									"type":          "time",
-									"index":         true,
-									"store":         false,
-									"sortable":      false,
-									"aggregatable":  true,
-									"highlightable": false,
-								},
+						"properties": map[string]interface{}{
+							"Athlete": map[string]interface{}{
+								"type":          "text",
+								"index":         true,
+								"store":         false,
+								"sortable":      false,
+								"aggregatable":  false,
+								"highlightable": false,
+							},
+							"City": map[string]interface{}{
+								"type":          "keyword",
+								"index":         true,
+								"store":         false,
+								"sortable":      false,
+								"aggregatable":  true,
+								"highlightable": false,
+							},
+							"Gender": map[string]interface{}{
+								"type":          "bool",
+								"index":         true,
+								"store":         false,
+								"sortable":      false,
+								"aggregatable":  true,
+								"highlightable": false,
+							},
+							"time": map[string]interface{}{
+								"type":          "time",
+								"index":         true,
+								"store":         false,
+								"sortable":      false,
+								"aggregatable":  true,
+								"highlightable": false,
 							},
 						},
 					},
@@ -103,16 +101,14 @@ func TestMapping(t *testing.T) {
 				args: args{
 					code: http.StatusOK,
 					data: map[string]interface{}{
-						"mappings": map[string]interface{}{
-							"properties": map[string]interface{}{
-								"Athlete": map[string]interface{}{
-									"type":          "text",
-									"index":         true,
-									"store":         false,
-									"sortable":      false,
-									"aggregatable":  false,
-									"highlightable": false,
-								},
+						"properties": map[string]interface{}{
+							"Athlete": map[string]interface{}{
+								"type":          "text",
+								"index":         true,
+								"store":         false,
+								"sortable":      false,
+								"aggregatable":  false,
+								"highlightable": false,
 							},
 						},
 					},

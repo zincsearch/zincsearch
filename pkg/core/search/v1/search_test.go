@@ -154,28 +154,6 @@ func TestSearch(t *testing.T) {
 			},
 		},
 		{
-			name: "Search Query - multiphrase",
-			args: args{
-				iQuery: &ZincQuery{
-					SearchType: "multiphrase",
-					Query: QueryParams{
-						Terms: [][]string{{"San Francisco"}},
-					},
-					MaxResults: 10,
-				},
-			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-			},
-		},
-		{
 			name: "Search Query - prefix",
 			args: args{
 				iQuery: &ZincQuery{

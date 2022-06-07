@@ -16,7 +16,6 @@
 package core
 
 import (
-	"math"
 	"runtime"
 	"sync"
 	"time"
@@ -142,19 +141,19 @@ func (t *telemetry) runEvents() {
 	}
 }
 
-func (t *telemetry) TotalIndexSize() float64 {
-	TotalIndexSize := 0.0
+func (t *telemetry) TotalIndexSize() uint64 {
+	TotalIndexSize := uint64(0)
 	for _, idx := range ZINC_INDEX_LIST.List() {
 		TotalIndexSize += t.GetIndexSize(idx.Name)
 	}
-	return math.Round(TotalIndexSize)
+	return TotalIndexSize
 }
 
-func (t *telemetry) GetIndexSize(indexName string) float64 {
+func (t *telemetry) GetIndexSize(indexName string) uint64 {
 	if index, ok := ZINC_INDEX_LIST.Get(indexName); ok {
-		return index.LoadStorageSize()
+		return index.StorageSize
 	}
-	return 0.0
+	return 0
 }
 
 func (t *telemetry) HeartBeat() {
