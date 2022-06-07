@@ -4,7 +4,6 @@ project_name: zinc
 before:
   hooks:
     # You may remove this if you don't use go modules.
-    - go clean -modcache
     - go mod tidy
     # you may remove this if you don't need go generate
     # - go generate ./...
@@ -62,8 +61,10 @@ dockers:
     extra_files:
       - go.mod
       - go.sum
-      - pkg
       - cmd
+      - docs
+      - pkg
+      - test
       - web
       - embed.go
   - image_templates:
@@ -78,8 +79,10 @@ dockers:
     extra_files:
       - go.mod
       - go.sum
-      - pkg
       - cmd
+      - docs
+      - pkg
+      - test
       - web
       - embed.go
   - image_templates:
@@ -94,8 +97,10 @@ dockers:
     extra_files:
       - go.mod
       - go.sum
-      - pkg
       - cmd
+      - docs
+      - pkg
+      - test
       - web
       - embed.go
   - image_templates:
@@ -110,8 +115,10 @@ dockers:
     extra_files:
       - go.mod
       - go.sum
-      - pkg
       - cmd
+      - docs
+      - pkg
+      - test
       - web
       - embed.go
   - image_templates:
@@ -126,8 +133,10 @@ dockers:
     extra_files:
       - go.mod
       - go.sum
-      - pkg
       - cmd
+      - docs
+      - pkg
+      - test
       - web
       - embed.go
   - image_templates:
@@ -142,8 +151,10 @@ dockers:
     extra_files:
       - go.mod
       - go.sum
-      - pkg
       - cmd
+      - docs
+      - pkg
+      - test
       - web
       - embed.go
 docker_manifests:
@@ -225,4 +236,3 @@ brews:
     # Remember you need to `snapcraft login` first.
     # Defaults to false.
     # publish: true
-
