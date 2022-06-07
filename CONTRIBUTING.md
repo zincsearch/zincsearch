@@ -39,7 +39,7 @@ It is important that you build the web app every time you make any changes to ja
 Download the dependencies
 
 ```shell
-go get -d -v # this will download the go libraries used by zinc
+go mod tidy # this will download the go libraries used by zinc
 ```
 
 Simple:
@@ -72,7 +72,7 @@ There are 2 areas of development.
 ### Server
 
 ```shell
-go get -d -v
+go mod tidy
 ZINC_FIRST_ADMIN_USER=admin ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123 go run cmd/zinc/main.go
 ```
 

@@ -28,7 +28,7 @@ WORKDIR $GOPATH/src/github.com/zinclabs/zinc/
 COPY . .
 # Fetch dependencies.
 # Using go get.
-RUN go get -d -v
+RUN go mod tidy
 # Using go mod.
 # RUN go mod download
 # RUN go mod verify
