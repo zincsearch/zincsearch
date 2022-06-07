@@ -264,8 +264,6 @@ func TestIndex_Settings(t *testing.T) {
 
 		err = StoreIndex(index)
 		assert.NoError(t, err)
-
-		index.UpdateMetadata()
 	})
 
 	t.Run("setting", func(t *testing.T) {

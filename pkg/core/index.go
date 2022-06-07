@@ -285,8 +285,7 @@ func (index *Index) UpdateMetadata() {
 	if w == nil {
 		return
 	}
-	status := w.Status()
-	index.StorageSize = status.CurOnDiskBytes
+	_, index.StorageSize = w.DirectoryStats()
 
 	if r, err := w.Reader(); err == nil {
 		if n, err := r.Count(); err == nil {
@@ -296,7 +295,15 @@ func (index *Index) UpdateMetadata() {
 }
 
 func (index *Index) Close() error {
+	if index.Writer == nil {
+		return nil
+	}
 	// update metadata before close
 	index.UpdateMetadata()
-	return index.Writer.Close()
+	// close writer
+	if err := index.Writer.Close(); err != nil {
+		return err
+	}
+	index.Writer = nil
+	return nil
 }
