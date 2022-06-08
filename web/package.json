@@ -3,7 +3,7 @@
   "description": "A web console for Zinc",
   "productName": "Zinc Console",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.2.4",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -27,7 +27,6 @@
   "devDependencies": {
     "@quasar/vite-plugin": "^1.0.9",
     "@types/js-cookie": "^3.0.2",
-    "@types/vue-i18n": "^7.0.0",
     "@vitejs/plugin-vue": "^2.3.3",
     "sass": "^1.32.0",
     "sass-loader": "^10.2.1",
