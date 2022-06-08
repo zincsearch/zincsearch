@@ -17,6 +17,7 @@ package config
 
 import (
 	"os"
+	"path"
 	"reflect"
 	"strconv"
 	"strings"
@@ -89,6 +90,15 @@ func init() {
 	_ = godotenv.Load()
 	rv := reflect.ValueOf(Global).Elem()
 	loadConfig(rv)
+
+	// check data path
+	testPath := path.Join(Global.DataPath, "_test_")
+	if err := os.MkdirAll(testPath, 0755); err != nil {
+		log.Fatal().Err(err).Msg("ZINC_DATA_PATH is not writable")
+	}
+	if err := os.Remove(testPath); err != nil {
+		log.Fatal().Err(err).Msg("ZINC_DATA_PATH is not writable")
+	}
 
 	// configure ice compress algorithm
 	switch strings.ToUpper(Global.IceCompressor) {
