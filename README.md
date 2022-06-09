@@ -50,8 +50,7 @@ Please create an issue if you would like something to be added to the roadmap.
 # Screenshots
 
 ## Search screen
-![Search screen 1](./screenshots/search_screen.jpg)
-![Search screen for games](./screenshots/search_screen_paris.jpg)
+![Search screen](./screenshots/search_screen.jpg)
 
 ## User management screen
 ![Users screen](./screenshots/users_screen.jpg)
