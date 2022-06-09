@@ -11,7 +11,7 @@
     "lint": "eslint --ext .js,.vue ./src/ && stylelint **/*.vue"
   },
   "dependencies": {
-    "@quasar/extras": "^1.13.6",
+    "@quasar/extras": "^1.14.0",
     "apexcharts": "^3.35.3",
     "axios": "^0.27.2",
     "buffer": "^6.0.3",
