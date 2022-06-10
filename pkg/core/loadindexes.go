@@ -49,18 +49,37 @@ func LoadZincIndexesFromMetadata() error {
 		}
 
 		// load index data
-		var defaultSearchAnalyzer *analysis.Analyzer
-		if index.Analyzers != nil {
-			defaultSearchAnalyzer = index.Analyzers["default"]
-		}
-		index.Writer, err = LoadIndexWriter(index.Name, index.StorageType, defaultSearchAnalyzer)
-		if err != nil {
-			return errors.New(errors.ErrorTypeRuntimeException, "load index writer error").Cause(err)
+		if err := OpenIndexWriter(index); err != nil {
+			return err
 		}
 
 		// load in memory
 		ZINC_INDEX_LIST.Add(index)
 	}
 
+	return nil
+}
+
+func ReopenIndex(indexName string) error {
+	index, ok := ZINC_INDEX_LIST.Get(indexName)
+	if !ok {
+		return errors.New(errors.ErrorTypeRuntimeException, "index not found")
+	}
+	if err := index.Close(); err != nil {
+		return err
+	}
+	return OpenIndexWriter(index)
+}
+
+func OpenIndexWriter(index *Index) error {
+	var err error
+	var defaultSearchAnalyzer *analysis.Analyzer
+	if index.Analyzers != nil {
+		defaultSearchAnalyzer = index.Analyzers["default"]
+	}
+	index.Writer, err = LoadIndexWriter(index.Name, index.StorageType, defaultSearchAnalyzer)
+	if err != nil {
+		return errors.New(errors.ErrorTypeRuntimeException, "load index writer error").Cause(err)
+	}
 	return nil
 }
