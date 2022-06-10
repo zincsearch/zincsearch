@@ -9,7 +9,7 @@ Zinc uses Go (For server) and VueJS (For Web UI)
 You must have follwing installed:
 
 1. Git
-2. Go 1.16 +
+2. Go 1.16 + (We recommend go 1.18+)
 3. nodejs v14+ and npm v6+
 
 ## Building from source code
@@ -128,3 +128,14 @@ In order to build multi-arch builds you will need [buildx](https://docs.docker.c
 ```shell
 docker buildx build --platform linux/amd64 --tag zinc:latest-linux-amd64 . -f Dockerfile.hub
 ```
+
+
+## How to contribute code
+
+1. Fork the repository on github (e.g. awesomedev/zinc)
+1. Clone the repo from the forked repository ( e.g. awesomedev/zinc) to your machine.
+1. create a new branch locally. 
+1. Make the changes to code.
+1. Push the code to your repo.
+1. Create a PR
+
