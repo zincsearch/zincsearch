@@ -36,11 +36,11 @@ type config struct {
 	DataPath                  string `env:"ZINC_DATA_PATH,default=./data"`
 	IceCompressor             string `env:"ZINC_ICE_COMPRESSOR"`
 	SentryEnable              bool   `env:"ZINC_SENTRY,default=true"`
+	SentryDSN                 string `env:"ZINC_SENTRY_DSN,default=https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942"`
 	ProfilerEnable            bool   `env:"ZINC_PROFILER,default=false"`
 	ProfilerServer            string `env:"ZINC_PROFILER_SERVER,default=https://pyroscope.dev.zincsearch.com"`
 	ProfilerAPIKey            string `env:"ZINC_PROFILER_API_KEY,default=psx-AfPbC5Bh6gI4dHkCMpoxM2Qd7Xblsqhip5nlwvHdhAE1"`
 	ProfilerFriendlyProfileID string `env:"ZINC_PROFILER_FRIENDLY_PROFILE_ID"`
-	SentryDSN                 string `env:"ZINC_SENTRY_DSN,default=https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942"`
 	TelemetryEnable           bool   `env:"ZINC_TELEMETRY,default=true"`
 	PrometheusEnable          bool   `env:"ZINC_PROMETHEUS_ENABLE,default=false"`
 	BatchSize                 int    `env:"ZINC_BATCH_SIZE,default=1024"`
