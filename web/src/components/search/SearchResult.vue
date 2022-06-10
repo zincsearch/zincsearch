@@ -506,7 +506,7 @@ export default defineComponent({
                       (bucket) => {
                         return {
                           x: date.formatDate(bucket.key, chartKeyFormat.value),
-                          y: parseInt(bucket.doc_count / 2, 10),
+                          y: parseInt(bucket.doc_count, 10),
                         };
                       }
                     ),
