@@ -116,7 +116,7 @@ func TestAnalyze(t *testing.T) {
 		{
 			name: "with not exist index analyzer",
 			args: args{
-				code:   http.StatusNotFound,
+				code:   http.StatusBadRequest,
 				data:   `{"analyzer":"standard","text":"this is a test"}`,
 				params: map[string]string{"target": "not_exist_index"},
 				result: "[this is a test]",

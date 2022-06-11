@@ -353,7 +353,7 @@ func TestSearch(t *testing.T) {
 			for _, d := range tt.data {
 				rand.Seed(time.Now().UnixNano())
 				docId := rand.Intn(1000)
-				err := index.UpdateDocument(strconv.Itoa(docId), d, true)
+				err := index.CreateDocument(strconv.Itoa(docId), d, true)
 				assert.NoError(t, err)
 			}
 			got, err := Search(index, tt.args.iQuery)

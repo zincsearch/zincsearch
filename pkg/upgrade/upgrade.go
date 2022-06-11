@@ -13,21 +13,20 @@
 * limitations under the License.
  */
 
-package core
+package upgrade
 
-// UpdateDocument inserts or updates a document in the zinc index
-func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, mintedID bool) error {
-	bdoc, err := index.BuildBlugeDocumentFromJSON(docID, doc)
-	if err != nil {
-		return err
-	}
+import (
+	"fmt"
 
-	// Finally update the document on disk
-	writer := index.Writer
-	if !mintedID {
-		err = writer.Update(bdoc.ID(), bdoc)
-	} else {
-		err = writer.Insert(bdoc)
+	"github.com/rs/zerolog/log"
+)
+
+func Do(oldVersion string) error {
+	log.Info().Msgf("Begin upgrade from version %s", oldVersion)
+	switch oldVersion {
+	case "v0.2.4":
+		return UpgradeFromV024()
+	default:
+		return fmt.Errorf("unsupported upgrade from version: %s", oldVersion)
 	}
-	return err
 }

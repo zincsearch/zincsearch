@@ -28,6 +28,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/uquery"
 	"github.com/zinclabs/zinc/pkg/uquery/fields"
 	"github.com/zinclabs/zinc/pkg/uquery/source"
+	"github.com/zinclabs/zinc/pkg/uquery/timerange"
 )
 
 func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) {
@@ -36,12 +37,17 @@ func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) 
 		return nil, err
 	}
 
-	reader, err := index.Writer.Reader()
+	timeMin, timeMax := timerange.Query(query.Query)
+	readers, err := index.GetReaders(timeMin, timeMax)
 	if err != nil {
 		log.Printf("index.SearchV2: error accessing reader: %s", err.Error())
 		return nil, err
 	}
-	defer reader.Close()
+	defer func() {
+		for _, reader := range readers {
+			reader.Close()
+		}
+	}()
 
 	ctx := context.Background()
 	var cancel context.CancelFunc
@@ -50,7 +56,7 @@ func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) 
 		defer cancel()
 	}
 
-	dmi, err := reader.Search(ctx, searchRequest)
+	dmi, err := bluge.MultiSearch(ctx, searchRequest, readers...)
 	if err != nil {
 		log.Printf("index.SearchV2: error executing search: %s", err.Error())
 		if err == context.DeadlineExceeded {
@@ -63,10 +69,10 @@ func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) 
 		return nil, err
 	}
 
-	return searchV2(dmi, query, index.Mappings)
+	return searchV2(index.ShardNum, len(readers), dmi, query, index.Mappings)
 }
 
-func searchV2(dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings *meta.Mappings) (*meta.SearchResponse, error) {
+func searchV2(shardNum, readerNum int, dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings *meta.Mappings) (*meta.SearchResponse, error) {
 	resp := &meta.SearchResponse{
 		Hits: meta.Hits{Hits: []meta.Hit{}},
 	}
@@ -148,11 +154,9 @@ func searchV2(dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings 
 	}
 
 	resp.Took = int(dmi.Aggregations().Duration().Milliseconds())
-	resp.Shards = meta.Shards{Total: 1, Successful: 1}
+	resp.Shards = meta.Shards{Total: shardNum, Successful: readerNum, Skipped: shardNum - readerNum}
 	resp.Hits = meta.Hits{
-		Total: meta.Total{
-			Value: int(dmi.Aggregations().Count()),
-		},
+		Total:    meta.Total{Value: int(dmi.Aggregations().Count())},
 		MaxScore: dmi.Aggregations().Metric("max_score"),
 		Hits:     Hits,
 	}

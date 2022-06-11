@@ -24,6 +24,7 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/uquery/timerange"
 )
 
 func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
@@ -89,13 +90,18 @@ func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
 		}, err
 	}
 
-	reader, err := index.Writer.Reader()
+	timeMin, timeMax := timerange.Query(iQuery.Query)
+	readers, err := index.GetReaders(timeMin, timeMax)
 	if err != nil {
 		log.Printf("error accessing reader: %s", err.Error())
 	}
-	defer reader.Close()
+	defer func() {
+		for _, reader := range readers {
+			reader.Close()
+		}
+	}()
 
-	dmi, err := reader.Search(context.Background(), searchRequest)
+	dmi, err := bluge.MultiSearch(context.Background(), searchRequest, readers...)
 	if err != nil {
 		log.Printf("error executing search: %s", err.Error())
 	}

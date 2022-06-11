@@ -16,11 +16,12 @@
 package core
 
 import (
-	"github.com/blugelabs/bluge/analysis"
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
+	"github.com/zinclabs/zinc/pkg/upgrade"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 )
 
@@ -35,10 +36,31 @@ func LoadZincIndexesFromMetadata() error {
 		index := new(Index)
 		index.Name = indexes[i].Name
 		index.StorageType = indexes[i].StorageType
+		index.StorageSize = indexes[i].StorageSize
+		index.DocTimeMin = indexes[i].DocTimeMin
+		index.DocTimeMax = indexes[i].DocTimeMax
+		index.DocNum = indexes[i].DocNum
+		index.ShardNum = indexes[i].ShardNum
+		index.Shards = append(index.Shards, indexes[i].Shards...)
 		index.Settings = indexes[i].Settings
 		index.Mappings = indexes[i].Mappings
-		index.Mappings = indexes[i].Mappings
-		log.Info().Msgf("Loading index... [%s:%s]", index.Name, index.StorageType)
+		index.CreateAt = indexes[i].CreateAt
+		index.UpdateAt = indexes[i].UpdateAt
+		log.Info().Msgf("Loading  index... [%s:%s] shards[%d]", index.Name, index.StorageType, index.ShardNum)
+
+		// upgrade from version <= 0.2.4
+		if index.ShardNum == 0 {
+			index.ShardNum = 1
+			index.Shards = append(index.Shards, &meta.IndexShard{})
+			//upgrade data
+			if index.StorageType != "disk" {
+				log.Panic().Msgf("Only disk storage type support upgrade from version <= 0.2.4, Please manual upgrade\n# mv %s %s_bak\n# mkdir %s\n# mv %s_bak %s/000000\n# restart zinc", index.Name, index.Name, index.Name, index.Name, index.Name)
+			} else {
+				if err := upgrade.UpgradeFromV024Index(index.Name); err != nil {
+					log.Panic().Err(err).Msgf("Automatic upgrade from version <= 0.2.4 failed, Please manual upgrade\n# mv %s %s_bak\n# mkdir %s\n# mv %s_bak %s/000000\n# restart zinc", index.Name, index.Name, index.Name, index.Name, index.Name)
+				}
+			}
+		}
 
 		// load index analysis
 		if index.Settings != nil && index.Settings.Analysis != nil {
@@ -47,39 +69,9 @@ func LoadZincIndexesFromMetadata() error {
 				return errors.New(errors.ErrorTypeRuntimeException, "parse stored analysis error").Cause(err)
 			}
 		}
-
-		// load index data
-		if err := OpenIndexWriter(index); err != nil {
-			return err
-		}
-
 		// load in memory
 		ZINC_INDEX_LIST.Add(index)
 	}
 
-	return nil
-}
-
-func ReopenIndex(indexName string) error {
-	index, ok := ZINC_INDEX_LIST.Get(indexName)
-	if !ok {
-		return errors.New(errors.ErrorTypeRuntimeException, "index not found")
-	}
-	if err := index.Close(); err != nil {
-		return err
-	}
-	return OpenIndexWriter(index)
-}
-
-func OpenIndexWriter(index *Index) error {
-	var err error
-	var defaultSearchAnalyzer *analysis.Analyzer
-	if index.Analyzers != nil {
-		defaultSearchAnalyzer = index.Analyzers["default"]
-	}
-	index.Writer, err = LoadIndexWriter(index.Name, index.StorageType, defaultSearchAnalyzer)
-	if err != nil {
-		return errors.New(errors.ErrorTypeRuntimeException, "load index writer error").Cause(err)
-	}
 	return nil
 }

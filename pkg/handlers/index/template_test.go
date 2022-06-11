@@ -179,7 +179,7 @@ func TestTemplate(t *testing.T) {
 			{
 				name: "not exists",
 				args: args{
-					code:   http.StatusNotFound,
+					code:   http.StatusBadRequest,
 					target: "TestTemplate.index_N",
 					result: `does not exists`,
 				},

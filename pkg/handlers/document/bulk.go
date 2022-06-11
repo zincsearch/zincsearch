@@ -38,11 +38,21 @@ func Bulk(c *gin.Context) {
 
 	defer c.Request.Body.Close()
 
-	ret, err := BulkWorker(target, c.Request.Body)
+	indexes, ret, err := BulkWorker(target, c.Request.Body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// check shards
+	for name := range indexes {
+		index, ok := core.ZINC_INDEX_LIST.Get(name)
+		if !ok {
+			continue
+		}
+		_ = index.CheckShards()
+	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "bulk data inserted", "record_count": ret.Count})
 }
 
@@ -52,16 +62,27 @@ func ESBulk(c *gin.Context) {
 	defer c.Request.Body.Close()
 
 	startTime := time.Now()
-	ret, err := BulkWorker(target, c.Request.Body)
+	indexes, ret, err := BulkWorker(target, c.Request.Body)
 	ret.Took = int(time.Since(startTime) / time.Millisecond)
 	if err != nil {
 		ret.Error = err.Error()
 	}
+
+	// check shards
+	for name := range indexes {
+		index, ok := core.ZINC_INDEX_LIST.Get(name)
+		if !ok {
+			continue
+		}
+		_ = index.CheckShards()
+	}
+
 	c.JSON(http.StatusOK, ret)
 }
 
-func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
+func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkResponse, error) {
 	bulkRes := &BulkResponse{Items: []map[string]*BulkResponseItem{}}
+	bulkIndexes := make(map[string]struct{})
 
 	// Prepare to read the entire raw text of the body
 	scanner := bufio.NewScanner(body)
@@ -97,7 +118,7 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 		if nextLineIsData {
 			bulkRes.Count++
 			nextLineIsData = false
-			mintedID := false
+			update := false
 
 			var docID = ""
 			if val, ok := lastLineMetaData["_id"]; ok && val != nil {
@@ -105,7 +126,8 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 			}
 			if docID == "" {
 				docID = ider.Generate()
-				mintedID = true
+			} else {
+				update = true
 			}
 
 			indexName := lastLineMetaData["_index"].(string)
@@ -130,13 +152,14 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 			if !exists { // If the requested indexName does not exist then create it
 				newIndex, err := core.NewIndex(indexName, "disk", nil)
 				if err != nil {
-					return bulkRes, err
+					return bulkIndexes, bulkRes, err
 				}
 				// store index
 				if err := core.StoreIndex(newIndex); err != nil {
-					return bulkRes, err
+					return bulkIndexes, bulkRes, err
 				}
 			}
+			bulkIndexes[indexName] = struct{}{}
 
 			// Since this is a bulk request, we need to check if we already created a new batch for this index. We need to create 1 batch per index.
 			if DoesExistInThisRequest(indexesInThisBatch, indexName) == -1 { // Add the list of indexes to the batch if it's not already there
@@ -144,15 +167,15 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 				batch[indexName] = index.NewBatch()
 			}
 
-			index, _ := core.GetIndex(indexName)
-			bdoc, err := index.BuildBlugeDocumentFromJSON(docID, doc)
+			newIndex, _ := core.GetIndex(indexName)
+			bdoc, err := newIndex.BuildBlugeDocumentFromJSON(docID, doc)
 			if err != nil {
-				return bulkRes, err
+				return bulkIndexes, bulkRes, err
 			}
 
 			// Add the documen to the batch. We will persist the batch to the index
 			// when we have processed all documents in the request
-			if !mintedID {
+			if update {
 				batch[indexName].Update(bdoc.ID(), bdoc)
 			} else {
 				batch[indexName].Insert(bdoc)
@@ -163,9 +186,15 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 			if documentsInBatch >= batchSize {
 				for _, indexName := range indexesInThisBatch {
 					// Persist the batch to the index
-					if err := index.Writer.Batch(batch[indexName]); err != nil {
+					newIndex, _ := core.GetIndex(indexName)
+					writer, err := newIndex.GetWriter()
+					if err != nil {
 						log.Error().Msgf("bulk: index updating batch err %s", err.Error())
-						return bulkRes, err
+						return bulkIndexes, bulkRes, err
+					}
+					if err := writer.Batch(batch[indexName]); err != nil {
+						log.Error().Msgf("bulk: index updating batch err %s", err.Error())
+						return bulkIndexes, bulkRes, err
 					}
 					batch[indexName].Reset()
 				}
@@ -181,7 +210,7 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 					lastLineMetaData["operation"] = k
 
 					if _, ok := v.(map[string]interface{}); !ok {
-						return nil, errors.New("bulk index data format error")
+						return nil, nil, errors.New("bulk index data format error")
 					}
 
 					if v.(map[string]interface{})["_index"] != "" { // if index is specified in metadata then it overtakes the index in the query path
@@ -190,7 +219,7 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 						lastLineMetaData["_index"] = target
 					}
 					if lastLineMetaData["_index"] == "" {
-						return nil, errors.New("bulk index data format error")
+						return nil, nil, errors.New("bulk index data format error")
 					}
 
 					lastLineMetaData["_id"] = v.(map[string]interface{})["_id"]
@@ -205,7 +234,7 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 						lastLineMetaData["_index"] = target
 					}
 					if lastLineMetaData["_index"] == "" {
-						return nil, errors.New("bulk index data format error")
+						return nil, nil, errors.New("bulk index data format error")
 					}
 
 					// delete
@@ -227,19 +256,24 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return bulkRes, err
+		return bulkIndexes, bulkRes, err
 	}
 
 	for _, indexName := range indexesInThisBatch {
 		// Persist the batch to the index
-		index, _ := core.GetIndex(indexName)
-		if err := index.Writer.Batch(batch[indexName]); err != nil {
+		newIndex, _ := core.GetIndex(indexName)
+		writer, err := newIndex.GetWriter()
+		if err != nil {
+			log.Error().Msgf("bulk: index updating batch err %s", err.Error())
+			return bulkIndexes, bulkRes, err
+		}
+		if err := writer.Batch(batch[indexName]); err != nil {
 			log.Printf("bulk: index updating batch err %s", err.Error())
-			return bulkRes, err
+			return bulkIndexes, bulkRes, err
 		}
 	}
 
-	return bulkRes, nil
+	return bulkIndexes, bulkRes, nil
 }
 
 // DoesExistInThisRequest takes a slice and looks for an element in it. If found it will

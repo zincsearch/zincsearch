@@ -35,10 +35,16 @@ import (
 // GetS3Config returns a bluge config that will store index data in S3
 // bucket: the S3 bucket to use
 // indexName: the name of the index to use. It will be an s3 prefix (folder)
-func GetS3Config(bucket string, indexName string) bluge.Config {
-	return bluge.DefaultConfigWithDirectory(func() index.Directory {
+func GetS3Config(bucket string, indexName string, timeRange ...int64) bluge.Config {
+	config := index.DefaultConfigWithDirectory(func() index.Directory {
 		return NewS3Directory(bucket, indexName)
 	})
+	if len(timeRange) == 2 {
+		if timeRange[0] <= timeRange[1] {
+			config = config.WithTimeRange(timeRange[0], timeRange[1])
+		}
+	}
+	return bluge.DefaultConfigWithIndexConfig(config)
 }
 
 type S3Directory struct {

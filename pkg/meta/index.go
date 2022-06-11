@@ -15,17 +15,34 @@
 
 package meta
 
-import "time"
+import (
+	"time"
+
+	"github.com/blugelabs/bluge"
+)
 
 type Index struct {
 	Name        string         `json:"name"`
 	StorageType string         `json:"storage_type"`
 	StorageSize uint64         `json:"storage_size"`
 	DocNum      uint64         `json:"doc_num"`
+	DocTimeMin  int64          `json:"doc_time_min"`
+	DocTimeMax  int64          `json:"doc_time_max"`
+	ShardNum    int            `json:"shard_num"`
+	Shards      []*IndexShard  `json:"shards"`
 	Settings    *IndexSettings `json:"settings,omitempty"`
 	Mappings    *Mappings      `json:"mappings,omitempty"`
 	CreateAt    time.Time      `json:"create_at"`
 	UpdateAt    time.Time      `json:"update_at"`
+}
+
+type IndexShard struct {
+	ID          int           `json:"id"`
+	DocTimeMin  int64         `json:"doc_time_min"`
+	DocTimeMax  int64         `json:"doc_time_max"`
+	DocNum      uint64        `json:"doc_num"`
+	StorageSize uint64        `json:"storage_size"`
+	Writer      *bluge.Writer `json:"-"`
 }
 
 type IndexSimple struct {

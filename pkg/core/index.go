@@ -16,202 +16,19 @@
 package core
 
 import (
-	"fmt"
-	"strconv"
-	"time"
+	"sync"
+	"sync/atomic"
 
-	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
-	"github.com/goccy/go-json"
 
 	"github.com/zinclabs/zinc/pkg/meta"
-	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
-	"github.com/zinclabs/zinc/pkg/zutils"
-	"github.com/zinclabs/zinc/pkg/zutils/flatten"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
 type Index struct {
 	meta.Index
 	Analyzers map[string]*analysis.Analyzer `json:"-"`
-	Writer    *bluge.Writer                 `json:"-"`
-}
-
-// BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
-// If no mappings are found, it creates te mapping for all the encountered fields. If mapping for some fields is found but not for others
-// then it creates the mapping for the missing fields.
-func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]interface{}) (*bluge.Document, error) {
-	// Pick the index mapping from the cache if it already exists
-	mappings := index.Mappings
-	if mappings == nil {
-		mappings = meta.NewMappings()
-	}
-
-	mappingsNeedsUpdate := false
-
-	// Create a new bluge document
-	bdoc := bluge.NewDocument(docID)
-	flatDoc, _ := flatten.Flatten(doc, "")
-	// Iterate through each field and add it to the bluge document
-	for key, value := range flatDoc {
-		if value == nil || key == "@timestamp" {
-			continue
-		}
-
-		if _, ok := mappings.GetProperty(key); !ok {
-			// try to find the type of the value and use it to define default mapping
-			switch value.(type) {
-			case string:
-				mappings.SetProperty(key, meta.NewProperty("text"))
-			case float64:
-				mappings.SetProperty(key, meta.NewProperty("numeric"))
-			case bool:
-				mappings.SetProperty(key, meta.NewProperty("bool"))
-			case []interface{}:
-				if v, ok := value.([]interface{}); ok {
-					for _, vv := range v {
-						switch vv.(type) {
-						case string:
-							mappings.SetProperty(key, meta.NewProperty("text"))
-						case float64:
-							mappings.SetProperty(key, meta.NewProperty("numeric"))
-						case bool:
-							mappings.SetProperty(key, meta.NewProperty("bool"))
-						}
-						break
-					}
-				}
-			}
-
-			mappingsNeedsUpdate = true
-		}
-
-		if prop, ok := mappings.GetProperty(key); ok && !prop.Index {
-			continue // not index, skip
-		}
-
-		switch v := value.(type) {
-		case []interface{}:
-			for _, v := range v {
-				if err := index.buildField(mappings, bdoc, key, v); err != nil {
-					return nil, err
-				}
-			}
-		default:
-			if err := index.buildField(mappings, bdoc, key, v); err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	if mappingsNeedsUpdate {
-		_ = index.SetMappings(mappings)
-		_ = StoreIndex(index)
-	}
-
-	timestamp := time.Now()
-	if v, ok := flatDoc["@timestamp"]; ok {
-		switch v := v.(type) {
-		case string:
-			if t, err := time.Parse(time.RFC3339, v); err == nil && !t.IsZero() {
-				timestamp = t
-				delete(doc, "@timestamp")
-			}
-		case float64:
-			if t := zutils.Unix(int64(v)); !t.IsZero() {
-				timestamp = t
-				delete(doc, "@timestamp")
-			}
-		default:
-			// noop
-		}
-	}
-	docByteVal, _ := json.Marshal(doc)
-	bdoc.AddField(bluge.NewDateTimeField("@timestamp", timestamp).StoreValue().Sortable().Aggregatable())
-	bdoc.AddField(bluge.NewStoredOnlyField("_index", []byte(index.Name)))
-	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", []string{"_id", "_index", "_source", "@timestamp"}))
-
-	// test for add time index
-	bdoc.SetTimestamp(timestamp.UnixNano())
-
-	return bdoc, nil
-}
-
-func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, key string, value interface{}) error {
-	var field *bluge.TermField
-	prop, _ := mappings.GetProperty(key)
-	switch prop.Type {
-	case "text":
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("field [%s] was set type to [text] but got a %T value", key, value)
-		}
-		field = bluge.NewTextField(key, v).SearchTermPositions()
-		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.Analyzers, index.Mappings, key)
-		if fieldAnalyzer != nil {
-			field.WithAnalyzer(fieldAnalyzer)
-		}
-	case "numeric":
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("field [%s] was set type to [numeric] but got a %T value", key, value)
-		}
-		field = bluge.NewNumericField(key, v)
-	case "keyword":
-		switch v := value.(type) {
-		case string:
-			field = bluge.NewKeywordField(key, v)
-		case float64:
-			field = bluge.NewKeywordField(key, strconv.FormatFloat(v, 'f', -1, 64))
-		case int:
-			field = bluge.NewKeywordField(key, strconv.FormatInt(int64(v), 10))
-		case bool:
-			field = bluge.NewKeywordField(key, strconv.FormatBool(v))
-		default:
-			field = bluge.NewKeywordField(key, fmt.Sprintf("%v", v))
-		}
-	case "bool":
-		value := value.(bool)
-		field = bluge.NewKeywordField(key, strconv.FormatBool(value))
-	case "date", "time":
-		switch v := value.(type) {
-		case string:
-			format := time.RFC3339
-			if prop.Format != "" {
-				format = prop.Format
-			}
-			var tim time.Time
-			var err error
-			if format == "epoch_millis" {
-				tim = time.UnixMilli(int64(value.(float64)))
-			} else {
-				tim, err = time.Parse(format, value.(string))
-			}
-			if err != nil {
-				return err
-			}
-			field = bluge.NewDateTimeField(key, tim)
-		case float64:
-			if t := zutils.Unix(int64(v)); !t.IsZero() {
-				field = bluge.NewDateTimeField(key, t)
-			}
-		}
-	}
-	if prop.Store || prop.Highlightable {
-		field.StoreValue()
-	}
-	if prop.Highlightable {
-		field.HighlightMatches()
-	}
-	if prop.Sortable {
-		field.Sortable()
-	}
-	if prop.Aggregatable {
-		field.Aggregatable()
-	}
-	bdoc.AddField(field)
-
-	return nil
+	lock      sync.RWMutex                  `json:"-"`
 }
 
 func (index *Index) UseTemplate() error {
@@ -280,30 +97,93 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 	return nil
 }
 
-func (index *Index) UpdateMetadata() {
-	w := index.Writer
-	if w == nil {
-		return
+func (index *Index) SetTimestamp(t int64) {
+	if index.DocTimeMin == 0 {
+		atomic.StoreInt64(&index.DocTimeMin, t)
 	}
-	_, index.StorageSize = w.DirectoryStats()
-
-	if r, err := w.Reader(); err == nil {
-		if n, err := r.Count(); err == nil {
-			index.DocNum = n
-		}
+	if index.DocTimeMax == 0 {
+		atomic.StoreInt64(&index.DocTimeMax, t)
+	}
+	if t < index.DocTimeMin {
+		atomic.StoreInt64(&index.DocTimeMin, t)
+	}
+	if t > index.DocTimeMax {
+		atomic.StoreInt64(&index.DocTimeMax, t)
 	}
 }
 
-func (index *Index) Close() error {
-	if index.Writer == nil {
-		return nil
+func (index *Index) UpdateMetadata() error {
+	var totalDocNum, totalSize uint64
+	// update docNum and storageSize
+	for i := 0; i < index.ShardNum; i++ {
+		index.UpdateMetadataByShard(i)
 	}
-	// update metadata before close
-	index.UpdateMetadata()
-	// close writer
-	if err := index.Writer.Close(); err != nil {
+	index.lock.RLock()
+	for i := 0; i < index.ShardNum; i++ {
+		totalDocNum += index.Shards[i].DocNum
+		totalSize += index.Shards[i].StorageSize
+	}
+	if totalDocNum > 0 && totalSize > 0 {
+		index.DocNum = totalDocNum
+		index.StorageSize = totalSize
+	}
+	// update docTime
+	index.Shards[index.ShardNum-1].DocTimeMin = index.DocTimeMin
+	index.Shards[index.ShardNum-1].DocTimeMax = index.DocTimeMax
+	index.lock.RUnlock()
+
+	return metadata.Index.Set(index.Name, index.Index)
+}
+
+func (index *Index) UpdateMetadataByShard(n int) {
+	index.lock.RLock()
+	shard := index.Shards[n]
+	index.lock.RUnlock()
+	if shard.Writer == nil {
+		return
+	}
+	var docNum, storageSize uint64
+	_, storageSize = shard.Writer.DirectoryStats()
+	if r, err := shard.Writer.Reader(); err == nil {
+		if n, err := r.Count(); err == nil {
+			docNum = n
+		}
+		_ = r.Close()
+	}
+	if docNum > 0 {
+		shard.DocNum = docNum
+	}
+	if storageSize > 0 {
+		shard.StorageSize = storageSize
+	}
+}
+
+func (index *Index) Reopen() error {
+	if err := index.Close(); err != nil {
 		return err
 	}
-	index.Writer = nil
+	if _, err := index.GetWriter(); err != nil {
+		return err
+	}
 	return nil
+}
+
+func (index *Index) Close() error {
+	var err error
+	// update metadata before close
+	if err = index.UpdateMetadata(); err != nil {
+		return err
+	}
+	index.lock.Lock()
+	for _, shard := range index.Shards {
+		if shard.Writer == nil {
+			continue
+		}
+		if e := shard.Writer.Close(); e != nil {
+			err = e
+		}
+		shard.Writer = nil
+	}
+	index.lock.Unlock()
+	return err
 }
