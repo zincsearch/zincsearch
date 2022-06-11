@@ -13,26 +13,24 @@
 * limitations under the License.
  */
 
-package index
+package directory
 
 import (
-	"net/http"
+	"path"
 
-	"github.com/gin-gonic/gin"
-
-	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/index"
 )
 
-func Refresh(c *gin.Context) {
-	indexName := c.Param("target")
-	index, exists := core.GetIndex(indexName)
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + " does not exists"})
-		return
+// GetDiskConfig returns a bluge config that will store index data in local disk
+// rootPath: the root path of data
+// indexName: the name of the index to use.
+func GetDiskConfig(rootPath string, indexName string, timeRange ...int64) bluge.Config {
+	config := index.DefaultConfig(path.Join(rootPath, indexName))
+	if len(timeRange) == 2 {
+		if timeRange[0] <= timeRange[1] {
+			config = config.WithTimeRange(timeRange[0], timeRange[1])
+		}
 	}
-	if err := index.Reopen(); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "refresh ok"})
+	return bluge.DefaultConfigWithIndexConfig(config)
 }

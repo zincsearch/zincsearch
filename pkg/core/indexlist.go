@@ -19,6 +19,9 @@ import (
 	"sync"
 
 	"github.com/rs/zerolog/log"
+
+	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
 var ZINC_INDEX_LIST IndexList
@@ -29,9 +32,25 @@ type IndexList struct {
 }
 
 func init() {
+	log.Info().Msgf("Starting Zinc %s", meta.Version)
+	// check version
+	version, _ := metadata.KV.Get("version")
+	if version == nil {
+		metadata.KV.Set("version", []byte(meta.Version))
+		// } else {
+		// version := string(version)
+		// if version != meta.Version {
+		// 	log.Error().Msgf("Version mismatch, loading data from old version %s", version)
+		// 	if err := upgrade.Do(version); err != nil {
+		// 		log.Fatal().Err(err).Msg("Failed to upgrade")
+		// 	}
+		// }
+	}
+
+	// start loading index
 	ZINC_INDEX_LIST.Indexes = make(map[string]*Index)
 	if err := LoadZincIndexesFromMetadata(); err != nil {
-		log.Error().Err(err).Msgf("Error loading index")
+		log.Error().Err(err).Msg("Error loading index")
 	}
 }
 

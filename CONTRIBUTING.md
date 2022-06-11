@@ -138,4 +138,3 @@ docker buildx build --platform linux/amd64 --tag zinc:latest-linux-amd64 . -f Do
 1. Make the changes to code.
 1. Push the code to your repo.
 1. Create a PR
-

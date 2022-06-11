@@ -46,20 +46,17 @@ func DeleteIndex(name string) error {
 		dataPath := config.Global.DataPath
 		err := os.RemoveAll(dataPath + "/" + index.Name)
 		if err != nil {
-			log.Error().Msgf("failed to delete index: %s", err.Error())
-			return err
+			log.Error().Err(err).Msg("failed to delete index")
 		}
 	} else if index.StorageType == "s3" {
 		err := deleteFilesForIndexFromS3(index.Name)
 		if err != nil {
-			log.Error().Msgf("failed to delete index from S3: %s", err.Error())
-			return err
+			log.Error().Err(err).Msg("failed to delete index from S3")
 		}
 	} else if index.StorageType == "minio" {
 		err := deleteFilesForIndexFromMinIO(index.Name)
 		if err != nil {
-			log.Error().Msgf("failed to delete index from minIO: %s", err.Error())
-			return err
+			log.Error().Err(err).Msg("failed to delete index from minIO")
 		}
 	}
 

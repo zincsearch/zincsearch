@@ -13,71 +13,55 @@
 * limitations under the License.
  */
 
-package search
+package index
 
 import (
 	"net/http"
 	"testing"
 
+	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/test/utils"
 )
 
-func TestSearchDSL(t *testing.T) {
-	indexName := "TestSearchDSL.index_1"
+func TestRefresh(t *testing.T) {
 	type args struct {
 		code   int
-		data   string
 		params map[string]string
 		result string
 	}
 	tests := []struct {
-		name string
-		args args
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "normal",
 			args: args{
 				code:   http.StatusOK,
-				data:   `{"query":{"match_all":{}},"size":10}`,
-				params: map[string]string{"target": indexName},
-				result: "successful",
+				params: map[string]string{"target": "TestRefresh.index_1"},
+				result: "refresh ok",
 			},
+			wantErr: false,
 		},
 		{
-			name: "multiple index",
-			args: args{
-				code:   http.StatusOK,
-				data:   `{"query":{"match_all":{}},"size":10}`,
-				result: "successful",
-			},
-		},
-		{
-			name: "index not found",
+			name: "empty",
 			args: args{
 				code:   http.StatusBadRequest,
-				data:   `{"query":{"match_all":{}},"size":10}`,
-				params: map[string]string{"target": "NotExist" + indexName},
+				params: map[string]string{"target": ""},
 				result: "does not exists",
 			},
-		},
-		{
-			name: "query jsone error",
-			args: args{
-				code:   http.StatusBadRequest,
-				data:   `{"query":{"match_all":{x}},"size":10}`,
-				params: map[string]string{"target": "olympics"},
-				result: "invalid character",
-			},
+			wantErr: false,
 		},
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err := core.NewIndex(indexName, "disk", nil)
+		index, err := core.NewIndex("TestRefresh.index_1", "disk", nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
+
 		err = core.StoreIndex(index)
 		assert.NoError(t, err)
 	})
@@ -85,16 +69,14 @@ func TestSearchDSL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c, w := utils.NewGinContext()
-			utils.SetGinRequestData(c, tt.args.data)
 			utils.SetGinRequestParams(c, tt.args.params)
-			SearchDSL(c)
+			Refresh(c)
 			assert.Equal(t, tt.args.code, w.Code)
 			assert.Contains(t, w.Body.String(), tt.args.result)
+
+			resp := make(map[string]string)
+			err := json.Unmarshal(w.Body.Bytes(), &resp)
+			assert.NoError(t, err)
 		})
 	}
-
-	t.Run("cleanup", func(t *testing.T) {
-		err := core.DeleteIndex(indexName)
-		assert.NoError(t, err)
-	})
 }

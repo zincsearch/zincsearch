@@ -38,10 +38,16 @@ import (
 // GetMinIOConfig returns a bluge config that will store index data in MinIO
 // bucket: the MinIO bucket to use
 // indexName: the name of the index to use. It will be an MinIO prefix (folder)
-func GetMinIOConfig(bucket string, indexName string) bluge.Config {
-	return bluge.DefaultConfigWithDirectory(func() index.Directory {
+func GetMinIOConfig(bucket string, indexName string, timeRange ...int64) bluge.Config {
+	config := index.DefaultConfigWithDirectory(func() index.Directory {
 		return NewMinIODirectory(bucket, indexName)
 	})
+	if len(timeRange) == 2 {
+		if timeRange[0] <= timeRange[1] {
+			config = config.WithTimeRange(timeRange[0], timeRange[1])
+		}
+	}
+	return bluge.DefaultConfigWithIndexConfig(config)
 }
 
 type MinIODirectory struct {

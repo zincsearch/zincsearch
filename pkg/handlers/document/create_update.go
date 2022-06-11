@@ -35,15 +35,15 @@ func CreateUpdate(c *gin.Context) {
 		return
 	}
 
-	mintedID := false
-
+	update := false
 	// If id field is present then use it, else create a new UUID and use it
 	if id, ok := doc["_id"]; ok {
 		docID = id.(string)
 	}
 	if docID == "" {
 		docID = ider.Generate()
-		mintedID = true
+	} else {
+		update = true
 	}
 
 	// If the index does not exist, then create it
@@ -59,11 +59,14 @@ func CreateUpdate(c *gin.Context) {
 		_ = core.StoreIndex(index)
 	}
 
-	err = index.UpdateDocument(docID, doc, mintedID)
+	err = index.CreateDocument(docID, doc, update)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// check shards
+	_ = index.CheckShards()
 
 	c.JSON(http.StatusOK, gin.H{"id": docID})
 }

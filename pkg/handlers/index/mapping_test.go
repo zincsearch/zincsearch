@@ -188,7 +188,7 @@ func TestMapping(t *testing.T) {
 			{
 				name: "empty",
 				args: args{
-					code:   http.StatusNotFound,
+					code:   http.StatusBadRequest,
 					target: "",
 					result: `does not exists`,
 				},

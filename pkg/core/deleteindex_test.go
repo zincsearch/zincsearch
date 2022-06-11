@@ -52,14 +52,14 @@ func TestDeleteIndex(t *testing.T) {
 			args: args{
 				name: indexNameS3,
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 		{
 			name: "minio",
 			args: args{
 				name: indexNameMinIO,
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 

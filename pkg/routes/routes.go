@@ -115,10 +115,11 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/api/_bulk", AuthMiddleware, document.Bulk)
 	r.POST("/api/:target/_bulk", AuthMiddleware, document.Bulk)
 	// Document CRUD APIs. Update is same as create.
-	r.POST("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)
-	r.PUT("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)
-	r.PUT("/api/:target/_doc/:id", AuthMiddleware, document.CreateUpdate)
-	r.DELETE("/api/:target/_doc/:id", AuthMiddleware, document.Delete)
+	r.POST("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)    // create
+	r.PUT("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)     // create
+	r.PUT("/api/:target/_doc/:id", AuthMiddleware, document.CreateUpdate) // create or update
+	r.POST("/api/:target/_update/:id", AuthMiddleware, document.Update)   // update
+	r.DELETE("/api/:target/_doc/:id", AuthMiddleware, document.Delete)    // delete
 
 	/**
 	 * elastic compatible APIs
@@ -159,12 +160,12 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/es/_bulk", AuthMiddleware, document.ESBulk)
 	r.POST("/es/:target/_bulk", AuthMiddleware, document.ESBulk)
 	// ES Document
-	r.POST("/es/:target/_doc", AuthMiddleware, document.CreateUpdate)
-	r.PUT("/es/:target/_doc/:id", AuthMiddleware, document.CreateUpdate)
-	r.PUT("/es/:target/_create/:id", AuthMiddleware, document.CreateUpdate)
-	r.POST("/es/:target/_create/:id", AuthMiddleware, document.CreateUpdate)
-	r.POST("/es/:target/_update/:id", AuthMiddleware, document.CreateUpdate)
-	r.DELETE("/es/:target/_doc/:id", AuthMiddleware, document.Delete)
+	r.POST("/es/:target/_doc", AuthMiddleware, document.CreateUpdate)        // create
+	r.PUT("/es/:target/_doc/:id", AuthMiddleware, document.CreateUpdate)     // create or update
+	r.PUT("/es/:target/_create/:id", AuthMiddleware, document.CreateUpdate)  // create
+	r.POST("/es/:target/_create/:id", AuthMiddleware, document.CreateUpdate) // create
+	r.POST("/es/:target/_update/:id", AuthMiddleware, document.Update)       // update part of document
+	r.DELETE("/es/:target/_doc/:id", AuthMiddleware, document.Delete)        // delete
 
 	core.Telemetry.Instance()
 	core.Telemetry.Event("server_start", nil)
