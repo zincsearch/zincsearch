@@ -23,7 +23,7 @@ import (
 )
 
 func BenchmarkBulk(b *testing.B) {
-	f, err := os.Open("../tmp/olympics.ndjson")
+	f, err := os.Open("../../tmp/olympics.ndjson")
 	if err != nil {
 		b.Error(err)
 	}
