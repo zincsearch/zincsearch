@@ -24,6 +24,14 @@ import (
 )
 
 // Delete deletes a zinc index and its associated data. Be careful using thus as you ca't undo this action.
+
+// @Summary Delete Index
+// @Tags  Index
+// @Param  target path  string  true  "Index"
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Success 200 {object} map[string]interface{}
+// @Router /api/index/:target [delete]
 func Delete(c *gin.Context) {
 	indexName := c.Param("target")
 

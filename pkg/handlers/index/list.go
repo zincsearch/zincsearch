@@ -25,6 +25,11 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// @Summary List Indexes
+// @Tags  Index
+// @Produce json
+// @Success 200 {object} []core.Index
+// @Router /api/index [get]
 func List(c *gin.Context) {
 	items := core.ZINC_INDEX_LIST.List()
 	for _, index := range items {

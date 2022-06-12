@@ -24,6 +24,11 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// @Summary List User
+// @Tags  User
+// @Produce json
+// @Success 200 {object} meta.SearchResponse
+// @Router /api/user [get]
 func List(c *gin.Context) {
 	users, err := auth.GetUsers()
 	if err != nil {

@@ -24,6 +24,14 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 )
 
+// @Summary Delete Document
+// @Tags  Document
+// @Param  id   path  string  true  "document ID"
+// @Param  target path  string  true  "Index"
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Success 200 {object} map[string]interface{}
+// @Router /api/:target/_doc/:id [delete]
 func Delete(c *gin.Context) {
 	indexName := c.Param("target")
 	docID := c.Param("id")

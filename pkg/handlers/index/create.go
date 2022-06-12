@@ -28,6 +28,13 @@ import (
 	"github.com/zinclabs/zinc/pkg/uquery/mappings"
 )
 
+// @Summary Create Index
+// @Tags  Index
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Param indexSimple body meta.IndexSimple true "Index data"
+// @Failure 400 {object} map[string]interface{}
+// @Router /api/index [post]
 func Create(c *gin.Context) {
 	var newIndex meta.IndexSimple
 	if err := c.BindJSON(&newIndex); err != nil {

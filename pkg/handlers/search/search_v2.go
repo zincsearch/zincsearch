@@ -31,6 +31,14 @@ import (
 )
 
 // SearchDSL searches the index for the given http request from end user
+
+// @Summary Search V2 DSL
+// @Tags  Search
+// @Produce json
+// @Success 200 {object} meta.SearchResponse
+// @Param  target   path   string  true  "index name"
+// @Failure 400 {object} map[string]interface{}
+// @Router /es/:target/_search [post]
 func SearchDSL(c *gin.Context) {
 	indexName := c.Param("target")
 
@@ -59,6 +67,15 @@ func SearchDSL(c *gin.Context) {
 }
 
 // MultipleSearch like bulk searches
+
+// @Summary Search V2 MultipleSearch
+// @Tags  Search
+// @Produce json
+// @Success 200 {object} meta.SearchResponse
+// @Param query body v1.ZincQuery true "query data"
+// @Param  target   path   string  true  "index name"
+// @Failure 400 {object} map[string]interface{}
+// @Router /es/:target/_msearch [post]
 func MultipleSearch(c *gin.Context) {
 	indexName := c.Param("target")
 	defaultIndexNames := make([]string, 0)

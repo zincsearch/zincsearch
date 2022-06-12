@@ -24,11 +24,12 @@ import (
 )
 
 // @Summary Login
+// @Tags  User
 // @Produce json
 // @Param login body LoginRequest true "Login Credentials"
 // @Success 200 {object} LoginResponse
 // @Failure 400 {object} LoginError
-// @Router /login [post]
+// @Router /api/login [post]
 func Login(c *gin.Context) {
 	// Read login input
 	var loginInput LoginRequest

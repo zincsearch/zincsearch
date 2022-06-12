@@ -44,8 +44,9 @@ import (
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
+// @securityDefinitions.basic BasicAuth
 // @host      localhost:4080
-// @BasePath  /api
+// @BasePath  /
 func main() {
 
 	if config.Global.SentryEnable && config.Global.SentryDSN != "" {
