@@ -63,6 +63,9 @@ func (t *pebbleStorage) List(prefix string, _, _ int) ([][]byte, error) {
 func (t *pebbleStorage) Get(key string) ([]byte, error) {
 	v, closer, err := t.db.Get([]byte(key))
 	if err != nil {
+		if err == pebble.ErrNotFound {
+			return nil, errors.ErrKeyNotFound
+		}
 		return nil, err
 	}
 	data := make([]byte, len(v))
@@ -92,7 +95,16 @@ func (t *pebbleStorage) Close() error {
 }
 
 func (t *pebbleStorage) prefixOption(prefix []byte) *pebble.IterOptions {
-	keyUpperBound := func(b []byte) []byte {
+	return &pebble.IterOptions{
+		LowerBound: prefix,
+		UpperBound: keyUpperBound(prefix),
+	}
+}
+
+var keyUpperBound func(b []byte) []byte
+
+func init() {
+	keyUpperBound = func(b []byte) []byte {
 		end := make([]byte, len(b))
 		copy(end, b)
 		for i := len(end) - 1; i >= 0; i-- {
@@ -102,10 +114,5 @@ func (t *pebbleStorage) prefixOption(prefix []byte) *pebble.IterOptions {
 			}
 		}
 		return nil // no upper-bound
-	}
-
-	return &pebble.IterOptions{
-		LowerBound: prefix,
-		UpperBound: keyUpperBound(prefix),
 	}
 }
