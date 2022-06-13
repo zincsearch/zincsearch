@@ -75,3 +75,19 @@ func TestSentryDSNOverride(t *testing.T) {
 		assert.Equal(t, customDSN, c.SentryDSN)
 	})
 }
+
+func TestS3Override(t *testing.T) {
+	bucket := "zinc-dev-misc1"
+
+	t.Run("prepare", func(t *testing.T) {
+		os.Setenv("ZINC_S3_BUCKET", bucket)
+	})
+
+	t.Run("check", func(t *testing.T) {
+		c := new(config)
+		rv := reflect.ValueOf(c).Elem()
+		loadConfig(rv)
+
+		assert.Equal(t, bucket, c.S3.Bucket)
+	})
+}
