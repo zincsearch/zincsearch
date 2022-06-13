@@ -102,7 +102,10 @@ type gse struct {
 var Global = new(config)
 
 func init() {
-	_ = godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		log.Print(err.Error())
+	}
 	rv := reflect.ValueOf(Global).Elem()
 	loadConfig(rv)
 
