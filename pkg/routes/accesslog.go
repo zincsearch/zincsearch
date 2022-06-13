@@ -24,8 +24,8 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-func AccessLog(r *gin.Engine) {
-	r.Use(func(c *gin.Context) {
+func AccessLog(app *gin.Engine) {
+	app.Use(func(c *gin.Context) {
 		timeStart := time.Now()
 		c.Writer.Header().Set("Zinc", meta.Version)
 

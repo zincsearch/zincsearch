@@ -68,7 +68,7 @@ type shard struct {
 }
 
 type etcd struct {
-	Endpoints []string `env:"ZINC_ETCD_ENDPOINTS"`
+	Endpoints []string `env:"ZINC_ETCD_ENDPOINTS,default=localhost:2379"`
 	Username  string   `env:"ZINC_ETCD_USERNAME"`
 	Password  string   `env:"ZINC_ETCD_PASSWORD"`
 }

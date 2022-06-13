@@ -27,6 +27,7 @@ import (
 // indexName: the name of the index to use.
 func GetDiskConfig(rootPath string, indexName string, timeRange ...int64) bluge.Config {
 	config := index.DefaultConfig(path.Join(rootPath, indexName))
+	config = config.WithPersisterNapTimeMSec(100)
 	if len(timeRange) == 2 {
 		if timeRange[0] <= timeRange[1] {
 			config = config.WithTimeRange(timeRange[0], timeRange[1])

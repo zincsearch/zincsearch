@@ -22,8 +22,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HTTPCacheForUI(r *gin.Engine) {
-	r.Use(func(c *gin.Context) {
+func HTTPCacheForUI(app *gin.Engine) {
+	app.Use(func(c *gin.Context) {
 		if c.Request.Method == "GET" || c.Request.Method == "HEAD" {
 			if strings.Contains(c.Request.RequestURI, "/ui/assets/") {
 				c.Writer.Header().Set("cache-control", "public, max-age=2592000")

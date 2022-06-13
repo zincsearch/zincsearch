@@ -48,7 +48,9 @@ func newTelemetry() *telemetry {
 	t.events = make(chan analytics.Track, 100)
 	t.initBaseInfo()
 
-	go t.runEvents()
+	if config.Global.TelemetryEnable {
+		go t.runEvents()
+	}
 
 	return t
 }
@@ -166,6 +168,10 @@ func (t *telemetry) HeartBeat() {
 }
 
 func (t *telemetry) Cron() {
+	if !config.Global.TelemetryEnable {
+		return
+	}
+
 	c := cron.New()
 	_, _ = c.AddFunc("@every 30m", t.HeartBeat)
 	c.Start()

@@ -17,7 +17,6 @@ package badger
 
 import (
 	"path"
-	"runtime"
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/dgraph-io/badger/v3/options"
@@ -42,7 +41,7 @@ func New(dbpath string) storage.Storager {
 
 func openBadgerDB(dbpath string, readOnly bool) (*badger.DB, error) {
 	opt := badger.DefaultOptions(dbpath)
-	opt.NumGoroutines = runtime.NumGoroutine() * 4
+	opt.NumGoroutines = 4
 	opt.MemTableSize = 1 << 24 // 16MB
 	opt.Compression = options.ZSTD
 	opt.ZSTDCompressionLevel = 3

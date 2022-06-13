@@ -16,18 +16,11 @@
 package routes
 
 import (
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
-	ginprometheus "github.com/zsais/go-gin-prometheus"
-
-	"github.com/zinclabs/zinc/pkg/config"
 )
 
-// SetPrometheus sets up prometheus metrics for gin
-func SetPrometheus(app *gin.Engine) {
-	if !config.Global.PrometheusEnable {
-		return
-	}
+func SetPProf(app *gin.Engine) {
+	pprof.Register(app)
 
-	p := ginprometheus.NewPrometheus("gin")
-	p.Use(app)
 }

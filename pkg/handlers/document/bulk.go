@@ -81,7 +81,7 @@ func ESBulk(c *gin.Context) {
 }
 
 func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkResponse, error) {
-	bulkRes := &BulkResponse{Items: []map[string]*BulkResponseItem{}}
+	bulkRes := &BulkResponse{Items: []map[string]BulkResponseItem{}}
 	bulkIndexes := make(map[string]struct{})
 
 	// Prepare to read the entire raw text of the body
@@ -134,15 +134,15 @@ func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkRespon
 			operation := lastLineMetaData["operation"].(string)
 			switch operation {
 			case "index":
-				bulkRes.Items = append(bulkRes.Items, map[string]*BulkResponseItem{
+				bulkRes.Items = append(bulkRes.Items, map[string]BulkResponseItem{
 					"index": NewBulkResponseItem(bulkRes.Count, indexName, docID, "created", nil),
 				})
 			case "create":
-				bulkRes.Items = append(bulkRes.Items, map[string]*BulkResponseItem{
+				bulkRes.Items = append(bulkRes.Items, map[string]BulkResponseItem{
 					"index": NewBulkResponseItem(bulkRes.Count, indexName, docID, "created", nil),
 				})
 			case "update":
-				bulkRes.Items = append(bulkRes.Items, map[string]*BulkResponseItem{
+				bulkRes.Items = append(bulkRes.Items, map[string]BulkResponseItem{
 					"index": NewBulkResponseItem(bulkRes.Count, indexName, docID, "updated", nil),
 				})
 			default:
@@ -204,32 +204,33 @@ func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkRespon
 		} else { // This branch will process the metadata line in the request. Each metadata line is preceded by a data line.
 
 			for k, v := range doc {
+				vm, ok := v.(map[string]interface{})
+				if !ok {
+					return nil, nil, errors.New("bulk index data format error")
+				}
+				for k := range lastLineMetaData {
+					delete(lastLineMetaData, k)
+				}
 				if k == "index" || k == "create" || k == "update" {
 					nextLineIsData = true
-
 					lastLineMetaData["operation"] = k
 
-					if _, ok := v.(map[string]interface{}); !ok {
-						return nil, nil, errors.New("bulk index data format error")
-					}
-
-					if v.(map[string]interface{})["_index"] != "" { // if index is specified in metadata then it overtakes the index in the query path
-						lastLineMetaData["_index"] = v.(map[string]interface{})["_index"]
+					if vm["_index"] != "" { // if index is specified in metadata then it overtakes the index in the query path
+						lastLineMetaData["_index"] = vm["_index"]
 					} else {
 						lastLineMetaData["_index"] = target
 					}
 					if lastLineMetaData["_index"] == "" {
 						return nil, nil, errors.New("bulk index data format error")
 					}
-
-					lastLineMetaData["_id"] = v.(map[string]interface{})["_id"]
+					lastLineMetaData["_id"] = vm["_id"]
 				} else if k == "delete" {
 					nextLineIsData = false
 
 					lastLineMetaData["operation"] = k
-					lastLineMetaData["_id"] = v.(map[string]interface{})["_id"]
-					if v.(map[string]interface{})["_index"] != "" { // if index is specified in metadata then it overtakes the index in the query path
-						lastLineMetaData["_index"] = v.(map[string]interface{})["_index"]
+					lastLineMetaData["_id"] = vm["_id"]
+					if vm["_index"] != "" { // if index is specified in metadata then it overtakes the index in the query path
+						lastLineMetaData["_index"] = vm["_index"]
 					} else {
 						lastLineMetaData["_index"] = target
 					}
@@ -247,7 +248,7 @@ func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkRespon
 					batch[indexName].Delete(bdoc.ID())
 
 					bulkRes.Count++
-					bulkRes.Items = append(bulkRes.Items, map[string]*BulkResponseItem{
+					bulkRes.Items = append(bulkRes.Items, map[string]BulkResponseItem{
 						"delete": NewBulkResponseItem(bulkRes.Count, indexName, bdoc.ID().Field(), "deleted", nil),
 					})
 				}
@@ -287,8 +288,8 @@ func DoesExistInThisRequest(slice []string, val string) int {
 	return -1
 }
 
-func NewBulkResponseItem(seqNo int, index, id, result string, err error) *BulkResponseItem {
-	return &BulkResponseItem{
+func NewBulkResponseItem(seqNo int, index, id, result string, err error) BulkResponseItem {
+	return BulkResponseItem{
 		Index:   index,
 		Type:    "_doc",
 		ID:      id,
@@ -306,11 +307,11 @@ func NewBulkResponseItem(seqNo int, index, id, result string, err error) *BulkRe
 }
 
 type BulkResponse struct {
-	Took   int                            `json:"took"`
-	Errors bool                           `json:"errors"`
-	Error  string                         `json:"error,omitempty"`
-	Count  int                            `json:"count"`
-	Items  []map[string]*BulkResponseItem `json:"items"`
+	Took   int                           `json:"took"`
+	Errors bool                          `json:"errors"`
+	Error  string                        `json:"error,omitempty"`
+	Count  int                           `json:"count"`
+	Items  []map[string]BulkResponseItem `json:"items"`
 }
 
 type BulkResponseItem struct {

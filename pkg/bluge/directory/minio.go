@@ -42,6 +42,7 @@ func GetMinIOConfig(bucket string, indexName string, timeRange ...int64) bluge.C
 	config := index.DefaultConfigWithDirectory(func() index.Directory {
 		return NewMinIODirectory(bucket, indexName)
 	})
+	config = config.WithPersisterNapTimeMSec(100)
 	if len(timeRange) == 2 {
 		if timeRange[0] <= timeRange[1] {
 			config = config.WithTimeRange(timeRange[0], timeRange[1])

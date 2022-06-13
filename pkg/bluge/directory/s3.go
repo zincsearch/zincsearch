@@ -39,6 +39,7 @@ func GetS3Config(bucket string, indexName string, timeRange ...int64) bluge.Conf
 	config := index.DefaultConfigWithDirectory(func() index.Directory {
 		return NewS3Directory(bucket, indexName)
 	})
+	config = config.WithPersisterNapTimeMSec(100)
 	if len(timeRange) == 2 {
 		if timeRange[0] <= timeRange[1] {
 			config = config.WithTimeRange(timeRange[0], timeRange[1])

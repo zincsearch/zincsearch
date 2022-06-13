@@ -49,11 +49,6 @@ func SetRoutes(r *gin.Engine) {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	// debug for accesslog
-	if gin.Mode() == gin.DebugMode {
-		AccessLog(r)
-	}
-
 	r.GET("/", meta.GUI)
 	r.GET("/version", meta.GetVersion)
 	r.GET("/healthz", meta.GetHealthz)

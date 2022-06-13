@@ -97,18 +97,24 @@ func main() {
 
 	/****** Coninuous profiling config end ******/
 
-	r := gin.New()
+	app := gin.New()
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.
-	r.Use(gin.Recovery())
+	app.Use(gin.Recovery())
 
-	routes.SetPrometheus(r) // Set up Prometheus.
-	routes.SetRoutes(r)     // Set up all API routes.
+	// debug for gin
+	if gin.Mode() == gin.DebugMode {
+		routes.AccessLog(app)
+		routes.SetPProf(app)
+	}
+
+	routes.SetPrometheus(app) // Set up Prometheus.
+	routes.SetRoutes(app)     // Set up all API routes.
 
 	// Run the server
 	PORT := config.Global.ServerPort
 	server := &http.Server{
 		Addr:    ":" + PORT,
-		Handler: r,
+		Handler: app,
 	}
 
 	shutdown(func(grace bool) {
