@@ -31,7 +31,7 @@ var db storage.Storager
 
 func init() {
 	if strings.ToLower(config.Global.ServerMode) == "cluster" {
-		db = etcd.New("/zinc/metadata")
+		db = etcd.New(config.Global.Etcd.Prefix + "/metadata")
 	} else {
 		db = badger.New("_metadata.db")
 	}
