@@ -31,8 +31,7 @@ type IndexList struct {
 	lock    sync.RWMutex
 }
 
-func init() {
-	log.Info().Msgf("Starting Zinc %s", meta.Version)
+func LoadIndexList() {
 	// check version
 	version, _ := metadata.KV.Get("version")
 	if version == nil {

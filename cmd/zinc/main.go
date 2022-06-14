@@ -17,6 +17,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -47,66 +48,31 @@ import (
 // @host      localhost:4080
 // @BasePath  /api
 func main() {
-
-	if config.Global.SentryEnable && config.Global.SentryDSN != "" {
-		/******** initialize sentry **********/
-		err := sentry.Init(sentry.ClientOptions{
-			Dsn:     config.Global.SentryDSN,
-			Release: "zinc@" + meta.Version,
-		})
-		if err != nil {
-			log.Print("sentry.Init: ", err.Error())
-		}
-		/******** sentry initialize complete *******/
+	// Version
+	if len(os.Args) > 1 && os.Args[1] == "version" {
+		fmt.Printf("zinc version %s\n", meta.Version)
+		os.Exit(0)
 	}
+	log.Info().Msgf("Starting Zinc %s", meta.Version)
 
-	/****** Coninuous profiling config start ******/
+	// Initialize sentry
+	sentries()
 
-	if config.Global.ProfilerEnable && config.Global.ProfilerServer != "" {
-		ProfileID := config.Global.ProfilerFriendlyProfileID
+	// Coninuous profiling
+	profiling()
 
-		if ProfileID == "" {
-			ProfileID = strings.ToLower(core.Telemetry.GetInstanceID())
-		}
+	// Index init
+	core.LoadIndexList()
 
-		pyroscope.Start(pyroscope.Config{
-			ApplicationName: "zincsearch-" + ProfileID,
-
-			// replace this with the address of pyroscope server
-			ServerAddress: config.Global.ProfilerServer,
-
-			// you can disable logging by setting this to nil
-			// Logger: pyroscope.StandardLogger,
-			Logger: nil,
-
-			// optionally, if authentication is enabled, specify the API key:
-			// AuthToken: os.Getenv("PYROSCOPE_AUTH_TOKEN"),
-			AuthToken: config.Global.ProfilerAPIKey,
-
-			// by default all profilers are enabled,
-			// but you can select the ones you want to use:
-			ProfileTypes: []pyroscope.ProfileType{
-				pyroscope.ProfileCPU,
-				pyroscope.ProfileAllocObjects,
-				pyroscope.ProfileAllocSpace,
-				pyroscope.ProfileInuseObjects,
-				pyroscope.ProfileInuseSpace,
-			},
-		})
-	}
-
-	/****** Coninuous profiling config end ******/
-
+	// HTTP init
 	app := gin.New()
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.
 	app.Use(gin.Recovery())
-
-	// debug for gin
+	// Debug for gin
 	if gin.Mode() == gin.DebugMode {
 		routes.AccessLog(app)
 		routes.SetPProf(app)
 	}
-
 	routes.SetPrometheus(app) // Set up Prometheus.
 	routes.SetRoutes(app)     // Set up all API routes.
 
@@ -116,7 +82,6 @@ func main() {
 		Addr:    ":" + PORT,
 		Handler: app,
 	}
-
 	shutdown(func(grace bool) {
 		// close indexes
 		err := core.ZINC_INDEX_LIST.Close()
@@ -142,8 +107,63 @@ func main() {
 			log.Fatal().Err(err).Msg("Server closed unexpect")
 		}
 	}
-
 	log.Info().Msg("Server shutdown ok")
+}
+
+func sentries() {
+	if !config.Global.SentryEnable {
+		return
+	}
+	if config.Global.SentryDSN == "" {
+		return
+	}
+
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn:     config.Global.SentryDSN,
+		Release: "zinc@" + meta.Version,
+	})
+	if err != nil {
+		log.Print("sentry.Init: ", err.Error())
+	}
+}
+
+func profiling() {
+	if !config.Global.ProfilerEnable {
+		return
+	}
+	if config.Global.ProfilerServer == "" {
+		return
+	}
+
+	ProfileID := config.Global.ProfilerFriendlyProfileID
+	if ProfileID == "" {
+		ProfileID = strings.ToLower(core.Telemetry.GetInstanceID())
+	}
+
+	pyroscope.Start(pyroscope.Config{
+		ApplicationName: "zincsearch-" + ProfileID,
+
+		// replace this with the address of pyroscope server
+		ServerAddress: config.Global.ProfilerServer,
+
+		// you can disable logging by setting this to nil
+		// Logger: pyroscope.StandardLogger,
+		Logger: nil,
+
+		// optionally, if authentication is enabled, specify the API key:
+		// AuthToken: os.Getenv("PYROSCOPE_AUTH_TOKEN"),
+		AuthToken: config.Global.ProfilerAPIKey,
+
+		// by default all profilers are enabled,
+		// but you can select the ones you want to use:
+		ProfileTypes: []pyroscope.ProfileType{
+			pyroscope.ProfileCPU,
+			pyroscope.ProfileAllocObjects,
+			pyroscope.ProfileAllocSpace,
+			pyroscope.ProfileInuseObjects,
+			pyroscope.ProfileInuseSpace,
+		},
+	})
 }
 
 //shutdown support twice signal must exit
