@@ -1,4 +1,4 @@
-basePath: /api
+basePath: /
 definitions:
   auth.LoginError:
     properties:
@@ -28,6 +28,344 @@ definitions:
       role:
         type: string
     type: object
+  core.Index:
+    properties:
+      create_at:
+        type: string
+      doc_num:
+        type: integer
+      mappings:
+        $ref: '#/definitions/meta.Mappings'
+      name:
+        type: string
+      settings:
+        $ref: '#/definitions/meta.IndexSettings'
+      storage_size:
+        type: integer
+      storage_type:
+        type: string
+      update_at:
+        type: string
+    type: object
+  meta.AggregationResponse:
+    properties:
+      buckets:
+        description: slice or map
+      interval:
+        description: support for auto_date_histogram_aggregation
+        type: string
+      value: {}
+    type: object
+  meta.Analyzer:
+    properties:
+      char_filter:
+        items:
+          type: string
+        type: array
+      filter:
+        description: compatibility with es, alias for TokenFilter
+        items:
+          type: string
+        type: array
+      lowercase:
+        description: for type=pattern
+        type: boolean
+      pattern:
+        description: for type=pattern
+        type: string
+      stopwords:
+        description: for type=pattern,standard,stop
+        items:
+          type: string
+        type: array
+      token_filter:
+        items:
+          type: string
+        type: array
+      tokenizer:
+        type: string
+      type:
+        description: options for compatible
+        type: string
+    type: object
+  meta.Hit:
+    properties:
+      '@timestamp':
+        type: string
+      _id:
+        type: string
+      _index:
+        type: string
+      _score:
+        type: number
+      _source: {}
+      _type:
+        type: string
+      fields:
+        additionalProperties: true
+        type: object
+      highlight:
+        additionalProperties: true
+        type: object
+    type: object
+  meta.Hits:
+    properties:
+      hits:
+        items:
+          $ref: '#/definitions/meta.Hit'
+        type: array
+      max_score:
+        type: number
+      total:
+        $ref: '#/definitions/meta.Total'
+    type: object
+  meta.IndexAnalysis:
+    properties:
+      analyzer:
+        additionalProperties:
+          $ref: '#/definitions/meta.Analyzer'
+        type: object
+      char_filter:
+        additionalProperties: true
+        type: object
+      filter:
+        additionalProperties: true
+        description: compatibility with es, alias for TokenFilter
+        type: object
+      token_filter:
+        additionalProperties: true
+        type: object
+      tokenizer:
+        additionalProperties: true
+        type: object
+    type: object
+  meta.IndexSettings:
+    properties:
+      analysis:
+        $ref: '#/definitions/meta.IndexAnalysis'
+      number_of_replicas:
+        type: integer
+      number_of_shards:
+        type: integer
+    type: object
+  meta.IndexSimple:
+    properties:
+      mappings:
+        additionalProperties: true
+        type: object
+      name:
+        type: string
+      settings:
+        $ref: '#/definitions/meta.IndexSettings'
+      storage_type:
+        type: string
+    type: object
+  meta.IndexTemplate:
+    properties:
+      created_at:
+        type: string
+      index_patterns:
+        items:
+          type: string
+        type: array
+      priority:
+        description: highest priority is chosen
+        type: integer
+      template:
+        $ref: '#/definitions/meta.TemplateTemplate'
+      updated_at:
+        type: string
+    type: object
+  meta.Mappings:
+    properties:
+      properties:
+        additionalProperties:
+          $ref: '#/definitions/meta.Property'
+        type: object
+    type: object
+  meta.Property:
+    properties:
+      aggregatable:
+        type: boolean
+      analyzer:
+        type: string
+      format:
+        description: date format yyyy-MM-dd HH:mm:ss || yyyy-MM-dd || epoch_millis
+        type: string
+      highlightable:
+        type: boolean
+      index:
+        type: boolean
+      search_analyzer:
+        type: string
+      sortable:
+        type: boolean
+      store:
+        type: boolean
+      type:
+        description: text, keyword, date, numeric, boolean, geo_point
+        type: string
+    type: object
+  meta.SearchResponse:
+    properties:
+      _shards:
+        $ref: '#/definitions/meta.Shards'
+      aggregations:
+        additionalProperties:
+          $ref: '#/definitions/meta.AggregationResponse'
+        type: object
+      error:
+        type: string
+      hits:
+        $ref: '#/definitions/meta.Hits'
+      timed_out:
+        type: boolean
+      took:
+        description: Time it took to generate the response
+        type: integer
+    type: object
+  meta.Shards:
+    properties:
+      failed:
+        type: integer
+      skipped:
+        type: integer
+      successful:
+        type: integer
+      total:
+        type: integer
+    type: object
+  meta.Template:
+    properties:
+      index_template:
+        $ref: '#/definitions/meta.IndexTemplate'
+      name:
+        type: string
+    type: object
+  meta.TemplateTemplate:
+    properties:
+      mappings:
+        $ref: '#/definitions/meta.Mappings'
+      settings:
+        $ref: '#/definitions/meta.IndexSettings'
+    type: object
+  meta.Total:
+    properties:
+      value:
+        description: Count of documents returned
+        type: integer
+    type: object
+  meta.User:
+    properties:
+      _id:
+        type: string
+      created_at:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+      salt:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  v1.AggregationDateRange:
+    properties:
+      from:
+        type: string
+      to:
+        type: string
+    type: object
+  v1.AggregationNumberRange:
+    properties:
+      from:
+        type: number
+      to:
+        type: number
+    type: object
+  v1.AggregationParams:
+    properties:
+      agg_type:
+        type: string
+      aggs:
+        additionalProperties:
+          $ref: '#/definitions/v1.AggregationParams'
+        type: object
+      date_ranges:
+        items:
+          $ref: '#/definitions/v1.AggregationDateRange'
+        type: array
+      field:
+        type: string
+      ranges:
+        items:
+          $ref: '#/definitions/v1.AggregationNumberRange'
+        type: array
+      size:
+        type: integer
+      weight_field:
+        description: Field name to be used for setting weight for primary field for
+          weighted average aggregation
+        type: string
+    type: object
+  v1.QueryHighlight:
+    properties:
+      fields:
+        items:
+          type: string
+        type: array
+      style:
+        type: string
+    type: object
+  v1.QueryParams:
+    properties:
+      boost:
+        type: integer
+      end_time:
+        type: string
+      field:
+        type: string
+      start_time:
+        type: string
+      term:
+        type: string
+      terms:
+        description: For multi phrase query
+        items:
+          items:
+            type: string
+          type: array
+        type: array
+    type: object
+  v1.ZincQuery:
+    properties:
+      _source: {}
+      aggs:
+        additionalProperties:
+          $ref: '#/definitions/v1.AggregationParams'
+        type: object
+      explain:
+        type: boolean
+      from:
+        type: integer
+      highlight:
+        $ref: '#/definitions/v1.QueryHighlight'
+      max_results:
+        type: integer
+      query:
+        $ref: '#/definitions/v1.QueryParams'
+      search_type:
+        description: SearchType is the type of search to perform. Can be match, match_phrase,
+          query_string, etc
+        type: string
+      sort_fields:
+        items:
+          type: string
+        type: array
+    type: object
 host: localhost:4080
 info:
   contact: {}
@@ -39,7 +377,336 @@ info:
   title: Zinc Search engine API
   version: "1.0"
 paths:
-  /login:
+  /api/:target/_analyze:
+    post:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: CreateUpdate Analyze
+      tags:
+      - Index
+  /api/:target/_bulk:
+    post:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: ES Bulk Document Inser/Update
+      tags:
+      - Document
+  /api/:target/_doc:
+    post:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: CreateUpdate Document
+      tags:
+      - Document
+  /api/:target/_doc/:id:
+    delete:
+      parameters:
+      - description: document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete Document
+      tags:
+      - Document
+  /api/:target/_mapping:
+    get:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Index Mappings
+      tags:
+      - Index
+    put:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Set index mapping
+      tags:
+      - Index
+  /api/:target/_search:
+    post:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      - description: query data
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/v1.ZincQuery'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.SearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Search V1
+      tags:
+      - Search
+  /api/:target/_settings:
+    get:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.IndexSettings'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Index Settings
+      tags:
+      - Index
+    put:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Set index Settings
+      tags:
+      - Index
+  /api/index:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/core.Index'
+            type: array
+      summary: List Indexes
+      tags:
+      - Index
+    post:
+      parameters:
+      - description: Index data
+        in: body
+        name: indexSimple
+        required: true
+        schema:
+          $ref: '#/definitions/meta.IndexSimple'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create Index
+      tags:
+      - Index
+  /api/index/:target:
+    delete:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete Index
+      tags:
+      - Index
+  /api/index/:target/refresh:
+    post:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Resfresh Index
+      tags:
+      - Index
+  /api/login:
     post:
       parameters:
       - description: Login Credentials
@@ -60,4 +727,203 @@ paths:
           schema:
             $ref: '#/definitions/auth.LoginError'
       summary: Login
+      tags:
+      - User
+  /api/user:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.SearchResponse'
+      summary: List User
+      tags:
+      - User
+    post:
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/meta.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create
+      tags:
+      - User
+  /api/user/:id:
+    delete:
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete user
+      tags:
+      - User
+  /es/:target/_msearch:
+    post:
+      parameters:
+      - description: query data
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/v1.ZincQuery'
+      - description: index name
+        in: path
+        name: target
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.SearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Search V2 MultipleSearch
+      tags:
+      - Search
+  /es/:target/_search:
+    post:
+      parameters:
+      - description: index name
+        in: path
+        name: target
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.SearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Search V2 DSL
+      tags:
+      - Search
+  /es/_index_template:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.Template'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List Index Teplates
+      tags:
+      - Index
+    post:
+      parameters:
+      - description: Index template data
+        in: body
+        name: indexTemplate
+        required: true
+        schema:
+          $ref: '#/definitions/meta.IndexTemplate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: create/update index template
+      tags:
+      - Index
+  /es/_index_template/:target:
+    delete:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete Template
+      tags:
+      - Index
+    get:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.IndexTemplate'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Index TEmplate
+      tags:
+      - Index
+securityDefinitions:
+  BasicAuth:
+    type: basic
 swagger: "2.0"

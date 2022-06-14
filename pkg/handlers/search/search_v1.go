@@ -25,6 +25,15 @@ import (
 )
 
 // SearchV1 searches the index for the given http request from end user
+
+// @Summary Search V1
+// @Tags  Search
+// @Produce json
+// @Success 200 {object} meta.SearchResponse
+// @Param  target path  string  true  "Index"
+// @Param query body v1.ZincQuery true "query data"
+// @Failure 400 {object} map[string]interface{}
+// @Router /api/:target/_search [post]
 func SearchV1(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)

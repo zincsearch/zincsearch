@@ -24,6 +24,13 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// @Summary Create
+// @Tags  User
+// @Produce json
+// @Success 200 {object} meta.User
+// @Param user body meta.User true "User data"
+// @Failure 400 {object} map[string]interface{}
+// @Router /api/user [post]
 func CreateUpdate(c *gin.Context) {
 	var user meta.User
 	if err := c.BindJSON(&user); err != nil {

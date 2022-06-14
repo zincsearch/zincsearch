@@ -33,6 +33,12 @@ import (
 	"github.com/zinclabs/zinc/pkg/ider"
 )
 
+// @Summary Bulk Document Inser/Update
+// @Tags  Document
+// @Param  target path  string  true  "Index"
+// @Failure 400 {object} map[string]interface{}
+// @Success 200 {object} map[string]interface{}
+// @Router /api/:target/_bulk [post]
 func Bulk(c *gin.Context) {
 	target := c.Param("target")
 
@@ -56,6 +62,11 @@ func Bulk(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "bulk data inserted", "record_count": ret.Count})
 }
 
+// @Summary ES Bulk Document Inser/Update
+// @Tags  Document
+// @Param  target path  string  true  "Index"
+// @Success 200 {object} map[string]interface{}
+// @Router /api/:target/_bulk [post]
 func ESBulk(c *gin.Context) {
 	target := c.Param("target")
 

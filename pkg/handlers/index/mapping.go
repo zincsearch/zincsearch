@@ -25,6 +25,13 @@ import (
 	"github.com/zinclabs/zinc/pkg/uquery/mappings"
 )
 
+// @Summary Get Index Mappings
+// @Tags  Index
+// @Produce json
+// @Param  target path  string  true  "Index"
+// @Success 200 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Router /api/:target/_mapping [get]
 func GetMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
@@ -42,6 +49,14 @@ func GetMapping(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{index.Name: gin.H{"mappings": mappings}})
 }
 
+// @Summary Set index mapping
+// @Tags  Index
+// @Produce json
+// @Param  target path  string  true  "Index"
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Success 200 {object} map[string]interface{}
+// @Router /api/:target/_mapping [put]
 func SetMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	if indexName == "" {

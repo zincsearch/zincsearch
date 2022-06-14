@@ -21,10 +21,504 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/login": {
+        "/api/:target/_analyze": {
+            "post": {
+                "tags": [
+                    "Index"
+                ],
+                "summary": "CreateUpdate Analyze",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/:target/_bulk": {
+            "post": {
+                "tags": [
+                    "Document"
+                ],
+                "summary": "ES Bulk Document Inser/Update",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/:target/_doc": {
+            "post": {
+                "tags": [
+                    "Document"
+                ],
+                "summary": "CreateUpdate Document",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/:target/_doc/:id": {
+            "delete": {
+                "tags": [
+                    "Document"
+                ],
+                "summary": "Delete Document",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "document ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/:target/_mapping": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Get Index Mappings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Set index mapping",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/:target/_search": {
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Search V1",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "query data",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.ZincQuery"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.SearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/:target/_settings": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Get Index Settings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.IndexSettings"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Set index Settings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/index": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "List Indexes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/core.Index"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Create Index",
+                "parameters": [
+                    {
+                        "description": "Index data",
+                        "name": "indexSimple",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.IndexSimple"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/index/:target": {
+            "delete": {
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Delete Index",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/index/:target/refresh": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Resfresh Index",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
                 ],
                 "summary": "Login",
                 "parameters": [
@@ -49,6 +543,300 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/auth.LoginError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "List User",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.SearchResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/:id": {
+            "delete": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Delete user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/es/:target/_msearch": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Search V2 MultipleSearch",
+                "parameters": [
+                    {
+                        "description": "query data",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.ZincQuery"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "index name",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.SearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/es/:target/_search": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Search V2 DSL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "index name",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.SearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/es/_index_template": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "List Index Teplates",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.Template"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "create/update index template",
+                "parameters": [
+                    {
+                        "description": "Index template data",
+                        "name": "indexTemplate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.IndexTemplate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/es/_index_template/:target": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Get Index TEmplate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.IndexTemplate"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Delete Template",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -99,6 +887,514 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "core.Index": {
+            "type": "object",
+            "properties": {
+                "create_at": {
+                    "type": "string"
+                },
+                "doc_num": {
+                    "type": "integer"
+                },
+                "mappings": {
+                    "$ref": "#/definitions/meta.Mappings"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "settings": {
+                    "$ref": "#/definitions/meta.IndexSettings"
+                },
+                "storage_size": {
+                    "type": "integer"
+                },
+                "storage_type": {
+                    "type": "string"
+                },
+                "update_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.AggregationResponse": {
+            "type": "object",
+            "properties": {
+                "buckets": {
+                    "description": "slice or map"
+                },
+                "interval": {
+                    "description": "support for auto_date_histogram_aggregation",
+                    "type": "string"
+                },
+                "value": {}
+            }
+        },
+        "meta.Analyzer": {
+            "type": "object",
+            "properties": {
+                "char_filter": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "filter": {
+                    "description": "compatibility with es, alias for TokenFilter",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "lowercase": {
+                    "description": "for type=pattern",
+                    "type": "boolean"
+                },
+                "pattern": {
+                    "description": "for type=pattern",
+                    "type": "string"
+                },
+                "stopwords": {
+                    "description": "for type=pattern,standard,stop",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "token_filter": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tokenizer": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "options for compatible",
+                    "type": "string"
+                }
+            }
+        },
+        "meta.Hit": {
+            "type": "object",
+            "properties": {
+                "@timestamp": {
+                    "type": "string"
+                },
+                "_id": {
+                    "type": "string"
+                },
+                "_index": {
+                    "type": "string"
+                },
+                "_score": {
+                    "type": "number"
+                },
+                "_source": {},
+                "_type": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "highlight": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "meta.Hits": {
+            "type": "object",
+            "properties": {
+                "hits": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/meta.Hit"
+                    }
+                },
+                "max_score": {
+                    "type": "number"
+                },
+                "total": {
+                    "$ref": "#/definitions/meta.Total"
+                }
+            }
+        },
+        "meta.IndexAnalysis": {
+            "type": "object",
+            "properties": {
+                "analyzer": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.Analyzer"
+                    }
+                },
+                "char_filter": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "filter": {
+                    "description": "compatibility with es, alias for TokenFilter",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "token_filter": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "tokenizer": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "meta.IndexSettings": {
+            "type": "object",
+            "properties": {
+                "analysis": {
+                    "$ref": "#/definitions/meta.IndexAnalysis"
+                },
+                "number_of_replicas": {
+                    "type": "integer"
+                },
+                "number_of_shards": {
+                    "type": "integer"
+                }
+            }
+        },
+        "meta.IndexSimple": {
+            "type": "object",
+            "properties": {
+                "mappings": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "name": {
+                    "type": "string"
+                },
+                "settings": {
+                    "$ref": "#/definitions/meta.IndexSettings"
+                },
+                "storage_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.IndexTemplate": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "index_patterns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "priority": {
+                    "description": "highest priority is chosen",
+                    "type": "integer"
+                },
+                "template": {
+                    "$ref": "#/definitions/meta.TemplateTemplate"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.Mappings": {
+            "type": "object",
+            "properties": {
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.Property"
+                    }
+                }
+            }
+        },
+        "meta.Property": {
+            "type": "object",
+            "properties": {
+                "aggregatable": {
+                    "type": "boolean"
+                },
+                "analyzer": {
+                    "type": "string"
+                },
+                "format": {
+                    "description": "date format yyyy-MM-dd HH:mm:ss || yyyy-MM-dd || epoch_millis",
+                    "type": "string"
+                },
+                "highlightable": {
+                    "type": "boolean"
+                },
+                "index": {
+                    "type": "boolean"
+                },
+                "search_analyzer": {
+                    "type": "string"
+                },
+                "sortable": {
+                    "type": "boolean"
+                },
+                "store": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "description": "text, keyword, date, numeric, boolean, geo_point",
+                    "type": "string"
+                }
+            }
+        },
+        "meta.SearchResponse": {
+            "type": "object",
+            "properties": {
+                "_shards": {
+                    "$ref": "#/definitions/meta.Shards"
+                },
+                "aggregations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.AggregationResponse"
+                    }
+                },
+                "error": {
+                    "type": "string"
+                },
+                "hits": {
+                    "$ref": "#/definitions/meta.Hits"
+                },
+                "timed_out": {
+                    "type": "boolean"
+                },
+                "took": {
+                    "description": "Time it took to generate the response",
+                    "type": "integer"
+                }
+            }
+        },
+        "meta.Shards": {
+            "type": "object",
+            "properties": {
+                "failed": {
+                    "type": "integer"
+                },
+                "skipped": {
+                    "type": "integer"
+                },
+                "successful": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "meta.Template": {
+            "type": "object",
+            "properties": {
+                "index_template": {
+                    "$ref": "#/definitions/meta.IndexTemplate"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.TemplateTemplate": {
+            "type": "object",
+            "properties": {
+                "mappings": {
+                    "$ref": "#/definitions/meta.Mappings"
+                },
+                "settings": {
+                    "$ref": "#/definitions/meta.IndexSettings"
+                }
+            }
+        },
+        "meta.Total": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "Count of documents returned",
+                    "type": "integer"
+                }
+            }
+        },
+        "meta.User": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "salt": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.AggregationDateRange": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "string"
+                },
+                "to": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.AggregationNumberRange": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "number"
+                },
+                "to": {
+                    "type": "number"
+                }
+            }
+        },
+        "v1.AggregationParams": {
+            "type": "object",
+            "properties": {
+                "agg_type": {
+                    "type": "string"
+                },
+                "aggs": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/v1.AggregationParams"
+                    }
+                },
+                "date_ranges": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.AggregationDateRange"
+                    }
+                },
+                "field": {
+                    "type": "string"
+                },
+                "ranges": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.AggregationNumberRange"
+                    }
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "weight_field": {
+                    "description": "Field name to be used for setting weight for primary field for weighted average aggregation",
+                    "type": "string"
+                }
+            }
+        },
+        "v1.QueryHighlight": {
+            "type": "object",
+            "properties": {
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.QueryParams": {
+            "type": "object",
+            "properties": {
+                "boost": {
+                    "type": "integer"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "field": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string"
+                },
+                "terms": {
+                    "description": "For multi phrase query",
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "v1.ZincQuery": {
+            "type": "object",
+            "properties": {
+                "_source": {},
+                "aggs": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/v1.AggregationParams"
+                    }
+                },
+                "explain": {
+                    "type": "boolean"
+                },
+                "from": {
+                    "type": "integer"
+                },
+                "highlight": {
+                    "$ref": "#/definitions/v1.QueryHighlight"
+                },
+                "max_results": {
+                    "type": "integer"
+                },
+                "query": {
+                    "$ref": "#/definitions/v1.QueryParams"
+                },
+                "search_type": {
+                    "description": "SearchType is the type of search to perform. Can be match, match_phrase, query_string, etc",
+                    "type": "string"
+                },
+                "sort_fields": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
         }
     }
 }`
@@ -107,7 +1403,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:4080",
-	BasePath:         "/api",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Zinc Search engine API",
 	Description:      "Zinc Search engine API",

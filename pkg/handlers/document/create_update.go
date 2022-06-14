@@ -24,6 +24,13 @@ import (
 	"github.com/zinclabs/zinc/pkg/ider"
 )
 
+// @Summary CreateUpdate Document
+// @Tags  Document
+// @Param  target path  string  true  "Index"
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Success 200 {object} map[string]interface{}
+// @Router /api/:target/_doc [post]
 func CreateUpdate(c *gin.Context) {
 	indexName := c.Param("target")
 	docID := c.Param("id") // ID for the document to be updated provided in URL path

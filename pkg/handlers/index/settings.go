@@ -26,6 +26,13 @@ import (
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 )
 
+// @Summary Get Index Settings
+// @Tags  Index
+// @Produce json
+// @Param  target path  string  true  "Index"
+// @Success 200 {object} meta.IndexSettings
+// @Failure 404 {object} map[string]interface{}
+// @Router /api/:target/_settings [get]
 func GetSettings(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
@@ -42,6 +49,14 @@ func GetSettings(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{index.Name: gin.H{"settings": settings}})
 }
 
+// @Summary Set index Settings
+// @Tags  Index
+// @Produce json
+// @Param  target path  string  true  "Index"
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Success 200 {object} map[string]interface{}
+// @Router /api/:target/_settings [put]
 func SetSettings(c *gin.Context) {
 	indexName := c.Param("target")
 	if indexName == "" {

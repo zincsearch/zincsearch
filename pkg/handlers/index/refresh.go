@@ -23,6 +23,13 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 )
 
+// @Summary Resfresh Index
+// @Tags  Index
+// @Produce json
+// @Param  target path  string  true  "Index"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Router /api/index/:target/refresh [post]
 func Refresh(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)

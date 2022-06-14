@@ -23,6 +23,11 @@ import (
 	"github.com/zinclabs/zinc/pkg/auth"
 )
 
+// @Summary Delete user
+// @Tags  User
+// @Param  id   path      string  true  "User ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /api/user/:id [delete]
 func Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": auth.DeleteUser(c.Param("id"))})
 }

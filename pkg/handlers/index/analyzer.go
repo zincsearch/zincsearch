@@ -28,6 +28,14 @@ import (
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
+// @Summary CreateUpdate Analyze
+// @Tags  Index
+// @Param  target path  string  true  "Index"
+// @Failure 400 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Success 200 {object} map[string]interface{}
+// @Router /api/:target/_analyze [post]
 func Analyze(c *gin.Context) {
 	var query analyzeRequest
 	if err := c.BindJSON(&query); err != nil {

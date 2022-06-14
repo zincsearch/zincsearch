@@ -24,6 +24,12 @@ import (
 	"github.com/zinclabs/zinc/pkg/uquery/template"
 )
 
+// @Summary List Index Teplates
+// @Tags  Index
+// @Produce json
+// @Success 200 {object} meta.Template
+// @Failure 400 {object} map[string]interface{}
+// @Router /es/_index_template [get]
 func ListTemplate(c *gin.Context) {
 	pattern := c.Query("pattern")
 	templates, err := core.ListTemplates(pattern)
@@ -35,6 +41,14 @@ func ListTemplate(c *gin.Context) {
 	c.JSON(http.StatusOK, templates)
 }
 
+// @Summary Get Index TEmplate
+// @Tags  Index
+// @Produce json
+// @Param  target path  string  true  "Index"
+// @Success 200 {object} meta.IndexTemplate
+// @Failure 400 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Router /es/_index_template/:target [get]
 func GetTemplate(c *gin.Context) {
 	name := c.Param("target")
 	if name == "" {
@@ -54,6 +68,13 @@ func GetTemplate(c *gin.Context) {
 	c.JSON(http.StatusOK, template)
 }
 
+// @Summary create/update index template
+// @Tags  Index
+// @Produce json
+// @Param indexTemplate body meta.IndexTemplate true "Index template data"
+// @Failure 400 {object} map[string]interface{}
+// @Success 200 {object} map[string]interface{}
+// @Router /es/_index_template [post]
 func UpdateTemplate(c *gin.Context) {
 	name := c.Param("target")
 	if name == "" {
@@ -84,6 +105,12 @@ func UpdateTemplate(c *gin.Context) {
 	})
 }
 
+// @Summary Delete Template
+// @Tags  Index
+// @Param  target path  string  true  "Index"
+// @Failure 400 {object} map[string]interface{}
+// @Success 200 {object} map[string]interface{}
+// @Router /es/_index_template/:target [delete]
 func DeleteTemplate(c *gin.Context) {
 	name := c.Param("target")
 	err := core.DeleteTemplate(name)
