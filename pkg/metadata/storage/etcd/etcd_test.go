@@ -45,7 +45,7 @@ func Test_etcdStorage_List(t *testing.T) {
 		{
 			name: "normal",
 			args: args{
-				prefix: "/test",
+				prefix: "/test/",
 			},
 			wantNum: 1,
 			wantErr: false,
@@ -53,7 +53,7 @@ func Test_etcdStorage_List(t *testing.T) {
 		{
 			name: "empty",
 			args: args{
-				prefix: "/notexist",
+				prefix: "/notexist/",
 			},
 			wantNum: 0,
 			wantErr: false,

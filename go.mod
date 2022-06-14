@@ -11,6 +11,7 @@ require (
 	github.com/blugelabs/query_string v0.3.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bwmarrin/snowflake v0.3.0
+	github.com/cockroachdb/pebble v0.0.0-20220613151633-4a952c0d3bdd
 	github.com/dgraph-io/badger/v3 v3.2103.2
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/gin-contrib/cors v1.3.1
@@ -37,6 +38,7 @@ require (
 	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1
+	go.etcd.io/bbolt v1.3.6
 	go.etcd.io/etcd/client/v3 v3.5.4
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce

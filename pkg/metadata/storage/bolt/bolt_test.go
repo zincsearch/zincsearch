@@ -13,7 +13,7 @@
 * limitations under the License.
  */
 
-package badger
+package bolt
 
 import (
 	"testing"
@@ -21,7 +21,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_badgerStorage_List(t *testing.T) {
+func Test_boltStorage_List(t *testing.T) {
 	type args struct {
 		prefix string
 		in1    int
@@ -69,7 +69,7 @@ func Test_badgerStorage_List(t *testing.T) {
 	}
 }
 
-func Test_badgerStorage_Get(t *testing.T) {
+func Test_boltStorage_Get(t *testing.T) {
 	type args struct {
 		key string
 	}
@@ -115,7 +115,7 @@ func Test_badgerStorage_Get(t *testing.T) {
 	}
 }
 
-func Test_badgerStorage_Set(t *testing.T) {
+func Test_boltStorage_Set(t *testing.T) {
 	type args struct {
 		key   string
 		value []byte
@@ -148,13 +148,13 @@ func Test_badgerStorage_Set(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := store.Set(tt.args.key, tt.args.value); (err != nil) != tt.wantErr {
-				t.Errorf("badgerStorage.Set() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("boltStorage.Set() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func Test_badgerStorage_Delete(t *testing.T) {
+func Test_boltStorage_Delete(t *testing.T) {
 	type args struct {
 		key string
 	}
@@ -185,7 +185,7 @@ func Test_badgerStorage_Delete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := store.Delete(tt.args.key); (err != nil) != tt.wantErr {
-				t.Errorf("badgerStorage.Delete() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("boltStorage.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
