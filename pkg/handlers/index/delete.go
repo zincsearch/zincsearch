@@ -21,29 +21,30 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 // Delete deletes a zinc index and its associated data. Be careful using thus as you ca't undo this action.
 
-// @Summary Delete Index
-// @Tags  Index
-// @Param  target path  string  true  "Index"
-// @Failure 400 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
+// @Summary Delete index
+// @Tags    Index
+// @Param   target path  string  true  "Index"
 // @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} meta.HTTPResponse
+// @Failure 500 {object} meta.HTTPResponse
 // @Router /api/index/:target [delete]
 func Delete(c *gin.Context) {
 	indexName := c.Param("target")
 
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index " + indexName + " does not exists"})
 		return
 	}
 
 	// delete meta
 	if err := core.DeleteIndex(index.Name); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 

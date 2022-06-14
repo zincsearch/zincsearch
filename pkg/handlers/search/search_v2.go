@@ -32,20 +32,21 @@ import (
 
 // SearchDSL searches the index for the given http request from end user
 
-// @Summary Search V2 DSL
-// @Tags  Search
+// @Summary Search V2 DSL for compatible ES
+// @Tags    Search
 // @Produce json
+// @Param   target path  string         true  "Index"
+// @Param   query  body  meta.ZincQuery true  "Query"
 // @Success 200 {object} meta.SearchResponse
-// @Param  target   path   string  true  "index name"
-// @Failure 400 {object} map[string]interface{}
+// @Failure 400 {object} meta.HTTPResponse
 // @Router /es/:target/_search [post]
 func SearchDSL(c *gin.Context) {
 	indexName := c.Param("target")
 
-	query := new(meta.ZincQuery)
+	query := &meta.ZincQuery{Size: 10}
 	if err := c.BindJSON(query); err != nil {
 		log.Printf("handlers.search.searchDSL: %s", err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
@@ -68,13 +69,14 @@ func SearchDSL(c *gin.Context) {
 
 // MultipleSearch like bulk searches
 
-// @Summary Search V2 MultipleSearch
-// @Tags  Search
+// @Summary Search V2 MultipleSearch for compatible ES
+// @Tags    Search
 // @Produce json
+// @Param   target path  string  false "Index"
+// @Param   query  body  object  true  "Query"
 // @Success 200 {object} meta.SearchResponse
-// @Param query body v1.ZincQuery true "query data"
-// @Param  target   path   string  true  "index name"
-// @Failure 400 {object} map[string]interface{}
+// @Failure 400 {object} meta.HTTPResponse
+// @Router /es/_msearch [post]
 // @Router /es/:target/_msearch [post]
 func MultipleSearch(c *gin.Context) {
 	indexName := c.Param("target")
@@ -101,7 +103,7 @@ func MultipleSearch(c *gin.Context) {
 	for scanner.Scan() { // Read each line
 		if nextLineIsData {
 			nextLineIsData = false
-			var query *meta.ZincQuery
+			query := &meta.ZincQuery{Size: 10}
 			if err = json.Unmarshal(scanner.Bytes(), &query); err != nil {
 				log.Error().Err(err).Msg("handlers.search..MultipleSearch: json.Unmarshal error")
 				responses = append(responses, &meta.SearchResponse{Error: err.Error()})

@@ -39,11 +39,14 @@ import (
 
 // @title           Zinc Search engine API
 // @version         1.0
-// @description     Zinc Search engine API
+// @description     Zinc Search engine API documents https://docs.zincsearch.com
 // @termsOfService  http://swagger.io/terms/
 
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @contact.name   Zinc Search
+// @contact.url    https://www.zincsearch.com
 
 // @securityDefinitions.basic BasicAuth
 // @host      localhost:4080

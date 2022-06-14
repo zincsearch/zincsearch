@@ -21,20 +21,21 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/auth"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 // @Summary Login
-// @Tags  User
+// @Tags    User
 // @Produce json
-// @Param login body LoginRequest true "Login Credentials"
+// @Param   login body LoginRequest true "Login credentials"
 // @Success 200 {object} LoginResponse
-// @Failure 400 {object} LoginError
+// @Failure 400 {object} meta.HTTPResponse
 // @Router /api/login [post]
 func Login(c *gin.Context) {
 	// Read login input
 	var loginInput LoginRequest
 	if err := c.ShouldBindJSON(&loginInput); err != nil {
-		c.JSON(http.StatusBadRequest, LoginError{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
@@ -62,10 +63,6 @@ type LoginUser struct {
 type LoginRequest struct {
 	ID       string `json:"_id"`
 	Password string `json:"password"`
-}
-
-type LoginError struct {
-	Error string `json:"error"`
 }
 
 type LoginResponse struct {

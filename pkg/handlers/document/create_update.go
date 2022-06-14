@@ -22,15 +22,19 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/ider"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-// @Summary CreateUpdate Document
-// @Tags  Document
-// @Param  target path  string  true  "Index"
-// @Failure 400 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
-// @Success 200 {object} map[string]interface{}
+// @Summary Create update document
+// @Tags    Document
+// @Param   target    path  string  true  "Index"
+// @Param   id        path  string  false "ID"
+// @Param   document  body  map[string]interface{}  true  "Document"
+// @Success 200 {object} meta.HTTPResponse
+// @Failure 400 {object} meta.HTTPResponse
+// @Failure 500 {object} meta.HTTPResponse
 // @Router /api/:target/_doc [post]
+// @Router /api/:target/_doc/:id [put]
 func CreateUpdate(c *gin.Context) {
 	indexName := c.Param("target")
 	docID := c.Param("id") // ID for the document to be updated provided in URL path
@@ -38,7 +42,7 @@ func CreateUpdate(c *gin.Context) {
 	var err error
 	var doc map[string]interface{}
 	if err = c.BindJSON(&doc); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
@@ -59,7 +63,7 @@ func CreateUpdate(c *gin.Context) {
 		// Create a new index with disk storage as default
 		index, err = core.NewIndex(indexName, "disk", nil)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
 			return
 		}
 		// store index
@@ -68,12 +72,12 @@ func CreateUpdate(c *gin.Context) {
 
 	err = index.CreateDocument(docID, doc, update)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
 	// check shards
 	_ = index.CheckShards()
 
-	c.JSON(http.StatusOK, gin.H{"id": docID})
+	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok", ID: docID})
 }
