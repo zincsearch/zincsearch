@@ -22,35 +22,37 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/core"
 	v1 "github.com/zinclabs/zinc/pkg/core/search/v1"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 // SearchV1 searches the index for the given http request from end user
 
 // @Summary Search V1
-// @Tags  Search
+// @Tags    Search
 // @Produce json
-// @Success 200 {object} meta.SearchResponse
-// @Param  target path  string  true  "Index"
-// @Param query body v1.ZincQuery true "query data"
-// @Failure 400 {object} map[string]interface{}
+// @Param   target path  string       true  "Index"
+// @Param   query  body  v1.ZincQuery true  "Query"
+// @Success 200 {object} v1.SearchResponse
+// @Failure 400 {object} meta.HTTPResponse
 // @Router /api/:target/_search [post]
 func SearchV1(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index " + indexName + " does not exists"})
 		return
 	}
 
 	var iQuery v1.ZincQuery
+	iQuery.MaxResults = 10
 	if err := c.BindJSON(&iQuery); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
 	res, err := v1.Search(index, &iQuery)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 

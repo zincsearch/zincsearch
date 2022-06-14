@@ -21,25 +21,26 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-// @Summary Resfresh Index
-// @Tags  Index
+// @Summary Resfresh index
+// @Tags    Index
 // @Produce json
-// @Param  target path  string  true  "Index"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} map[string]interface{}
+// @Param   target  path  string  true  "Index"
+// @Success 200 {object} meta.HTTPResponse
+// @Failure 400 {object} meta.HTTPResponse
 // @Router /api/index/:target/refresh [post]
 func Refresh(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index " + indexName + " does not exists"})
 		return
 	}
 	if err := index.Reopen(); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "refresh ok"})
+	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok"})
 }

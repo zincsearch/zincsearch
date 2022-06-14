@@ -21,13 +21,21 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/auth"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 // @Summary Delete user
-// @Tags  User
-// @Param  id   path      string  true  "User ID"
-// @Success 200 {object} map[string]interface{}
+// @Tags    User
+// @Param   id  path  string  true  "User id"
+// @Success 200 {object} meta.HTTPResponse
+// @Success 500 {object} meta.HTTPResponse
 // @Router /api/user/:id [delete]
 func Delete(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": auth.DeleteUser(c.Param("id"))})
+	id := c.Param("id")
+	err := auth.DeleteUser(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "deleted", ID: id})
 }

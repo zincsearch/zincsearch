@@ -25,8 +25,8 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-// @Summary List Indexes
-// @Tags  Index
+// @Summary List indexes
+// @Tags    Index
 // @Produce json
 // @Success 200 {object} []core.Index
 // @Router /api/index [get]

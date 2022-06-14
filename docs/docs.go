@@ -11,7 +11,10 @@ const docTemplate = `{
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
         "termsOfService": "http://swagger.io/terms/",
-        "contact": {},
+        "contact": {
+            "name": "Zinc Search",
+            "url": "https://www.zincsearch.com"
+        },
         "license": {
             "name": "Apache 2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -26,14 +29,22 @@ const docTemplate = `{
                 "tags": [
                     "Index"
                 ],
-                "summary": "CreateUpdate Analyze",
+                "summary": "Analyze",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
                         "name": "target",
-                        "in": "path",
-                        "required": true
+                        "in": "path"
+                    },
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 ],
                 "responses": {
@@ -47,22 +58,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -73,14 +69,22 @@ const docTemplate = `{
                 "tags": [
                     "Document"
                 ],
-                "summary": "ES Bulk Document Inser/Update",
+                "summary": "Bulk documents",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
                         "name": "target",
-                        "in": "path",
-                        "required": true
+                        "in": "path"
+                    },
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -89,6 +93,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -99,7 +109,7 @@ const docTemplate = `{
                 "tags": [
                     "Document"
                 ],
-                "summary": "CreateUpdate Document",
+                "summary": "Create update document",
                 "parameters": [
                     {
                         "type": "string",
@@ -107,51 +117,115 @@ const docTemplate = `{
                         "name": "target",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Document",
+                        "name": "document",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
             }
         },
         "/api/:target/_doc/:id": {
-            "delete": {
+            "put": {
                 "tags": [
                     "Document"
                 ],
-                "summary": "Delete Document",
+                "summary": "Create update document",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "document ID",
-                        "name": "id",
+                        "description": "Index",
+                        "name": "target",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Document",
+                        "name": "document",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Document"
+                ],
+                "summary": "Delete document",
+                "parameters": [
+                    {
+                        "type": "string",
                         "description": "Index",
                         "name": "target",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -160,22 +234,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -189,41 +260,7 @@ const docTemplate = `{
                 "tags": [
                     "Index"
                 ],
-                "summary": "Get Index Mappings",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "put": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Index"
-                ],
-                "summary": "Set index mapping",
+                "summary": "Get index mappings",
                 "parameters": [
                     {
                         "type": "string",
@@ -244,15 +281,54 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Set index mappings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Mapping",
+                        "name": "mapping",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.Mappings"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -276,7 +352,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "query data",
+                        "description": "Query",
                         "name": "query",
                         "in": "body",
                         "required": true,
@@ -289,14 +365,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.SearchResponse"
+                            "$ref": "#/definitions/v1.SearchResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -310,7 +385,7 @@ const docTemplate = `{
                 "tags": [
                     "Index"
                 ],
-                "summary": "Get Index Settings",
+                "summary": "Get index settings",
                 "parameters": [
                     {
                         "type": "string",
@@ -324,14 +399,16 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.IndexSettings"
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/meta.IndexSettings"
+                            }
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -351,6 +428,114 @@ const docTemplate = `{
                         "name": "target",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Settings",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.IndexSettings"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/:target/_update/:id": {
+            "post": {
+                "tags": [
+                    "Document"
+                ],
+                "summary": "Update document with id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Document",
+                        "name": "document",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/_analyze": {
+            "post": {
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Analyze",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 ],
                 "responses": {
@@ -364,6 +549,39 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/_bulk": {
+            "post": {
+                "tags": [
+                    "Document"
+                ],
+                "summary": "Bulk documents",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
@@ -371,8 +589,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -386,7 +603,7 @@ const docTemplate = `{
                 "tags": [
                     "Index"
                 ],
-                "summary": "List Indexes",
+                "summary": "List indexes",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -406,11 +623,11 @@ const docTemplate = `{
                 "tags": [
                     "Index"
                 ],
-                "summary": "Create Index",
+                "summary": "Create index",
                 "parameters": [
                     {
                         "description": "Index data",
-                        "name": "indexSimple",
+                        "name": "index",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -429,8 +646,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -441,7 +657,7 @@ const docTemplate = `{
                 "tags": [
                     "Index"
                 ],
-                "summary": "Delete Index",
+                "summary": "Delete index",
                 "parameters": [
                     {
                         "type": "string",
@@ -462,15 +678,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -484,7 +698,7 @@ const docTemplate = `{
                 "tags": [
                     "Index"
                 ],
-                "summary": "Resfresh Index",
+                "summary": "Resfresh index",
                 "parameters": [
                     {
                         "type": "string",
@@ -498,15 +712,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -523,7 +735,7 @@ const docTemplate = `{
                 "summary": "Login",
                 "parameters": [
                     {
-                        "description": "Login Credentials",
+                        "description": "Login credentials",
                         "name": "login",
                         "in": "body",
                         "required": true,
@@ -542,7 +754,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/auth.LoginError"
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -556,12 +768,21 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "List User",
+                "summary": "List user",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.SearchResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/meta.User"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -573,7 +794,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Create",
+                "summary": "Create update user",
                 "parameters": [
                     {
                         "description": "User data",
@@ -589,14 +810,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.User"
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -611,10 +837,49 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
+                        "description": "User id",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/es/:target/_bulk": {
+            "post": {
+                "tags": [
+                    "Document"
+                ],
+                "summary": "ES bulk documents",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -636,23 +901,22 @@ const docTemplate = `{
                 "tags": [
                     "Search"
                 ],
-                "summary": "Search V2 MultipleSearch",
+                "summary": "Search V2 MultipleSearch for compatible ES",
                 "parameters": [
                     {
-                        "description": "query data",
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Query",
                         "name": "query",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.ZincQuery"
+                            "type": "object"
                         }
-                    },
-                    {
-                        "type": "string",
-                        "description": "index name",
-                        "name": "target",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -665,8 +929,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -680,14 +943,23 @@ const docTemplate = `{
                 "tags": [
                     "Search"
                 ],
-                "summary": "Search V2 DSL",
+                "summary": "Search V2 DSL for compatible ES",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "index name",
+                        "description": "Index",
                         "name": "target",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.ZincQuery"
+                        }
                     }
                 ],
                 "responses": {
@@ -699,6 +971,39 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/es/_bulk": {
+            "post": {
+                "tags": [
+                    "Document"
+                ],
+                "summary": "ES bulk documents",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -715,19 +1020,21 @@ const docTemplate = `{
                 "tags": [
                     "Index"
                 ],
-                "summary": "List Index Teplates",
+                "summary": "List index teplates",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.Template"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/meta.Template"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -739,11 +1046,11 @@ const docTemplate = `{
                 "tags": [
                     "Index"
                 ],
-                "summary": "create/update index template",
+                "summary": "Create update index template",
                 "parameters": [
                     {
-                        "description": "Index template data",
-                        "name": "indexTemplate",
+                        "description": "Template data",
+                        "name": "template",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -762,8 +1069,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -777,11 +1083,11 @@ const docTemplate = `{
                 "tags": [
                     "Index"
                 ],
-                "summary": "Get Index TEmplate",
+                "summary": "Get index template",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Index",
+                        "description": "Template",
                         "name": "target",
                         "in": "path",
                         "required": true
@@ -797,15 +1103,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -814,11 +1112,11 @@ const docTemplate = `{
                 "tags": [
                     "Index"
                 ],
-                "summary": "Delete Template",
+                "summary": "Delete template",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Index",
+                        "description": "Template",
                         "name": "target",
                         "in": "path",
                         "required": true
@@ -828,15 +1126,55 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/es/_msearch": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Search V2 MultipleSearch for compatible ES",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.SearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -844,11 +1182,16 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "auth.LoginError": {
+        "aggregation.HistogramBound": {
             "type": "object",
             "properties": {
-                "error": {
-                    "type": "string"
+                "max": {
+                    "description": "maximum",
+                    "type": "number"
+                },
+                "min": {
+                    "description": "minimum",
+                    "type": "number"
                 }
             }
         },
@@ -897,6 +1240,12 @@ const docTemplate = `{
                 "doc_num": {
                     "type": "integer"
                 },
+                "doc_time_max": {
+                    "type": "integer"
+                },
+                "doc_time_min": {
+                    "type": "integer"
+                },
                 "mappings": {
                     "$ref": "#/definitions/meta.Mappings"
                 },
@@ -906,6 +1255,15 @@ const docTemplate = `{
                 "settings": {
                     "$ref": "#/definitions/meta.IndexSettings"
                 },
+                "shard_num": {
+                    "type": "integer"
+                },
+                "shards": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/meta.IndexShard"
+                    }
+                },
                 "storage_size": {
                     "type": "integer"
                 },
@@ -914,6 +1272,176 @@ const docTemplate = `{
                 },
                 "update_at": {
                     "type": "string"
+                }
+            }
+        },
+        "meta.AggregationAutoDateHistogram": {
+            "type": "object",
+            "properties": {
+                "buckets": {
+                    "type": "integer"
+                },
+                "field": {
+                    "type": "string"
+                },
+                "format": {
+                    "description": "format key_as_string",
+                    "type": "string"
+                },
+                "keyed": {
+                    "type": "boolean"
+                },
+                "minimum_interval": {
+                    "description": "minute,hour,day,week,month,quarter,year",
+                    "type": "string"
+                },
+                "time_zone": {
+                    "description": "time_zone",
+                    "type": "string"
+                }
+            }
+        },
+        "meta.AggregationDateHistogram": {
+            "type": "object",
+            "properties": {
+                "calendar_interval": {
+                    "description": "minute,hour,day,week,month,quarter,year",
+                    "type": "string"
+                },
+                "extended_bounds": {
+                    "$ref": "#/definitions/aggregation.HistogramBound"
+                },
+                "field": {
+                    "type": "string"
+                },
+                "fixed_interval": {
+                    "description": "ms,s,m,h,d",
+                    "type": "string"
+                },
+                "format": {
+                    "description": "format key_as_string",
+                    "type": "string"
+                },
+                "hard_bounds": {
+                    "$ref": "#/definitions/aggregation.HistogramBound"
+                },
+                "interval": {
+                    "description": "ms,s,m,h,d",
+                    "type": "string"
+                },
+                "keyed": {
+                    "type": "boolean"
+                },
+                "min_doc_count": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "time_zone": {
+                    "description": "time_zone",
+                    "type": "string"
+                }
+            }
+        },
+        "meta.AggregationDateRange": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string"
+                },
+                "format": {
+                    "description": "format the ` + "`" + `to` + "`" + ` and ` + "`" + `from` + "`" + ` values to ` + "`" + `_as_string` + "`" + `, and used to format ` + "`" + `keyed response` + "`" + `",
+                    "type": "string"
+                },
+                "keyed": {
+                    "type": "boolean"
+                },
+                "ranges": {
+                    "description": "refer",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/meta.DateRange"
+                    }
+                },
+                "time_zone": {
+                    "description": "refer",
+                    "type": "string"
+                }
+            }
+        },
+        "meta.AggregationHistogram": {
+            "type": "object",
+            "properties": {
+                "extended_bounds": {
+                    "$ref": "#/definitions/aggregation.HistogramBound"
+                },
+                "field": {
+                    "type": "string"
+                },
+                "hard_bounds": {
+                    "$ref": "#/definitions/aggregation.HistogramBound"
+                },
+                "interval": {
+                    "type": "number"
+                },
+                "keyed": {
+                    "type": "boolean"
+                },
+                "min_doc_count": {
+                    "type": "integer"
+                },
+                "offset": {
+                    "type": "number"
+                },
+                "size": {
+                    "type": "integer"
+                }
+            }
+        },
+        "meta.AggregationIPRange": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string"
+                },
+                "keyed": {
+                    "type": "boolean"
+                },
+                "ranges": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/meta.IPRange"
+                    }
+                }
+            }
+        },
+        "meta.AggregationMetric": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string"
+                },
+                "weight_field": {
+                    "description": "Field name to be used for setting weight for primary field for weighted average aggregation",
+                    "type": "string"
+                }
+            }
+        },
+        "meta.AggregationRange": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string"
+                },
+                "keyed": {
+                    "type": "boolean"
+                },
+                "ranges": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/meta.Range"
+                    }
                 }
             }
         },
@@ -928,6 +1456,79 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "value": {}
+            }
+        },
+        "meta.Aggregations": {
+            "type": "object",
+            "properties": {
+                "aggs": {
+                    "description": "nested aggregations",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.Aggregations"
+                    }
+                },
+                "auto_date_histogram": {
+                    "$ref": "#/definitions/meta.AggregationAutoDateHistogram"
+                },
+                "avg": {
+                    "$ref": "#/definitions/meta.AggregationMetric"
+                },
+                "cardinality": {
+                    "$ref": "#/definitions/meta.AggregationMetric"
+                },
+                "count": {
+                    "$ref": "#/definitions/meta.AggregationMetric"
+                },
+                "date_histogram": {
+                    "$ref": "#/definitions/meta.AggregationDateHistogram"
+                },
+                "date_range": {
+                    "$ref": "#/definitions/meta.AggregationDateRange"
+                },
+                "histogram": {
+                    "$ref": "#/definitions/meta.AggregationHistogram"
+                },
+                "ip_range": {
+                    "description": "TODO: not implemented",
+                    "$ref": "#/definitions/meta.AggregationIPRange"
+                },
+                "max": {
+                    "$ref": "#/definitions/meta.AggregationMetric"
+                },
+                "min": {
+                    "$ref": "#/definitions/meta.AggregationMetric"
+                },
+                "range": {
+                    "$ref": "#/definitions/meta.AggregationRange"
+                },
+                "sum": {
+                    "$ref": "#/definitions/meta.AggregationMetric"
+                },
+                "terms": {
+                    "$ref": "#/definitions/meta.AggregationsTerms"
+                },
+                "weighted_avg": {
+                    "$ref": "#/definitions/meta.AggregationMetric"
+                }
+            }
+        },
+        "meta.AggregationsTerms": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string"
+                },
+                "order": {
+                    "description": "{ \"_count\": \"asc\" }",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "size": {
+                    "type": "integer"
+                }
             }
         },
         "meta.Analyzer": {
@@ -973,6 +1574,67 @@ const docTemplate = `{
                 "type": {
                     "description": "options for compatible",
                     "type": "string"
+                }
+            }
+        },
+        "meta.DateRange": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "string"
+                },
+                "to": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.HTTPResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "error": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.Highlight": {
+            "type": "object",
+            "properties": {
+                "fields": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.Highlight"
+                    }
+                },
+                "fragment_size": {
+                    "type": "integer"
+                },
+                "number_of_fragments": {
+                    "type": "integer"
+                },
+                "post_tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "pre_tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -1022,6 +1684,17 @@ const docTemplate = `{
                 }
             }
         },
+        "meta.IPRange": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "string"
+                },
+                "to": {
+                    "type": "string"
+                }
+            }
+        },
         "meta.IndexAnalysis": {
             "type": "object",
             "properties": {
@@ -1060,6 +1733,26 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "number_of_shards": {
+                    "type": "integer"
+                }
+            }
+        },
+        "meta.IndexShard": {
+            "type": "object",
+            "properties": {
+                "doc_num": {
+                    "type": "integer"
+                },
+                "doc_time_max": {
+                    "type": "integer"
+                },
+                "doc_time_min": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "storage_size": {
                     "type": "integer"
                 }
             }
@@ -1148,6 +1841,17 @@ const docTemplate = `{
                 "type": {
                     "description": "text, keyword, date, numeric, boolean, geo_point",
                     "type": "string"
+                }
+            }
+        },
+        "meta.Range": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "number"
+                },
+                "to": {
+                    "type": "number"
                 }
             }
         },
@@ -1252,6 +1956,62 @@ const docTemplate = `{
                 }
             }
         },
+        "meta.ZincQuery": {
+            "type": "object",
+            "properties": {
+                "_source": {
+                    "description": "true, false, [\"field1\", \"field2.*\"]"
+                },
+                "aggs": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.Aggregations"
+                    }
+                },
+                "explain": {
+                    "type": "boolean"
+                },
+                "fields": {
+                    "description": "[\"field1\", \"field2.*\", {\"field\": \"fieldName\", \"format\": \"epoch_millis\"}]"
+                },
+                "from": {
+                    "type": "integer"
+                },
+                "highlight": {
+                    "$ref": "#/definitions/meta.Highlight"
+                },
+                "query": {},
+                "size": {
+                    "type": "integer"
+                },
+                "sort": {
+                    "description": "\"_sorce\", [\"+Year\",\"-Year\", {\"Year\": \"desc\"}, \"Date\": {\"order\": \"asc\"\", \"format\": \"yyyy-MM-dd\"}}\"}]"
+                },
+                "timeout": {
+                    "type": "integer"
+                },
+                "track_total_hits": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "v1.AggregationBucket": {
+            "type": "object",
+            "properties": {
+                "aggregations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/v1.AggregationResponse"
+                    }
+                },
+                "doc_count": {
+                    "type": "integer"
+                },
+                "key": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.AggregationDateRange": {
             "type": "object",
             "properties": {
@@ -1310,6 +2070,56 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.AggregationResponse": {
+            "type": "object",
+            "properties": {
+                "buckets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.AggregationBucket"
+                    }
+                },
+                "value": {}
+            }
+        },
+        "v1.Hit": {
+            "type": "object",
+            "properties": {
+                "@timestamp": {
+                    "type": "string"
+                },
+                "_id": {
+                    "type": "string"
+                },
+                "_index": {
+                    "type": "string"
+                },
+                "_score": {
+                    "type": "number"
+                },
+                "_source": {},
+                "_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.Hits": {
+            "type": "object",
+            "properties": {
+                "hits": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.Hit"
+                    }
+                },
+                "max_score": {
+                    "type": "number"
+                },
+                "total": {
+                    "$ref": "#/definitions/v1.Total"
+                }
+            }
+        },
         "v1.QueryHighlight": {
             "type": "object",
             "properties": {
@@ -1351,6 +2161,39 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
+                }
+            }
+        },
+        "v1.SearchResponse": {
+            "type": "object",
+            "properties": {
+                "aggregations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/v1.AggregationResponse"
+                    }
+                },
+                "error": {
+                    "type": "string"
+                },
+                "hits": {
+                    "$ref": "#/definitions/v1.Hits"
+                },
+                "timed_out": {
+                    "type": "boolean"
+                },
+                "took": {
+                    "description": "Time it took to generate the response",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.Total": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "Count of documents returned",
+                    "type": "integer"
                 }
             }
         },
@@ -1406,7 +2249,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Zinc Search engine API",
-	Description:      "Zinc Search engine API",
+	Description:      "Zinc Search engine API documents https://docs.zincsearch.com",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

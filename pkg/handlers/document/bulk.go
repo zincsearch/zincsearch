@@ -31,13 +31,16 @@ import (
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/ider"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-// @Summary Bulk Document Inser/Update
-// @Tags  Document
-// @Param  target path  string  true  "Index"
-// @Failure 400 {object} map[string]interface{}
+// @Summary Bulk documents
+// @Tags    Document
+// @Param   target path  string  false "Index"
+// @Param   query  body  string  true  "Query"
 // @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} meta.HTTPResponse
+// @Router /api/_bulk [post]
 // @Router /api/:target/_bulk [post]
 func Bulk(c *gin.Context) {
 	target := c.Param("target")
@@ -46,7 +49,7 @@ func Bulk(c *gin.Context) {
 
 	indexes, ret, err := BulkWorker(target, c.Request.Body)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
@@ -62,11 +65,13 @@ func Bulk(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "bulk data inserted", "record_count": ret.Count})
 }
 
-// @Summary ES Bulk Document Inser/Update
+// @Summary ES bulk documents
 // @Tags  Document
-// @Param  target path  string  true  "Index"
+// @Param   target path  string  false "Index"
+// @Param   query  body  string  true  "Query"
 // @Success 200 {object} map[string]interface{}
-// @Router /api/:target/_bulk [post]
+// @Router /es/_bulk [post]
+// @Router /es/:target/_bulk [post]
 func ESBulk(c *gin.Context) {
 	target := c.Param("target")
 

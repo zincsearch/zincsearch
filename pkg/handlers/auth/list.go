@@ -24,42 +24,24 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-// @Summary List User
-// @Tags  User
+// @Summary List user
+// @Tags    User
 // @Produce json
-// @Success 200 {object} meta.SearchResponse
+// @Success 200 {object} []meta.User
+// @Failure 500 {object} meta.HTTPResponse
 // @Router /api/user [get]
 func List(c *gin.Context) {
 	users, err := auth.GetUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
-	var Hits []meta.Hit
 	for _, u := range users {
-		// remove salt from response
+		// remove password and salt from response
 		u.Salt = ""
 		u.Password = ""
-		hit := meta.Hit{
-			Index:     u.Name,
-			Type:      u.Name,
-			ID:        u.ID,
-			Timestamp: u.UpdatedAt,
-			Source:    u,
-		}
-		Hits = append(Hits, hit)
-	}
 
-	resp := meta.SearchResponse{
-		Took: 0,
-		Hits: meta.Hits{
-			Total: meta.Total{
-				Value: len(users),
-			},
-			MaxScore: 0,
-			Hits:     Hits,
-		},
 	}
-	c.JSON(http.StatusOK, resp)
+	c.JSON(http.StatusOK, users)
 }

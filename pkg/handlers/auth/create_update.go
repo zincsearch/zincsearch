@@ -24,29 +24,30 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-// @Summary Create
-// @Tags  User
+// @Summary Create update user
+// @Tags    User
 // @Produce json
-// @Success 200 {object} meta.User
-// @Param user body meta.User true "User data"
-// @Failure 400 {object} map[string]interface{}
+// @Param   user body meta.User true "User data"
+// @Success 200 {object} meta.HTTPResponse
+// @Failure 400 {object} meta.HTTPResponse
+// @Failure 500 {object} meta.HTTPResponse
 // @Router /api/user [post]
 func CreateUpdate(c *gin.Context) {
 	var user meta.User
 	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
 	if user.ID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user.id should be not empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "user.id should be not empty"})
 		return
 	}
 
 	newUser, err := auth.CreateUser(user.ID, user.Name, user.Password, user.Role)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": newUser})
+	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok", Data: gin.H{"id": newUser.ID}})
 }

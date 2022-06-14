@@ -24,22 +24,23 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
-// @Summary CreateUpdate Analyze
-// @Tags  Index
-// @Param  target path  string  true  "Index"
-// @Failure 400 {object} map[string]interface{}
-// @Failure 404 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
+// @Summary Analyze
+// @Tags    Index
+// @Param   target path  string  false "Index"
+// @Param   query  body  object  true  "Query"
 // @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} meta.HTTPResponse
+// @Router /api/_analyze [post]
 // @Router /api/:target/_analyze [post]
 func Analyze(c *gin.Context) {
 	var query analyzeRequest
 	if err := c.BindJSON(&query); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
@@ -50,7 +51,7 @@ func Analyze(c *gin.Context) {
 		// use index analyzer
 		index, exists := core.GetIndex(indexName)
 		if !exists {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + " does not exists"})
+			c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index " + indexName + " does not exists"})
 			return
 		}
 		if query.Filed != "" && query.Analyzer == "" {
@@ -70,7 +71,7 @@ func Analyze(c *gin.Context) {
 			if query.Analyzer == "" {
 				ana = new(analysis.Analyzer)
 			} else {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "analyzer " + query.Analyzer + " does not exists"})
+				c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "analyzer " + query.Analyzer + " does not exists"})
 				return
 			}
 		}
@@ -81,7 +82,7 @@ func Analyze(c *gin.Context) {
 			if query.Analyzer == "" {
 				ana = new(analysis.Analyzer)
 			} else {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "analyzer " + query.Analyzer + " does not exists"})
+				c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "analyzer " + query.Analyzer + " does not exists"})
 				return
 			}
 		}
@@ -122,7 +123,7 @@ func Analyze(c *gin.Context) {
 	}
 
 	if ana.Tokenizer == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "analyzer need set a tokenizer"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "analyzer need set a tokenizer"})
 		return
 	}
 

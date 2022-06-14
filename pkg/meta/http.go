@@ -15,13 +15,11 @@
 
 package meta
 
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
-
-// GetHealthz function gets all events
-func GetHealthz(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+type HTTPResponse struct {
+	Code    int         `json:"code"`
+	Message string      `json:"message,omitempty"`
+	Error   string      `json:"error,omitempty"`
+	ID      string      `json:"id,omitempty"`
+	Index   string      `json:"index,omitempty"`
+	Data    interface{} `json:"data,omitempty"`
 }

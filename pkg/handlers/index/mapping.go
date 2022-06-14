@@ -25,18 +25,18 @@ import (
 	"github.com/zinclabs/zinc/pkg/uquery/mappings"
 )
 
-// @Summary Get Index Mappings
-// @Tags  Index
+// @Summary Get index mappings
+// @Tags    Index
 // @Produce json
-// @Param  target path  string  true  "Index"
+// @Param   target path  string  true  "Index"
 // @Success 200 {object} map[string]interface{}
-// @Failure 404 {object} map[string]interface{}
+// @Failure 400 {object} meta.HTTPResponse
 // @Router /api/:target/_mapping [get]
 func GetMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index " + indexName + " does not exists"})
 		return
 	}
 
@@ -49,30 +49,31 @@ func GetMapping(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{index.Name: gin.H{"mappings": mappings}})
 }
 
-// @Summary Set index mapping
-// @Tags  Index
+// @Summary Set index mappings
+// @Tags    Index
 // @Produce json
-// @Param  target path  string  true  "Index"
-// @Failure 400 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
-// @Success 200 {object} map[string]interface{}
+// @Param   target  path  string        true  "Index"
+// @Param   mapping body  meta.Mappings true  "Mapping"
+// @Success 200 {object} meta.HTTPResponse
+// @Failure 400 {object} meta.HTTPResponse
+// @Failure 500 {object} meta.HTTPResponse
 // @Router /api/:target/_mapping [put]
 func SetMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	if indexName == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "index.name should be not empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index.name should be not empty"})
 		return
 	}
 
 	var mappingRequest map[string]interface{}
 	if err := c.BindJSON(&mappingRequest); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
 	mappings, err := mappings.Request(nil, mappingRequest)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
@@ -82,7 +83,7 @@ func SetMapping(c *gin.Context) {
 		if index.Mappings != nil && index.Mappings.Len() > 0 {
 			for field := range mappings.ListProperty() {
 				if _, ok := index.Mappings.GetProperty(field); ok {
-					c.JSON(http.StatusBadRequest, gin.H{"error": "index [" + indexName + "] already exists mapping of field [" + field + "]"})
+					c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index [" + indexName + "] already exists mapping of field [" + field + "]"})
 					return
 				}
 			}
@@ -96,7 +97,7 @@ func SetMapping(c *gin.Context) {
 		// create index
 		index, err = core.NewIndex(indexName, "", nil)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
 			return
 		}
 	}
@@ -108,9 +109,9 @@ func SetMapping(c *gin.Context) {
 
 	// store index
 	if err := core.StoreIndex(index); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "ok"})
+	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok"})
 }

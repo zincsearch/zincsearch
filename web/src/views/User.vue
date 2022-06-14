@@ -92,18 +92,18 @@ export default defineComponent({
     const getUsers = () => {
       userService.list().then((res) => {
         var counter = 1;
-        users.value = res.data.hits.hits.map((data) => {
+        users.value = res.data.map((data) => {
           return {
             "#": counter++,
-            id: data._source._id,
-            name: data._source.name || data._source._id,
-            role: data._source.role,
+            id: data._id,
+            name: data.name || data._id,
+            role: data.role,
             created: date.formatDate(
-              data._source.created_at,
+              data.created_at,
               "YYYY-MM-DDTHH:mm:ssZ"
             ),
             updated: date.formatDate(
-              data._source.updated_at,
+              data.updated_at,
               "YYYY-MM-DDTHH:mm:ssZ"
             ),
             actions: "",
