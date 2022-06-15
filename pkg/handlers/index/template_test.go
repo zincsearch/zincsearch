@@ -66,7 +66,7 @@ func TestTemplate(t *testing.T) {
 						},
 					},
 					target: "TestTemplate.index_1",
-					result: `created`,
+					result: `{"message":"ok"`,
 				},
 				wantErr: false,
 			},
@@ -254,7 +254,7 @@ func TestTemplate(t *testing.T) {
 				args: args{
 					code:   http.StatusOK,
 					target: "test1",
-					result: `{"message":"ok"}`,
+					result: `"message":"ok"`,
 				},
 				wantErr: false,
 			},
@@ -263,7 +263,7 @@ func TestTemplate(t *testing.T) {
 				args: args{
 					code:   http.StatusOK,
 					target: "",
-					result: `{"message":"ok"}`,
+					result: `"message":"ok"`,
 				},
 				wantErr: false,
 			},
@@ -272,7 +272,7 @@ func TestTemplate(t *testing.T) {
 				args: args{
 					code:   http.StatusOK,
 					target: "testN",
-					result: `{"message":"ok"}`,
+					result: `"message":"ok"`,
 				},
 				wantErr: false,
 			},

@@ -16,7 +16,6 @@
 package meta
 
 type HTTPResponse struct {
-	Code    int         `json:"code"`
 	Message string      `json:"message,omitempty"`
 	Error   string      `json:"error,omitempty"`
 	ID      string      `json:"id,omitempty"`

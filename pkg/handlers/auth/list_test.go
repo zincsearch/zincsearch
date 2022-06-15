@@ -37,7 +37,7 @@ func TestList(t *testing.T) {
 			name: "normal",
 			args: args{
 				code:   http.StatusOK,
-				result: "timestamp",
+				result: `[{"_id":`,
 			},
 		},
 	}

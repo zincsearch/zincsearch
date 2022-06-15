@@ -53,7 +53,7 @@ func TestDelete(t *testing.T) {
 				params: map[string]string{
 					"target": "TestDelete.index_1",
 				},
-				result: `"id":""`,
+				result: `"message":"deleted"`,
 			},
 		},
 		{

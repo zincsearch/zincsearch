@@ -66,9 +66,6 @@ func main() {
 	// Coninuous profiling
 	profiling()
 
-	// Index init
-	core.LoadIndexList()
-
 	// HTTP init
 	app := gin.New()
 	routes.Setup(app)

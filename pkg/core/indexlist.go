@@ -31,7 +31,7 @@ type IndexList struct {
 	lock    sync.RWMutex
 }
 
-func LoadIndexList() {
+func init() {
 	// check version
 	version, _ := metadata.KV.Get("version")
 	if version == nil {

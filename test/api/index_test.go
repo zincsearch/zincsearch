@@ -32,7 +32,7 @@ func TestIndex(t *testing.T) {
 			body.WriteString(fmt.Sprintf(`{"name":"%s","storage_type":"disk"}`, "newindex"))
 			resp := request("PUT", "/api/index", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
-			assert.Equal(t, resp.Body.String(), `{"index":"newindex","message":"index created","storage_type":"disk"}`)
+			assert.Equal(t, resp.Body.String(), `{"index":"newindex","message":"ok","storage_type":"disk"}`)
 		})
 
 		t.Run("create index with error input", func(t *testing.T) {
@@ -84,7 +84,7 @@ func TestIndex(t *testing.T) {
 				}`)
 				resp := request("PUT", "/api/"+indexName+"-mapping/_mapping", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
-				assert.Equal(t, `{"message":"ok"}`, resp.Body.String())
+				assert.Contains(t, resp.Body.String(), `"message":"ok"`)
 			})
 		})
 

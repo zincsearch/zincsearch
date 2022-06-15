@@ -49,7 +49,7 @@ func TestUpdate(t *testing.T) {
 				params: map[string]string{
 					"target": "TestUpdate.index_1",
 				},
-				result: `{"id":"1"}`,
+				result: `"id":"1"`,
 			},
 		},
 		{
@@ -60,7 +60,7 @@ func TestUpdate(t *testing.T) {
 				params: map[string]string{
 					"target": "TestUpdate.index_1",
 				},
-				result: `{"error":`,
+				result: `"error":`,
 			},
 		},
 		{
@@ -71,7 +71,7 @@ func TestUpdate(t *testing.T) {
 				params: map[string]string{
 					"target": "TestUpdate.index_1",
 				},
-				result: `{"error":`,
+				result: `"error":`,
 			},
 		},
 		{
@@ -82,7 +82,7 @@ func TestUpdate(t *testing.T) {
 				params: map[string]string{
 					"target": "TestUpdate.index_2",
 				},
-				result: `{"error":`,
+				result: `"error":`,
 			},
 		},
 	}

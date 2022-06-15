@@ -145,11 +145,11 @@ func TestAuth(t *testing.T) {
 			resp := request("GET", "/api/user", nil)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
-			data := new(meta.SearchResponse)
-			err := json.Unmarshal(resp.Body.Bytes(), data)
+			data := make([]meta.User, 0)
+			err := json.Unmarshal(resp.Body.Bytes(), &data)
 			assert.NoError(t, err)
-			assert.GreaterOrEqual(t, data.Hits.Total.Value, 1)
-			assert.Equal(t, "admin", data.Hits.Hits[0].ID)
+			assert.GreaterOrEqual(t, len(data), 1)
+			assert.Equal(t, "admin", data[0].ID)
 		})
 	})
 }

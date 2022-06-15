@@ -42,7 +42,7 @@ func TestRefresh(t *testing.T) {
 			args: args{
 				code:   http.StatusOK,
 				params: map[string]string{"target": "TestRefresh.index_1"},
-				result: "refresh ok",
+				result: "ok",
 			},
 			wantErr: false,
 		},
