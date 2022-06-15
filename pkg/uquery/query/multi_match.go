@@ -17,6 +17,7 @@ package query
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/blugelabs/bluge"
@@ -50,7 +51,23 @@ func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, anal
 		case "operator":
 			value.Operator = v.(string)
 		case "minimum_should_match":
-			value.MinimumShouldMatch = v.(float64)
+			switch v := v.(type) {
+			case string:
+				if strings.Contains(v, "%") || strings.Contains(v, "<") {
+					return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[multi_match] %s value only support integer", k))
+				}
+				vi, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[multi_match] %s type string convert to int error: %s", k, err))
+				}
+				value.MinimumShouldMatch = float64(vi)
+			case int:
+				value.MinimumShouldMatch = float64(v)
+			case float64:
+				value.MinimumShouldMatch = v
+			default:
+				return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[multi_match] %s doesn't support values of type: %T", k, v))
+			}
 		default:
 			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[multi_match] unknown field [%s]", k))
 		}

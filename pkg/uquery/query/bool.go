@@ -17,6 +17,7 @@ package query
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/blugelabs/bluge"
@@ -110,7 +111,23 @@ func BoolQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers 
 			}
 			boolQuery.AddMust(filterQuery)
 		case "minimum_should_match":
-			boolQuery.SetMinShould(int(v.(float64)))
+			switch v := v.(type) {
+			case string:
+				if strings.Contains(v, "%") || strings.Contains(v, "<") {
+					return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s value only support integer", k))
+				}
+				vi, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s type string convert to int error: %s", k, err))
+				}
+				boolQuery.SetMinShould(int(vi))
+			case int:
+				boolQuery.SetMinShould(v)
+			case float64:
+				boolQuery.SetMinShould(int(v))
+			default:
+				return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s doesn't support values of type: %T", k, v))
+			}
 		default:
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[bool] unknown field [%s]", k))
 		}
