@@ -59,9 +59,10 @@ func main() {
 	}
 	log.Info().Msgf("Starting Zinc %s", meta.Version)
 
+	// Initialize telemetry
+	telemetry()
 	// Initialize sentry
 	sentries()
-
 	// Coninuous profiling
 	profiling()
 
@@ -70,15 +71,7 @@ func main() {
 
 	// HTTP init
 	app := gin.New()
-	// Recovery middleware recovers from any panics and writes a 500 if there was one.
-	app.Use(gin.Recovery())
-	// Debug for gin
-	if gin.Mode() == gin.DebugMode {
-		routes.AccessLog(app)
-		routes.SetPProf(app)
-	}
-	routes.SetPrometheus(app) // Set up Prometheus.
-	routes.SetRoutes(app)     // Set up all API routes.
+	routes.Setup(app)
 
 	// Run the server
 	PORT := config.Global.ServerPort
@@ -112,6 +105,12 @@ func main() {
 		}
 	}
 	log.Info().Msg("Server shutdown ok")
+}
+
+func telemetry() {
+	core.Telemetry.Instance()
+	core.Telemetry.Event("server_start", nil)
+	core.Telemetry.Cron()
 }
 
 func sentries() {
