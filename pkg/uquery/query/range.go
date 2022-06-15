@@ -17,6 +17,7 @@ package query
 
 import (
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -94,6 +95,9 @@ func RangeQueryNumeric(field string, query map[string]interface{}, mappings *met
 	if value.LTE != nil && value.LTE.(float64) > 0 {
 		max = value.LTE.(float64)
 		maxInclusive = true
+	}
+	if max == 0 {
+		max = float64(math.MaxInt64)
 	}
 	subq := bluge.NewNumericRangeInclusiveQuery(min, max, minInclusive, maxInclusive).SetField(field)
 	if value.Boost >= 0 {
@@ -193,6 +197,9 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 		if err != nil {
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.lte format err %s", field, err.Error()))
 		}
+	}
+	if max.IsZero() {
+		max = time.Now()
 	}
 	subq := bluge.NewDateRangeInclusiveQuery(min.UTC(), max.UTC(), minInclusive, maxInclusive).SetField(field)
 	if value.Boost >= 0 {
