@@ -50,7 +50,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.0 // indirect
 )
 
-replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v1.1.4
+replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v1.1.5
 
 replace github.com/blugelabs/ice => github.com/zinclabs/ice v1.1.3
 
