@@ -25,7 +25,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-func IdsQuery(query map[string]interface{}) (bluge.Query, error) {
+func IdsQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[ids] query doesn't support multiple fields")
 	}
@@ -65,5 +65,5 @@ func IdsQuery(query map[string]interface{}) (bluge.Query, error) {
 
 	return TermsQuery(map[string]interface{}{
 		"_id": value.Values,
-	})
+	}, mappings)
 }

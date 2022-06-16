@@ -59,13 +59,13 @@ func RangeQueryNumeric(field string, query map[string]interface{}, mappings *met
 		k := strings.ToLower(k)
 		switch k {
 		case "gt":
-			value.GT = v.(float64)
+			value.GT, _ = zutils.ToFloat64(v)
 		case "gte":
-			value.GTE = v.(float64)
+			value.GTE, _ = zutils.ToFloat64(v)
 		case "lt":
-			value.LT = v.(float64)
+			value.LT, _ = zutils.ToFloat64(v)
 		case "lte":
-			value.LTE = v.(float64)
+			value.LTE, _ = zutils.ToFloat64(v)
 		case "format":
 			value.Format = v.(string)
 		case "time_zone":

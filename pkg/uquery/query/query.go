@@ -115,7 +115,7 @@ func Query(query interface{}, mappings *meta.Mappings, analyzers map[string]*ana
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[exists] failed to parse field").Cause(err)
 			}
 		case "ids":
-			if subq, err = IdsQuery(v); err != nil {
+			if subq, err = IdsQuery(v, mappings); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[ids] failed to parse field").Cause(err)
 			}
 		case "range":
@@ -139,11 +139,11 @@ func Query(query interface{}, mappings *meta.Mappings, analyzers map[string]*ana
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[wildcard] failed to parse field").Cause(err)
 			}
 		case "term":
-			if subq, err = TermQuery(v); err != nil {
+			if subq, err = TermQuery(v, mappings); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[term] failed to parse field").Cause(err)
 			}
 		case "terms":
-			if subq, err = TermsQuery(v); err != nil {
+			if subq, err = TermsQuery(v, mappings); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[terms] failed to parse field").Cause(err)
 			}
 		case "terms_set":

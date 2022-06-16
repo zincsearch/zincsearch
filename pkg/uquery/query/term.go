@@ -24,9 +24,10 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
-func TermQuery(query map[string]interface{}) (bluge.Query, error) {
+func TermQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[term] query doesn't support multiple fields")
 	}
@@ -48,16 +49,7 @@ func TermQuery(query map[string]interface{}) (bluge.Query, error) {
 				k := strings.ToLower(k)
 				switch k {
 				case "value":
-					switch vv := v.(type) {
-					case string:
-						value.Value = vv
-					case float64:
-						value.Value = vv
-					case bool:
-						value.Value = vv
-					default:
-						return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", v))
-					}
+					value.Value = v
 				case "case_insensitive":
 					value.CaseInsensitive = v.(bool)
 				case "boost":
@@ -73,26 +65,51 @@ func TermQuery(query map[string]interface{}) (bluge.Query, error) {
 
 	// TODO: case_insensitive support
 
-	switch value.Value.(type) {
-	case string:
-		subq := bluge.NewTermQuery(value.Value.(string)).SetField(field)
-		if value.Boost >= 0 {
-			subq.SetBoost(value.Boost)
-		}
-		return subq, nil
-	case float64:
-		subq := bluge.NewNumericRangeInclusiveQuery(value.Value.(float64), value.Value.(float64), true, true).SetField(field)
-		if value.Boost >= 0 {
-			subq.SetBoost(value.Boost)
-		}
-		return subq, nil
-	case bool:
-		subq := bluge.NewTermQuery(strconv.FormatBool(value.Value.(bool))).SetField(field)
-		if value.Boost >= 0 {
-			subq.SetBoost(value.Boost)
-		}
-		return subq, nil
+	prop, _ := mappings.GetProperty(field)
+	switch prop.Type {
+	case "text", "keyword":
+		return TermQueryText(field, value)
+	case "numeric":
+		return TermQueryNumeric(field, value)
+	case "bool":
+		return TermQueryBool(field, value)
 	default:
 		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", value.Value))
 	}
+}
+
+func TermQueryNumeric(field string, value *meta.TermQuery) (bluge.Query, error) {
+	val, err := zutils.ToFloat64(value.Value)
+	if err != nil {
+		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] convert value to numeric error: %s", err))
+	}
+	subq := bluge.NewNumericRangeInclusiveQuery(val, val, true, true).SetField(field)
+	if value.Boost >= 0 {
+		subq.SetBoost(value.Boost)
+	}
+	return subq, nil
+}
+
+func TermQueryBool(field string, value *meta.TermQuery) (bluge.Query, error) {
+	val, err := zutils.ToBool(value.Value)
+	if err != nil {
+		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] convert value to boolean error: %s", err))
+	}
+	subq := bluge.NewTermQuery(strconv.FormatBool(val)).SetField(field)
+	if value.Boost >= 0 {
+		subq.SetBoost(value.Boost)
+	}
+	return subq, nil
+}
+
+func TermQueryText(field string, value *meta.TermQuery) (bluge.Query, error) {
+	val, err := zutils.ToString(value.Value)
+	if err != nil {
+		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] convert value to string error: %s", err))
+	}
+	subq := bluge.NewTermQuery(val).SetField(field)
+	if value.Boost >= 0 {
+		subq.SetBoost(value.Boost)
+	}
+	return subq, nil
 }

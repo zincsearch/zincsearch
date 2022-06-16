@@ -17,22 +17,23 @@ package query
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/blugelabs/bluge"
 
 	"github.com/zinclabs/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-func TermsQuery(query map[string]interface{}) (bluge.Query, error) {
+func TermsQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
 	if len(query) > 2 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[terms] query doesn't support multiple fields")
 	}
 
 	field := ""
 	values := []string{}
-	valueInts := []float64{}
+	valueFloat := []float64{}
+	valueInts := []int{}
 	valueBools := []bool{}
 	boost := -1.0
 	for k, v := range query {
@@ -46,6 +47,8 @@ func TermsQuery(query map[string]interface{}) (bluge.Query, error) {
 		case []string:
 			values = v
 		case []float64:
+			valueFloat = v
+		case []int:
 			valueInts = v
 		case []bool:
 			valueBools = v
@@ -55,6 +58,8 @@ func TermsQuery(query map[string]interface{}) (bluge.Query, error) {
 				case string:
 					values = append(values, vvv)
 				case float64:
+					valueFloat = append(valueFloat, vvv)
+				case int:
 					valueInts = append(valueInts, vvv)
 				case bool:
 					valueBools = append(valueBools, vvv)
@@ -69,13 +74,32 @@ func TermsQuery(query map[string]interface{}) (bluge.Query, error) {
 
 	subq := bluge.NewBooleanQuery()
 	for _, term := range values {
-		subq.AddShould(bluge.NewTermQuery(term).SetField(field))
+		subqq, err := TermQueryText(field, &meta.TermQuery{Value: term})
+		if err != nil {
+			return nil, err
+		}
+		subq.AddShould(subqq)
+	}
+	for _, term := range valueFloat {
+		subqq, err := TermQueryNumeric(field, &meta.TermQuery{Value: term})
+		if err != nil {
+			return nil, err
+		}
+		subq.AddShould(subqq)
 	}
 	for _, term := range valueInts {
-		subq.AddShould(bluge.NewNumericRangeInclusiveQuery(term, term, true, true).SetField(field))
+		subqq, err := TermQueryNumeric(field, &meta.TermQuery{Value: term})
+		if err != nil {
+			return nil, err
+		}
+		subq.AddShould(subqq)
 	}
 	for _, term := range valueBools {
-		subq.AddShould(bluge.NewTermQuery(strconv.FormatBool(term)).SetField(field))
+		subqq, err := TermQueryBool(field, &meta.TermQuery{Value: term})
+		if err != nil {
+			return nil, err
+		}
+		subq.AddShould(subqq)
 	}
 	if boost >= 0 {
 		subq.SetBoost(boost)
