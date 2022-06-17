@@ -1,0 +1,57 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      
+      - echo Logging in to Amazon ECR...
+      # - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/zinclabs
+      # Install AWS CLI
+      # - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      # - unzip awscliv2.zip
+      # - ./aws/install
+      # - rm awscliv2.zip
+      # - rm -rf aws
+
+      # install buildx
+      # - wget https://github.com/docker/buildx/releases/download/v0.7.1/buildx-v0.7.1.linux-amd64
+      # - chmod +x buildx-v0.7.1.linux-amd64
+      # - mkdir -p ~/.docker/cli-plugins
+      # - mv buildx-v0.7.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
+
+      # - Install Go
+      - cd /root/.goenv/plugins/go-build/../.. && git pull && cd -
+      - goenv install 1.18.3
+      - goenv rehash
+      - goenv global 1.18.3
+
+      # - export DOCKER_CLI_EXPERIMENTAL=enabled
+      # - export DOCKER_BUILDKIT=1
+      # update npm
+      - npm install -g npm@latest
+  build:
+    commands:
+      # - echo install snap
+      # - apt update
+      # - apt install snapd -y
+      # - snap install snapcraft --classic
+      # - docker run -v "$PWD":/build -w /build snapcore/snapcraft:stable snapcraft
+      
+      # Build vujes UI
+      - echo "Building front end..."
+      - cd web
+      - npm install
+      - npm run build
+      - cd ..
+      - ./coverage.sh
+      - go build -o main cmd/zinc/main.go
+      # Build binary and container images using goreleaser
+      # - echo Build started on `date`
+      # - GIT_TAG="$(git describe --tags --abbrev=0)"
+      # - curl -sL https://git.io/goreleaser | bash
+  # post_build:
+  #   commands:
+  #     - echo Build completed on `date`
+
+
+      
