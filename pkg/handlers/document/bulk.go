@@ -20,6 +20,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"sync/atomic"
 	"time"
 
 	"github.com/blugelabs/bluge"
@@ -92,6 +93,9 @@ func ESBulk(c *gin.Context) {
 		}
 		_ = index.CheckShards()
 	}
+
+	// update seqNo
+	atomic.AddInt64(&globalSeqNo, int64(ret.Count))
 
 	c.JSON(http.StatusOK, ret)
 }
@@ -304,7 +308,7 @@ func DoesExistInThisRequest(slice []string, val string) int {
 	return -1
 }
 
-func NewBulkResponseItem(seqNo int, index, id, result string, err error) BulkResponseItem {
+func NewBulkResponseItem(seqNo int64, index, id, result string, err error) BulkResponseItem {
 	return BulkResponseItem{
 		Index:   index,
 		Type:    "_doc",
@@ -316,30 +320,34 @@ func NewBulkResponseItem(seqNo int, index, id, result string, err error) BulkRes
 			Successful: 1,
 			Failed:     0,
 		},
-		Status: 200,
-		SeqNo:  seqNo,
-		Error:  err,
+		Status:      200,
+		SeqNo:       globalSeqNo + seqNo,
+		PrimaryTerm: 1,
+		Error:       err,
 	}
 }
+
+var globalSeqNo int64
 
 type BulkResponse struct {
 	Took   int                           `json:"took"`
 	Errors bool                          `json:"errors"`
 	Error  string                        `json:"error,omitempty"`
-	Count  int                           `json:"count"`
 	Items  []map[string]BulkResponseItem `json:"items"`
+	Count  int64                         `json:"-"`
 }
 
 type BulkResponseItem struct {
-	Index   string                `json:"_index"`
-	Type    string                `json:"_type"`
-	ID      string                `json:"_id"`
-	Version int64                 `json:"_version"`
-	Result  string                `json:"result"`
-	Shards  BulkResponseItemShard `json:"_shards"`
-	Status  int                   `json:"status"`
-	SeqNo   int                   `json:"seq_no"`
-	Error   error                 `json:"error,omitempty"`
+	Index       string                `json:"_index"`
+	Type        string                `json:"_type"`
+	ID          string                `json:"_id"`
+	Version     int64                 `json:"_version"`
+	Result      string                `json:"result"`
+	Status      int                   `json:"status"`
+	Shards      BulkResponseItemShard `json:"_shards"`
+	SeqNo       int64                 `json:"_seq_no"`
+	PrimaryTerm int                   `json:"_primary_term"`
+	Error       error                 `json:"error,omitempty"`
 }
 
 type BulkResponseItemShard struct {
