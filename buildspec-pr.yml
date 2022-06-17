@@ -25,6 +25,9 @@ phases:
       - goenv rehash
       - goenv global 1.18.3
 
+      # install prerequisites
+      - yum install bc
+
       # - export DOCKER_CLI_EXPERIMENTAL=enabled
       # - export DOCKER_BUILDKIT=1
       # update npm
