@@ -217,6 +217,6 @@ func RequestTokenFilterSingle(name string, options interface{}) (analysis.TokenF
 	case "tr_stemmer", "turkish_stemmer":
 		return tr.StemmerFilter(), nil
 	default:
-		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[token_filter] unkown token filter [%s]", name))
+		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[token_filter] unknown token filter [%s]", name))
 	}
 }
