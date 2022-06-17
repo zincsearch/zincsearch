@@ -15,3 +15,5 @@ fi
 
 find ./pkg -name data -type dir|xargs rm -fR
 find ./test -name data -type dir|xargs rm -fR
+
+# echo "test"
