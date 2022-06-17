@@ -246,7 +246,7 @@ func QueryAnalyzer(data map[string]*analysis.Analyzer, name string) (*analysis.A
 	case "tr", "turkish":
 		return tr.Analyzer(), nil
 	default:
-		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] unkown analyzer [%s]", name))
+		return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[analyzer] unknown analyzer [%s]", name))
 	}
 }
 

@@ -104,6 +104,6 @@ func RequestTokenizerSingle(name string, options interface{}) (analysis.Tokenize
 	case "gse_search":
 		return chs.NewGseSearchTokenizer(), nil
 	default:
-		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[tokenizer] unkown tokenizer [%s]", name))
+		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[tokenizer] unknown tokenizer [%s]", name))
 	}
 }

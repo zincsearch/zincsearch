@@ -93,6 +93,6 @@ func RequestCharFilterSingle(name string, options interface{}) (analysis.CharFil
 	case "mapping":
 		return zincchar.NewMappingCharFilter(options)
 	default:
-		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] unkown character filter [%s]", name))
+		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[char_filter] unknown character filter [%s]", name))
 	}
 }
