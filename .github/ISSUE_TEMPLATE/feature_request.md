@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+Note: Any feature request that do not follow below template will be closed without consideration. You may remove this line while filing a feature request.
+
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
