@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-Note: Any issue that does not follow below template will be closed without consideration. You may remove this note when filing issue.
+Note: Any issue that does not follow below template will be closed without consideration. You may remove this line when filing issue.
 
 <!-- Please keep this note for the community -->
 ### Community Note
