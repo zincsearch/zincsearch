@@ -36,8 +36,6 @@ import (
 // isMatchIndex("abc", "bc") false
 // isMatchIndex("abc", "abc") true
 func isMatchIndex(zincIndexName, indexName string) bool {
-	// the old code: indexName == "" || (indexName != "" && strings.HasPrefix(zincIndexName, indexName[:len(indexName)-1]))
-
 	if indexName == "" {
 		return true
 	}
@@ -64,8 +62,8 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 	var shardNum int
 
 	timeMin, timeMax := timerange.Query(query.Query)
+	isMatched := false
 	for _, index := range ZINC_INDEX_LIST.List() {
-		isMatched := false
 		for _, indexName := range indexNames {
 			isMatched = isMatchIndex(index.Name, indexName)
 			if isMatched {
