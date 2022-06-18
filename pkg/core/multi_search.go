@@ -70,18 +70,22 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 				break
 			}
 		}
-		if isMatched {
-			reader, err := index.GetReaders(timeMin, timeMax)
-			if err != nil {
-				return nil, err
-			}
-			readers = append(readers, reader...)
-			shardNum += index.ShardNum
-			if mappings == nil {
-				mappings = index.Mappings
-				analyzers = index.Analyzers
-			}
+		
+		if !isMatched {
+			continue
 		}
+		
+		reader, err := index.GetReaders(timeMin, timeMax)
+		if err != nil {
+			return nil, err
+		}
+		readers = append(readers, reader...)
+		shardNum += index.ShardNum
+		if mappings == nil {
+			mappings = index.Mappings
+			analyzers = index.Analyzers
+		}
+		
 	}
 	defer func() {
 		for _, reader := range readers {
