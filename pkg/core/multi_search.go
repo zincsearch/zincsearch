@@ -30,33 +30,62 @@ import (
 	"github.com/zinclabs/zinc/pkg/uquery/timerange"
 )
 
+// isMatchIndex("abc", "a")  false
+// isMatchIndex("abc", "a*") true
+// isMatchIndex("abc", "*bc") true
+// isMatchIndex("abc", "bc") false
+// isMatchIndex("abc", "abc") true
+func isMatchIndex(zincIndexName, indexName string) bool {
+	if indexName == "" {
+		return true
+	}
+	name := indexName
+	// eg.: *-test
+	if strings.HasPrefix(indexName, "*") {
+		name = indexName[1:len(indexName)] // eg.: *-test -> -test
+		return strings.HasSuffix(zincIndexName, name)
+	}
+
+	// eg.: test-*
+	if strings.HasSuffix(indexName, "*") {
+		name = indexName[:len(indexName)-1] // eg.: test-* -> test-
+		return strings.HasPrefix(zincIndexName, name)
+	}
+
+	return zincIndexName == indexName
+}
+
 func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchResponse, error) {
 	var mappings *meta.Mappings
 	var analyzers map[string]*analysis.Analyzer
 	var readers []*bluge.Reader
 	var shardNum int
-	indexMap := make(map[string]struct{})
 
 	timeMin, timeMax := timerange.Query(query.Query)
+	isMatched := false
 	for _, index := range ZINC_INDEX_LIST.List() {
 		for _, indexName := range indexNames {
-			if _, ok := indexMap[index.Name]; ok {
-				continue
-			}
-			if indexName == "" || (indexName != "" && strings.HasPrefix(index.Name, indexName[:len(indexName)-1])) {
-				reader, err := index.GetReaders(timeMin, timeMax)
-				if err != nil {
-					return nil, err
-				}
-				readers = append(readers, reader...)
-				shardNum += index.ShardNum
-				if mappings == nil {
-					mappings = index.Mappings
-					analyzers = index.Analyzers
-				}
-				indexMap[index.Name] = struct{}{}
+			isMatched = isMatchIndex(index.Name, indexName)
+			if isMatched {
+				break
 			}
 		}
+		
+		if !isMatched {
+			continue
+		}
+		
+		reader, err := index.GetReaders(timeMin, timeMax)
+		if err != nil {
+			return nil, err
+		}
+		readers = append(readers, reader...)
+		shardNum += index.ShardNum
+		if mappings == nil {
+			mappings = index.Mappings
+			analyzers = index.Analyzers
+		}
+		
 	}
 	defer func() {
 		for _, reader := range readers {

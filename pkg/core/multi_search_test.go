@@ -23,6 +23,19 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+func TestIsMatchIndex(t *testing.T) {
+	ret := isMatchIndex("abc", "a") //  false
+	assert.False(t, ret)
+	ret = isMatchIndex("abc", "a*") // true
+	assert.True(t, ret)
+	ret = isMatchIndex("abc", "*bc") // true
+	assert.True(t, ret)
+	ret = isMatchIndex("abc", "bc") // false
+	assert.False(t, ret)
+	ret = isMatchIndex("abc", "abc") // true
+	assert.True(t, ret)
+}
+
 func TestMultiSearch(t *testing.T) {
 	type args struct {
 		indexName string
