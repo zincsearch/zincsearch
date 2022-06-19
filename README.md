@@ -98,8 +98,7 @@ Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap item
 # Who uses Zinc (Known users)?
 
 1. [Quadrantsec](https://quadrantsec.com/)
-2. [Accodeing to you](https://accodeing.com/)
-3. [Paopao](https://github.com/rocboss/paopao-ce)
+1. [Paopao](https://github.com/rocboss/paopao-ce)
 
 Please do raise a PR adding your details if you are using Zinc.
 
