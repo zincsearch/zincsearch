@@ -326,7 +326,7 @@ export default defineComponent({
           },
         },
         sort: ["-@timestamp"],
-        form: 0,
+        from: 0,
         size: parseInt(maxRecordToReturn.value, 10),
       };
 
