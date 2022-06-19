@@ -30,31 +30,6 @@ import (
 	"github.com/zinclabs/zinc/pkg/uquery/timerange"
 )
 
-// isMatchIndex("abc", "a")  false
-// isMatchIndex("abc", "a*") true
-// isMatchIndex("abc", "*bc") true
-// isMatchIndex("abc", "bc") false
-// isMatchIndex("abc", "abc") true
-func isMatchIndex(zincIndexName, indexName string) bool {
-	if indexName == "" {
-		return true
-	}
-	name := indexName
-	// eg.: *-test
-	if strings.HasPrefix(indexName, "*") {
-		name = indexName[1:len(indexName)] // eg.: *-test -> -test
-		return strings.HasSuffix(zincIndexName, name)
-	}
-
-	// eg.: test-*
-	if strings.HasSuffix(indexName, "*") {
-		name = indexName[:len(indexName)-1] // eg.: test-* -> test-
-		return strings.HasPrefix(zincIndexName, name)
-	}
-
-	return zincIndexName == indexName
-}
-
 func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchResponse, error) {
 	var mappings *meta.Mappings
 	var analyzers map[string]*analysis.Analyzer
@@ -63,18 +38,21 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 
 	timeMin, timeMax := timerange.Query(query.Query)
 	isMatched := false
+	hasIndex := false
 	for _, index := range ZINC_INDEX_LIST.List() {
-		for _, indexName := range indexNames {
-			isMatched = isMatchIndex(index.Name, indexName)
-			if isMatched {
-				break
+		if len(indexNames) > 0 {
+			for _, indexName := range indexNames {
+				isMatched = isMatchIndex(index.Name, indexName)
+				if isMatched {
+					hasIndex = true
+					break
+				}
+			}
+			if !isMatched {
+				continue
 			}
 		}
-		
-		if !isMatched {
-			continue
-		}
-		
+
 		reader, err := index.GetReaders(timeMin, timeMax)
 		if err != nil {
 			return nil, err
@@ -85,17 +63,21 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 			mappings = index.Mappings
 			analyzers = index.Analyzers
 		}
-		
+
 	}
+
+	if len(readers) == 0 {
+		if !hasIndex {
+			return nil, fmt.Errorf("core.MultiSearchV2: error accessing reader: no index found")
+		}
+		return &meta.SearchResponse{}, nil
+	}
+
 	defer func() {
 		for _, reader := range readers {
 			reader.Close()
 		}
 	}()
-
-	if len(readers) == 0 {
-		return nil, fmt.Errorf("core.MultiSearchV2: error accessing reader: no index found")
-	}
 
 	searchRequest, err := uquery.ParseQueryDSL(query, mappings, analyzers)
 	if err != nil {
@@ -123,4 +105,27 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 	}
 
 	return searchV2(shardNum, len(readers), dmi, query, mappings)
+}
+
+// isMatchIndex("abc", "a")  false
+// isMatchIndex("abc", "a*") true
+// isMatchIndex("abc", "*bc") true
+// isMatchIndex("abc", "bc") false
+// isMatchIndex("abc", "abc") true
+func isMatchIndex(zincIndexName, indexName string) bool {
+	if indexName == "" {
+		return true
+	}
+
+	// eg.: *-test
+	if strings.HasPrefix(indexName, "*") {
+		return strings.HasSuffix(zincIndexName, indexName[1:])
+	}
+
+	// eg.: test-*
+	if strings.HasSuffix(indexName, "*") {
+		return strings.HasPrefix(zincIndexName, indexName[:len(indexName)-1])
+	}
+
+	return zincIndexName == indexName
 }
