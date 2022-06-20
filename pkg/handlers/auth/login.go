@@ -24,18 +24,19 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// @Id Login
 // @Summary Login
 // @Tags    User
 // @Produce json
 // @Param   login body LoginRequest true "Login credentials"
 // @Success 200 {object} LoginResponse
-// @Failure 400 {object} meta.HTTPResponse
+// @Failure 400 {object} meta.HTTPResponseError
 // @Router /api/login [post]
 func Login(c *gin.Context) {
 	// Read login input
 	var loginInput LoginRequest
 	if err := c.ShouldBindJSON(&loginInput); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 

@@ -27,32 +27,33 @@ import (
 
 // SearchV1 searches the index for the given http request from end user
 
+// @Id SearchV1
 // @Summary Search V1
 // @Tags    Search
 // @Produce json
-// @Param   target path  string       true  "Index"
+// @Param   index  path  string       true  "Index"
 // @Param   query  body  v1.ZincQuery true  "Query"
 // @Success 200 {object} v1.SearchResponse
-// @Failure 400 {object} meta.HTTPResponse
-// @Router /api/:target/_search [post]
+// @Failure 400 {object} meta.HTTPResponseError
+// @Router /api/{index}/_search [post]
 func SearchV1(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
 		return
 	}
 
 	var iQuery v1.ZincQuery
 	iQuery.MaxResults = 10
 	if err := c.BindJSON(&iQuery); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
 	res, err := v1.Search(index, &iQuery)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 

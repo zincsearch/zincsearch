@@ -24,15 +24,16 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// @Id UpdateDocument
 // @Summary Update document with id
 // @Tags    Document
-// @Param   target path  string  true  "Index"
+// @Param   index  path  string  true  "Index"
 // @Param   id     path  string  true  "ID"
 // @Param   document  body  map[string]interface{}  true  "Document"
-// @Success 200 {object} meta.HTTPResponse
-// @Failure 400 {object} meta.HTTPResponse
-// @Failure 500 {object} meta.HTTPResponse
-// @Router /api/:target/_update/:id [post]
+// @Success 200 {object} meta.HTTPResponseID
+// @Failure 400 {object} meta.HTTPResponseError
+// @Failure 500 {object} meta.HTTPResponseError
+// @Router /api/{index}/_update/{id} [post]
 func Update(c *gin.Context) {
 	indexName := c.Param("target")
 	docID := c.Param("id") // ID for the document to be updated provided in URL path
@@ -40,7 +41,7 @@ func Update(c *gin.Context) {
 	var err error
 	var doc map[string]interface{}
 	if err = c.BindJSON(&doc); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -49,22 +50,22 @@ func Update(c *gin.Context) {
 		docID = id.(string)
 	}
 	if docID == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "_id field is required"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "_id field is required"})
 		return
 	}
 
 	// If the index does not exist, then create it
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index does not exists"})
 		return
 	}
 
 	err = index.UpdateDocument(docID, doc)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok", ID: docID})
+	c.JSON(http.StatusOK, meta.HTTPResponseID{Message: "ok", ID: docID})
 }

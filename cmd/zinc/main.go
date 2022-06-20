@@ -38,19 +38,19 @@ import (
 )
 
 // @title           Zinc Search engine API
-// @version         1.0
+// @version         1.0.0
 // @description     Zinc Search engine API documents https://docs.zincsearch.com
 // @termsOfService  http://swagger.io/terms/
 
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+// @license.name    Apache 2.0
+// @license.url     http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @contact.name   Zinc Search
-// @contact.url    https://www.zincsearch.com
+// @contact.name    Zinc Search
+// @contact.url     https://www.zincsearch.com
 
 // @securityDefinitions.basic BasicAuth
-// @host      localhost:4080
-// @BasePath  /
+// @host            localhost:4080
+// @BasePath        /
 func main() {
 	// Version
 	if len(os.Args) > 1 && os.Args[1] == "version" {

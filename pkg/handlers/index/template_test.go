@@ -140,7 +140,7 @@ func TestTemplate(t *testing.T) {
 					utils.SetGinRequestData(c, tt.args.rawData)
 				}
 				utils.SetGinRequestParams(c, map[string]string{"target": tt.args.target})
-				UpdateTemplate(c)
+				CreateTemplate(c)
 				assert.Equal(t, tt.args.code, w.Code)
 				assert.Contains(t, w.Body.String(), tt.args.result)
 			})

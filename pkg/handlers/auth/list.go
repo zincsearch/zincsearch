@@ -24,16 +24,17 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// @Id ListUsers
 // @Summary List user
 // @Tags    User
 // @Produce json
 // @Success 200 {object} []meta.User
-// @Failure 500 {object} meta.HTTPResponse
+// @Failure 500 {object} meta.HTTPResponseError
 // @Router /api/user [get]
 func List(c *gin.Context) {
 	users, err := auth.GetUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 

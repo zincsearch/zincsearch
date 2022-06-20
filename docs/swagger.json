@@ -12,23 +12,404 @@
             "name": "Apache 2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
-        "version": "1.0"
+        "version": "1.0.0"
     },
     "host": "localhost:4080",
     "basePath": "/",
     "paths": {
-        "/api/:target/_analyze": {
+        "/api/_analyze": {
             "post": {
                 "tags": [
                     "Index"
                 ],
                 "summary": "Analyze",
+                "operationId": "Analyze",
+                "parameters": [
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/index.AnalyzeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/_bulk": {
+            "post": {
+                "tags": [
+                    "Document"
+                ],
+                "summary": "Bulk documents",
+                "operationId": "Bulk",
+                "parameters": [
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseRecordCount"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/index": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "List indexes",
+                "operationId": "ListIndexes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/core.Index"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Create index",
+                "operationId": "CreateIndex",
+                "parameters": [
+                    {
+                        "description": "Index data",
+                        "name": "index",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.IndexSimple"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseIndex"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/index/{index}": {
+            "delete": {
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Delete index",
+                "operationId": "DeleteIndex",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
-                        "name": "target",
-                        "in": "path"
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseIndex"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/index/{index}/refresh": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Resfresh index",
+                "operationId": "Refresh",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Login",
+                "operationId": "Login",
+                "parameters": [
+                    {
+                        "description": "Login credentials",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "List user",
+                "operationId": "ListUsers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/meta.User"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user",
+                "operationId": "UpdateUser",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseID"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create user",
+                "operationId": "CreateUser",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseID"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/{id}": {
+            "delete": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Delete user",
+                "operationId": "DeleteUser",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseID"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/{index}/_analyze": {
+            "post": {
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Analyze",
+                "operationId": "AnalyzeIndex",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
                     },
                     {
                         "description": "Query",
@@ -44,78 +425,32 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/index.AnalyzeResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
             }
         },
-        "/api/:target/_bulk": {
+        "/api/{index}/_doc": {
             "post": {
                 "tags": [
                     "Document"
                 ],
-                "summary": "Bulk documents",
+                "summary": "Create or update document",
+                "operationId": "IndexDocument",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
-                        "name": "target",
-                        "in": "path"
-                    },
-                    {
-                        "description": "Query",
-                        "name": "query",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/:target/_doc": {
-            "post": {
-                "tags": [
-                    "Document"
-                ],
-                "summary": "Create update document",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
+                        "name": "index",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "ID",
-                        "name": "id",
-                        "in": "path"
                     },
                     {
                         "description": "Document",
@@ -132,35 +467,36 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseID"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
             }
         },
-        "/api/:target/_doc/:id": {
+        "/api/{index}/_doc/{id}": {
             "put": {
                 "tags": [
                     "Document"
                 ],
-                "summary": "Create update document",
+                "summary": "Create or update document with id",
+                "operationId": "IndexDocumentWithID",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
-                        "name": "target",
+                        "name": "index",
                         "in": "path",
                         "required": true
                     },
@@ -168,7 +504,8 @@
                         "type": "string",
                         "description": "ID",
                         "name": "id",
-                        "in": "path"
+                        "in": "path",
+                        "required": true
                     },
                     {
                         "description": "Document",
@@ -185,19 +522,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseID"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
@@ -207,11 +544,12 @@
                     "Document"
                 ],
                 "summary": "Delete document",
+                "operationId": "DeleteDocument",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
-                        "name": "target",
+                        "name": "index",
                         "in": "path",
                         "required": true
                     },
@@ -227,25 +565,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseDocument"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
             }
         },
-        "/api/:target/_mapping": {
+        "/api/{index}/_mapping": {
             "get": {
                 "produces": [
                     "application/json"
@@ -254,11 +592,12 @@
                     "Index"
                 ],
                 "summary": "Get index mappings",
+                "operationId": "GetMapping",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
-                        "name": "target",
+                        "name": "index",
                         "in": "path",
                         "required": true
                     }
@@ -274,7 +613,7 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
@@ -287,11 +626,12 @@
                     "Index"
                 ],
                 "summary": "Set index mappings",
+                "operationId": "SetMapping",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
-                        "name": "target",
+                        "name": "index",
                         "in": "path",
                         "required": true
                     },
@@ -315,19 +655,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
             }
         },
-        "/api/:target/_search": {
+        "/api/{index}/_search": {
             "post": {
                 "produces": [
                     "application/json"
@@ -336,11 +676,12 @@
                     "Search"
                 ],
                 "summary": "Search V1",
+                "operationId": "SearchV1",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
-                        "name": "target",
+                        "name": "index",
                         "in": "path",
                         "required": true
                     },
@@ -364,13 +705,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
             }
         },
-        "/api/:target/_settings": {
+        "/api/{index}/_settings": {
             "get": {
                 "produces": [
                     "application/json"
@@ -379,11 +720,12 @@
                     "Index"
                 ],
                 "summary": "Get index settings",
+                "operationId": "GetSettings",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
-                        "name": "target",
+                        "name": "index",
                         "in": "path",
                         "required": true
                     }
@@ -393,15 +735,13 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "$ref": "#/definitions/meta.IndexSettings"
-                            }
+                            "additionalProperties": true
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
@@ -414,11 +754,12 @@
                     "Index"
                 ],
                 "summary": "Set index Settings",
+                "operationId": "SetSettings",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
-                        "name": "target",
+                        "name": "index",
                         "in": "path",
                         "required": true
                     },
@@ -442,29 +783,30 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
             }
         },
-        "/api/:target/_update/:id": {
+        "/api/{index}/_update/{id}": {
             "post": {
                 "tags": [
                     "Document"
                 ],
                 "summary": "Update document with id",
+                "operationId": "UpdateDocument",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Index",
-                        "name": "target",
+                        "name": "index",
                         "in": "path",
                         "required": true
                     },
@@ -490,482 +832,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseID"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/_analyze": {
-            "post": {
-                "tags": [
-                    "Index"
-                ],
-                "summary": "Analyze",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
-                        "in": "path"
-                    },
-                    {
-                        "description": "Query",
-                        "name": "query",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/_bulk": {
-            "post": {
-                "tags": [
-                    "Document"
-                ],
-                "summary": "Bulk documents",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
-                        "in": "path"
-                    },
-                    {
-                        "description": "Query",
-                        "name": "query",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/index": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Index"
-                ],
-                "summary": "List indexes",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/core.Index"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Index"
-                ],
-                "summary": "Create index",
-                "parameters": [
-                    {
-                        "description": "Index data",
-                        "name": "index",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/meta.IndexSimple"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/index/:target": {
-            "delete": {
-                "tags": [
-                    "Index"
-                ],
-                "summary": "Delete index",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/index/:target/refresh": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Index"
-                ],
-                "summary": "Resfresh index",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/login": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Login",
-                "parameters": [
-                    {
-                        "description": "Login credentials",
-                        "name": "login",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth.LoginRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/auth.LoginResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/user": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "List user",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/meta.User"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Create update user",
-                "parameters": [
-                    {
-                        "description": "User data",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/meta.User"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/user/:id": {
-            "delete": {
-                "tags": [
-                    "User"
-                ],
-                "summary": "Delete user",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/es/:target/_bulk": {
-            "post": {
-                "tags": [
-                    "Document"
-                ],
-                "summary": "ES bulk documents",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
-                        "in": "path"
-                    },
-                    {
-                        "description": "Query",
-                        "name": "query",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/es/:target/_msearch": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Search"
-                ],
-                "summary": "Search V2 MultipleSearch for compatible ES",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
-                        "in": "path"
-                    },
-                    {
-                        "description": "Query",
-                        "name": "query",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/meta.SearchResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/es/:target/_search": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Search"
-                ],
-                "summary": "Search V2 DSL for compatible ES",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Query",
-                        "name": "query",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/meta.ZincQuery"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/meta.SearchResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
@@ -977,13 +856,8 @@
                     "Document"
                 ],
                 "summary": "ES bulk documents",
+                "operationId": "ESBulk",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
-                        "in": "path"
-                    },
                     {
                         "description": "Query",
                         "name": "query",
@@ -1000,6 +874,12 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
@@ -1014,6 +894,7 @@
                     "Index"
                 ],
                 "summary": "List index teplates",
+                "operationId": "ListTemplates",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1040,6 +921,7 @@
                     "Index"
                 ],
                 "summary": "Create update index template",
+                "operationId": "CreateTemplate",
                 "parameters": [
                     {
                         "description": "Template data",
@@ -1055,20 +937,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/meta.HTTPResponseTemplate"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
             }
         },
-        "/es/_index_template/:target": {
+        "/es/_index_template/{name}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -1077,11 +958,12 @@
                     "Index"
                 ],
                 "summary": "Get index template",
+                "operationId": "GetTemplate",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Template",
-                        "name": "target",
+                        "name": "name",
                         "in": "path",
                         "required": true
                     }
@@ -1101,16 +983,59 @@
                     }
                 }
             },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Create update index template",
+                "operationId": "UpdateTemplate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Template",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Template data",
+                        "name": "template",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.IndexTemplate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseTemplate"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "tags": [
                     "Index"
                 ],
                 "summary": "Delete template",
+                "operationId": "DeleteTemplate",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Template",
-                        "name": "target",
+                        "name": "name",
                         "in": "path",
                         "required": true
                     }
@@ -1125,7 +1050,7 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
@@ -1140,13 +1065,8 @@
                     "Search"
                 ],
                 "summary": "Search V2 MultipleSearch for compatible ES",
+                "operationId": "MSearch",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
-                        "in": "path"
-                    },
                     {
                         "description": "Query",
                         "name": "query",
@@ -1168,6 +1088,84 @@
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/es/{index}/_search": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Search V2 DSL for compatible ES",
+                "operationId": "Search",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.ZincQuery"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.SearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthz": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get healthz",
+                "operationId": "Healthz",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/version": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get version",
+                "operationId": "Version",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.ResponseVersion"
                         }
                     }
                 }
@@ -1264,6 +1262,40 @@
                     "type": "string"
                 },
                 "update_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "index.AnalyzeResponse": {
+            "type": "object",
+            "properties": {
+                "tokens": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/index.AnalyzeResponseToken"
+                    }
+                }
+            }
+        },
+        "index.AnalyzeResponseToken": {
+            "type": "object",
+            "properties": {
+                "end_offset": {
+                    "type": "integer"
+                },
+                "keyword": {
+                    "type": "boolean"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "start_offset": {
+                    "type": "integer"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -1584,13 +1616,14 @@
         "meta.HTTPResponse": {
             "type": "object",
             "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "data": {},
-                "error": {
+                "message": {
                     "type": "string"
-                },
+                }
+            }
+        },
+        "meta.HTTPResponseDocument": {
+            "type": "object",
+            "properties": {
                 "id": {
                     "type": "string"
                 },
@@ -1598,6 +1631,61 @@
                     "type": "string"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.HTTPResponseError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.HTTPResponseID": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.HTTPResponseIndex": {
+            "type": "object",
+            "properties": {
+                "index": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "storage_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.HTTPResponseRecordCount": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "record_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "meta.HTTPResponseTemplate": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "template": {
                     "type": "string"
                 }
             }
@@ -1845,6 +1933,26 @@
                 },
                 "to": {
                     "type": "number"
+                }
+            }
+        },
+        "meta.ResponseVersion": {
+            "type": "object",
+            "properties": {
+                "branch": {
+                    "type": "string"
+                },
+                "build": {
+                    "type": "string"
+                },
+                "build_date": {
+                    "type": "string"
+                },
+                "commit_hash": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
                 }
             }
         },

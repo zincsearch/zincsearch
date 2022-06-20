@@ -25,6 +25,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/uquery/template"
 )
 
+// @Id ListTemplates
 // @Summary List index teplates
 // @Tags    Index
 // @Produce json
@@ -35,83 +36,97 @@ func ListTemplate(c *gin.Context) {
 	pattern := c.Query("pattern")
 	templates, err := core.ListTemplates(pattern)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, templates)
 }
 
+// @Id GetTemplate
 // @Summary Get index template
 // @Tags    Index
 // @Produce json
-// @Param   target path  string  true  "Template"
+// @Param   name path  string  true  "Template"
 // @Success 200 {object} meta.IndexTemplate
 // @Failure 400 {object} meta.HTTPResponse
-// @Router /es/_index_template/:target [get]
+// @Router /es/_index_template/{name} [get]
 func GetTemplate(c *gin.Context) {
 	name := c.Param("target")
 	if name == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "template.name should be not empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template.name should be not empty"})
 		return
 	}
 	template, exists, err := core.LoadTemplate(name)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "template " + name + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template " + name + " does not exists"})
 		return
 	}
 	c.JSON(http.StatusOK, template)
 }
 
+// @Id CreateTemplate
 // @Summary Create update index template
 // @Tags    Index
 // @Produce json
 // @Param   template body meta.IndexTemplate true "Template data"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} meta.HTTPResponse
+// @Success 200 {object} meta.HTTPResponseTemplate
+// @Failure 400 {object} meta.HTTPResponseError
 // @Router /es/_index_template [post]
-func UpdateTemplate(c *gin.Context) {
+func CreateTemplate(c *gin.Context) {
 	name := c.Param("target")
 	if name == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "template.name should be not empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template.name should be not empty"})
 		return
 	}
 
 	var data map[string]interface{}
 	if err := c.BindJSON(&data); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
 	template, err := template.Request(data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
 	err = core.NewTemplate(name, template)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "ok", "template": name})
+	c.JSON(http.StatusOK, meta.HTTPResponseTemplate{Message: "ok", Template: name})
 }
 
+// @Id UpdateTemplate
+// @Summary Create update index template
+// @Tags    Index
+// @Produce json
+// @Param   name     path string  true  "Template"
+// @Param   template body meta.IndexTemplate true "Template data"
+// @Success 200 {object} meta.HTTPResponseTemplate
+// @Failure 400 {object} meta.HTTPResponseError
+// @Router /es/_index_template/{name} [put]
+func UpdateTemplateForSwagger() {}
+
+// @Id DeleteTemplate
 // @Summary Delete template
 // @Tags    Index
-// @Param   target path  string  true  "Template"
+// @Param   name  path  string  true  "Template"
 // @Success 200 {object} meta.HTTPResponse
-// @Failure 400 {object} meta.HTTPResponse
-// @Router /es/_index_template/:target [delete]
+// @Failure 400 {object} meta.HTTPResponseError
+// @Router /es/_index_template/{name} [delete]
 func DeleteTemplate(c *gin.Context) {
 	name := c.Param("target")
 	err := core.DeleteTemplate(name)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok"})

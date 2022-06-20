@@ -22,6 +22,12 @@ import (
 )
 
 // GetHealthz function gets all events
+
+// @Id Healthz
+// @Summary Get healthz
+// @Produce json
+// @Success 200 {object} HTTPResponse
+// @Router /healthz [get]
 func GetHealthz(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	c.JSON(http.StatusOK, HTTPResponse{Message: "ok"})
 }
