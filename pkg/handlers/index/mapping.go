@@ -107,6 +107,24 @@ func SetMapping(c *gin.Context) {
 
 	// update mappings
 	if mappings != nil && mappings.Len() > 0 {
+		for k, v := range mappings.Properties {
+			if v.Fields == nil {
+				continue
+			}
+
+			update := false
+			for kField, field := range v.Fields {
+				if field.Fields != nil {
+					field.Fields = nil
+					v.Fields[kField] = field
+					update = true
+				}
+			}
+
+			if update {
+				mappings.Properties[k] = v
+			}
+		}
 		_ = index.SetMappings(mappings)
 	}
 

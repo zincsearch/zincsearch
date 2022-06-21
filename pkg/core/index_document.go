@@ -19,11 +19,13 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/blugelabs/bluge"
 	"github.com/goccy/go-json"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
@@ -54,9 +56,23 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 
 		if _, ok := mappings.GetProperty(key); !ok {
 			// try to find the type of the value and use it to define default mapping
-			switch value.(type) {
+			switch v := value.(type) {
 			case string:
-				mappings.SetProperty(key, meta.NewProperty("text"))
+				if layout, ok := isDateProperty(v); ok {
+					prop := meta.NewProperty("date")
+					prop.Format = layout
+					mappings.SetProperty(key, prop)
+				} else {
+					newProp := meta.NewProperty("text")
+					if config.Global.EnableTextKeywordMapping {
+						p := meta.NewProperty("keyword")
+						newProp.AddField("keyword", p)
+
+						mappings.SetProperty(key+".keyword", p)
+					}
+
+					mappings.SetProperty(key, newProp)
+				}
 			case int, int64, float64:
 				mappings.SetProperty(key, meta.NewProperty("numeric"))
 			case bool:
@@ -64,9 +80,23 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 			case []interface{}:
 				if v, ok := value.([]interface{}); ok {
 					for _, vv := range v {
-						switch vv.(type) {
+						switch val := vv.(type) {
 						case string:
-							mappings.SetProperty(key, meta.NewProperty("text"))
+							if layout, ok := isDateProperty(val); ok {
+								prop := meta.NewProperty("date")
+								prop.Format = layout
+								mappings.SetProperty(key, prop)
+							} else {
+								newProp := meta.NewProperty("text")
+								if config.Global.EnableTextKeywordMapping {
+									p := meta.NewProperty("keyword")
+									newProp.AddField("keyword", p)
+
+									mappings.SetProperty(key+".keyword", p)
+								}
+
+								mappings.SetProperty(key, newProp)
+							}
 						case float64:
 							mappings.SetProperty(key, meta.NewProperty("numeric"))
 						case bool:
@@ -131,6 +161,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 
 func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, key string, value interface{}) error {
 	var field *bluge.TermField
+
 	prop, _ := mappings.GetProperty(key)
 	switch prop.Type {
 	case "text":
@@ -138,6 +169,7 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 		if err != nil {
 			return fmt.Errorf("field [%s] was set type to [text] but the value [%v] can't convert to string", key, value)
 		}
+
 		field = bluge.NewTextField(key, v).SearchTermPositions()
 		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.Analyzers, index.Mappings, key)
 		if fieldAnalyzer != nil {
@@ -181,6 +213,15 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 		field.Aggregatable()
 	}
 	bdoc.AddField(field)
+
+	if prop.Fields != nil {
+		for propField := range prop.Fields {
+			err := index.buildField(mappings, bdoc, key+"."+propField, value)
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	return nil
 }
@@ -249,4 +290,29 @@ func (index *Index) FindID(id string) (*bluge.Writer, error) {
 		}
 	}
 	return nil, errors.ErrorIDNotFound
+}
+
+// isDateProperty returns true if the given value matches the default date format.
+func isDateProperty(value string) (string, bool) {
+	layout := detectTimeLayout(value)
+	_, err := time.Parse(layout, value)
+
+	return layout, err == nil
+}
+
+// detectTimeLayout tries to figure out the correct layout of the input date.
+func detectTimeLayout(value string) string {
+	layout := ""
+	switch {
+	case len(value) == 19 && strings.Index(value, " ") == 10:
+		layout = "2006-01-02 15:04:05"
+	case len(value) == 19 && strings.Index(value, "T") == 10:
+		layout = "2006-01-02T15:04:05"
+	case len(value) == 25 && strings.Index(value, "T") == 10:
+		layout = time.RFC3339
+	case len(value) == 29 && strings.Index(value, "T") == 10 && strings.Index(value, ".") == 19:
+		layout = "2006-01-02T15:04:05.999Z07:00"
+	}
+
+	return layout
 }
