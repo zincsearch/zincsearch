@@ -37,6 +37,9 @@ func NewIndex(name, storageType string, defaultSearchAnalyzer *analysis.Analyzer
 	if strings.HasPrefix(name, "_") {
 		return nil, fmt.Errorf("core.NewIndex: index name cannot start with _")
 	}
+	if storageType == "" {
+		storageType = "disk"
+	}
 
 	index := new(Index)
 	index.Name = name

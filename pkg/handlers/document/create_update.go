@@ -60,7 +60,7 @@ func CreateUpdate(c *gin.Context) {
 	index, exists := core.GetIndex(indexName)
 	if !exists {
 		// Create a new index with disk storage as default
-		index, err = core.NewIndex(indexName, "disk", nil)
+		index, err = core.NewIndex(indexName, "", nil)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 			return
