@@ -91,4 +91,4 @@ func CreateUpdate(c *gin.Context) {
 // @Failure 400 {object} meta.HTTPResponseError
 // @Failure 500 {object} meta.HTTPResponseError
 // @Router /api/{index}/_doc/{id} [put]
-func CreateWithIDForSwagger() {}
+func CreateWithIDForSDK() {}

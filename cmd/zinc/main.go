@@ -51,6 +51,7 @@ import (
 // @securityDefinitions.basic BasicAuth
 // @host            localhost:4080
 // @BasePath        /
+// @schemes http https
 func main() {
 	// Version
 	if len(os.Args) > 1 && os.Args[1] == "version" {

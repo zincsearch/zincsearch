@@ -698,7 +698,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.ZincQuery"
+                            "$ref": "#/definitions/v1.ZincQueryForSDK"
                         }
                     }
                 ],
@@ -915,7 +915,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
@@ -985,7 +985,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
@@ -1080,7 +1080,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object"
+                            "type": "string"
                         }
                     }
                 ],
@@ -1094,7 +1094,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
@@ -1124,7 +1124,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/meta.ZincQuery"
+                            "$ref": "#/definitions/meta.ZincQueryForSDK"
                         }
                     }
                 ],
@@ -1609,6 +1609,43 @@ const docTemplate = `{
                 }
             }
         },
+        "meta.BoolQueryForSDK": {
+            "type": "object",
+            "properties": {
+                "filter": {
+                    "description": "query, [query1, query2]",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/meta.QueryForSDK"
+                    }
+                },
+                "minimum_should_match": {
+                    "description": "only for should",
+                    "type": "number"
+                },
+                "must": {
+                    "description": "query, [query1, query2]",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/meta.QueryForSDK"
+                    }
+                },
+                "must_not": {
+                    "description": "query, [query1, query2]",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/meta.QueryForSDK"
+                    }
+                },
+                "should": {
+                    "description": "query, [query1, query2]",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/meta.QueryForSDK"
+                    }
+                }
+            }
+        },
         "meta.DateRange": {
             "type": "object",
             "properties": {
@@ -1616,6 +1653,31 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "to": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.ExistsQuery": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.FuzzyQuery": {
+            "type": "object",
+            "properties": {
+                "boost": {
+                    "type": "number"
+                },
+                "fuzziness": {
+                    "description": "auto, 1,2,3,n"
+                },
+                "prefix_length": {
+                    "type": "number"
+                },
+                "value": {
                     "type": "string"
                 }
             }
@@ -1783,6 +1845,17 @@ const docTemplate = `{
                 }
             }
         },
+        "meta.IdsQuery": {
+            "type": "object",
+            "properties": {
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "meta.IndexAnalysis": {
             "type": "object",
             "properties": {
@@ -1898,6 +1971,121 @@ const docTemplate = `{
                 }
             }
         },
+        "meta.MatchAllQuery": {
+            "type": "object"
+        },
+        "meta.MatchBoolPrefixQuery": {
+            "type": "object",
+            "properties": {
+                "analyzer": {
+                    "type": "string"
+                },
+                "boost": {
+                    "type": "number"
+                },
+                "query": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.MatchNoneQuery": {
+            "type": "object"
+        },
+        "meta.MatchPhrasePrefixQuery": {
+            "type": "object",
+            "properties": {
+                "analyzer": {
+                    "type": "string"
+                },
+                "boost": {
+                    "type": "number"
+                },
+                "query": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.MatchPhraseQuery": {
+            "type": "object",
+            "properties": {
+                "analyzer": {
+                    "type": "string"
+                },
+                "boost": {
+                    "type": "number"
+                },
+                "query": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.MatchQuery": {
+            "type": "object",
+            "properties": {
+                "analyzer": {
+                    "type": "string"
+                },
+                "boost": {
+                    "type": "number"
+                },
+                "fuzziness": {
+                    "description": "auto, 1,2,3,n"
+                },
+                "operator": {
+                    "description": "or(default), and",
+                    "type": "string"
+                },
+                "prefix_length": {
+                    "type": "number"
+                },
+                "query": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.MultiMatchQuery": {
+            "type": "object",
+            "properties": {
+                "analyzer": {
+                    "type": "string"
+                },
+                "boost": {
+                    "type": "number"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "minimum_should_match": {
+                    "type": "number"
+                },
+                "operator": {
+                    "description": "or(default), and",
+                    "type": "string"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "best_fields(default), most_fields, cross_fields, phrase, phrase_prefix, bool_prefix",
+                    "type": "string"
+                }
+            }
+        },
+        "meta.PrefixQuery": {
+            "type": "object",
+            "properties": {
+                "boost": {
+                    "type": "number"
+                },
+                "value": {
+                    "description": "You can speed up prefix queries using the index_prefixes mapping parameter.",
+                    "type": "string"
+                }
+            }
+        },
         "meta.Property": {
             "type": "object",
             "properties": {
@@ -1932,6 +2120,147 @@ const docTemplate = `{
                 }
             }
         },
+        "meta.QueryForSDK": {
+            "type": "object",
+            "properties": {
+                "bool": {
+                    "description": ".",
+                    "$ref": "#/definitions/meta.BoolQueryForSDK"
+                },
+                "exists": {
+                    "description": ".",
+                    "$ref": "#/definitions/meta.ExistsQuery"
+                },
+                "fuzzy": {
+                    "description": "simple, PrefixQuery",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.FuzzyQuery"
+                    }
+                },
+                "ids": {
+                    "description": ".",
+                    "$ref": "#/definitions/meta.IdsQuery"
+                },
+                "match": {
+                    "description": "simple, MatchQuery",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.MatchQuery"
+                    }
+                },
+                "match_all": {
+                    "description": "just set or null",
+                    "$ref": "#/definitions/meta.MatchAllQuery"
+                },
+                "match_bool_prefix": {
+                    "description": "simple, MatchBoolPrefixQuery",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.MatchBoolPrefixQuery"
+                    }
+                },
+                "match_none": {
+                    "description": "just set or null",
+                    "$ref": "#/definitions/meta.MatchNoneQuery"
+                },
+                "match_phrase": {
+                    "description": "simple, MatchPhraseQuery",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.MatchPhraseQuery"
+                    }
+                },
+                "match_phrase_prefix": {
+                    "description": "simple, MatchPhrasePrefixQuery",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.MatchPhrasePrefixQuery"
+                    }
+                },
+                "multi_match": {
+                    "description": ".",
+                    "$ref": "#/definitions/meta.MultiMatchQuery"
+                },
+                "prefix": {
+                    "description": ".",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.PrefixQuery"
+                    }
+                },
+                "query_string": {
+                    "description": ".",
+                    "$ref": "#/definitions/meta.QueryStringQuery"
+                },
+                "range": {
+                    "description": "simple, FuzzyQuery",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.RangeQueryForSDK"
+                    }
+                },
+                "regexp": {
+                    "description": "simple, FuzzyQuery",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.RegexpQuery"
+                    }
+                },
+                "simple_query_string": {
+                    "description": ".",
+                    "$ref": "#/definitions/meta.SimpleQueryStringQuery"
+                },
+                "term": {
+                    "description": "simple, TermQuery",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.TermQueryForSDK"
+                    }
+                },
+                "terms": {
+                    "description": ".",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.TermsQuery"
+                    }
+                },
+                "wildcard": {
+                    "description": "simple, WildcardQuery",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.WildcardQuery"
+                    }
+                }
+            }
+        },
+        "meta.QueryStringQuery": {
+            "type": "object",
+            "properties": {
+                "analyzer": {
+                    "type": "string"
+                },
+                "boost": {
+                    "type": "number"
+                },
+                "default_field": {
+                    "type": "string"
+                },
+                "default_operator": {
+                    "description": "or(default), and",
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "query": {
+                    "type": "string"
+                }
+            }
+        },
         "meta.Range": {
             "type": "object",
             "properties": {
@@ -1940,6 +2269,52 @@ const docTemplate = `{
                 },
                 "to": {
                     "type": "number"
+                }
+            }
+        },
+        "meta.RangeQueryForSDK": {
+            "type": "object",
+            "properties": {
+                "boost": {
+                    "type": "number"
+                },
+                "format": {
+                    "description": "Date format used to convert date values in the query.",
+                    "type": "string"
+                },
+                "gt": {
+                    "description": "string, float64",
+                    "type": "string"
+                },
+                "gte": {
+                    "description": "string, float64",
+                    "type": "string"
+                },
+                "lt": {
+                    "description": "string, float64",
+                    "type": "string"
+                },
+                "lte": {
+                    "description": "string, float64",
+                    "type": "string"
+                },
+                "time_zone": {
+                    "description": "used to convert date values in the query to UTC.",
+                    "type": "string"
+                }
+            }
+        },
+        "meta.RegexpQuery": {
+            "type": "object",
+            "properties": {
+                "boost": {
+                    "type": "number"
+                },
+                "flags": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         },
@@ -2007,6 +2382,33 @@ const docTemplate = `{
                 }
             }
         },
+        "meta.SimpleQueryStringQuery": {
+            "type": "object",
+            "properties": {
+                "all_fields": {
+                    "type": "boolean"
+                },
+                "analyzer": {
+                    "type": "string"
+                },
+                "boost": {
+                    "type": "number"
+                },
+                "default_operator": {
+                    "description": "or(default), and",
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "query": {
+                    "type": "string"
+                }
+            }
+        },
         "meta.Template": {
             "type": "object",
             "properties": {
@@ -2028,6 +2430,24 @@ const docTemplate = `{
                     "$ref": "#/definitions/meta.IndexSettings"
                 }
             }
+        },
+        "meta.TermQueryForSDK": {
+            "type": "object",
+            "properties": {
+                "boost": {
+                    "type": "number"
+                },
+                "case_insensitive": {
+                    "type": "boolean"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.TermsQuery": {
+            "type": "object",
+            "additionalProperties": true
         },
         "meta.Total": {
             "type": "object",
@@ -2064,11 +2484,26 @@ const docTemplate = `{
                 }
             }
         },
-        "meta.ZincQuery": {
+        "meta.WildcardQuery": {
+            "type": "object",
+            "properties": {
+                "boost": {
+                    "type": "number"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.ZincQueryForSDK": {
             "type": "object",
             "properties": {
                 "_source": {
-                    "description": "true, false, [\"field1\", \"field2.*\"]"
+                    "description": "true, false, [\"field1\", \"field2.*\"]",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "aggs": {
                     "type": "object",
@@ -2080,7 +2515,11 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "fields": {
-                    "description": "[\"field1\", \"field2.*\", {\"field\": \"fieldName\", \"format\": \"epoch_millis\"}]"
+                    "description": "[\"field1\", \"field2.*\", {\"field\": \"fieldName\", \"format\": \"epoch_millis\"}]",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "from": {
                     "type": "integer"
@@ -2088,12 +2527,18 @@ const docTemplate = `{
                 "highlight": {
                     "$ref": "#/definitions/meta.Highlight"
                 },
-                "query": {},
+                "query": {
+                    "$ref": "#/definitions/meta.QueryForSDK"
+                },
                 "size": {
                     "type": "integer"
                 },
                 "sort": {
-                    "description": "\"_sorce\", [\"+Year\",\"-Year\", {\"Year\": \"desc\"}, \"Date\": {\"order\": \"asc\"\", \"format\": \"yyyy-MM-dd\"}}\"}]"
+                    "description": "\"_sorce\", [\"+Year\",\"-Year\", {\"Year\": \"desc\"}, \"Date\": {\"order\": \"asc\"\", \"format\": \"yyyy-MM-dd\"}}\"}]",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "timeout": {
                     "type": "integer"
@@ -2305,10 +2750,15 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.ZincQuery": {
+        "v1.ZincQueryForSDK": {
             "type": "object",
             "properties": {
-                "_source": {},
+                "_source": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "aggs": {
                     "type": "object",
                     "additionalProperties": {
@@ -2355,7 +2805,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0.0",
 	Host:             "localhost:4080",
 	BasePath:         "/",
-	Schemes:          []string{},
+	Schemes:          []string{"http", "https"},
 	Title:            "Zinc Search engine API",
 	Description:      "Zinc Search engine API documents https://docs.zincsearch.com",
 	InfoInstanceName: "swagger",

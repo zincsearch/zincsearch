@@ -30,7 +30,7 @@ import (
 // @Tags    Index
 // @Produce json
 // @Success 200 {object} []meta.Template
-// @Failure 400 {object} meta.HTTPResponse
+// @Failure 400 {object} meta.HTTPResponseError
 // @Router /es/_index_template [get]
 func ListTemplate(c *gin.Context) {
 	pattern := c.Query("pattern")
@@ -48,7 +48,7 @@ func ListTemplate(c *gin.Context) {
 // @Produce json
 // @Param   name path  string  true  "Template"
 // @Success 200 {object} meta.IndexTemplate
-// @Failure 400 {object} meta.HTTPResponse
+// @Failure 400 {object} meta.HTTPResponseError
 // @Router /es/_index_template/{name} [get]
 func GetTemplate(c *gin.Context) {
 	name := c.Param("target")
@@ -113,7 +113,7 @@ func CreateTemplate(c *gin.Context) {
 // @Success 200 {object} meta.HTTPResponseTemplate
 // @Failure 400 {object} meta.HTTPResponseError
 // @Router /es/_index_template/{name} [put]
-func UpdateTemplateForSwagger() {}
+func UpdateTemplateForSDK() {}
 
 // @Id DeleteTemplate
 // @Summary Delete template

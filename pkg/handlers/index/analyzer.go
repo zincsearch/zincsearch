@@ -143,7 +143,7 @@ func Analyze(c *gin.Context) {
 // @Success 200 {object} AnalyzeResponse
 // @Failure 400 {object} meta.HTTPResponseError
 // @Router /api/{index}/_analyze [post]
-func AnalyzeIndexForSwagger() {}
+func AnalyzeIndexForSDK() {}
 
 func parseTokenizer(data interface{}) ([]analysis.Tokenizer, error) {
 	if data == nil {

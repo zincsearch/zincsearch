@@ -36,8 +36,8 @@ import (
 // @Summary Search V2 DSL for compatible ES
 // @Tags    Search
 // @Produce json
-// @Param   index  path  string         true  "Index"
-// @Param   query  body  meta.ZincQuery true  "Query"
+// @Param   index  path  string  true  "Index"
+// @Param   query  body  meta.ZincQueryForSDK true  "Query"
 // @Success 200 {object} meta.SearchResponse
 // @Failure 400 {object} meta.HTTPResponseError
 // @Router /es/{index}/_search [post]
@@ -74,9 +74,9 @@ func SearchDSL(c *gin.Context) {
 // @Summary Search V2 MultipleSearch for compatible ES
 // @Tags    Search
 // @Produce json
-// @Param   query  body  object  true  "Query"
+// @Param   query  body  string  true  "Query"
 // @Success 200 {object} meta.SearchResponse
-// @Failure 400 {object} meta.HTTPResponse
+// @Failure 400 {object} meta.HTTPResponseError
 // @Router /es/_msearch [post]
 func MultipleSearch(c *gin.Context) {
 	indexName := c.Param("target")

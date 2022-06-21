@@ -31,8 +31,8 @@ import (
 // @Summary Search V1
 // @Tags    Search
 // @Produce json
-// @Param   index  path  string       true  "Index"
-// @Param   query  body  v1.ZincQuery true  "Query"
+// @Param   index  path  string  true  "Index"
+// @Param   query  body  v1.ZincQueryForSDK  true  "Query"
 // @Success 200 {object} v1.SearchResponse
 // @Failure 400 {object} meta.HTTPResponseError
 // @Router /api/{index}/_search [post]
