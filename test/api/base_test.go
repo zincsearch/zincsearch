@@ -42,7 +42,7 @@ func TestApiBase(t *testing.T) {
 			data := make(map[string]interface{})
 			err := json.Unmarshal(resp.Body.Bytes(), &data)
 			assert.NoError(t, err)
-			_, ok := data["Version"]
+			_, ok := data["version"]
 			assert.True(t, ok)
 		})
 		t.Run("/healthz", func(t *testing.T) {
@@ -54,7 +54,7 @@ func TestApiBase(t *testing.T) {
 			data := make(map[string]interface{})
 			err := json.Unmarshal(resp.Body.Bytes(), &data)
 			assert.NoError(t, err)
-			status, ok := data["status"]
+			status, ok := data["message"]
 			assert.True(t, ok)
 			assert.Equal(t, "ok", status)
 		})
