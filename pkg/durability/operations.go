@@ -17,18 +17,23 @@ func WriteWAL(message []byte) {
 
 // return the requested number of WAL entries
 func ReadWAL(entriesCount uint64) [][]byte {
-	var entries [][]byte
-	fmt.Println("durability package readWAL")
+	// fmt.Println("durability package readWAL")
 
 	start, err := log1.FirstIndex()
 	if err != nil {
 		fmt.Println("err: ", err)
 	}
+
+	var entries [][]byte
+	if start == 0 {
+		return entries // return empty array if no WAL entries exist
+	}
+
 	for i := start; i < entriesCount; i++ {
 		fmt.Println("durability package readWAL loop")
 		entry, err := log1.Read(i)
 		if err != nil {
-			fmt.Println("durability package readWAL loop error, err: ", err)
+			fmt.Println("durability package readWAL loop i= ", i, ", entriesCount: ", entriesCount, ", err:", err)
 		} else {
 			entries = append(entries, entry)
 		}
