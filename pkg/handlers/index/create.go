@@ -69,7 +69,7 @@ func CreateES(c *gin.Context) {
 
 	var newIndex meta.IndexSimple
 	if err := c.BindJSON(&newIndex); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -81,7 +81,7 @@ func CreateES(c *gin.Context) {
 
 	err := CreateIndexWorker(&newIndex, indexName)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 

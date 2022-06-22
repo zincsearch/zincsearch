@@ -40,6 +40,13 @@ type Property struct {
 	Sortable       bool   `json:"sortable"`
 	Aggregatable   bool   `json:"aggregatable"`
 	Highlightable  bool   `json:"highlightable"`
+	// Fields allow the same string value to be indexed in multiple ways for different purposes,
+	// such as one field for search and a multi-field for sorting and aggregations,
+	// or the same string value analyzed by different analyzers.
+	// If the Fields property is defined within a sub-field, it will be ignored.
+	//
+	// Currently, only "text" fields support the Fields parameter.
+	Fields map[string]Property `json:"fields,omitempty"`
 }
 
 func NewMappings() *Mappings {
@@ -60,12 +67,48 @@ func NewProperty(typ string) Property {
 		Sortable:       true,
 		Aggregatable:   true,
 		Highlightable:  false,
+		Fields:         make(map[string]Property),
 	}
 	if typ == "text" {
 		p.Sortable = false
 		p.Aggregatable = false
 	}
 	return p
+}
+
+// AddField adds the given field to the property.
+func (p *Property) AddField(field string, value Property) {
+	if p.Fields == nil {
+		p.Fields = make(map[string]Property)
+	}
+
+	value.Fields = nil
+
+	// explicitly allow field overwriting
+	p.Fields[field] = value
+}
+
+// DeepClone returns a copy of the Property.
+func (p *Property) DeepClone() Property {
+	prop := NewProperty(p.Type)
+	prop.Analyzer = p.Analyzer
+	prop.SearchAnalyzer = p.SearchAnalyzer
+	prop.Format = p.Format
+	prop.Index = p.Index
+	prop.Store = p.Store
+	prop.Sortable = p.Sortable
+	prop.Aggregatable = p.Aggregatable
+	prop.Highlightable = p.Highlightable
+
+	if p.Fields != nil {
+		for k, v := range p.Fields {
+			prop.Fields[k] = v.DeepClone()
+		}
+	} else {
+		prop.Fields = nil
+	}
+
+	return prop
 }
 
 func (t *Mappings) Len() int {
@@ -95,6 +138,20 @@ func (t *Mappings) ListProperty() map[string]Property {
 		m[k] = v
 	}
 	t.lock.RUnlock()
+	return m
+}
+
+// DeepClone returns a full copy of the mapping.
+func (t *Mappings) DeepClone() *Mappings {
+	m := NewMappings()
+
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
+	for k, v := range t.Properties {
+		m.Properties[k] = v.DeepClone()
+	}
+
 	return m
 }
 

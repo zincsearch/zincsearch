@@ -118,7 +118,7 @@ func TestMapping(t *testing.T) {
 				wantErr: true,
 			},
 			{
-				name: "empty",
+				name: "empty_body",
 				args: args{
 					code:   http.StatusOK,
 					data:   map[string]interface{}{},

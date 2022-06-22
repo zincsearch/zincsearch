@@ -25,6 +25,7 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/goccy/go-json"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
@@ -62,7 +63,15 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 					prop.Format = layout
 					mappings.SetProperty(key, prop)
 				} else {
-					mappings.SetProperty(key, meta.NewProperty("text"))
+					newProp := meta.NewProperty("text")
+					if config.Global.EnableTextKeywordMapping {
+						p := meta.NewProperty("keyword")
+						newProp.AddField("keyword", p)
+
+						mappings.SetProperty(key+".keyword", p)
+					}
+
+					mappings.SetProperty(key, newProp)
 				}
 			case int, int64, float64:
 				mappings.SetProperty(key, meta.NewProperty("numeric"))
@@ -78,7 +87,15 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 								prop.Format = layout
 								mappings.SetProperty(key, prop)
 							} else {
-								mappings.SetProperty(key, meta.NewProperty("text"))
+								newProp := meta.NewProperty("text")
+								if config.Global.EnableTextKeywordMapping {
+									p := meta.NewProperty("keyword")
+									newProp.AddField("keyword", p)
+
+									mappings.SetProperty(key+".keyword", p)
+								}
+
+								mappings.SetProperty(key, newProp)
 							}
 						case float64:
 							mappings.SetProperty(key, meta.NewProperty("numeric"))
@@ -144,6 +161,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 
 func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, key string, value interface{}) error {
 	var field *bluge.TermField
+
 	prop, _ := mappings.GetProperty(key)
 	switch prop.Type {
 	case "text":
@@ -151,6 +169,7 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 		if err != nil {
 			return fmt.Errorf("field [%s] was set type to [text] but the value [%v] can't convert to string", key, value)
 		}
+
 		field = bluge.NewTextField(key, v).SearchTermPositions()
 		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.Analyzers, index.Mappings, key)
 		if fieldAnalyzer != nil {
@@ -194,6 +213,15 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 		field.Aggregatable()
 	}
 	bdoc.AddField(field)
+
+	if prop.Fields != nil {
+		for propField := range prop.Fields {
+			err := index.buildField(mappings, bdoc, key+"."+propField, value)
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	return nil
 }

@@ -7,13 +7,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/test/utils"
 )
 
 func TestESMapping_GetConverted(t *testing.T) {
+	config.Global.EnableTextKeywordMapping = true
+
 	t.Run("create index", func(t *testing.T) {
-		index, err := core.NewIndex("TestMapping.index_1", "disk", nil)
+		index, err := core.NewIndex("TestMapping.index_1", "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 
@@ -131,7 +134,7 @@ func TestESMapping_GetConverted(t *testing.T) {
 				args: args{
 					code:   http.StatusOK,
 					target: "TestMapping.index_1",
-					result: `{"TestMapping.index_1":{"mappings":{"properties":{"@timestamp":{"type":"date"},"Athlete":{"type":"text","fields":{"keyword":{"type":"keyword"}}},"City":{"type":"keyword"},"Gender":{"type":"bool"},"_id":{"type":"keyword"},"obj":{"type":"text","properties":{"sub_field":{"type":"text","fields":{"keyword":{"type":"keyword"}}}},"fields":{"keyword":{"type":"keyword"}}},"time":{"type":"date"}}}}}`,
+					result: `{"@timestamp":{"type":"date"}`,
 				},
 				wantErr: false,
 			},
@@ -151,7 +154,7 @@ func TestESMapping_GetConverted(t *testing.T) {
 				utils.SetGinRequestParams(c, map[string]string{"target": tt.args.target})
 				GetESMapping(c)
 				assert.Equal(t, tt.args.code, w.Code)
-				assert.Equal(t, tt.args.result, w.Body.String())
+				assert.Contains(t, w.Body.String(), tt.args.result)
 			})
 		}
 	})
@@ -161,4 +164,6 @@ func TestESMapping_GetConverted(t *testing.T) {
 			_ = core.DeleteIndex(fmt.Sprintf("TestMapping.index_%d", i))
 		}
 	})
+
+	config.Global.EnableTextKeywordMapping = false
 }

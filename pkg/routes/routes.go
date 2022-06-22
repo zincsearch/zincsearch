@@ -147,7 +147,7 @@ func SetRoutes(r *gin.Engine) {
 	r.PUT("/es/:target", AuthMiddleware, index.CreateES)
 	r.HEAD("/es/:target", AuthMiddleware, index.Exist)
 
-	r.GET("/es/:target/_mapping", AuthMiddleware, index.GetMapping)
+	r.GET("/es/:target/_mapping", AuthMiddleware, index.GetESMapping)
 	r.PUT("/es/:target/_mapping", AuthMiddleware, index.SetMapping)
 
 	r.GET("/es/:target/_settings", AuthMiddleware, index.GetSettings)
