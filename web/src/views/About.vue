@@ -7,31 +7,31 @@
       <div class="row items-center q-mb-md">
         <div class="col-sm-3 col-12">Version</div>
         <div class="col-sm-9 col-12 q-mb-none q-pl-md q-pt-sm q-pb-sm">
-          {{ version.Version }}
+          {{ version.version }}
         </div>
       </div>
       <div class="row items-center q-mb-md">
         <div class="col-sm-3 col-12">Build</div>
         <div class="col-sm-9 col-12 q-mb-none q-pl-md q-pt-sm q-pb-sm">
-          {{ version.Build }}
+          {{ version.build }}
         </div>
       </div>
       <div class="row items-center q-mb-md">
         <div class="col-sm-3 col-12">CommitHash</div>
         <div class="col-sm-9 col-12 q-mb-none q-pl-md q-pt-sm q-pb-sm">
-          {{ version.CommitHash }}
+          {{ version.commit_hash }}
         </div>
       </div>
       <div class="row items-center q-mb-md">
         <div class="col-sm-3 col-12">Branch</div>
         <div class="col-sm-9 col-12 q-mb-none q-pl-md q-pt-sm q-pb-sm">
-          {{ version.Branch }}
+          {{ version.branch }}
         </div>
       </div>
       <div class="row items-center q-mb-md">
         <div class="col-sm-3 col-12">BuildDate</div>
         <div class="col-sm-9 col-12 q-mb-none q-pl-md q-pt-sm q-pb-sm">
-          {{ version.BuildDate }}
+          {{ version.build_date }}
         </div>
       </div>
     </div>

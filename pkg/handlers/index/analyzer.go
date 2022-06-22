@@ -29,18 +29,17 @@ import (
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
+// @Id Analyze
 // @Summary Analyze
 // @Tags    Index
-// @Param   target path  string  false "Index"
 // @Param   query  body  object  true  "Query"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} meta.HTTPResponse
+// @Success 200 {object} AnalyzeResponse
+// @Failure 400 {object} meta.HTTPResponseError
 // @Router /api/_analyze [post]
-// @Router /api/:target/_analyze [post]
 func Analyze(c *gin.Context) {
-	var query analyzeRequest
+	var query AnalyzeRequest
 	if err := c.BindJSON(&query); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -51,7 +50,7 @@ func Analyze(c *gin.Context) {
 		// use index analyzer
 		index, exists := core.GetIndex(indexName)
 		if !exists {
-			c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index " + indexName + " does not exists"})
+			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
 			return
 		}
 		if query.Filed != "" && query.Analyzer == "" {
@@ -71,7 +70,7 @@ func Analyze(c *gin.Context) {
 			if query.Analyzer == "" {
 				ana = new(analysis.Analyzer)
 			} else {
-				c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "analyzer " + query.Analyzer + " does not exists"})
+				c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "analyzer " + query.Analyzer + " does not exists"})
 				return
 			}
 		}
@@ -82,7 +81,7 @@ func Analyze(c *gin.Context) {
 			if query.Analyzer == "" {
 				ana = new(analysis.Analyzer)
 			} else {
-				c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "analyzer " + query.Analyzer + " does not exists"})
+				c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "analyzer " + query.Analyzer + " does not exists"})
 				return
 			}
 		}
@@ -123,17 +122,28 @@ func Analyze(c *gin.Context) {
 	}
 
 	if ana.Tokenizer == nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "analyzer need set a tokenizer"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "analyzer need set a tokenizer"})
 		return
 	}
 
 	tokens := ana.Analyze([]byte(query.Text))
-	ret := make([]gin.H, 0, len(tokens))
+	ret := AnalyzeResponse{}
+	ret.Tokens = make([]AnalyzeResponseToken, 0, len(tokens))
 	for _, token := range tokens {
-		ret = append(ret, formatToken(token))
+		ret.Tokens = append(ret.Tokens, formatToken(token))
 	}
-	c.JSON(http.StatusOK, gin.H{"tokens": ret})
+	c.JSON(http.StatusOK, ret)
 }
+
+// @Id AnalyzeIndex
+// @Summary Analyze
+// @Tags    Index
+// @Param   index  path  string  true  "Index"
+// @Param   query  body  object  true  "Query"
+// @Success 200 {object} AnalyzeResponse
+// @Failure 400 {object} meta.HTTPResponseError
+// @Router /api/{index}/_analyze [post]
+func AnalyzeIndexForSDK() {}
 
 func parseTokenizer(data interface{}) ([]analysis.Tokenizer, error) {
 	if data == nil {
@@ -264,14 +274,14 @@ func parseCharFilter(data interface{}) ([]analysis.CharFilter, error) {
 	return chars, nil
 }
 
-func formatToken(token *analysis.Token) gin.H {
-	return gin.H{
-		"token":        string(token.Term),
-		"start_offset": token.Start,
-		"end_offset":   token.End,
-		"position":     token.PositionIncr,
-		"type":         formatTokenType(token.Type),
-		"keyword":      token.KeyWord,
+func formatToken(token *analysis.Token) AnalyzeResponseToken {
+	return AnalyzeResponseToken{
+		Token:       string(token.Term),
+		StartOffset: token.Start,
+		EndOffset:   token.End,
+		Position:    token.PositionIncr,
+		Type:        formatTokenType(token.Type),
+		Keyword:     token.KeyWord,
 	}
 }
 
@@ -298,7 +308,7 @@ func formatTokenType(typ analysis.TokenType) string {
 	}
 }
 
-type analyzeRequest struct {
+type AnalyzeRequest struct {
 	Analyzer    string      `json:"analyzer"`
 	Filed       string      `json:"field"`
 	Text        string      `json:"text"`
@@ -306,4 +316,17 @@ type analyzeRequest struct {
 	CharFilter  interface{} `json:"char_filter"`
 	TokenFilter interface{} `json:"token_filter"`
 	Filter      interface{} `json:"filter"` // compatibility with es, alias for TokenFilter
+}
+
+type AnalyzeResponse struct {
+	Tokens []AnalyzeResponseToken `json:"tokens"`
+}
+
+type AnalyzeResponseToken struct {
+	Token       string `json:"token"`
+	StartOffset int    `json:"start_offset"`
+	EndOffset   int    `json:"end_offset"`
+	Position    int    `json:"position"`
+	Type        string `json:"type"`
+	Keyword     bool   `json:"keyword"`
 }

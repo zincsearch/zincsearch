@@ -28,31 +28,32 @@ import (
 	"github.com/zinclabs/zinc/pkg/uquery/mappings"
 )
 
+// @Id CreateIndex
 // @Summary Create index
 // @Tags    Index
 // @Produce json
 // @Param   index body meta.IndexSimple true "Index data"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} meta.HTTPResponse
+// @Success 200 {object} meta.HTTPResponseIndex
+// @Failure 400 {object} meta.HTTPResponseError
 // @Router /api/index [post]
 func Create(c *gin.Context) {
 	var newIndex meta.IndexSimple
 	if err := c.BindJSON(&newIndex); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
 	indexName := c.Param("target")
 	err := CreateIndexWorker(&newIndex, indexName)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":      "ok",
-		"index":        newIndex.Name,
-		"storage_type": newIndex.StorageType,
+	c.JSON(http.StatusOK, meta.HTTPResponseIndex{
+		Message:     "ok",
+		Index:       newIndex.Name,
+		StorageType: newIndex.StorageType,
 	})
 }
 

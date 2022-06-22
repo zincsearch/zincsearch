@@ -16,9 +16,36 @@
 package meta
 
 type HTTPResponse struct {
-	Message string      `json:"message,omitempty"`
-	Error   string      `json:"error,omitempty"`
-	ID      string      `json:"id,omitempty"`
-	Index   string      `json:"index,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
+	Message string `json:"message"`
+}
+
+type HTTPResponseID struct {
+	Message string `json:"message"`
+	ID      string `json:"id"`
+}
+
+type HTTPResponseDocument struct {
+	Message string `json:"message"`
+	Index   string `json:"index"`
+	ID      string `json:"id,omitempty"`
+}
+
+type HTTPResponseIndex struct {
+	Message     string `json:"message"`
+	Index       string `json:"index"`
+	StorageType string `json:"storage_type,omitempty"`
+}
+
+type HTTPResponseTemplate struct {
+	Message  string `json:"message"`
+	Template string `json:"template"`
+}
+
+type HTTPResponseRecordCount struct {
+	Message     string `json:"message"`
+	RecordCount int64  `json:"record_count"`
+}
+
+type HTTPResponseError struct {
+	Error string `json:"error"`
 }

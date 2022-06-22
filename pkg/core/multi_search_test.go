@@ -99,7 +99,13 @@ func TestMultiSearch(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := MultiSearch([]string{tt.args.indexName}, tt.args.query)
+			var err error
+			var got *meta.SearchResponse
+			if tt.args.indexName == "" {
+				got, err = MultiSearch(nil, tt.args.query)
+			} else {
+				got, err = MultiSearch([]string{tt.args.indexName}, tt.args.query)
+			}
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -115,4 +121,17 @@ func TestMultiSearch(t *testing.T) {
 			assert.NoError(t, err)
 		}
 	})
+}
+
+func TestIsMatchIndex(t *testing.T) {
+	ret := isMatchIndex("abc", "a") //  false
+	assert.False(t, ret)
+	ret = isMatchIndex("abc", "a*") // true
+	assert.True(t, ret)
+	ret = isMatchIndex("abc", "*bc") // true
+	assert.True(t, ret)
+	ret = isMatchIndex("abc", "bc") // false
+	assert.False(t, ret)
+	ret = isMatchIndex("abc", "abc") // true
+	assert.True(t, ret)
 }

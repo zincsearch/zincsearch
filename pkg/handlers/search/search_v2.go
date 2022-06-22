@@ -32,21 +32,22 @@ import (
 
 // SearchDSL searches the index for the given http request from end user
 
+// @Id Search
 // @Summary Search V2 DSL for compatible ES
 // @Tags    Search
 // @Produce json
-// @Param   target path  string         true  "Index"
-// @Param   query  body  meta.ZincQuery true  "Query"
+// @Param   index  path  string  true  "Index"
+// @Param   query  body  meta.ZincQueryForSDK true  "Query"
 // @Success 200 {object} meta.SearchResponse
-// @Failure 400 {object} meta.HTTPResponse
-// @Router /es/:target/_search [post]
+// @Failure 400 {object} meta.HTTPResponseError
+// @Router /es/{index}/_search [post]
 func SearchDSL(c *gin.Context) {
 	indexName := c.Param("target")
 
 	query := &meta.ZincQuery{Size: 10}
 	if err := c.BindJSON(query); err != nil {
 		log.Printf("handlers.search.searchDSL: %s", err.Error())
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -69,15 +70,14 @@ func SearchDSL(c *gin.Context) {
 
 // MultipleSearch like bulk searches
 
+// @Id MSearch
 // @Summary Search V2 MultipleSearch for compatible ES
 // @Tags    Search
 // @Produce json
-// @Param   target path  string  false "Index"
-// @Param   query  body  object  true  "Query"
+// @Param   query  body  string  true  "Query"
 // @Success 200 {object} meta.SearchResponse
-// @Failure 400 {object} meta.HTTPResponse
+// @Failure 400 {object} meta.HTTPResponseError
 // @Router /es/_msearch [post]
-// @Router /es/:target/_msearch [post]
 func MultipleSearch(c *gin.Context) {
 	indexName := c.Param("target")
 	defaultIndexNames := make([]string, 0)

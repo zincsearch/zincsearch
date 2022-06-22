@@ -26,31 +26,32 @@ import (
 
 // Delete deletes a zinc index and its associated data. Be careful using thus as you ca't undo this action.
 
+// @Id DeleteIndex
 // @Summary Delete index
 // @Tags    Index
-// @Param   target path  string  true  "Index"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} meta.HTTPResponse
-// @Failure 500 {object} meta.HTTPResponse
-// @Router /api/index/:target [delete]
+// @Param   index  path  string  true  "Index"
+// @Success 200 {object} meta.HTTPResponseIndex
+// @Failure 400 {object} meta.HTTPResponseError
+// @Failure 500 {object} meta.HTTPResponseError
+// @Router /api/index/{index} [delete]
 func Delete(c *gin.Context) {
 	indexName := c.Param("target")
 
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
 		return
 	}
 
 	// delete meta
 	if err := core.DeleteIndex(index.Name); err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "deleted",
-		"index":   index.Name,
-		"storage": index.StorageType,
+	c.JSON(http.StatusOK, meta.HTTPResponseIndex{
+		Message:     "deleted",
+		Index:       index.Name,
+		StorageType: index.StorageType,
 	})
 }

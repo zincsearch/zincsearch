@@ -25,6 +25,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// @Id ListIndexes
 // @Summary List indexes
 // @Tags    Index
 // @Produce json

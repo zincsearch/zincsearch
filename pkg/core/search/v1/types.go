@@ -31,6 +31,19 @@ type ZincQuery struct {
 	Source       interface{}                  `json:"_source"`
 }
 
+type ZincQueryForSDK struct {
+	// SearchType is the type of search to perform. Can be match, match_phrase, query_string, etc
+	SearchType   string                       `json:"search_type"`
+	MaxResults   int                          `json:"max_results"`
+	From         int                          `json:"from"`
+	Explain      bool                         `json:"explain"`
+	Highlight    QueryHighlight               `json:"highlight"`
+	Query        QueryParams                  `json:"query"`
+	Aggregations map[string]AggregationParams `json:"aggs"`
+	SortFields   []string                     `json:"sort_fields"`
+	Source       []string                     `json:"_source"`
+}
+
 type QueryParams struct {
 	Boost     int        `json:"boost"`
 	Term      string     `json:"term"`

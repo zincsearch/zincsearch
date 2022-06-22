@@ -26,18 +26,19 @@ import (
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 )
 
+// @Id GetSettings
 // @Summary Get index settings
 // @Tags    Index
 // @Produce json
-// @Param   target path  string  true  "Index"
-// @Success 200 {object} map[string]meta.IndexSettings
-// @Failure 400 {object} meta.HTTPResponse
-// @Router /api/:target/_settings [get]
+// @Param   index path  string  true  "Index"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} meta.HTTPResponseError
+// @Router /api/{index}/_settings [get]
 func GetSettings(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
 		return
 	}
 
@@ -49,25 +50,26 @@ func GetSettings(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{index.Name: gin.H{"settings": settings}})
 }
 
+// @Id SetSettings
 // @Summary Set index Settings
 // @Tags    Index
 // @Produce json
-// @Param   target   path  string             true  "Index"
+// @Param   index    path  string             true  "Index"
 // @Param   settings body  meta.IndexSettings true  "Settings"
 // @Success 200 {object} meta.HTTPResponse
-// @Failure 400 {object} meta.HTTPResponse
-// @Failure 500 {object} meta.HTTPResponse
-// @Router /api/:target/_settings [put]
+// @Failure 400 {object} meta.HTTPResponseError
+// @Failure 500 {object} meta.HTTPResponseError
+// @Router /api/{index}/_settings [put]
 func SetSettings(c *gin.Context) {
 	indexName := c.Param("target")
 	if indexName == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index.name should be not empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index.name should be not empty"})
 		return
 	}
 
 	var settings *meta.IndexSettings
 	if err := c.BindJSON(&settings); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -78,7 +80,7 @@ func SetSettings(c *gin.Context) {
 
 	analyzers, err := zincanalysis.RequestAnalyzer(settings.Analysis)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -89,12 +91,12 @@ func SetSettings(c *gin.Context) {
 			index.Settings.NumberOfReplicas = settings.NumberOfReplicas
 		}
 		if settings.Analysis != nil && len(settings.Analysis.Analyzer) > 0 {
-			c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "can't update analyzer for existing index"})
+			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "can't update analyzer for existing index"})
 			return
 		}
 		// store index
 		if err := core.StoreIndex(index); err != nil {
-			c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 			return
 		}
 
@@ -108,7 +110,7 @@ func SetSettings(c *gin.Context) {
 	}
 	index, err = core.NewIndex(indexName, "", defaultSearchAnalyzer)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -120,7 +122,7 @@ func SetSettings(c *gin.Context) {
 
 	// store index
 	if err := core.StoreIndex(index); err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 

@@ -67,14 +67,12 @@ func TermQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Que
 
 	prop, _ := mappings.GetProperty(field)
 	switch prop.Type {
-	case "text", "keyword":
-		return TermQueryText(field, value)
 	case "numeric":
 		return TermQueryNumeric(field, value)
 	case "bool":
 		return TermQueryBool(field, value)
 	default:
-		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] doesn't support values of type: %T", value.Value))
+		return TermQueryText(field, value)
 	}
 }
 
