@@ -22,6 +22,8 @@ const (
 	TextValuesSource
 	NumericValueSource
 	NumericValuesSource
+	BooleanValueSource
+	BooleanValuesSource
 )
 
 type SearchAggregation interface {
