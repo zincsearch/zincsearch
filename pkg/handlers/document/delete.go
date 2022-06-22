@@ -25,36 +25,37 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// @Id DeleteDocument
 // @Summary Delete document
 // @Tags    Document
-// @Param   target path  string  true  "Index"
+// @Param   index  path  string  true  "Index"
 // @Param   id     path  string  true  "ID"
-// @Success 200 {object} meta.HTTPResponse
-// @Failure 400 {object} meta.HTTPResponse
-// @Failure 500 {object} meta.HTTPResponse
-// @Router /api/:target/_doc/:id [delete]
+// @Success 200 {object} meta.HTTPResponseDocument
+// @Failure 400 {object} meta.HTTPResponseError
+// @Failure 500 {object} meta.HTTPResponseError
+// @Router /api/{index}/_doc/{id} [delete]
 func Delete(c *gin.Context) {
 	indexName := c.Param("target")
 	docID := c.Param("id")
 
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index does not exists"})
 		return
 	}
 
 	bdoc := bluge.NewDocument(docID)
 	writers, err := index.GetWriters()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 	for _, w := range writers {
 		err = w.Delete(bdoc.ID())
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 			return
 		}
 	}
-	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "deleted", Index: indexName, ID: docID})
+	c.JSON(http.StatusOK, meta.HTTPResponseDocument{Message: "deleted", Index: indexName, ID: docID})
 }

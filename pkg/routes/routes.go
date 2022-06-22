@@ -135,8 +135,8 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/es/:target/_msearch", AuthMiddleware, search.MultipleSearch)
 
 	r.GET("/es/_index_template", AuthMiddleware, index.ListTemplate)
-	r.POST("/es/_index_template", AuthMiddleware, index.UpdateTemplate)
-	r.PUT("/es/_index_template/:target", AuthMiddleware, index.UpdateTemplate)
+	r.POST("/es/_index_template", AuthMiddleware, index.CreateTemplate)
+	r.PUT("/es/_index_template/:target", AuthMiddleware, index.CreateTemplate)
 	r.GET("/es/_index_template/:target", AuthMiddleware, index.GetTemplate)
 	r.HEAD("/es/_index_template/:target", AuthMiddleware, index.GetTemplate)
 	r.DELETE("/es/_index_template/:target", AuthMiddleware, index.DeleteTemplate)

@@ -25,16 +25,15 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-// @Summary Create update document
+// @Id IndexDocument
+// @Summary Create or update document
 // @Tags    Document
-// @Param   target    path  string  true  "Index"
-// @Param   id        path  string  false "ID"
+// @Param   index     path  string  true  "Index"
 // @Param   document  body  map[string]interface{}  true  "Document"
-// @Success 200 {object} meta.HTTPResponse
-// @Failure 400 {object} meta.HTTPResponse
-// @Failure 500 {object} meta.HTTPResponse
-// @Router /api/:target/_doc [post]
-// @Router /api/:target/_doc/:id [put]
+// @Success 200 {object} meta.HTTPResponseID
+// @Failure 400 {object} meta.HTTPResponseError
+// @Failure 500 {object} meta.HTTPResponseError
+// @Router /api/{index}/_doc [post]
 func CreateUpdate(c *gin.Context) {
 	indexName := c.Param("target")
 	docID := c.Param("id") // ID for the document to be updated provided in URL path
@@ -42,7 +41,7 @@ func CreateUpdate(c *gin.Context) {
 	var err error
 	var doc map[string]interface{}
 	if err = c.BindJSON(&doc); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -61,9 +60,9 @@ func CreateUpdate(c *gin.Context) {
 	index, exists := core.GetIndex(indexName)
 	if !exists {
 		// Create a new index with disk storage as default
-		index, err = core.NewIndex(indexName, "disk", nil)
+		index, err = core.NewIndex(indexName, "", nil)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 			return
 		}
 		// store index
@@ -72,12 +71,24 @@ func CreateUpdate(c *gin.Context) {
 
 	err = index.CreateDocument(docID, doc, update)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
 	// check shards
 	_ = index.CheckShards()
 
-	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok", ID: docID})
+	c.JSON(http.StatusOK, meta.HTTPResponseID{Message: "ok", ID: docID})
 }
+
+// @Id IndexDocumentWithID
+// @Summary Create or update document with id
+// @Tags    Document
+// @Param   index     path  string  true  "Index"
+// @Param   id        path  string  true  "ID"
+// @Param   document  body  map[string]interface{}  true  "Document"
+// @Success 200 {object} meta.HTTPResponseID
+// @Failure 400 {object} meta.HTTPResponseError
+// @Failure 500 {object} meta.HTTPResponseError
+// @Router /api/{index}/_doc/{id} [put]
+func CreateWithIDForSDK() {}

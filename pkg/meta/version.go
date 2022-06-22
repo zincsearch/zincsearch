@@ -40,12 +40,26 @@ var (
 )
 
 // GetVersion returns the version of the program
+
+// @Id Version
+// @Summary Get version
+// @Produce json
+// @Success 200 {object} ResponseVersion
+// @Router /version [get]
 func GetVersion(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"Version":    Version,
-		"Build":      Build,
-		"CommitHash": CommitHash,
-		"Branch":     Branch,
-		"BuildDate":  BuildDate,
+	c.JSON(http.StatusOK, ResponseVersion{
+		Version:    Version,
+		Build:      Build,
+		CommitHash: CommitHash,
+		Branch:     Branch,
+		BuildDate:  BuildDate,
 	})
+}
+
+type ResponseVersion struct {
+	Version    string `json:"version"`
+	Build      string `json:"build"`
+	CommitHash string `json:"commit_hash"`
+	Branch     string `json:"branch"`
+	BuildDate  string `json:"build_date"`
 }

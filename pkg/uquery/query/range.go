@@ -66,12 +66,8 @@ func RangeQueryNumeric(field string, query map[string]interface{}, mappings *met
 			value.LT, _ = zutils.ToFloat64(v)
 		case "lte":
 			value.LTE, _ = zutils.ToFloat64(v)
-		case "format":
-			value.Format = v.(string)
-		case "time_zone":
-			value.TimeZone = v.(string)
 		case "boost":
-			value.Boost = v.(float64)
+			value.Boost, _ = zutils.ToFloat64(v)
 		default:
 			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[range] unknown field [%s]", k))
 		}
@@ -122,11 +118,11 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 		case "lte":
 			value.LTE = v
 		case "format":
-			value.Format = v.(string)
+			value.Format, _ = zutils.ToString(v)
 		case "time_zone":
-			value.TimeZone = v.(string)
+			value.TimeZone, _ = zutils.ToString(v)
 		case "boost":
-			value.Boost = v.(float64)
+			value.Boost, _ = zutils.ToFloat64(v)
 		default:
 			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[range] unknown field [%s]", k))
 		}
@@ -158,9 +154,11 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 	maxInclusive := false
 	if value.GT != nil {
 		if format == "epoch_millis" {
-			min = time.UnixMilli(int64(value.GT.(float64)))
+			v, _ := zutils.ToFloat64(value.GT)
+			min = time.UnixMilli(int64(v))
 		} else {
-			min, err = time.ParseInLocation(format, value.GT.(string), timeZone)
+			v, _ := zutils.ToString(value.GT)
+			min, err = time.ParseInLocation(format, v, timeZone)
 		}
 		if err != nil {
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.gt format err %s", field, err.Error()))
@@ -169,9 +167,11 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 	if value.GTE != nil {
 		minInclusive = true
 		if format == "epoch_millis" {
-			min = time.UnixMilli(int64(value.GTE.(float64)))
+			v, _ := zutils.ToFloat64(value.GTE)
+			min = time.UnixMilli(int64(v))
 		} else {
-			min, err = time.ParseInLocation(format, value.GTE.(string), timeZone)
+			v, _ := zutils.ToString(value.GTE)
+			min, err = time.ParseInLocation(format, v, timeZone)
 		}
 		if err != nil {
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.gte format err %s", field, err.Error()))
@@ -179,9 +179,11 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 	}
 	if value.LT != nil {
 		if format == "epoch_millis" {
-			max = time.UnixMilli(int64(value.LT.(float64)))
+			v, _ := zutils.ToFloat64(value.LT)
+			max = time.UnixMilli(int64(v))
 		} else {
-			max, err = time.ParseInLocation(format, value.LT.(string), timeZone)
+			v, _ := zutils.ToString(value.LT)
+			max, err = time.ParseInLocation(format, v, timeZone)
 		}
 		if err != nil {
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.lt format err %s", field, err.Error()))
@@ -190,9 +192,11 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 	if value.LTE != nil {
 		maxInclusive = true
 		if format == "epoch_millis" {
-			max = time.UnixMilli(int64(value.LTE.(float64)))
+			v, _ := zutils.ToFloat64(value.LTE)
+			max = time.UnixMilli(int64(v))
 		} else {
-			max, err = time.ParseInLocation(format, value.LTE.(string), timeZone)
+			v, _ := zutils.ToString(value.LTE)
+			max, err = time.ParseInLocation(format, v, timeZone)
 		}
 		if err != nil {
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s range.lte format err %s", field, err.Error()))

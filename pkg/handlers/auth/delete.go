@@ -24,18 +24,19 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// @Id DeleteUser
 // @Summary Delete user
 // @Tags    User
 // @Param   id  path  string  true  "User id"
-// @Success 200 {object} meta.HTTPResponse
-// @Success 500 {object} meta.HTTPResponse
-// @Router /api/user/:id [delete]
+// @Success 200 {object} meta.HTTPResponseID
+// @Success 500 {object} meta.HTTPResponseError
+// @Router /api/user/{id} [delete]
 func Delete(c *gin.Context) {
 	id := c.Param("id")
 	err := auth.DeleteUser(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "deleted", ID: id})
+	c.JSON(http.StatusOK, meta.HTTPResponseID{Message: "deleted", ID: id})
 }

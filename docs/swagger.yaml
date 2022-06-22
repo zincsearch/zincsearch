@@ -61,6 +61,28 @@ definitions:
       update_at:
         type: string
     type: object
+  index.AnalyzeResponse:
+    properties:
+      tokens:
+        items:
+          $ref: '#/definitions/index.AnalyzeResponseToken'
+        type: array
+    type: object
+  index.AnalyzeResponseToken:
+    properties:
+      end_offset:
+        type: integer
+      keyword:
+        type: boolean
+      position:
+        type: integer
+      start_offset:
+        type: integer
+      token:
+        type: string
+      type:
+        type: string
+    type: object
   meta.AggregationAutoDateHistogram:
     properties:
       buckets:
@@ -268,6 +290,32 @@ definitions:
         description: options for compatible
         type: string
     type: object
+  meta.BoolQueryForSDK:
+    properties:
+      filter:
+        description: query, [query1, query2]
+        items:
+          $ref: '#/definitions/meta.QueryForSDK'
+        type: array
+      minimum_should_match:
+        description: only for should
+        type: number
+      must:
+        description: query, [query1, query2]
+        items:
+          $ref: '#/definitions/meta.QueryForSDK'
+        type: array
+      must_not:
+        description: query, [query1, query2]
+        items:
+          $ref: '#/definitions/meta.QueryForSDK'
+        type: array
+      should:
+        description: query, [query1, query2]
+        items:
+          $ref: '#/definitions/meta.QueryForSDK'
+        type: array
+    type: object
   meta.DateRange:
     properties:
       from:
@@ -275,18 +323,69 @@ definitions:
       to:
         type: string
     type: object
+  meta.ExistsQuery:
+    properties:
+      field:
+        type: string
+    type: object
+  meta.FuzzyQuery:
+    properties:
+      boost:
+        type: number
+      fuzziness:
+        description: auto, 1,2,3,n
+      prefix_length:
+        type: number
+      value:
+        type: string
+    type: object
   meta.HTTPResponse:
     properties:
-      code:
-        type: integer
-      data: {}
-      error:
+      message:
         type: string
+    type: object
+  meta.HTTPResponseDocument:
+    properties:
       id:
         type: string
       index:
         type: string
       message:
+        type: string
+    type: object
+  meta.HTTPResponseError:
+    properties:
+      error:
+        type: string
+    type: object
+  meta.HTTPResponseID:
+    properties:
+      id:
+        type: string
+      message:
+        type: string
+    type: object
+  meta.HTTPResponseIndex:
+    properties:
+      index:
+        type: string
+      message:
+        type: string
+      storage_type:
+        type: string
+    type: object
+  meta.HTTPResponseRecordCount:
+    properties:
+      message:
+        type: string
+      record_count:
+        type: integer
+    type: object
+  meta.HTTPResponseTemplate:
+    properties:
+      message:
+        type: string
+      template:
         type: string
     type: object
   meta.Highlight:
@@ -345,6 +444,13 @@ definitions:
         type: string
       to:
         type: string
+    type: object
+  meta.IdsQuery:
+    properties:
+      values:
+        items:
+          type: string
+        type: array
     type: object
   meta.IndexAnalysis:
     properties:
@@ -423,6 +529,84 @@ definitions:
           $ref: '#/definitions/meta.Property'
         type: object
     type: object
+  meta.MatchAllQuery:
+    type: object
+  meta.MatchBoolPrefixQuery:
+    properties:
+      analyzer:
+        type: string
+      boost:
+        type: number
+      query:
+        type: string
+    type: object
+  meta.MatchNoneQuery:
+    type: object
+  meta.MatchPhrasePrefixQuery:
+    properties:
+      analyzer:
+        type: string
+      boost:
+        type: number
+      query:
+        type: string
+    type: object
+  meta.MatchPhraseQuery:
+    properties:
+      analyzer:
+        type: string
+      boost:
+        type: number
+      query:
+        type: string
+    type: object
+  meta.MatchQuery:
+    properties:
+      analyzer:
+        type: string
+      boost:
+        type: number
+      fuzziness:
+        description: auto, 1,2,3,n
+      operator:
+        description: or(default), and
+        type: string
+      prefix_length:
+        type: number
+      query:
+        type: string
+    type: object
+  meta.MultiMatchQuery:
+    properties:
+      analyzer:
+        type: string
+      boost:
+        type: number
+      fields:
+        items:
+          type: string
+        type: array
+      minimum_should_match:
+        type: number
+      operator:
+        description: or(default), and
+        type: string
+      query:
+        type: string
+      type:
+        description: best_fields(default), most_fields, cross_fields, phrase, phrase_prefix,
+          bool_prefix
+        type: string
+    type: object
+  meta.PrefixQuery:
+    properties:
+      boost:
+        type: number
+      value:
+        description: You can speed up prefix queries using the index_prefixes mapping
+          parameter.
+        type: string
+    type: object
   meta.Property:
     properties:
       aggregatable:
@@ -446,12 +630,157 @@ definitions:
         description: text, keyword, date, numeric, boolean, geo_point
         type: string
     type: object
+  meta.QueryForSDK:
+    properties:
+      bool:
+        $ref: '#/definitions/meta.BoolQueryForSDK'
+        description: .
+      exists:
+        $ref: '#/definitions/meta.ExistsQuery'
+        description: .
+      fuzzy:
+        additionalProperties:
+          $ref: '#/definitions/meta.FuzzyQuery'
+        description: simple, PrefixQuery
+        type: object
+      ids:
+        $ref: '#/definitions/meta.IdsQuery'
+        description: .
+      match:
+        additionalProperties:
+          $ref: '#/definitions/meta.MatchQuery'
+        description: simple, MatchQuery
+        type: object
+      match_all:
+        $ref: '#/definitions/meta.MatchAllQuery'
+        description: just set or null
+      match_bool_prefix:
+        additionalProperties:
+          $ref: '#/definitions/meta.MatchBoolPrefixQuery'
+        description: simple, MatchBoolPrefixQuery
+        type: object
+      match_none:
+        $ref: '#/definitions/meta.MatchNoneQuery'
+        description: just set or null
+      match_phrase:
+        additionalProperties:
+          $ref: '#/definitions/meta.MatchPhraseQuery'
+        description: simple, MatchPhraseQuery
+        type: object
+      match_phrase_prefix:
+        additionalProperties:
+          $ref: '#/definitions/meta.MatchPhrasePrefixQuery'
+        description: simple, MatchPhrasePrefixQuery
+        type: object
+      multi_match:
+        $ref: '#/definitions/meta.MultiMatchQuery'
+        description: .
+      prefix:
+        additionalProperties:
+          $ref: '#/definitions/meta.PrefixQuery'
+        description: .
+        type: object
+      query_string:
+        $ref: '#/definitions/meta.QueryStringQuery'
+        description: .
+      range:
+        additionalProperties:
+          $ref: '#/definitions/meta.RangeQueryForSDK'
+        description: simple, FuzzyQuery
+        type: object
+      regexp:
+        additionalProperties:
+          $ref: '#/definitions/meta.RegexpQuery'
+        description: simple, FuzzyQuery
+        type: object
+      simple_query_string:
+        $ref: '#/definitions/meta.SimpleQueryStringQuery'
+        description: .
+      term:
+        additionalProperties:
+          $ref: '#/definitions/meta.TermQueryForSDK'
+        description: simple, TermQuery
+        type: object
+      terms:
+        additionalProperties:
+          $ref: '#/definitions/meta.TermsQuery'
+        description: .
+        type: object
+      wildcard:
+        additionalProperties:
+          $ref: '#/definitions/meta.WildcardQuery'
+        description: simple, WildcardQuery
+        type: object
+    type: object
+  meta.QueryStringQuery:
+    properties:
+      analyzer:
+        type: string
+      boost:
+        type: number
+      default_field:
+        type: string
+      default_operator:
+        description: or(default), and
+        type: string
+      fields:
+        items:
+          type: string
+        type: array
+      query:
+        type: string
+    type: object
   meta.Range:
     properties:
       from:
         type: number
       to:
         type: number
+    type: object
+  meta.RangeQueryForSDK:
+    properties:
+      boost:
+        type: number
+      format:
+        description: Date format used to convert date values in the query.
+        type: string
+      gt:
+        description: string, float64
+        type: string
+      gte:
+        description: string, float64
+        type: string
+      lt:
+        description: string, float64
+        type: string
+      lte:
+        description: string, float64
+        type: string
+      time_zone:
+        description: used to convert date values in the query to UTC.
+        type: string
+    type: object
+  meta.RegexpQuery:
+    properties:
+      boost:
+        type: number
+      flags:
+        type: string
+      value:
+        type: string
+    type: object
+  meta.ResponseVersion:
+    properties:
+      branch:
+        type: string
+      build:
+        type: string
+      build_date:
+        type: string
+      commit_hash:
+        type: string
+      version:
+        type: string
     type: object
   meta.SearchResponse:
     properties:
@@ -482,6 +811,24 @@ definitions:
       total:
         type: integer
     type: object
+  meta.SimpleQueryStringQuery:
+    properties:
+      all_fields:
+        type: boolean
+      analyzer:
+        type: string
+      boost:
+        type: number
+      default_operator:
+        description: or(default), and
+        type: string
+      fields:
+        items:
+          type: string
+        type: array
+      query:
+        type: string
+    type: object
   meta.Template:
     properties:
       index_template:
@@ -495,6 +842,18 @@ definitions:
         $ref: '#/definitions/meta.Mappings'
       settings:
         $ref: '#/definitions/meta.IndexSettings'
+    type: object
+  meta.TermQueryForSDK:
+    properties:
+      boost:
+        type: number
+      case_insensitive:
+        type: boolean
+      value:
+        type: string
+    type: object
+  meta.TermsQuery:
+    additionalProperties: true
     type: object
   meta.Total:
     properties:
@@ -519,10 +878,20 @@ definitions:
       updated_at:
         type: string
     type: object
-  meta.ZincQuery:
+  meta.WildcardQuery:
+    properties:
+      boost:
+        type: number
+      value:
+        type: string
+    type: object
+  meta.ZincQueryForSDK:
     properties:
       _source:
         description: true, false, ["field1", "field2.*"]
+        items:
+          type: string
+        type: array
       aggs:
         additionalProperties:
           $ref: '#/definitions/meta.Aggregations'
@@ -531,16 +900,23 @@ definitions:
         type: boolean
       fields:
         description: '["field1", "field2.*", {"field": "fieldName", "format": "epoch_millis"}]'
+        items:
+          type: string
+        type: array
       from:
         type: integer
       highlight:
         $ref: '#/definitions/meta.Highlight'
-      query: {}
+      query:
+        $ref: '#/definitions/meta.QueryForSDK'
       size:
         type: integer
       sort:
         description: '"_sorce", ["+Year","-Year", {"Year": "desc"}, "Date": {"order":
           "asc"", "format": "yyyy-MM-dd"}}"}]'
+        items:
+          type: string
+        type: array
       timeout:
         type: integer
       track_total_hits:
@@ -680,9 +1056,12 @@ definitions:
         description: Count of documents returned
         type: integer
     type: object
-  v1.ZincQuery:
+  v1.ZincQueryForSDK:
     properties:
-      _source: {}
+      _source:
+        items:
+          type: string
+        type: array
       aggs:
         additionalProperties:
           $ref: '#/definitions/v1.AggregationParams'
@@ -717,15 +1096,12 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
   title: Zinc Search engine API
-  version: "1.0"
+  version: 1.0.0
 paths:
-  /api/:target/_analyze:
+  /api/_analyze:
     post:
+      operationId: Analyze
       parameters:
-      - description: Index
-        in: path
-        name: target
-        type: string
       - description: Query
         in: body
         name: query
@@ -736,22 +1112,18 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/index.AnalyzeResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Analyze
       tags:
       - Index
-  /api/:target/_bulk:
+  /api/_bulk:
     post:
+      operationId: Bulk
       parameters:
-      - description: Index
-        in: path
-        name: target
-        type: string
       - description: Query
         in: body
         name: query
@@ -762,26 +1134,49 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/meta.HTTPResponseRecordCount'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Bulk documents
       tags:
       - Document
-  /api/:target/_doc:
+  /api/{index}/_analyze:
     post:
+      operationId: AnalyzeIndex
       parameters:
       - description: Index
         in: path
-        name: target
+        name: index
         required: true
         type: string
-      - description: ID
+      - description: Query
+        in: body
+        name: query
+        required: true
+        schema:
+          type: object
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/index.AnalyzeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Analyze
+      tags:
+      - Index
+  /api/{index}/_doc:
+    post:
+      operationId: IndexDocument
+      parameters:
+      - description: Index
         in: path
-        name: id
+        name: index
+        required: true
         type: string
       - description: Document
         in: body
@@ -794,24 +1189,25 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseID'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-      summary: Create update document
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Create or update document
       tags:
       - Document
-  /api/:target/_doc/:id:
+  /api/{index}/_doc/{id}:
     delete:
+      operationId: DeleteDocument
       parameters:
       - description: Index
         in: path
-        name: target
+        name: index
         required: true
         type: string
       - description: ID
@@ -823,28 +1219,30 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseDocument'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Delete document
       tags:
       - Document
     put:
+      operationId: IndexDocumentWithID
       parameters:
       - description: Index
         in: path
-        name: target
+        name: index
         required: true
         type: string
       - description: ID
         in: path
         name: id
+        required: true
         type: string
       - description: Document
         in: body
@@ -857,24 +1255,25 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseID'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-      summary: Create update document
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Create or update document with id
       tags:
       - Document
-  /api/:target/_mapping:
+  /api/{index}/_mapping:
     get:
+      operationId: GetMapping
       parameters:
       - description: Index
         in: path
-        name: target
+        name: index
         required: true
         type: string
       produces:
@@ -888,15 +1287,16 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Get index mappings
       tags:
       - Index
     put:
+      operationId: SetMapping
       parameters:
       - description: Index
         in: path
-        name: target
+        name: index
         required: true
         type: string
       - description: Mapping
@@ -915,20 +1315,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Set index mappings
       tags:
       - Index
-  /api/:target/_search:
+  /api/{index}/_search:
     post:
+      operationId: SearchV1
       parameters:
       - description: Index
         in: path
-        name: target
+        name: index
         required: true
         type: string
       - description: Query
@@ -936,7 +1337,7 @@ paths:
         name: query
         required: true
         schema:
-          $ref: '#/definitions/v1.ZincQuery'
+          $ref: '#/definitions/v1.ZincQueryForSDK'
       produces:
       - application/json
       responses:
@@ -947,16 +1348,17 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Search V1
       tags:
       - Search
-  /api/:target/_settings:
+  /api/{index}/_settings:
     get:
+      operationId: GetSettings
       parameters:
       - description: Index
         in: path
-        name: target
+        name: index
         required: true
         type: string
       produces:
@@ -965,21 +1367,21 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties:
-              $ref: '#/definitions/meta.IndexSettings'
+            additionalProperties: true
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Get index settings
       tags:
       - Index
     put:
+      operationId: SetSettings
       parameters:
       - description: Index
         in: path
-        name: target
+        name: index
         required: true
         type: string
       - description: Settings
@@ -998,20 +1400,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Set index Settings
       tags:
       - Index
-  /api/:target/_update/:id:
+  /api/{index}/_update/{id}:
     post:
+      operationId: UpdateDocument
       parameters:
       - description: Index
         in: path
-        name: target
+        name: index
         required: true
         type: string
       - description: ID
@@ -1030,72 +1433,21 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseID'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Update document with id
-      tags:
-      - Document
-  /api/_analyze:
-    post:
-      parameters:
-      - description: Index
-        in: path
-        name: target
-        type: string
-      - description: Query
-        in: body
-        name: query
-        required: true
-        schema:
-          type: object
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-      summary: Analyze
-      tags:
-      - Index
-  /api/_bulk:
-    post:
-      parameters:
-      - description: Index
-        in: path
-        name: target
-        type: string
-      - description: Query
-        in: body
-        name: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-      summary: Bulk documents
       tags:
       - Document
   /api/index:
     get:
+      operationId: ListIndexes
       produces:
       - application/json
       responses:
@@ -1109,6 +1461,7 @@ paths:
       tags:
       - Index
     post:
+      operationId: CreateIndex
       parameters:
       - description: Index data
         in: body
@@ -1122,46 +1475,46 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/meta.HTTPResponseIndex'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Create index
       tags:
       - Index
-  /api/index/:target:
+  /api/index/{index}:
     delete:
+      operationId: DeleteIndex
       parameters:
       - description: Index
         in: path
-        name: target
+        name: index
         required: true
         type: string
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/meta.HTTPResponseIndex'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Delete index
       tags:
       - Index
-  /api/index/:target/refresh:
+  /api/index/{index}/refresh:
     post:
+      operationId: Refresh
       parameters:
       - description: Index
         in: path
-        name: target
+        name: index
         required: true
         type: string
       produces:
@@ -1174,12 +1527,13 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Resfresh index
       tags:
       - Index
   /api/login:
     post:
+      operationId: Login
       parameters:
       - description: Login credentials
         in: body
@@ -1197,12 +1551,13 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Login
       tags:
       - User
   /api/user:
     get:
+      operationId: ListUsers
       produces:
       - application/json
       responses:
@@ -1215,11 +1570,12 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: List user
       tags:
       - User
     post:
+      operationId: CreateUser
       parameters:
       - description: User data
         in: body
@@ -1233,20 +1589,48 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseID'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-      summary: Create update user
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Create user
       tags:
       - User
-  /api/user/:id:
+    put:
+      operationId: UpdateUser
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/meta.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseID'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Update user
+      tags:
+      - User
+  /api/user/{id}:
     delete:
+      operationId: DeleteUser
       parameters:
       - description: User id
         in: path
@@ -1257,98 +1641,18 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseID'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Delete user
       tags:
       - User
-  /es/:target/_bulk:
-    post:
-      parameters:
-      - description: Index
-        in: path
-        name: target
-        type: string
-      - description: Query
-        in: body
-        name: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: ES bulk documents
-      tags:
-      - Document
-  /es/:target/_msearch:
-    post:
-      parameters:
-      - description: Index
-        in: path
-        name: target
-        type: string
-      - description: Query
-        in: body
-        name: query
-        required: true
-        schema:
-          type: object
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/meta.SearchResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-      summary: Search V2 MultipleSearch for compatible ES
-      tags:
-      - Search
-  /es/:target/_search:
-    post:
-      parameters:
-      - description: Index
-        in: path
-        name: target
-        required: true
-        type: string
-      - description: Query
-        in: body
-        name: query
-        required: true
-        schema:
-          $ref: '#/definitions/meta.ZincQuery'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/meta.SearchResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-      summary: Search V2 DSL for compatible ES
-      tags:
-      - Search
   /es/_bulk:
     post:
+      operationId: ESBulk
       parameters:
-      - description: Index
-        in: path
-        name: target
-        type: string
       - description: Query
         in: body
         name: query
@@ -1361,11 +1665,16 @@ paths:
           schema:
             additionalProperties: true
             type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: ES bulk documents
       tags:
       - Document
   /es/_index_template:
     get:
+      operationId: ListTemplates
       produces:
       - application/json
       responses:
@@ -1378,11 +1687,12 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: List index teplates
       tags:
       - Index
     post:
+      operationId: CreateTemplate
       parameters:
       - description: Template data
         in: body
@@ -1396,21 +1706,21 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/meta.HTTPResponseTemplate'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Create update index template
       tags:
       - Index
-  /es/_index_template/:target:
+  /es/_index_template/{name}:
     delete:
+      operationId: DeleteTemplate
       parameters:
       - description: Template
         in: path
-        name: target
+        name: name
         required: true
         type: string
       responses:
@@ -1421,15 +1731,16 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Delete template
       tags:
       - Index
     get:
+      operationId: GetTemplate
       parameters:
       - description: Template
         in: path
-        name: target
+        name: name
         required: true
         type: string
       produces:
@@ -1442,23 +1753,48 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Get index template
+      tags:
+      - Index
+    put:
+      operationId: UpdateTemplate
+      parameters:
+      - description: Template
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Template data
+        in: body
+        name: template
+        required: true
+        schema:
+          $ref: '#/definitions/meta.IndexTemplate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseTemplate'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Create update index template
       tags:
       - Index
   /es/_msearch:
     post:
+      operationId: MSearch
       parameters:
-      - description: Index
-        in: path
-        name: target
-        type: string
       - description: Query
         in: body
         name: query
         required: true
         schema:
-          type: object
+          type: string
       produces:
       - application/json
       responses:
@@ -1469,10 +1805,64 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HTTPResponseError'
       summary: Search V2 MultipleSearch for compatible ES
       tags:
       - Search
+  /es/{index}/_search:
+    post:
+      operationId: Search
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      - description: Query
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/meta.ZincQueryForSDK'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.SearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Search V2 DSL for compatible ES
+      tags:
+      - Search
+  /healthz:
+    get:
+      operationId: Healthz
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+      summary: Get healthz
+  /version:
+    get:
+      operationId: Version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.ResponseVersion'
+      summary: Get version
+schemes:
+- http
+- https
 securityDefinitions:
   BasicAuth:
     type: basic

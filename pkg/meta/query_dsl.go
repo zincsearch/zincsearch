@@ -32,6 +32,20 @@ type ZincQuery struct {
 	TrackTotalHits bool                    `json:"track_total_hits"`
 }
 
+type ZincQueryForSDK struct {
+	Query          QueryForSDK             `json:"query"`
+	Aggregations   map[string]Aggregations `json:"aggs"`
+	Highlight      *Highlight              `json:"highlight"`
+	Fields         []string                `json:"fields"`  // ["field1", "field2.*", {"field": "fieldName", "format": "epoch_millis"}]
+	Source         []string                `json:"_source"` // true, false, ["field1", "field2.*"]
+	Sort           []string                `json:"sort"`    // "_sorce", ["+Year","-Year", {"Year": "desc"}, "Date": {"order": "asc"", "format": "yyyy-MM-dd"}}"}]
+	Explain        bool                    `json:"explain"`
+	From           int                     `json:"from"`
+	Size           int                     `json:"size"`
+	Timeout        int                     `json:"timeout"`
+	TrackTotalHits bool                    `json:"track_total_hits"`
+}
+
 type Query struct {
 	Bool              *BoolQuery                         `json:"bool,omitempty"`                // .
 	Boosting          *BoostingQuery                     `json:"boosting,omitempty"`            // TODO: not implemented
@@ -61,12 +75,42 @@ type Query struct {
 	GeoShape          interface{}                        `json:"geo_shape,omitempty"`           // TODO: not implemented
 }
 
+type QueryForSDK struct {
+	Bool              *BoolQueryForSDK                   `json:"bool,omitempty"`                // .
+	Match             map[string]*MatchQuery             `json:"match,omitempty"`               // simple, MatchQuery
+	MatchBoolPrefix   map[string]*MatchBoolPrefixQuery   `json:"match_bool_prefix,omitempty"`   // simple, MatchBoolPrefixQuery
+	MatchPhrase       map[string]*MatchPhraseQuery       `json:"match_phrase,omitempty"`        // simple, MatchPhraseQuery
+	MatchPhrasePrefix map[string]*MatchPhrasePrefixQuery `json:"match_phrase_prefix,omitempty"` // simple, MatchPhrasePrefixQuery
+	MultiMatch        *MultiMatchQuery                   `json:"multi_match,omitempty"`         // .
+	MatchAll          *MatchAllQuery                     `json:"match_all,omitempty"`           // just set or null
+	MatchNone         *MatchNoneQuery                    `json:"match_none,omitempty"`          // just set or null
+	QueryString       *QueryStringQuery                  `json:"query_string,omitempty"`        // .
+	SimpleQueryString *SimpleQueryStringQuery            `json:"simple_query_string,omitempty"` // .
+	Exists            *ExistsQuery                       `json:"exists,omitempty"`              // .
+	Ids               *IdsQuery                          `json:"ids,omitempty"`                 // .
+	Range             map[string]*RangeQueryForSDK       `json:"range,omitempty"`               // simple, FuzzyQuery
+	Regexp            map[string]*RegexpQuery            `json:"regexp,omitempty"`              // simple, FuzzyQuery
+	Prefix            map[string]*PrefixQuery            `json:"prefix,omitempty"`              // .
+	Fuzzy             map[string]*FuzzyQuery             `json:"fuzzy,omitempty"`               // simple, PrefixQuery
+	Wildcard          map[string]*WildcardQuery          `json:"wildcard,omitempty"`            // simple, WildcardQuery
+	Term              map[string]*TermQueryForSDK        `json:"term,omitempty"`                // simple, TermQuery
+	Terms             map[string]*TermsQuery             `json:"terms,omitempty"`               // .
+}
+
 type BoolQuery struct {
 	Should             interface{} `json:"should,omitempty"`               // query, [query1, query2]
 	Must               interface{} `json:"must,omitempty"`                 // query, [query1, query2]
 	MustNot            interface{} `json:"must_not,omitempty"`             // query, [query1, query2]
 	Filter             interface{} `json:"filter,omitempty"`               // query, [query1, query2]
 	MinimumShouldMatch float64     `json:"minimum_should_match,omitempty"` // only for should
+}
+
+type BoolQueryForSDK struct {
+	Should             []*QueryForSDK `json:"should,omitempty"`               // query, [query1, query2]
+	Must               []*QueryForSDK `json:"must,omitempty"`                 // query, [query1, query2]
+	MustNot            []*QueryForSDK `json:"must_not,omitempty"`             // query, [query1, query2]
+	Filter             []*QueryForSDK `json:"filter,omitempty"`               // query, [query1, query2]
+	MinimumShouldMatch float64        `json:"minimum_should_match,omitempty"` // only for should
 }
 
 type BoostingQuery struct {
@@ -166,6 +210,16 @@ type RangeQuery struct {
 	Boost    float64     `json:"boost,omitempty"`
 }
 
+type RangeQueryForSDK struct {
+	GT       string  `json:"gt,omitempty"`        // string, float64
+	GTE      string  `json:"gte,omitempty"`       // string, float64
+	LT       string  `json:"lt,omitempty"`        // string, float64
+	LTE      string  `json:"lte,omitempty"`       // string, float64
+	Format   string  `json:"format,omitempty"`    // Date format used to convert date values in the query.
+	TimeZone string  `json:"time_zone,omitempty"` // used to convert date values in the query to UTC.
+	Boost    float64 `json:"boost,omitempty"`
+}
+
 // RegexpQuery
 // {"regexp":{"field":{"value":"[0-9]*"}}}
 type RegexpQuery struct {
@@ -207,6 +261,12 @@ type TermQuery struct {
 	Value           interface{} `json:"value,omitempty"`
 	Boost           float64     `json:"boost,omitempty"`
 	CaseInsensitive bool        `json:"case_insensitive,omitempty"`
+}
+
+type TermQueryForSDK struct {
+	Value           string  `json:"value,omitempty"`
+	Boost           float64 `json:"boost,omitempty"`
+	CaseInsensitive bool    `json:"case_insensitive,omitempty"`
 }
 
 // TermsQuery

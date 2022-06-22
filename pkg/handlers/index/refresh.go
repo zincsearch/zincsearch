@@ -24,22 +24,23 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// @Id Refresh
 // @Summary Resfresh index
 // @Tags    Index
 // @Produce json
-// @Param   target  path  string  true  "Index"
+// @Param   index  path  string  true  "Index"
 // @Success 200 {object} meta.HTTPResponse
-// @Failure 400 {object} meta.HTTPResponse
-// @Router /api/index/:target/refresh [post]
+// @Failure 400 {object} meta.HTTPResponseError
+// @Router /api/index/{index}/refresh [post]
 func Refresh(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
 		return
 	}
 	if err := index.Reopen(); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok"})
