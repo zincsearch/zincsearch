@@ -11,6 +11,13 @@ rm coverage.out
 
 go test ./... -race -covermode=atomic -coverprofile=coverage.out
 
+# Check discussion at https://github.com/golang/go/issues/25989
+rc=$?
+if [ $rc -ne 0 ]; then
+  echo "testing failed" >&2
+  exit $rc
+fi
+
 # make sure to set CODECOV_TOKEN env variable before doing this
 # codecov -f coverage.out
 # or 
