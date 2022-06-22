@@ -145,6 +145,7 @@ func SetRoutes(r *gin.Engine) {
 	r.DELETE("/es/_index_template/:target", AuthMiddleware, index.DeleteTemplate)
 
 	r.PUT("/es/:target", AuthMiddleware, index.CreateES)
+	r.HEAD("/es/:target", AuthMiddleware, index.Exist)
 
 	r.GET("/es/:target/_mapping", AuthMiddleware, index.GetMapping)
 	r.PUT("/es/:target/_mapping", AuthMiddleware, index.SetMapping)
