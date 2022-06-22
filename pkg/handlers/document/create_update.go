@@ -46,6 +46,25 @@ func CreateUpdate(c *gin.Context) {
 		return
 	}
 
+	err = sendToWAL("single", docID, indexName, &c.Request.Body)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+		return
+	}
+
+	// err = createUpdateDocumentWorker(doc, docID, indexName)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponse{Error: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok", ID: docID})
+}
+
+// createUpdateDocument is a helper function to create or update a document
+func createUpdateDocumentWorker(doc map[string]interface{}, docID string, indexName string) error {
+
 	update := false
 	// If id field is present then use it, else create a new UUID and use it
 	if id, ok := doc["_id"]; ok {
@@ -57,14 +76,17 @@ func CreateUpdate(c *gin.Context) {
 		update = true
 	}
 
+	var err error
+
 	// If the index does not exist, then create it
 	index, exists := core.GetIndex(indexName)
 	if !exists {
 		// Create a new index with disk storage as default
 		index, err = core.NewIndex(indexName, "disk", nil)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
-			return
+			return err
+			// c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
+			// return
 		}
 		// store index
 		_ = core.StoreIndex(index)
@@ -72,12 +94,11 @@ func CreateUpdate(c *gin.Context) {
 
 	err = index.CreateDocument(docID, doc, update)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponse{Error: err.Error()})
-		return
+		return err
 	}
 
 	// check shards
 	_ = index.CheckShards()
 
-	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok", ID: docID})
+	return nil
 }

@@ -48,6 +48,7 @@ type config struct {
 	BatchSize                 int    `env:"ZINC_BATCH_SIZE,default=1024"`
 	MaxResults                int    `env:"ZINC_MAX_RESULTS,default=10000"`
 	AggregationTermsSize      int    `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
+	WALSyncTime               int    `env:"ZINC_WAL_SYNC_TIME,default=5"` // how often to sync WAL
 	Shard                     shard
 	Etcd                      etcd
 	S3                        s3
