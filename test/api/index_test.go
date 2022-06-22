@@ -32,7 +32,13 @@ func TestIndex(t *testing.T) {
 			body.WriteString(fmt.Sprintf(`{"name":"%s","storage_type":"disk"}`, "newindex"))
 			resp := request("PUT", "/api/index", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
-			assert.Equal(t, resp.Body.String(), `{"index":"newindex","message":"ok","storage_type":"disk"}`)
+
+			data := make(map[string]interface{})
+			err := json.Unmarshal(resp.Body.Bytes(), &data)
+			assert.NoError(t, err)
+			assert.Equal(t, data["index"], "newindex")
+			assert.Equal(t, data["storage_type"], "disk")
+			assert.Equal(t, data["message"], "ok")
 		})
 
 		t.Run("create index with error input", func(t *testing.T) {
