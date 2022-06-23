@@ -23,6 +23,12 @@
     "paths": {
         "/api/_analyze": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Index"
                 ],
@@ -57,6 +63,12 @@
         },
         "/api/_bulk": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -112,6 +124,9 @@
                 }
             },
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -149,6 +164,9 @@
         },
         "/api/index/{index}": {
             "delete": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Index"
                 ],
@@ -222,6 +240,9 @@
         },
         "/api/login": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -286,6 +307,9 @@
                 }
             },
             "put": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -327,6 +351,9 @@
                 }
             },
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -370,6 +397,9 @@
         },
         "/api/user/{id}": {
             "delete": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "User"
                 ],
@@ -402,6 +432,12 @@
         },
         "/api/{index}/_analyze": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Index"
                 ],
@@ -443,6 +479,12 @@
         },
         "/api/{index}/_doc": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -491,6 +533,12 @@
         },
         "/api/{index}/_doc/{id}": {
             "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -544,6 +592,9 @@
                 }
             },
             "delete": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -623,6 +674,9 @@
                 }
             },
             "put": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -673,6 +727,9 @@
         },
         "/api/{index}/_search": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -751,6 +808,9 @@
                 }
             },
             "put": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -801,6 +861,12 @@
         },
         "/api/{index}/_update/{id}": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -856,6 +922,12 @@
         },
         "/es/_bulk": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -918,6 +990,9 @@
                 }
             },
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -988,6 +1063,9 @@
                 }
             },
             "put": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1030,6 +1108,9 @@
                 }
             },
             "delete": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Index"
                 ],
@@ -1062,6 +1143,9 @@
         },
         "/es/_msearch": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1099,6 +1183,9 @@
         },
         "/es/{index}/_search": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1152,7 +1239,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HealthzResponse"
                         }
                     }
                 }
@@ -1169,7 +1256,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.ResponseVersion"
+                            "$ref": "#/definitions/meta.VersionResponse"
                         }
                     }
                 }
@@ -1756,6 +1843,14 @@
                 }
             }
         },
+        "meta.HealthzResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "meta.Highlight": {
             "type": "object",
             "properties": {
@@ -2315,26 +2410,6 @@
                 }
             }
         },
-        "meta.ResponseVersion": {
-            "type": "object",
-            "properties": {
-                "branch": {
-                    "type": "string"
-                },
-                "build": {
-                    "type": "string"
-                },
-                "build_date": {
-                    "type": "string"
-                },
-                "commit_hash": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string"
-                }
-            }
-        },
         "meta.SearchResponse": {
             "type": "object",
             "properties": {
@@ -2477,6 +2552,26 @@
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.VersionResponse": {
+            "type": "object",
+            "properties": {
+                "branch": {
+                    "type": "string"
+                },
+                "build": {
+                    "type": "string"
+                },
+                "build_date": {
+                    "type": "string"
+                },
+                "commit_hash": {
+                    "type": "string"
+                },
+                "version": {
                     "type": "string"
                 }
             }

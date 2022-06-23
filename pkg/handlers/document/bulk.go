@@ -38,6 +38,8 @@ import (
 // @Id Bulk
 // @Summary Bulk documents
 // @Tags    Document
+// @Accept  json
+// @Produce json
 // @Param   query  body  string  true  "Query"
 // @Success 200 {object} meta.HTTPResponseRecordCount
 // @Failure 500 {object} meta.HTTPResponseError
@@ -68,6 +70,8 @@ func Bulk(c *gin.Context) {
 // @Id ESBulk
 // @Summary ES bulk documents
 // @Tags    Document
+// @Accept  json
+// @Produce json
 // @Param   query  body  string  true  "Query"
 // @Success 200 {object} map[string]interface{}
 // @Failure 500 {object} meta.HTTPResponseError
@@ -128,7 +132,7 @@ func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkRespon
 			delete(doc, k)
 		}
 		if err = json.Unmarshal(scanner.Bytes(), &doc); err != nil {
-			log.Error().Msgf("bulk.json.Unmarshal: err %s", err.Error())
+			log.Error().Msgf("bulk.json.Unmarshal: %s, err %s", scanner.Text(), err.Error())
 			continue
 		}
 

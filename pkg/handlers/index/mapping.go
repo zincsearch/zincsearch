@@ -53,6 +53,7 @@ func GetMapping(c *gin.Context) {
 // @Id SetMapping
 // @Summary Set index mappings
 // @Tags    Index
+// @Accept  json
 // @Produce json
 // @Param   index   path  string        true  "Index"
 // @Param   mapping body  meta.Mappings true  "Mapping"

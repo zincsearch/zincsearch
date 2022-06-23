@@ -27,6 +27,7 @@ import (
 // @Id Login
 // @Summary Login
 // @Tags    User
+// @Accept  json
 // @Produce json
 // @Param   login body LoginRequest true "Login credentials"
 // @Success 200 {object} LoginResponse

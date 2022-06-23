@@ -53,6 +53,7 @@ func GetSettings(c *gin.Context) {
 // @Id SetSettings
 // @Summary Set index Settings
 // @Tags    Index
+// @Accept  json
 // @Produce json
 // @Param   index    path  string             true  "Index"
 // @Param   settings body  meta.IndexSettings true  "Settings"

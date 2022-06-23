@@ -27,6 +27,7 @@ import (
 // @Id CreateUser
 // @Summary Create user
 // @Tags    User
+// @Accept  json
 // @Produce json
 // @Param   user body meta.User true "User data"
 // @Success 200 {object} meta.HTTPResponseID
@@ -56,6 +57,7 @@ func CreateUpdate(c *gin.Context) {
 // @Id UpdateUser
 // @Summary Update user
 // @Tags    User
+// @Accept  json
 // @Produce json
 // @Param   user body meta.User true "User data"
 // @Success 200 {object} meta.HTTPResponseID

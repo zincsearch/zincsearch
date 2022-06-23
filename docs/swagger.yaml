@@ -388,6 +388,11 @@ definitions:
       template:
         type: string
     type: object
+  meta.HealthzResponse:
+    properties:
+      status:
+        type: string
+    type: object
   meta.Highlight:
     properties:
       fields:
@@ -769,19 +774,6 @@ definitions:
       value:
         type: string
     type: object
-  meta.ResponseVersion:
-    properties:
-      branch:
-        type: string
-      build:
-        type: string
-      build_date:
-        type: string
-      commit_hash:
-        type: string
-      version:
-        type: string
-    type: object
   meta.SearchResponse:
     properties:
       _shards:
@@ -876,6 +868,19 @@ definitions:
       salt:
         type: string
       updated_at:
+        type: string
+    type: object
+  meta.VersionResponse:
+    properties:
+      branch:
+        type: string
+      build:
+        type: string
+      build_date:
+        type: string
+      commit_hash:
+        type: string
+      version:
         type: string
     type: object
   meta.WildcardQuery:
@@ -1100,6 +1105,8 @@ info:
 paths:
   /api/_analyze:
     post:
+      consumes:
+      - application/json
       operationId: Analyze
       parameters:
       - description: Query
@@ -1108,6 +1115,8 @@ paths:
         required: true
         schema:
           type: object
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -1122,6 +1131,8 @@ paths:
       - Index
   /api/_bulk:
     post:
+      consumes:
+      - application/json
       operationId: Bulk
       parameters:
       - description: Query
@@ -1130,6 +1141,8 @@ paths:
         required: true
         schema:
           type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -1144,6 +1157,8 @@ paths:
       - Document
   /api/{index}/_analyze:
     post:
+      consumes:
+      - application/json
       operationId: AnalyzeIndex
       parameters:
       - description: Index
@@ -1157,6 +1172,8 @@ paths:
         required: true
         schema:
           type: object
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -1171,6 +1188,8 @@ paths:
       - Index
   /api/{index}/_doc:
     post:
+      consumes:
+      - application/json
       operationId: IndexDocument
       parameters:
       - description: Index
@@ -1185,6 +1204,8 @@ paths:
         schema:
           additionalProperties: true
           type: object
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -1215,6 +1236,8 @@ paths:
         name: id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -1232,6 +1255,8 @@ paths:
       tags:
       - Document
     put:
+      consumes:
+      - application/json
       operationId: IndexDocumentWithID
       parameters:
       - description: Index
@@ -1251,6 +1276,8 @@ paths:
         schema:
           additionalProperties: true
           type: object
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -1292,6 +1319,8 @@ paths:
       tags:
       - Index
     put:
+      consumes:
+      - application/json
       operationId: SetMapping
       parameters:
       - description: Index
@@ -1325,6 +1354,8 @@ paths:
       - Index
   /api/{index}/_search:
     post:
+      consumes:
+      - application/json
       operationId: SearchV1
       parameters:
       - description: Index
@@ -1377,6 +1408,8 @@ paths:
       tags:
       - Index
     put:
+      consumes:
+      - application/json
       operationId: SetSettings
       parameters:
       - description: Index
@@ -1410,6 +1443,8 @@ paths:
       - Index
   /api/{index}/_update/{id}:
     post:
+      consumes:
+      - application/json
       operationId: UpdateDocument
       parameters:
       - description: Index
@@ -1429,6 +1464,8 @@ paths:
         schema:
           additionalProperties: true
           type: object
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -1461,6 +1498,8 @@ paths:
       tags:
       - Index
     post:
+      consumes:
+      - application/json
       operationId: CreateIndex
       parameters:
       - description: Index data
@@ -1492,6 +1531,8 @@ paths:
         name: index
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -1533,6 +1574,8 @@ paths:
       - Index
   /api/login:
     post:
+      consumes:
+      - application/json
       operationId: Login
       parameters:
       - description: Login credentials
@@ -1575,6 +1618,8 @@ paths:
       tags:
       - User
     post:
+      consumes:
+      - application/json
       operationId: CreateUser
       parameters:
       - description: User data
@@ -1602,6 +1647,8 @@ paths:
       tags:
       - User
     put:
+      consumes:
+      - application/json
       operationId: UpdateUser
       parameters:
       - description: User data
@@ -1637,6 +1684,8 @@ paths:
         name: id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -1651,6 +1700,8 @@ paths:
       - User
   /es/_bulk:
     post:
+      consumes:
+      - application/json
       operationId: ESBulk
       parameters:
       - description: Query
@@ -1659,6 +1710,8 @@ paths:
         required: true
         schema:
           type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -1692,6 +1745,8 @@ paths:
       tags:
       - Index
     post:
+      consumes:
+      - application/json
       operationId: CreateTemplate
       parameters:
       - description: Template data
@@ -1723,6 +1778,8 @@ paths:
         name: name
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -1758,6 +1815,8 @@ paths:
       tags:
       - Index
     put:
+      consumes:
+      - application/json
       operationId: UpdateTemplate
       parameters:
       - description: Template
@@ -1787,6 +1846,8 @@ paths:
       - Index
   /es/_msearch:
     post:
+      consumes:
+      - application/json
       operationId: MSearch
       parameters:
       - description: Query
@@ -1811,6 +1872,8 @@ paths:
       - Search
   /es/{index}/_search:
     post:
+      consumes:
+      - application/json
       operationId: Search
       parameters:
       - description: Index
@@ -1847,7 +1910,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/meta.HTTPResponse'
+            $ref: '#/definitions/meta.HealthzResponse'
       summary: Get healthz
   /version:
     get:
@@ -1858,7 +1921,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/meta.ResponseVersion'
+            $ref: '#/definitions/meta.VersionResponse'
       summary: Get version
 schemes:
 - http
