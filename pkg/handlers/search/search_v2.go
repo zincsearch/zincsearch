@@ -74,7 +74,7 @@ func SearchDSL(c *gin.Context) {
 // @Id MSearch
 // @Summary Search V2 MultipleSearch for compatible ES
 // @Tags    Search
-// @Accept  json
+// @Accept  plain
 // @Produce json
 // @Param   query  body  string  true  "Query"
 // @Success 200 {object} meta.SearchResponse

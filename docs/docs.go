@@ -67,7 +67,7 @@ const docTemplate = `{
         "/api/_bulk": {
             "post": {
                 "consumes": [
-                    "application/json"
+                    "text/plain"
                 ],
                 "produces": [
                     "application/json"
@@ -926,7 +926,7 @@ const docTemplate = `{
         "/es/_bulk": {
             "post": {
                 "consumes": [
-                    "application/json"
+                    "text/plain"
                 ],
                 "produces": [
                     "application/json"
@@ -1147,7 +1147,7 @@ const docTemplate = `{
         "/es/_msearch": {
             "post": {
                 "consumes": [
-                    "application/json"
+                    "text/plain"
                 ],
                 "produces": [
                     "application/json"

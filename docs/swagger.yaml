@@ -1132,7 +1132,7 @@ paths:
   /api/_bulk:
     post:
       consumes:
-      - application/json
+      - text/plain
       operationId: Bulk
       parameters:
       - description: Query
@@ -1701,7 +1701,7 @@ paths:
   /es/_bulk:
     post:
       consumes:
-      - application/json
+      - text/plain
       operationId: ESBulk
       parameters:
       - description: Query
@@ -1847,7 +1847,7 @@ paths:
   /es/_msearch:
     post:
       consumes:
-      - application/json
+      - text/plain
       operationId: MSearch
       parameters:
       - description: Query

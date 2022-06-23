@@ -38,7 +38,7 @@ import (
 // @Id Bulk
 // @Summary Bulk documents
 // @Tags    Document
-// @Accept  json
+// @Accept  plain
 // @Produce json
 // @Param   query  body  string  true  "Query"
 // @Success 200 {object} meta.HTTPResponseRecordCount
@@ -70,7 +70,7 @@ func Bulk(c *gin.Context) {
 // @Id ESBulk
 // @Summary ES bulk documents
 // @Tags    Document
-// @Accept  json
+// @Accept  plain
 // @Produce json
 // @Param   query  body  string  true  "Query"
 // @Success 200 {object} map[string]interface{}
