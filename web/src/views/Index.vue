@@ -124,6 +124,7 @@ export default defineComponent({
             no: counter++,
             name: data.name,
             doc_num: data.doc_num,
+            shard_num: data.shard_num,
             storage_size: storage_size,
             storage_type: data.storage_type,
             actions: {
@@ -156,6 +157,13 @@ export default defineComponent({
         name: "doc_num",
         field: (row) => row.doc_num,
         label: "DOC_NUM",
+        align: "right",
+        sortable: true,
+      },
+      {
+        name: "shard_num",
+        field: (row) => row.shard_num,
+        label: "SHARD_NUM",
         align: "right",
         sortable: true,
       },
@@ -193,6 +201,7 @@ export default defineComponent({
       index.value = {
         name: props.row.name,
         doc_num: props.row.doc_num,
+        shard_num: props.row.shard_num,
         storage_size: props.row.storage_size,
         storage_type: props.row.storage_type,
         settings: props.row.actions.settings,
