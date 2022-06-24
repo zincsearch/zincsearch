@@ -156,6 +156,12 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 			field = bluge.NewNumericField(key, float64(v))
 		case int:
 			field = bluge.NewNumericField(key, float64(v))
+		case string:
+			f, err := strconv.ParseFloat(v, 64)
+			if err != nil {
+				return fmt.Errorf("field [%s] was set type to [numeric] but the value [%s] can't convert to int", key, v)
+			}
+			field = bluge.NewNumericField(key, f)
 		default:
 			return fmt.Errorf("field [%s] was set type to [numeric] but got a %T value", key, value)
 		}
