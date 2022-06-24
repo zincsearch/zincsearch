@@ -44,6 +44,7 @@ func TestIndex_CreateUpdateDocument(t *testing.T) {
 				docID: "test1",
 				doc: map[string]interface{}{
 					"name": "Hello",
+					"test": "bool",
 				},
 				update: false,
 			},
@@ -53,6 +54,7 @@ func TestIndex_CreateUpdateDocument(t *testing.T) {
 			args: args{
 				docID: "test1",
 				doc: map[string]interface{}{
+					"name": "Hello",
 					"test": "Hello",
 				},
 				update: true,
@@ -63,11 +65,12 @@ func TestIndex_CreateUpdateDocument(t *testing.T) {
 			args: args{
 				docID: "test1",
 				doc: map[string]interface{}{
+					"name": "Hello",
 					"test": true,
 				},
 				update: true,
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 

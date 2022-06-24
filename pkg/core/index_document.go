@@ -139,9 +139,9 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 	prop, _ := mappings.GetProperty(key)
 	switch prop.Type {
 	case "text":
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("field [%s] was set type to [text] but got a %T value", key, value)
+		v, err := zutils.ToString(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [text] but the value [%v] can't convert to string", key, value)
 		}
 		field = bluge.NewTextField(key, v).SearchTermPositions()
 		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.Analyzers, index.Mappings, key)
@@ -149,38 +149,23 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 			field.WithAnalyzer(fieldAnalyzer)
 		}
 	case "numeric":
-		switch v := value.(type) {
-		case float64:
-			field = bluge.NewNumericField(key, float64(v))
-		case int64:
-			field = bluge.NewNumericField(key, float64(v))
-		case int:
-			field = bluge.NewNumericField(key, float64(v))
-		case string:
-			f, err := strconv.ParseFloat(v, 64)
-			if err != nil {
-				return fmt.Errorf("field [%s] was set type to [numeric] but the value [%s] can't convert to int", key, v)
-			}
-			field = bluge.NewNumericField(key, f)
-		default:
-			return fmt.Errorf("field [%s] was set type to [numeric] but got a %T value", key, value)
+		v, err := zutils.ToFloat64(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [numeric] but the value [%v] can't convert to int", key, value)
 		}
+		field = bluge.NewNumericField(key, v)
 	case "keyword":
-		switch v := value.(type) {
-		case string:
-			field = bluge.NewKeywordField(key, v)
-		case float64:
-			field = bluge.NewKeywordField(key, strconv.FormatFloat(v, 'f', -1, 64))
-		case int:
-			field = bluge.NewKeywordField(key, strconv.FormatInt(int64(v), 10))
-		case bool:
-			field = bluge.NewKeywordField(key, strconv.FormatBool(v))
-		default:
-			field = bluge.NewKeywordField(key, fmt.Sprintf("%v", v))
+		v, err := zutils.ToString(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [keyword] but the value [%v] can't convert to string", key, value)
 		}
+		field = bluge.NewKeywordField(key, v)
 	case "bool":
-		value := value.(bool)
-		field = bluge.NewKeywordField(key, strconv.FormatBool(value))
+		v, err := zutils.ToBool(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [bool] but the value [%v] can't convert to boolean", key, value)
+		}
+		field = bluge.NewKeywordField(key, strconv.FormatBool(v))
 	case "date", "time":
 		switch v := value.(type) {
 		case string:
