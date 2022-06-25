@@ -130,17 +130,20 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 
 	var err error
 	format := time.RFC3339
+	timeZone := time.UTC
 	if mappings != nil {
 		if prop, ok := mappings.GetProperty(field); ok {
 			if prop.Format != "" {
 				format = prop.Format
+			}
+			if prop.TimeZone != "" {
+				timeZone, _ = zutils.ParseTimeZone(prop.TimeZone)
 			}
 		}
 	}
 	if value.Format != "" {
 		format = value.Format
 	}
-	timeZone := time.UTC
 	if value.TimeZone != "" {
 		timeZone, err = zutils.ParseTimeZone(value.TimeZone)
 		if err != nil {

@@ -104,6 +104,11 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init: func() {
+				index.Mappings.SetProperty("@timestamp", meta.Property{
+					Type:   "time",
+					Index:  true,
+					Format: "2006-01-02 15:04:05.000",
+				})
 				index.Mappings.SetProperty("time", meta.Property{
 					Type:   "time",
 					Index:  true,
@@ -127,20 +132,20 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 			},
 			init: func() {
 				index.Mappings.SetProperty("id", meta.Property{
-					Type:          "keyword",
-					Index:         true,
-					Store:         true,
-					Highlightable: true,
+					Type:         "keyword",
+					Index:        true,
+					Aggregatable: true,
 				})
 				index.Mappings.SetProperty("name", meta.Property{
-					Type:     "text",
-					Index:    true,
-					Analyzer: "analyzer_1",
+					Type:          "text",
+					Analyzer:      "analyzer_1",
+					Index:         true,
+					Highlightable: true,
 				})
 				index.Analyzers["analyzer_1"] = analyzer.NewStandardAnalyzer()
 			},
 			want:    &bluge.Document{},
-			wantErr: true,
+			wantErr: false,
 		},
 		{
 			name: "type conflict text",
@@ -153,7 +158,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 			},
 			init:    func() {},
 			want:    &bluge.Document{},
-			wantErr: true,
+			wantErr: false,
 		},
 		{
 			name: "type conflict numeric",
@@ -169,7 +174,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 			},
 			init:    func() {},
 			want:    &bluge.Document{},
-			wantErr: true,
+			wantErr: false,
 		},
 		{
 			name: "keyword type float64",
@@ -239,6 +244,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				assert.Error(t, err)
 				return
 			}
+			assert.Nil(t, err)
 			assert.NotNil(t, got)
 			wantType := reflect.TypeOf(tt.want)
 			gotType := reflect.TypeOf(got)

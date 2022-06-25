@@ -15,7 +15,10 @@
 
 package errors
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 const (
 	ErrorTypeParsingException         = "parsing_exception"
@@ -42,10 +45,12 @@ func (e *Error) Cause(err error) *Error {
 }
 
 func (e *Error) MarshalJSON() ([]byte, error) {
+	reason := strings.ReplaceAll(e.Reason, "\"", "\\\"")
 	if e.CausedBy != nil {
-		return []byte(fmt.Sprintf(`{"type":"%s","reason":"%s","cause":"%s"}`, e.Type, e.Reason, e.CausedBy.Error())), nil
+		cause := strings.ReplaceAll(e.CausedBy.Error(), "\"", "\\\"")
+		return []byte(fmt.Sprintf(`{"type":"%s","reason":"%s","cause":"%s"}`, e.Type, reason, cause)), nil
 	}
-	return []byte(fmt.Sprintf(`{"type":"%s","reason":"%s"}`, e.Type, e.Reason)), nil
+	return []byte(fmt.Sprintf(`{"type":"%s","reason":"%s"}`, e.Type, reason)), nil
 }
 
 func (e *Error) Error() string {

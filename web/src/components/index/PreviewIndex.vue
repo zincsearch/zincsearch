@@ -47,6 +47,12 @@
               </div>
             </div>
             <div class="row items-center q-mb-md">
+              <div class="col-sm-3 col-12">Shards Num</div>
+              <div class="col-sm-9 col-12 q-mb-none q-pl-md q-pt-sm q-pb-sm">
+                {{ indexData.shard_num }}
+              </div>
+            </div>
+            <div class="row items-center q-mb-md">
               <div class="col-sm-3 col-12">Storage Size</div>
               <div class="col-sm-9 col-12 q-mb-none q-pl-md q-pt-sm q-pb-sm">
                 {{ indexData.storage_size }}
@@ -126,6 +132,7 @@ export default defineComponent({
     if (this.modelValue && this.modelValue.name) {
       this.indexData["name"] = this.modelValue.name;
       this.indexData["doc_num"] = this.modelValue.doc_num;
+      this.indexData["shard_num"] = this.modelValue.shard_num;
       this.indexData["storage_type"] = this.modelValue.storage_type;
       this.indexData["storage_size"] = this.modelValue.storage_size;
       this.indexData["settings"] = this.modelValue.settings || {};
