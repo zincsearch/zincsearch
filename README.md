@@ -77,7 +77,7 @@ Check [bulk ingestion docs](https://docs.zincsearch.com/ingestion/bulk-ingestion
 
 ### Fluent bit
 
-Check [fluet-bit ingestion docs](https://docs.zincsearch.com/ingestion/fluent-bit/)
+Check [fluent-bit ingestion docs](https://docs.zincsearch.com/ingestion/fluent-bit/)
 
 ### Syslog-ng
 
