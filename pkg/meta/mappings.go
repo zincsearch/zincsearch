@@ -21,6 +21,9 @@ import (
 	"sync"
 )
 
+// Timestamp field name
+const TimeFieldName = "@timestamp"
+
 type Mappings struct {
 	Properties map[string]Property `json:"properties,omitempty"`
 	lock       sync.RWMutex
@@ -30,7 +33,8 @@ type Property struct {
 	Type           string `json:"type"` // text, keyword, date, numeric, boolean, geo_point
 	Analyzer       string `json:"analyzer,omitempty"`
 	SearchAnalyzer string `json:"search_analyzer,omitempty"`
-	Format         string `json:"format,omitempty"` // date format yyyy-MM-dd HH:mm:ss || yyyy-MM-dd || epoch_millis
+	Format         string `json:"format,omitempty"`    // date format yyyy-MM-dd HH:mm:ss || yyyy-MM-dd || epoch_millis
+	TimeZone       string `json:"time_zone,omitempty"` // date format time_zone
 	Index          bool   `json:"index"`
 	Store          bool   `json:"store"`
 	Sortable       bool   `json:"sortable"`
@@ -50,6 +54,7 @@ func NewProperty(typ string) Property {
 		Analyzer:       "",
 		SearchAnalyzer: "",
 		Format:         "",
+		TimeZone:       "",
 		Index:          true,
 		Store:          false,
 		Sortable:       true,
