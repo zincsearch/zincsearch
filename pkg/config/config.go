@@ -36,7 +36,7 @@ type config struct {
 	NodeID                    string `env:"ZINC_NODE_ID,default=1"`
 	DataPath                  string `env:"ZINC_DATA_PATH,default=./data"`
 	MetadataStorage           string `env:"ZINC_METADATA_STORAGE,default=bolt"`
-	IceCompressor             string `env:"ZINC_ICE_COMPRESSOR"`
+	IceCompressor             string `env:"ZINC_ICE_COMPRESSOR,default=zstd"`
 	SentryEnable              bool   `env:"ZINC_SENTRY,default=true"`
 	SentryDSN                 string `env:"ZINC_SENTRY_DSN,default=https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942"`
 	ProfilerEnable            bool   `env:"ZINC_PROFILER,default=false"`
