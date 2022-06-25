@@ -24,6 +24,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{}) (*meta.Mappings, error) {
@@ -100,6 +101,12 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 				newProp.SearchAnalyzer = v.(string)
 			case "format":
 				newProp.Format = v.(string)
+			case "time_zone":
+				newProp.TimeZone = v.(string)
+				_, err := zutils.ParseTimeZone(newProp.TimeZone)
+				if err != nil {
+					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] %s time_zone parse err %s", field, err.Error()))
+				}
 			case "index":
 				newProp.Index = v.(bool)
 			case "store":

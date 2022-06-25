@@ -104,6 +104,11 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init: func() {
+				index.Mappings.SetProperty("@timestamp", meta.Property{
+					Type:   "time",
+					Index:  true,
+					Format: "2006-01-02 15:04:05.000",
+				})
 				index.Mappings.SetProperty("time", meta.Property{
 					Type:   "time",
 					Index:  true,

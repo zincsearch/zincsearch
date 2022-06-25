@@ -23,6 +23,7 @@ import (
 	"github.com/blugelabs/bluge/search"
 	"github.com/blugelabs/bluge/search/aggregations"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
@@ -109,7 +110,7 @@ func (t *AutoDateHistogramAggregation) getIntervals() []time.Duration {
 		intervals = append(intervals, time.Hour*24*1, time.Hour*24*7)
 		fallthrough
 	case "month":
-		intervals = append(intervals, time.Hour*24*30*1, time.Hour*24*30*3)
+		intervals = append(intervals, time.Hour*24*30*1, time.Hour*24*30*3, time.Hour*24*30*6)
 		fallthrough
 	case "year":
 		intervals = append(intervals, time.Hour*24*30*12*1, time.Hour*24*30*12*5, time.Hour*24*30*12*10, time.Hour*24*30*12*20, time.Hour*24*30*12*50)
@@ -190,6 +191,11 @@ func (a *AutoDateHistogramCalculator) Merge(other search.Calculator) {
 }
 
 func (a *AutoDateHistogramCalculator) Finish() {
+	// Calc AggregationTermsSize
+	for a.minValue+int64(a.intervals[a.currentInterval])*int64(config.Global.AggregationTermsSize) < a.maxValue {
+		a.currentInterval++
+	}
+
 	for {
 		// Replenish bucket
 		if len(a.bucketsList) <= a.size {
@@ -267,11 +273,11 @@ func (a *AutoDateHistogramCalculator) bucketKey(value int64) (int64, string) {
 	var nsec int64
 	if a.intervals[a.currentInterval] >= time.Hour*24*30*12 {
 		t := time.Unix(0, value).In(a.timeZone)
-		t = time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, t.Location())
+		t = time.Date(t.Year(), 1, 1, 0, 0, 0, 0, t.Location())
 		nsec = t.UnixNano()
 	} else if a.intervals[a.currentInterval] >= time.Hour*24*30 {
 		t := time.Unix(0, value).In(a.timeZone)
-		t = time.Date(t.Year(), 1, 1, 0, 0, 0, 0, t.Location())
+		t = time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, t.Location())
 		nsec = t.UnixNano()
 	} else {
 		nsec = (value / int64(a.intervals[a.currentInterval])) * int64(a.intervals[a.currentInterval])

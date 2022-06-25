@@ -348,6 +348,7 @@ export default defineComponent({
               "@timestamp": {
                 gte: timestamps.start_time.toISOString(),
                 lt: timestamps.end_time.toISOString(),
+                format: "2006-01-02T15:04:05Z07:00"
               },
             },
           });
