@@ -33,7 +33,7 @@ phases:
       # install prerequisites
       - yum install bc -y
 
-      # - export DOCKER_CLI_EXPERIMENTAL=enabled
+      - export DOCKER_CLI_EXPERIMENTAL=enabled
       # - export DOCKER_BUILDKIT=1
       # update npm
       - npm install -g npm@latest
