@@ -3,8 +3,13 @@ version: 0.2
 phases:
   pre_build:
     commands:
+      - GORELEASER_LATEST_VERSION=(curl -sL -o /dev/null -w %{url_effective} "https://github.com/goreleaser/goreleaser/releases/latest" | rev | cut -f1 -d'/'| rev)
+      # - GORELEASER_LATEST_VERSION=v1.9.2
+      - wget https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_LATEST_VERSION/goreleaser_$(uname -s)_$(uname -m).tar.gz
+      - tar -xzf goreleaser_$(uname -s)_$(uname -m).tar.gz
+      - sudo mv goreleaser /usr/local/bin/goreleaser
       
-      - echo Logging in to Amazon ECR...
+      # - echo Logging in to Amazon ECR...
       # - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/zinclabs
       # Install AWS CLI
       # - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -51,11 +56,11 @@ phases:
       # Build binary and container images using goreleaser
       - echo Build started on `date`
       # - GIT_TAG="$(git describe --tags --abbrev=0)"
-      - GORELEASER_LATEST_VERSION=(curl -sL -o /dev/null -w %{url_effective} "https://github.com/goreleaser/goreleaser/releases/latest" | rev | cut -f1 -d'/'| rev)
+      # - GORELEASER_LATEST_VERSION=(curl -sL -o /dev/null -w %{url_effective} "https://github.com/goreleaser/goreleaser/releases/latest" | rev | cut -f1 -d'/'| rev)
       # - GORELEASER_LATEST_VERSION=v1.9.2
-      - wget https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_LATEST_VERSION/goreleaser_$(uname -s)_$(uname -m).tar.gz
-      - tar -xzf goreleaser_$(uname -s)_$(uname -m).tar.gz
-      - sudo mv goreleaser /usr/local/bin/goreleaser
+      # - wget https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_LATEST_VERSION/goreleaser_$(uname -s)_$(uname -m).tar.gz
+      # - tar -xzf goreleaser_$(uname -s)_$(uname -m).tar.gz
+      # - sudo mv goreleaser /usr/local/bin/goreleaser
       - goreleaser build --snapshot
   # post_build:
   #   commands:
