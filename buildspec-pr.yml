@@ -61,7 +61,7 @@ phases:
       # - wget https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_LATEST_VERSION/goreleaser_$(uname -s)_$(uname -m).tar.gz
       # - tar -xzf goreleaser_$(uname -s)_$(uname -m).tar.gz
       # - sudo mv goreleaser /usr/local/bin/goreleaser
-      - goreleaser release --skip-validate         
+      - goreleaser build
   # post_build:
   #   commands:
   #     - echo Build completed on `date`
