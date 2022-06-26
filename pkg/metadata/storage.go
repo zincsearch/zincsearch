@@ -24,7 +24,6 @@ import (
 	"github.com/zinclabs/zinc/pkg/metadata/storage/badger"
 	"github.com/zinclabs/zinc/pkg/metadata/storage/bolt"
 	"github.com/zinclabs/zinc/pkg/metadata/storage/etcd"
-	"github.com/zinclabs/zinc/pkg/metadata/storage/pebble"
 )
 
 var ErrorKeyNotExists = errors.New("key not exists")
@@ -38,8 +37,8 @@ func init() {
 		switch strings.ToLower(config.Global.MetadataStorage) {
 		case "badger":
 			db = badger.New("_metadata.db")
-		case "pebble":
-			db = pebble.New("_metadata.peb")
+		// case "pebble":
+		// 	db = pebble.New("_metadata.peb")
 		default:
 			db = bolt.New("_metadata.bolt")
 		}
