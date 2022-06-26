@@ -16,6 +16,7 @@
 package zutils
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -205,6 +206,106 @@ func TestUnix(t *testing.T) {
 			if got := Unix(tt.args.n); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unix() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestParseTime(t *testing.T) {
+	nowStr := time.Now().Format(time.RFC3339)
+	now, _ := time.Parse(time.RFC3339, nowStr)
+
+	type args struct {
+		value    interface{}
+		format   string
+		timeZone string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    time.Time
+		wantErr bool
+	}{
+		{
+			name: "ParseTime RFC3339",
+			args: args{
+				value:    now.Format(time.RFC3339),
+				format:   "",
+				timeZone: "",
+			},
+			want:    now,
+			wantErr: false,
+		},
+		{
+			name: "ParseTime RFC3339Nano",
+			args: args{
+				value:    now.Format(time.RFC3339Nano),
+				format:   "",
+				timeZone: "",
+			},
+			want:    now,
+			wantErr: false,
+		},
+		{
+			name: "ParseTime RFC1123Z",
+			args: args{
+				value:    now.Format(time.RFC1123Z),
+				format:   time.RFC1123Z,
+				timeZone: "",
+			},
+			want:    now,
+			wantErr: false,
+		},
+		{
+			name: "ParseTime RFC1123",
+			args: args{
+				value:    now.Format(time.RFC1123),
+				format:   time.RFC1123,
+				timeZone: time.Local.String(),
+			},
+			want:    now,
+			wantErr: false,
+		},
+		{
+			name: "ParseTime epoch_millis",
+			args: args{
+				value:    now.UnixNano(),
+				format:   "",
+				timeZone: "",
+			},
+			want:    now,
+			wantErr: false,
+		},
+		{
+			name: "ParseTime epoch_millis",
+			args: args{
+				value:    now.UnixNano(),
+				format:   "epoch_millis",
+				timeZone: "",
+			},
+			want:    now,
+			wantErr: false,
+		},
+		{
+			name: "ParseTime epoch_millis",
+			args: args{
+				value:    fmt.Sprintf("%d", now.UnixNano()),
+				format:   "epoch_millis",
+				timeZone: "",
+			},
+			want:    now,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseTime(tt.args.value, tt.args.format, tt.args.timeZone)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+			assert.False(t, got.IsZero())
+			assert.Equal(t, tt.want.UnixNano(), got.UnixNano())
 		})
 	}
 }

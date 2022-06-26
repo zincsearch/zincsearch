@@ -44,10 +44,10 @@ var (
 // @Id Version
 // @Summary Get version
 // @Produce json
-// @Success 200 {object} ResponseVersion
+// @Success 200 {object} VersionResponse
 // @Router /version [get]
 func GetVersion(c *gin.Context) {
-	c.JSON(http.StatusOK, ResponseVersion{
+	c.JSON(http.StatusOK, VersionResponse{
 		Version:    Version,
 		Build:      Build,
 		CommitHash: CommitHash,
@@ -56,7 +56,7 @@ func GetVersion(c *gin.Context) {
 	})
 }
 
-type ResponseVersion struct {
+type VersionResponse struct {
 	Version    string `json:"version"`
 	Build      string `json:"build"`
 	CommitHash string `json:"commit_hash"`

@@ -30,6 +30,7 @@ import (
 // @Id SearchV1
 // @Summary Search V1
 // @Tags    Search
+// @Accept  json
 // @Produce json
 // @Param   index  path  string  true  "Index"
 // @Param   query  body  v1.ZincQueryForSDK  true  "Query"

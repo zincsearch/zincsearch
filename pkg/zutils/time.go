@@ -16,6 +16,7 @@
 package zutils
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -80,4 +81,62 @@ func Unix(n int64) time.Time {
 		return time.UnixMilli(n)
 	}
 	return time.Unix(n, 0)
+}
+
+func ParseTime(value interface{}, format, timeZone string) (time.Time, error) {
+	var vInt int64
+	var vStr string
+	switch v := value.(type) {
+	case float64:
+		vInt = int64(v)
+	case int64:
+		vInt = v
+	case string:
+		vStr = v
+	default:
+		return time.Time{}, fmt.Errorf("value type of time must be string / float64 / int64")
+	}
+
+	if vInt != 0 {
+		t := Unix(vInt)
+		if t.IsZero() {
+			return time.Time{}, fmt.Errorf("time format is [epoch_millis] but the value [%d] is not a valid timestamp", vInt)
+		}
+		return t, nil
+	}
+
+	if vStr == "" {
+		return time.Time{}, fmt.Errorf("time value is empty")
+	}
+
+	var err error
+	timFormat := time.RFC3339
+	timZone := time.UTC
+	if format != "" {
+		timFormat = format
+	}
+	if timeZone != "" {
+		timZone, err = ParseTimeZone(timeZone)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("invalid time zone: %s", timeZone)
+		}
+	}
+
+	if timFormat == "epoch_millis" {
+		v, err := ToInt(vStr)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("time format is [epoch_millis] but the value [%s] can't convert to int", vStr)
+		}
+		if t := Unix(int64(v)); t.IsZero() {
+			return time.Time{}, fmt.Errorf("time format is [epoch_millis] but the value [%s] is not a valid timestamp", vStr)
+		} else {
+			return t, nil
+		}
+	}
+
+	t, err := time.ParseInLocation(timFormat, vStr, timZone)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("time format is [%s] but the value [%s] parse err: %s", timFormat, vStr, err.Error())
+	}
+	return t, nil
 }

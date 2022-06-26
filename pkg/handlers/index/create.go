@@ -31,6 +31,7 @@ import (
 // @Id CreateIndex
 // @Summary Create index
 // @Tags    Index
+// @Accept  json
 // @Produce json
 // @Param   index body meta.IndexSimple true "Index data"
 // @Success 200 {object} meta.HTTPResponseIndex

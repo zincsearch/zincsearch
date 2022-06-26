@@ -32,6 +32,8 @@ import (
 // @Id Analyze
 // @Summary Analyze
 // @Tags    Index
+// @Accept  json
+// @Produce json
 // @Param   query  body  object  true  "Query"
 // @Success 200 {object} AnalyzeResponse
 // @Failure 400 {object} meta.HTTPResponseError
@@ -138,6 +140,8 @@ func Analyze(c *gin.Context) {
 // @Id AnalyzeIndex
 // @Summary Analyze
 // @Tags    Index
+// @Accept  json
+// @Produce json
 // @Param   index  path  string  true  "Index"
 // @Param   query  body  object  true  "Query"
 // @Success 200 {object} AnalyzeResponse

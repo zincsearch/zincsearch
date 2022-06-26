@@ -26,6 +26,12 @@ const docTemplate = `{
     "paths": {
         "/api/_analyze": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Index"
                 ],
@@ -60,6 +66,12 @@ const docTemplate = `{
         },
         "/api/_bulk": {
             "post": {
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -115,6 +127,9 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -152,6 +167,9 @@ const docTemplate = `{
         },
         "/api/index/{index}": {
             "delete": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Index"
                 ],
@@ -225,6 +243,9 @@ const docTemplate = `{
         },
         "/api/login": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -289,6 +310,9 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -330,6 +354,9 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -373,6 +400,9 @@ const docTemplate = `{
         },
         "/api/user/{id}": {
             "delete": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "User"
                 ],
@@ -405,6 +435,12 @@ const docTemplate = `{
         },
         "/api/{index}/_analyze": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Index"
                 ],
@@ -446,6 +482,12 @@ const docTemplate = `{
         },
         "/api/{index}/_doc": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -494,6 +536,12 @@ const docTemplate = `{
         },
         "/api/{index}/_doc/{id}": {
             "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -547,6 +595,9 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -626,6 +677,9 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -676,6 +730,9 @@ const docTemplate = `{
         },
         "/api/{index}/_search": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -754,6 +811,9 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -804,6 +864,12 @@ const docTemplate = `{
         },
         "/api/{index}/_update/{id}": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -859,6 +925,12 @@ const docTemplate = `{
         },
         "/es/_bulk": {
             "post": {
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Document"
                 ],
@@ -921,6 +993,9 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -991,6 +1066,9 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1033,6 +1111,9 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Index"
                 ],
@@ -1065,6 +1146,9 @@ const docTemplate = `{
         },
         "/es/_msearch": {
             "post": {
+                "consumes": [
+                    "text/plain"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1102,6 +1186,9 @@ const docTemplate = `{
         },
         "/es/{index}/_search": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1155,7 +1242,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
+                            "$ref": "#/definitions/meta.HealthzResponse"
                         }
                     }
                 }
@@ -1172,7 +1259,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/meta.ResponseVersion"
+                            "$ref": "#/definitions/meta.VersionResponse"
                         }
                     }
                 }
@@ -1759,6 +1846,14 @@ const docTemplate = `{
                 }
             }
         },
+        "meta.HealthzResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "meta.Highlight": {
             "type": "object",
             "properties": {
@@ -2318,26 +2413,6 @@ const docTemplate = `{
                 }
             }
         },
-        "meta.ResponseVersion": {
-            "type": "object",
-            "properties": {
-                "branch": {
-                    "type": "string"
-                },
-                "build": {
-                    "type": "string"
-                },
-                "build_date": {
-                    "type": "string"
-                },
-                "commit_hash": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string"
-                }
-            }
-        },
         "meta.SearchResponse": {
             "type": "object",
             "properties": {
@@ -2480,6 +2555,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "meta.VersionResponse": {
+            "type": "object",
+            "properties": {
+                "branch": {
+                    "type": "string"
+                },
+                "build": {
+                    "type": "string"
+                },
+                "build_date": {
+                    "type": "string"
+                },
+                "commit_hash": {
+                    "type": "string"
+                },
+                "version": {
                     "type": "string"
                 }
             }

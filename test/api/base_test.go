@@ -54,7 +54,7 @@ func TestApiBase(t *testing.T) {
 			data := make(map[string]interface{})
 			err := json.Unmarshal(resp.Body.Bytes(), &data)
 			assert.NoError(t, err)
-			status, ok := data["message"]
+			status, ok := data["status"]
 			assert.True(t, ok)
 			assert.Equal(t, "ok", status)
 		})

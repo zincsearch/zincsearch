@@ -27,6 +27,8 @@ import (
 // @Id UpdateDocument
 // @Summary Update document with id
 // @Tags    Document
+// @Accept  json
+// @Produce json
 // @Param   index  path  string  true  "Index"
 // @Param   id     path  string  true  "ID"
 // @Param   document  body  map[string]interface{}  true  "Document"

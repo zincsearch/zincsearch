@@ -89,7 +89,14 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 	mappings.SetProperty("_id", meta.NewProperty("keyword"))
 
 	// @timestamp need date_range/date_histogram aggregation, and mappings used for type check in aggregation
-	mappings.SetProperty("@timestamp", meta.NewProperty("date"))
+	fieldTimestamp, exists := mappings.GetProperty(meta.TimeFieldName)
+	if !exists {
+		fieldTimestamp = meta.NewProperty("date")
+	}
+	fieldTimestamp.Index = true
+	fieldTimestamp.Sortable = true
+	fieldTimestamp.Aggregatable = true
+	mappings.SetProperty(meta.TimeFieldName, fieldTimestamp)
 
 	// update in the cache
 	index.Mappings = mappings

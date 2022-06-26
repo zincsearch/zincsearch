@@ -48,7 +48,7 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 	flatDoc, _ := flatten.Flatten(doc, "")
 	// Iterate through each field and add it to the bluge document
 	for key, value := range flatDoc {
-		if value == nil || key == "@timestamp" {
+		if value == nil || key == meta.TimeFieldName {
 			continue
 		}
 
@@ -103,28 +103,23 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 		_ = StoreIndex(index)
 	}
 
+	// set timestamp
 	timestamp := time.Now()
-	if v, ok := flatDoc["@timestamp"]; ok {
-		switch v := v.(type) {
-		case string:
-			if t, err := time.Parse(time.RFC3339, v); err == nil && !t.IsZero() {
-				timestamp = t
-				delete(doc, "@timestamp")
-			}
-		case float64:
-			if t := zutils.Unix(int64(v)); !t.IsZero() {
-				timestamp = t
-				delete(doc, "@timestamp")
-			}
-		default:
-			// noop
+	if value, ok := flatDoc[meta.TimeFieldName]; ok {
+		delete(doc, meta.TimeFieldName)
+		prop, _ := mappings.GetProperty(meta.TimeFieldName)
+		v, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)
+		if err != nil {
+			return nil, fmt.Errorf("field [%s] value [%v] parse err: %s", meta.TimeFieldName, value, err.Error())
 		}
+		timestamp = v
 	}
+	bdoc.AddField(bluge.NewDateTimeField(meta.TimeFieldName, timestamp).StoreValue().Sortable().Aggregatable())
+
 	docByteVal, _ := json.Marshal(doc)
-	bdoc.AddField(bluge.NewDateTimeField("@timestamp", timestamp).StoreValue().Sortable().Aggregatable())
 	bdoc.AddField(bluge.NewStoredOnlyField("_index", []byte(index.Name)))
 	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", []string{"_id", "_index", "_source", "@timestamp"}))
+	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", []string{"_id", "_index", "_source", meta.TimeFieldName}))
 
 	// Add time for index
 	bdoc.SetTimestamp(timestamp.UnixNano())
@@ -139,9 +134,9 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 	prop, _ := mappings.GetProperty(key)
 	switch prop.Type {
 	case "text":
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("field [%s] was set type to [text] but got a %T value", key, value)
+		v, err := zutils.ToString(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [text] but the value [%v] can't convert to string", key, value)
 		}
 		field = bluge.NewTextField(key, v).SearchTermPositions()
 		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.Analyzers, index.Mappings, key)
@@ -149,53 +144,29 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 			field.WithAnalyzer(fieldAnalyzer)
 		}
 	case "numeric":
-		switch v := value.(type) {
-		case float64:
-			field = bluge.NewNumericField(key, float64(v))
-		case int64:
-			field = bluge.NewNumericField(key, float64(v))
-		case int:
-			field = bluge.NewNumericField(key, float64(v))
-		default:
-			return fmt.Errorf("field [%s] was set type to [numeric] but got a %T value", key, value)
+		v, err := zutils.ToFloat64(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [numeric] but the value [%v] can't convert to int", key, value)
 		}
+		field = bluge.NewNumericField(key, v)
 	case "keyword":
-		switch v := value.(type) {
-		case string:
-			field = bluge.NewKeywordField(key, v)
-		case float64:
-			field = bluge.NewKeywordField(key, strconv.FormatFloat(v, 'f', -1, 64))
-		case int:
-			field = bluge.NewKeywordField(key, strconv.FormatInt(int64(v), 10))
-		case bool:
-			field = bluge.NewKeywordField(key, strconv.FormatBool(v))
-		default:
-			field = bluge.NewKeywordField(key, fmt.Sprintf("%v", v))
+		v, err := zutils.ToString(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [keyword] but the value [%v] can't convert to string", key, value)
 		}
+		field = bluge.NewKeywordField(key, v)
 	case "bool":
-		value := value.(bool)
-		field = bluge.NewKeywordField(key, strconv.FormatBool(value))
-	case "date", "time":
-		switch v := value.(type) {
-		case string:
-			format := time.RFC3339
-			if prop.Format != "" {
-				format = prop.Format
-			}
-			tim, err := time.Parse(format, v)
-			if err != nil {
-				return err
-			}
-			field = bluge.NewDateTimeField(key, tim)
-		case float64:
-			if t := zutils.Unix(int64(v)); !t.IsZero() {
-				field = bluge.NewDateTimeField(key, t)
-			} else {
-				return fmt.Errorf("value is not a valid timestamp")
-			}
-		default:
-			return fmt.Errorf("value type of date must be string or float64")
+		v, err := zutils.ToBool(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [bool] but the value [%v] can't convert to boolean", key, value)
 		}
+		field = bluge.NewKeywordField(key, strconv.FormatBool(v))
+	case "date", "time":
+		v, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)
+		if err != nil {
+			return fmt.Errorf("field [%s] value [%v] parse err: %s", key, value, err.Error())
+		}
+		field = bluge.NewDateTimeField(key, v)
 	}
 	if prop.Store || prop.Highlightable {
 		field.StoreValue()

@@ -6,7 +6,7 @@ export ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
 # clean up
 find ./pkg -name data -type d|xargs rm -fR
 find ./test -name data -type d|xargs rm -fR
-rm coverage.out
+rm -f coverage.out
 # clean up finished
 
 go test ./... -race -covermode=atomic -coverprofile=coverage.out

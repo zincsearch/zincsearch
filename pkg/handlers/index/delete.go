@@ -29,6 +29,7 @@ import (
 // @Id DeleteIndex
 // @Summary Delete index
 // @Tags    Index
+// @Produce json
 // @Param   index  path  string  true  "Index"
 // @Success 200 {object} meta.HTTPResponseIndex
 // @Failure 400 {object} meta.HTTPResponseError

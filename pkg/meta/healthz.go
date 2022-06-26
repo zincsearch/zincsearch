@@ -26,8 +26,12 @@ import (
 // @Id Healthz
 // @Summary Get healthz
 // @Produce json
-// @Success 200 {object} HTTPResponse
+// @Success 200 {object} HealthzResponse
 // @Router /healthz [get]
 func GetHealthz(c *gin.Context) {
-	c.JSON(http.StatusOK, HTTPResponse{Message: "ok"})
+	c.JSON(http.StatusOK, HealthzResponse{Status: "ok"})
+}
+
+type HealthzResponse struct {
+	Status string `json:"status"`
 }

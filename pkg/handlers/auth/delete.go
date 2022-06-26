@@ -27,6 +27,7 @@ import (
 // @Id DeleteUser
 // @Summary Delete user
 // @Tags    User
+// @Produce json
 // @Param   id  path  string  true  "User id"
 // @Success 200 {object} meta.HTTPResponseID
 // @Success 500 {object} meta.HTTPResponseError

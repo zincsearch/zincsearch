@@ -35,6 +35,7 @@ import (
 // @Id Search
 // @Summary Search V2 DSL for compatible ES
 // @Tags    Search
+// @Accept  json
 // @Produce json
 // @Param   index  path  string  true  "Index"
 // @Param   query  body  meta.ZincQueryForSDK true  "Query"
@@ -73,6 +74,7 @@ func SearchDSL(c *gin.Context) {
 // @Id MSearch
 // @Summary Search V2 MultipleSearch for compatible ES
 // @Tags    Search
+// @Accept  plain
 // @Produce json
 // @Param   query  body  string  true  "Query"
 // @Success 200 {object} meta.SearchResponse
@@ -105,14 +107,14 @@ func MultipleSearch(c *gin.Context) {
 			nextLineIsData = false
 			query := &meta.ZincQuery{Size: 10}
 			if err = json.Unmarshal(scanner.Bytes(), &query); err != nil {
-				log.Error().Err(err).Msg("handlers.search..MultipleSearch: json.Unmarshal error")
+				log.Error().Msgf("handlers.search.MultipleSearch.json.Unmarshal: %s, err %s", scanner.Text(), err.Error())
 				responses = append(responses, &meta.SearchResponse{Error: err.Error()})
 				continue
 			}
 			// search query
 			resp, err := searchIndex(indexNames, query)
 			if err != nil {
-				log.Error().Err(err).Msg("handlers.search..MultipleSearch: searchIndex: error")
+				log.Error().Msgf("handlers.search.MultipleSearch.searchIndex: err %s", err.Error())
 				responses = append(responses, &meta.SearchResponse{Error: err.Error()})
 			} else {
 				responses = append(responses, resp)
@@ -121,7 +123,7 @@ func MultipleSearch(c *gin.Context) {
 			nextLineIsData = true
 			indexNames = indexNames[:0]
 			if err = json.Unmarshal(scanner.Bytes(), &doc); err != nil {
-				log.Error().Err(err).Msg("handlers.search..MultipleSearch: json.Unmarshal: error")
+				log.Error().Msgf("handlers.search.MultipleSearch.json.Unmarshal: %s, err %s", scanner.Text(), err.Error())
 				continue
 			}
 			if v, ok := doc["index"]; ok {

@@ -28,6 +28,8 @@ import (
 // @Id IndexDocument
 // @Summary Create or update document
 // @Tags    Document
+// @Accept  json
+// @Produce json
 // @Param   index     path  string  true  "Index"
 // @Param   document  body  map[string]interface{}  true  "Document"
 // @Success 200 {object} meta.HTTPResponseID
@@ -108,6 +110,8 @@ func createUpdateDocumentWorker(doc map[string]interface{}, docID string, indexN
 // @Id IndexDocumentWithID
 // @Summary Create or update document with id
 // @Tags    Document
+// @Accept  json
+// @Produce json
 // @Param   index     path  string  true  "Index"
 // @Param   id        path  string  true  "ID"
 // @Param   document  body  map[string]interface{}  true  "Document"

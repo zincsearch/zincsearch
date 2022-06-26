@@ -47,6 +47,9 @@ func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
 		}
 	}
 
+	resp := new(SearchResponse)
+	resp.Hits.Hits = make([]Hit, 0)
+
 	var err error
 	switch iQuery.SearchType {
 	case "alldocuments":
@@ -77,17 +80,15 @@ func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
 	}
 
 	if err != nil {
-		return &SearchResponse{
-			Error: err.Error(),
-		}, err
+		resp.Error = err.Error()
+		return resp, err
 	}
 
 	// handle aggregations
 	err = AddAggregations(searchRequest, iQuery.Aggregations, index.Mappings)
 	if err != nil {
-		return &SearchResponse{
-			Error: err.Error(),
-		}, err
+		resp.Error = err.Error()
+		return resp, err
 	}
 
 	timeMin, timeMax := timerange.Query(iQuery.Query)
@@ -106,7 +107,7 @@ func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
 		log.Printf("error executing search: %s", err.Error())
 	}
 
-	var hits []Hit
+	var hits = make([]Hit, 0)
 
 	next, err := dmi.Next()
 	for err == nil && next != nil {
@@ -145,16 +146,10 @@ func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
 		log.Printf("error iterating results: %s", err.Error())
 	}
 
-	resp := &SearchResponse{
-		Took: int(dmi.Aggregations().Duration().Milliseconds()),
-		Hits: Hits{
-			Total: Total{
-				Value: int(dmi.Aggregations().Count()),
-			},
-			MaxScore: dmi.Aggregations().Metric("max_score"),
-			Hits:     hits,
-		},
-	}
+	resp.Took = int(dmi.Aggregations().Duration().Milliseconds())
+	resp.Hits.Total.Value = int(dmi.Aggregations().Count())
+	resp.Hits.MaxScore = dmi.Aggregations().Metric("max_score")
+	resp.Hits.Hits = hits
 
 	if len(iQuery.Aggregations) > 0 {
 		resp.Aggregations, err = ParseAggregations(dmi.Aggregations())

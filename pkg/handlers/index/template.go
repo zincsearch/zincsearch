@@ -71,6 +71,7 @@ func GetTemplate(c *gin.Context) {
 // @Id CreateTemplate
 // @Summary Create update index template
 // @Tags    Index
+// @Accept  json
 // @Produce json
 // @Param   template body meta.IndexTemplate true "Template data"
 // @Success 200 {object} meta.HTTPResponseTemplate
@@ -107,6 +108,7 @@ func CreateTemplate(c *gin.Context) {
 // @Id UpdateTemplate
 // @Summary Create update index template
 // @Tags    Index
+// @Accept  json
 // @Produce json
 // @Param   name     path string  true  "Template"
 // @Param   template body meta.IndexTemplate true "Template data"
@@ -118,6 +120,7 @@ func UpdateTemplateForSDK() {}
 // @Id DeleteTemplate
 // @Summary Delete template
 // @Tags    Index
+// @Produce json
 // @Param   name  path  string  true  "Template"
 // @Success 200 {object} meta.HTTPResponse
 // @Failure 400 {object} meta.HTTPResponseError

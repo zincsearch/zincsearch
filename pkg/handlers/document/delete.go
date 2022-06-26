@@ -28,6 +28,7 @@ import (
 // @Id DeleteDocument
 // @Summary Delete document
 // @Tags    Document
+// @Produce json
 // @Param   index  path  string  true  "Index"
 // @Param   id     path  string  true  "ID"
 // @Success 200 {object} meta.HTTPResponseDocument

@@ -25,7 +25,7 @@ import (
 
 func RangeQuery(query map[string]interface{}) (int64, int64) {
 	for field, v := range query {
-		if field == "@timestamp" {
+		if field == meta.TimeFieldName {
 			vv, ok := v.(map[string]interface{})
 			if !ok {
 				return 0, 0
