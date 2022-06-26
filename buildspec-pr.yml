@@ -50,10 +50,10 @@ phases:
       # - go build -o main cmd/zinc/main.go
       # Build binary and container images using goreleaser
       - echo Build started on `date`
-      - GIT_TAG="$(git describe --tags --abbrev=0)"
+      # - GIT_TAG="$(git describe --tags --abbrev=0)"
       - wget https://git.io/goreleaser
       - sudo mv goreleaser /usr/local/bin/goreleaser
-      - goreleaser build
+      - goreleaser build --snapshot
   # post_build:
   #   commands:
   #     - echo Build completed on `date`
