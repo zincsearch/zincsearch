@@ -52,7 +52,7 @@ phases:
       - echo Build started on `date`
       - GIT_TAG="$(git describe --tags --abbrev=0)"
       - wget https://git.io/goreleaser
-      - mv goreleaser /usr/local/bin/goreleaser
+      - sudo mv goreleaser /usr/local/bin/goreleaser
       - goreleaser build
   # post_build:
   #   commands:
