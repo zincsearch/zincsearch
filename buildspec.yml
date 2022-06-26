@@ -43,6 +43,7 @@ phases:
       - npm install
       - npm run build
       - cd ..
+      - ./coverage.sh
       # Build binary and container images using goreleaser
       - echo Build started on `date`
       - GIT_TAG="$(git describe --tags --abbrev=0)"
