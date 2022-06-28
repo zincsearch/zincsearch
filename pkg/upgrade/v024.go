@@ -57,6 +57,9 @@ func UpgradeFromV024Index(indexName string) error {
 	if ok, _ := zutils.IsExist(path.Join(rootPath, indexName)); !ok {
 		return nil // if index does not exist, skip
 	}
+	if ok, _ := zutils.IsExist(path.Join(rootPath, indexName, "000000")); ok {
+		return nil // if index already upgraded, skip
+	}
 	if err := os.Rename(path.Join(rootPath, indexName), path.Join(rootPath, indexName+"_old")); err != nil {
 		return err
 	}
