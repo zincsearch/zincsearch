@@ -37,8 +37,6 @@ func init() {
 		switch strings.ToLower(config.Global.MetadataStorage) {
 		case "badger":
 			db = badger.New("_metadata.db")
-		// case "pebble":
-		// 	db = pebble.New("_metadata.peb")
 		default:
 			db = bolt.New("_metadata.bolt")
 		}
