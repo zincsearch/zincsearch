@@ -18,7 +18,7 @@ package meta
 import (
 	"time"
 
-	"gopkg.in/segmentio/analytics-go.v3"
+	"github.com/segmentio/analytics-go/v3"
 )
 
 var (

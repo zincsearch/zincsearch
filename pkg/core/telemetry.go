@@ -22,9 +22,9 @@ import (
 
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/analytics-go/v3"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
-	"gopkg.in/segmentio/analytics-go.v3"
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
