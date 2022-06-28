@@ -53,6 +53,9 @@ func SetRoutes(r *gin.Engine) {
 	r.GET("/healthz", meta.GetHealthz)
 
 	// use ginSwagger middleware to serve the API docs
+	r.GET("/swagger", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	})
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	front, err := zinc.GetFrontendAssets()
