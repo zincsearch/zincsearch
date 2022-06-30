@@ -60,7 +60,7 @@ func DeleteIndex(name string) error {
 		}
 	}
 
-	// 4. Delete form metadata
+	// 5. Delete form metadata
 	return metadata.Index.Delete(name)
 }
 

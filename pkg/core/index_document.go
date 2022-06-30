@@ -31,6 +31,8 @@ import (
 	"github.com/zinclabs/zinc/pkg/zutils/flatten"
 )
 
+var errIdNotFound = errors.New("id not found")
+
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
 // If no mappings are found, it creates te mapping for all the encountered fields. If mapping for some fields is found but not for others
 // then it creates the mapping for the missing fields.
@@ -185,6 +187,18 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 	return nil
 }
 
+func (index *Index) CreateDocumentAsync(docID string, doc map[string]interface{}) error {
+	return index.wal.CreateDocument(docID, doc)
+}
+
+func (index *Index) UpdateDocumentAsync(docID string, doc map[string]interface{}) error {
+	return index.wal.UpdateDocument(docID, doc)
+}
+
+func (index *Index) DeleteDocumentAsync(docID string) error {
+	return index.wal.DeleteDocument(docID)
+}
+
 // CreateDocument inserts or updates a document in the zinc index
 func (index *Index) CreateDocument(docID string, doc map[string]interface{}, update bool) error {
 	bdoc, err := index.BuildBlugeDocumentFromJSON(docID, doc)
@@ -218,6 +232,21 @@ func (index *Index) UpdateDocument(docID string, doc map[string]interface{}) err
 	return writer.Update(bdoc.ID(), bdoc)
 }
 
+func (index *Index) DeleteDocument(docID string) error {
+	bdoc := bluge.NewDocument(docID)
+	writers, err := index.GetWriters()
+	if err != nil {
+		return err
+	}
+	for _, w := range writers {
+		err = w.Delete(bdoc.ID())
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (index *Index) FindID(id string) (*bluge.Writer, error) {
 	query := bluge.NewBooleanQuery()
 	query.AddMust(bluge.NewTermQuery(id).SetField("_id"))
@@ -244,5 +273,5 @@ func (index *Index) FindID(id string) (*bluge.Writer, error) {
 			return w, nil
 		}
 	}
-	return nil, errors.New("id not found")
+	return nil, errIdNotFound
 }

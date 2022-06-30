@@ -18,7 +18,6 @@ package document
 import (
 	"net/http"
 
-	"github.com/blugelabs/bluge"
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
@@ -45,18 +44,9 @@ func Delete(c *gin.Context) {
 		return
 	}
 
-	bdoc := bluge.NewDocument(docID)
-	writers, err := index.GetWriters()
-	if err != nil {
+	if err := index.DeleteDocumentAsync(docID); err != nil {
 		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
-	}
-	for _, w := range writers {
-		err = w.Delete(bdoc.ID())
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
-			return
-		}
 	}
 	c.JSON(http.StatusOK, meta.HTTPResponseDocument{Message: "deleted", Index: indexName, ID: docID})
 }

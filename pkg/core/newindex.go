@@ -57,6 +57,9 @@ func NewIndex(name, storageType string, defaultSearchAnalyzer *analysis.Analyzer
 		index.Shards = append(index.Shards, &meta.IndexShard{ID: i})
 	}
 
+	// TODO: better place for starting
+	index.StartWALConsumer(false)
+
 	return index, nil
 }
 

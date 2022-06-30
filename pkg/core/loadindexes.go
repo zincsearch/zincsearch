@@ -16,6 +16,8 @@
 package core
 
 import (
+	"fmt"
+
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/errors"
@@ -69,6 +71,12 @@ func LoadZincIndexesFromMetadata() error {
 				return errors.New(errors.ErrorTypeRuntimeException, "parse stored analysis error").Cause(err)
 			}
 		}
+
+		fmt.Println("loading", index.Name)
+		if err := index.StartWALConsumer(true); err != nil {
+			log.Panic().Err(err)
+		}
+
 		// load in memory
 		ZINC_INDEX_LIST.Add(index)
 	}

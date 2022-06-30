@@ -71,7 +71,12 @@ func CreateUpdate(c *gin.Context) {
 		_ = core.StoreIndex(index)
 	}
 
-	err = index.CreateDocument(docID, doc, update)
+	if update {
+		err = index.UpdateDocumentAsync(docID, doc)
+	} else {
+		err = index.CreateDocumentAsync(docID, doc)
+	}
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return

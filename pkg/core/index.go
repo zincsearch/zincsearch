@@ -29,6 +29,8 @@ type Index struct {
 	meta.Index
 	Analyzers map[string]*analysis.Analyzer `json:"-"`
 	lock      sync.RWMutex                  `json:"-"`
+
+	wal WriteAheadLog
 }
 
 func (index *Index) UseTemplate() error {
@@ -181,6 +183,9 @@ func (index *Index) Close() error {
 	if err = index.UpdateMetadata(); err != nil {
 		return err
 	}
+
+	// TODO: flush WAL or not?
+
 	index.lock.Lock()
 	for _, shard := range index.Shards {
 		if shard.Writer == nil {

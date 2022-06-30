@@ -63,7 +63,7 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	err = index.UpdateDocument(docID, doc)
+	err = index.UpdateDocumentAsync(docID, doc)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
