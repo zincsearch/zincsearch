@@ -117,6 +117,9 @@ func (index *Index) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error) 
 		var i = i
 		egLimit <- struct{}{}
 		eg.Go(func() error {
+			defer func() {
+				<-egLimit
+			}()
 			w, err := index.GetWriter(i)
 			if err != nil {
 				return err
@@ -128,7 +131,6 @@ func (index *Index) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error) 
 			chs <- r
 			return nil
 		})
-		<-egLimit
 		if index.Shards[i].DocTimeMin < timeMin {
 			break
 		}
