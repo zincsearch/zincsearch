@@ -17,7 +17,6 @@ package core
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -25,6 +24,7 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/goccy/go-json"
 
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/zutils"
@@ -206,12 +206,16 @@ func (index *Index) CreateDocument(docID string, doc map[string]interface{}, upd
 }
 
 // UpdateDocument updates a document in the zinc index
-func (index *Index) UpdateDocument(docID string, doc map[string]interface{}) error {
-	bdoc, err := index.BuildBlugeDocumentFromJSON(docID, doc)
+func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, insert bool) error {
+	writer, err := index.FindID(docID)
 	if err != nil {
+		if insert && err == errors.ErrorIDNotFound {
+			return index.CreateDocument(docID, doc, false)
+		}
 		return err
 	}
-	writer, err := index.FindID(docID)
+
+	bdoc, err := index.BuildBlugeDocumentFromJSON(docID, doc)
 	if err != nil {
 		return err
 	}
@@ -244,5 +248,5 @@ func (index *Index) FindID(id string) (*bluge.Writer, error) {
 			return w, nil
 		}
 	}
-	return nil, errors.New("id not found")
+	return nil, errors.ErrorIDNotFound
 }

@@ -22,6 +22,7 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id UpdateDocument
@@ -38,7 +39,9 @@ import (
 // @Router /api/{index}/_update/{id} [post]
 func Update(c *gin.Context) {
 	indexName := c.Param("target")
-	docID := c.Param("id") // ID for the document to be updated provided in URL path
+	docID := c.Param("id")      // ID for the document to be updated provided in URL path
+	insert := c.Query("insert") // true or false
+	insertBool, _ := zutils.ToBool(insert)
 
 	var err error
 	var doc map[string]interface{}
@@ -63,7 +66,7 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	err = index.UpdateDocument(docID, doc)
+	err = index.UpdateDocument(docID, doc, insertBool)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
