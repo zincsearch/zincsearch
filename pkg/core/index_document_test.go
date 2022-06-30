@@ -115,8 +115,9 @@ func TestIndex_CreateUpdateDocument(t *testing.T) {
 
 func TestIndex_UpdateDocument(t *testing.T) {
 	type args struct {
-		docID string
-		doc   map[string]interface{}
+		docID  string
+		doc    map[string]interface{}
+		insert bool
 	}
 	tests := []struct {
 		name    string
@@ -131,6 +132,19 @@ func TestIndex_UpdateDocument(t *testing.T) {
 					"name": "HelloUpdate",
 					"time": float64(1579098983),
 				},
+				insert: false,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Insert",
+			args: args{
+				docID: "2",
+				doc: map[string]interface{}{
+					"name": "HelloUpdate",
+					"time": float64(1579098983),
+				},
+				insert: true,
 			},
 			wantErr: false,
 		},
@@ -157,7 +171,7 @@ func TestIndex_UpdateDocument(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := index.UpdateDocument(tt.args.docID, tt.args.doc); (err != nil) != tt.wantErr {
+			if err := index.UpdateDocument(tt.args.docID, tt.args.doc, tt.args.insert); (err != nil) != tt.wantErr {
 				t.Errorf("Index.UpdateDocument() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
