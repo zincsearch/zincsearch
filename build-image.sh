@@ -2,9 +2,9 @@
 # author xiaojun207
 # eg. : sh build-image.sh
 
-VERSION="0.2.5" # 版本
-COMMIT_HASH="79b9cbf66548b0c9728c1613fa2c64aeb19db81e" #
-BUILD_DATE="20220630" #
+VERSION=`git describe --tags --always`
+BUILD_DATE=`date -u '+%Y-%m-%d_%I:%M:%S%p-GMT'`
+COMMIT_HASH=`git rev-parse HEAD`
 IMAGE="zinclabs/zinc"
 
 # build image
