@@ -8,13 +8,13 @@
           </q-card-section>
           <q-card-section class="bg-white">
             <q-form class="q-gutter-md" @submit="onSubmit">
-              <q-input v-model="id" label="User ID">
+              <q-input data-cy="login-user-id" v-model="id" label="User ID">
                 <template #prepend>
                   <q-icon name="email" />
                 </template>
               </q-input>
 
-              <q-input v-model="password" type="password" :label="t('login.password')">
+              <q-input data-cy="login-password" v-model="password" type="password" :label="t('login.password')">
                 <template #prepend>
                   <q-icon name="lock" />
                 </template>
@@ -22,6 +22,7 @@
 
               <q-card-actions class="q-px-lg q-mt-md q-mb-xl">
                 <q-btn
+                  data-cy="login-sign-in"
                   unelevated
                   size="lg"
                   class="full-width"

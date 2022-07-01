@@ -3,6 +3,7 @@
     <div class="col row justify-between">
       <div class="col">
         <q-input
+          data-cy="search-bar-input"
           v-model="searchQuery"
           :placeholder="t('search.typeSearch')"
           dense
@@ -23,6 +24,7 @@
     <div class="q-ml-sm search-time">
       <q-btn-group spread>
         <q-btn
+          data-cy="search-bar-refresh-button"
           dense
           color="primary"
           label=""
@@ -33,6 +35,7 @@
           @click="searchData"
         />
         <q-btn-dropdown
+          data-cy="search-bar-button-dropdown"
           color="primary"
           class="q-pa-sm search-dropdown"
           no-caps
