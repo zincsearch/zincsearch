@@ -16,19 +16,33 @@
         <div class="q-mr-xs">
           <q-btn
             unelevated
-            outline
             no-caps
-            padding="xs lg"
-            icon-right="help"
+            padding="xs sm"
             :label="t('menu.documentation')"
             href="https://docs.zincsearch.com"
             target="_blank"
           />
         </div>
-        <div class="q-mr-xs">
-          <q-btn-dropdown outline no-caps padding="xs lg" icon-right="manage_accounts">
+
+        <div>
+          <q-btn-dropdown unelevated no-caps padding="xs sm">
             <template #label>
-              <div class="row items-center no-wrap">{{ user.name }}</div>
+              <div class="row no-wrap" style="margin-right: -12px;">{{ selectedLanguage.label }}</div>
+            </template>
+            <q-list>
+              <q-item v-ripple v-close-popup clickable v-for="lang in langList" :key="lang.value" v-bind="lang" @click="changeLanguage(lang)">
+                <q-item-section>
+                  <q-item-label>{{lang.label}}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+
+        <div class="q-mr-xs">
+          <q-btn-dropdown unelevated no-caps padding="xs sm">
+            <template #label>
+              <div class="row items-center no-wrap" style="margin-right: -12px;">{{ user.name }}</div>
             </template>
             <q-list>
               <q-item-label header>{{ t("menu.account") }}</q-item-label>
@@ -49,22 +63,6 @@
             </q-list>
           </q-btn-dropdown>
         </div>
-
-        <div>
-          <q-btn-dropdown outline no-caps padding="xs lg" icon-right="language">
-            <template #label>
-              <div class="row items-center no-wrap">{{ selectedLanguage.label }}</div>
-            </template>
-            <q-list>
-              <q-item v-ripple v-close-popup clickable v-for="lang in langList" :key="lang.value" v-bind="lang" @click="changeLanguage(lang)">
-                <q-item-section>
-                  <q-item-label>{{lang.label}}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
-        </div>
-
 
       </q-toolbar>
     </q-header>
