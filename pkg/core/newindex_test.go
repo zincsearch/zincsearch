@@ -18,16 +18,13 @@ package core
 import (
 	"testing"
 
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/analysis/analyzer"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewIndex(t *testing.T) {
 	type args struct {
-		name                  string
-		storageType           string
-		defaultSearchAnalyzer *analysis.Analyzer
+		name        string
+		storageType string
 	}
 	tests := []struct {
 		name    string
@@ -37,43 +34,39 @@ func TestNewIndex(t *testing.T) {
 		{
 			name: "normal",
 			args: args{
-				name:                  "TestNewIndex.index_1",
-				storageType:           "disk",
-				defaultSearchAnalyzer: nil,
+				name:        "TestNewIndex.index_1",
+				storageType: "disk",
 			},
 			wantErr: false,
 		},
 		{
 			name: "underline prefix",
 			args: args{
-				name:                  "_TestNewIndex.index_2",
-				storageType:           "disk",
-				defaultSearchAnalyzer: nil,
+				name:        "_TestNewIndex.index_2",
+				storageType: "disk",
 			},
 			wantErr: true,
 		},
 		{
 			name: "with analyzer",
 			args: args{
-				name:                  "TestNewIndex.index_3",
-				storageType:           "disk",
-				defaultSearchAnalyzer: analyzer.NewStandardAnalyzer(),
+				name:        "TestNewIndex.index_3",
+				storageType: "disk",
 			},
 			wantErr: false,
 		},
 		{
 			name: "empty",
 			args: args{
-				name:                  "",
-				storageType:           "disk",
-				defaultSearchAnalyzer: nil,
+				name:        "",
+				storageType: "disk",
 			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewIndex(tt.args.name, tt.args.storageType, tt.args.defaultSearchAnalyzer)
+			got, err := NewIndex(tt.args.name, tt.args.storageType)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -119,7 +112,7 @@ func TestGetIndex(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err := NewIndex("TestGetIndex.index_1", "disk", nil)
+		index, err := NewIndex("TestGetIndex.index_1", "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 

@@ -98,7 +98,7 @@ func SetMapping(c *gin.Context) {
 		mappings = index.Mappings
 	} else {
 		// create index
-		index, err = core.NewIndex(indexName, "", nil)
+		index, err = core.NewIndex(indexName, "")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 			return
