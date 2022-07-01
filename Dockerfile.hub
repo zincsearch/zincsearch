@@ -1,6 +1,16 @@
 # syntax=docker/dockerfile:experimental
 ############################
-# STEP 1 build executable binary
+# STEP 1 build web dist
+############################
+FROM node:13.8.0-slim as webBuilder
+WORKDIR /web
+COPY ./web /web
+
+RUN npm install
+RUN npm run build
+
+############################
+# STEP 2 build executable binary
 ############################
 # FROM golang:alpine AS builder
 FROM --platform=$BUILDPLATFORM golang:1.18 as builder
@@ -14,18 +24,21 @@ RUN update-ca-certificates
 # RUN apk update && apk add --no-cache git
 # Create appuser.
 ENV USER=appuser
-ENV UID=10001 
-# See https://stackoverflow.com/a/55757473/12429735RUN 
-RUN adduser \    
-    --disabled-password \    
-    --gecos "" \    
-    --home "/nonexistent" \    
-    --shell "/sbin/nologin" \    
-    --no-create-home \    
-    --uid "${UID}" \    
+ENV UID=10001
+# See https://stackoverflow.com/a/55757473/12429735RUN
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
     "${USER}"
 WORKDIR $GOPATH/src/github.com/zinclabs/zinc/
+
 COPY . .
+COPY --from=webBuilder /web/dist web/dist
+
 # Fetch dependencies.
 # Using go get.
 RUN go mod tidy
@@ -33,7 +46,7 @@ RUN go mod tidy
 # RUN go mod download
 # RUN go mod verify
 # Build the binary.
-# to tackle error standard_init_linux.go:207: exec user process caused "no such file or directory" set CGO_ENABLED=0. 
+# to tackle error standard_init_linux.go:207: exec user process caused "no such file or directory" set CGO_ENABLED=0.
 # CGO_ENABLED=0 builds a statically linked binary.
 # docs for -ldflags at https://pkg.go.dev/cmd/link
 #       -w : Omit the DWARF symbol table.
@@ -46,7 +59,7 @@ ENV BUILD_DATE=$BUILD_DATE
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
 ############################
-# STEP 2 build a small image
+# STEP 3 build a small image
 ############################
 # FROM public.ecr.aws/lts/ubuntu:latest
 FROM scratch
