@@ -169,6 +169,11 @@ export default {
       l.value == language.value
     ));
 
+    if (!selectedLanguage || !selectedLanguage.value) {
+      language.value = "en"
+      selectedLanguage.value = langList[0]
+    }
+
     const changeLanguage = (item: any) => {
       setLanguage(item.value);
       selectedLanguage.value = item;
