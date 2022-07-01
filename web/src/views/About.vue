@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-lg">
     <h3 class="q-ma-none">Zinc</h3>
-    <p class="q-mt-md">A modern search engine.</p>
+    <p class="q-mt-md">{{t('about.introduction')}}</p>
 
     <div class="q-pa-md">
       <div class="row items-center q-mb-md">
@@ -42,11 +42,13 @@
 import { defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import aboutService from "../services/about";
+import { useI18n } from "vue-i18n";
 
 export default defineComponent({
   name: "PageAbout",
 
   setup() {
+    const { t } = useI18n();
     const store = useStore();
 
     const version = ref({});
@@ -58,6 +60,7 @@ export default defineComponent({
     getVersion();
 
     return {
+      t,
       version,
     };
   },
