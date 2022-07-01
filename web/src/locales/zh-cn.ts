@@ -20,6 +20,7 @@ export default {
       account: "账号管理",
       feedback: "反馈问题",
       zincSearch: "Zinc Search",
+      documentation: "文档",
     },
     about: {
       name: "Zinc",
