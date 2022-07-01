@@ -1,8 +1,12 @@
 # Unit Test Workflows
-## Setting up the test enviroment
+## Setting up the test enviroment (for etcd metadata storage)
 1. Need to install **etcd** , add `root` user and enable authentication. You can use this [link](https://etcd.io/docs/v3.4/op-guide/authentication/) to setup etcd. 
 2. Update the root password in your .env file.
 3. You are good to go.
+
+## For boltdb, badger metadata storage 
+
+You just need to specify ZINC_METADATA_STORAGE environment variable to "bolt" or "badger" . Default value of ZINC_METADATA_STORAGE is "bolt"
 
 ## Steps to run tests
 1. A bash script at project root named `test.sh` can be used to run these unit tests.
