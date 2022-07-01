@@ -27,7 +27,7 @@
         <div>
           <q-btn-dropdown unelevated no-caps padding="xs sm">
             <template #label>
-              <div class="row no-wrap" style="margin-right: -12px;">{{ selectedLanguage.label }}</div>
+              <div class="row no-wrap" >{{ selectedLanguage.label }}</div>
             </template>
             <q-list>
               <q-item v-ripple v-close-popup clickable v-for="lang in langList" :key="lang.value" v-bind="lang" @click="changeLanguage(lang)">
@@ -42,7 +42,7 @@
         <div class="q-mr-xs">
           <q-btn-dropdown unelevated no-caps padding="xs sm">
             <template #label>
-              <div class="row items-center no-wrap" style="margin-right: -12px;">{{ user.name }}</div>
+              <div class="row items-center no-wrap">{{ user.name }}</div>
             </template>
             <q-list>
               <q-item-label header>{{ t("menu.account") }}</q-item-label>
@@ -199,4 +199,9 @@ export default {
 
 <style lang="scss">
 @import "../styles/app.scss";
+
+.q-header .q-btn-dropdown__arrow {
+  margin-left: -4px;
+}
+
 </style>
