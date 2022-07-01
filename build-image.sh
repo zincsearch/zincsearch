@@ -6,10 +6,10 @@
 VERSION=`git describe --tags --always` # eg.: 0.2.5
 BUILD_DATE=`date +%Y%m%d` # eg.: 20220701
 COMMIT_HASH=`git rev-parse HEAD` #
-IMAGE="$1" #
+IMAGE="zinclabs/zinc"
 
-if [ -z "$1" ]; then
-  IMAGE="zinclabs/zinc"
+if [ -n "$1" ]; then
+  IMAGE="$1" #
 fi
 
 # build image
