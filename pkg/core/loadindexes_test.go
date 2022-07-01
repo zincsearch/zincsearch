@@ -25,7 +25,7 @@ import (
 
 func TestLoadIndexes(t *testing.T) {
 	t.Run("create some index", func(t *testing.T) {
-		index, err := NewIndex("TestLoadIndexes.index_1", "disk", nil)
+		index, err := NewIndex("TestLoadIndexes.index_1", "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 

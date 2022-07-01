@@ -19,7 +19,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/blugelabs/bluge/analysis"
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
@@ -84,11 +83,7 @@ func CreateIndexWorker(newIndex *meta.IndexSimple, indexName string) error {
 		return errors.New(err.Error())
 	}
 
-	var defaultSearchAnalyzer *analysis.Analyzer
-	if analyzers != nil {
-		defaultSearchAnalyzer = analyzers["default"]
-	}
-	index, err := core.NewIndex(newIndex.Name, newIndex.StorageType, defaultSearchAnalyzer)
+	index, err := core.NewIndex(newIndex.Name, newIndex.StorageType)
 	if err != nil {
 		return errors.New(err.Error())
 	}

@@ -23,6 +23,7 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
+	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 )
 
 type Index struct {
@@ -42,7 +43,11 @@ func (index *Index) UseTemplate() error {
 	}
 
 	if template.Template.Settings != nil {
+		// update settings
 		_ = index.SetSettings(template.Template.Settings)
+		// update analyzers
+		analyzers, _ := zincanalysis.RequestAnalyzer(template.Template.Settings.Analysis)
+		_ = index.SetAnalyzers(analyzers)
 	}
 
 	if template.Template.Mappings != nil {

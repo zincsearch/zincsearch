@@ -78,7 +78,7 @@ func TestIndex_CreateUpdateDocument(t *testing.T) {
 	var index *Index
 	var err error
 	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex(indexName, "disk", nil)
+		index, err = NewIndex(indexName, "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 	})
@@ -153,7 +153,7 @@ func TestIndex_UpdateDocument(t *testing.T) {
 	var index *Index
 	var err error
 	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex("TestIndex_UpdateDocument.index_1", "disk", nil)
+		index, err = NewIndex("TestIndex_UpdateDocument.index_1", "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 
