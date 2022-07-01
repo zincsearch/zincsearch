@@ -21,7 +21,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/blugelabs/bluge/analysis/analyzer"
 	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
 
@@ -234,7 +233,7 @@ func TestAnalyze(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err := core.NewIndex(indexName, "disk", analyzer.NewStandardAnalyzer())
+		index, err := core.NewIndex(indexName, "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 

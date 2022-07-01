@@ -64,20 +64,20 @@ func TestDeleteIndex(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err := NewIndex(indexName, "disk", nil)
+		index, err := NewIndex(indexName, "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 		err = StoreIndex(index)
 		assert.NoError(t, err)
 
-		indexS3, err := NewIndex(indexNameS3, "disk", nil)
+		indexS3, err := NewIndex(indexNameS3, "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, indexS3)
 		err = StoreIndex(indexS3)
 		assert.NoError(t, err)
 		indexS3.StorageType = "s3"
 
-		indexMinio, err := NewIndex(indexNameMinIO, "disk", nil)
+		indexMinio, err := NewIndex(indexNameMinIO, "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, indexMinio)
 		err = StoreIndex(indexMinio)

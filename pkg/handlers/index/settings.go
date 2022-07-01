@@ -18,7 +18,6 @@ package index
 import (
 	"net/http"
 
-	"github.com/blugelabs/bluge/analysis"
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
@@ -105,11 +104,7 @@ func SetSettings(c *gin.Context) {
 		return
 	}
 
-	var defaultSearchAnalyzer *analysis.Analyzer
-	if analyzers != nil {
-		defaultSearchAnalyzer = analyzers["default"]
-	}
-	index, err = core.NewIndex(indexName, "", defaultSearchAnalyzer)
+	index, err = core.NewIndex(indexName, "")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return

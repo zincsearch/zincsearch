@@ -67,7 +67,7 @@ func TestSearchV1(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err := core.NewIndex(indexName, "disk", nil)
+		index, err := core.NewIndex(indexName, "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 		err = core.StoreIndex(index)

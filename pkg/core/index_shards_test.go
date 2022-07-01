@@ -63,7 +63,7 @@ func TestIndex_CheckShards(t *testing.T) {
 	t.Run("perpare", func(t *testing.T) {
 		config.Global.Shard.MaxSize = 1024
 
-		index, err = NewIndex("TestIndex_CheckShards.index_1", "disk", nil)
+		index, err = NewIndex("TestIndex_CheckShards.index_1", "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 

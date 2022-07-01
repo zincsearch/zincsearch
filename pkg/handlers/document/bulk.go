@@ -173,7 +173,7 @@ func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkRespon
 
 			_, exists := core.GetIndex(indexName)
 			if !exists { // If the requested indexName does not exist then create it
-				newIndex, err := core.NewIndex(indexName, "", nil)
+				newIndex, err := core.NewIndex(indexName, "")
 				if err != nil {
 					return bulkIndexes, bulkRes, err
 				}

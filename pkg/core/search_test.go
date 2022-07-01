@@ -288,7 +288,7 @@ func TestIndex_Search(t *testing.T) {
 	indexName := "Search.index_1"
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			index, err := NewIndex(indexName, "disk", nil)
+			index, err := NewIndex(indexName, "disk")
 			assert.NoError(t, err)
 			assert.NotNil(t, index)
 			err = StoreIndex(index)
