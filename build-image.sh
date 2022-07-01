@@ -1,7 +1,7 @@
 #!/bin/sh
 # author xiaojun207
 # eg.1 : sh build-image.sh
-# eg.2, set image: sh build-image.sh xiaojun207/zinc
+# eg.2, set image: sh build-image.sh public.ecr.aws/h9e2j3o7/zinc
 
 VERSION=`git describe --tags --always` # eg.: 0.2.5
 BUILD_DATE=`date +%Y%m%d` # eg.: 20220701
