@@ -20,7 +20,6 @@ export default {
       account: "Account",
       feedback: "Feedback",
       zincSearch: "Zinc Search",
-      documentation: "Documentation",
     },
     about: {
       name: "Zinc",
