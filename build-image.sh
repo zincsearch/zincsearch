@@ -1,11 +1,16 @@
 #!/bin/sh
 # author xiaojun207
-# eg. : sh build-image.sh
+# eg.1 : sh build-image.sh
+# eg.2, set image: sh build-image.sh xiaojun207/zinc
 
 VERSION=`git describe --tags --always` # eg.: 0.2.5
 BUILD_DATE=`date +%Y%m%d` # eg.: 20220701
 COMMIT_HASH=`git rev-parse HEAD` #
-IMAGE="zinclabs/zinc" #
+IMAGE="$1" #
+
+if [ -z "$1" ]; then
+  IMAGE="zinclabs/zinc"
+fi
 
 # build image
 docker buildx build \
@@ -17,5 +22,7 @@ docker buildx build \
   . -f Dockerfile
 
 # push to image rep
-# docker push "$IMAGE:${VERSION}"
-# docker push "$IMAGE:latest"
+if [ -n "$1" ]; then
+ docker push "$IMAGE:${VERSION}"
+ docker push "$IMAGE:latest"
+fi
