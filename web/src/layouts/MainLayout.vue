@@ -14,7 +14,33 @@
         <q-toolbar-title>{{ t("menu.zincSearch") }}</q-toolbar-title>
 
         <div class="q-mr-xs">
-          <q-btn-dropdown outline rounded no-caps icon-right="manage_accounts">
+          <q-btn
+            unelevated
+            no-caps
+            padding="xs sm"
+            :label="t('menu.documentation')"
+            href="https://docs.zincsearch.com"
+            target="_blank"
+          />
+        </div>
+
+        <div>
+          <q-btn-dropdown unelevated no-caps padding="xs sm">
+            <template #label>
+              <div class="row no-wrap" >{{ selectedLanguage.label }}</div>
+            </template>
+            <q-list>
+              <q-item v-ripple v-close-popup clickable v-for="lang in langList" :key="lang.value" v-bind="lang" @click="changeLanguage(lang)">
+                <q-item-section>
+                  <q-item-label>{{lang.label}}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+
+        <div class="q-mr-xs">
+          <q-btn-dropdown unelevated no-caps padding="xs sm">
             <template #label>
               <div class="row items-center no-wrap">{{ user.name }}</div>
             </template>
@@ -37,24 +63,6 @@
             </q-list>
           </q-btn-dropdown>
         </div>
-
-        <div>
-          <q-btn-dropdown outline rounded no-caps icon-right="language">
-            <q-list>
-              <q-item v-ripple v-close-popup clickable @click="changeLanguage('en')">
-                <q-item-section>
-                  <q-item-label>English</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item v-ripple v-close-popup clickable @click="changeLanguage('zh-cn')">
-                <q-item-section>
-                  <q-item-label>简体中文</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
-        </div>
-
 
       </q-toolbar>
     </q-header>
@@ -97,6 +105,7 @@
 <script lang="ts">
 import MenuLink from "../components/MenuLink.vue";
 import { useI18n } from "vue-i18n";
+import { getLocale } from "../locales";
 import { setLanguage } from "../utils/cookies";
 
 
@@ -143,8 +152,29 @@ export default {
         link: "/about",
       },
     ];
-    const changeLanguage = (language: string) => {
-      setLanguage(language);
+
+    const langList = [
+      {
+        "label": "English",
+        "value":  "en",
+      },{
+        "label": "简体中文",
+        "value":  "zh-cn",
+      }
+    ]
+
+    const local = ref(getLocale());
+    const selectedLanguage = ref(langList.find((l) =>
+      l.value == local.value
+    ));
+
+    if (!selectedLanguage || !selectedLanguage.value) {
+      selectedLanguage.value = langList[0]
+    }
+
+    const changeLanguage = (item: any) => {
+      setLanguage(item.value);
+      selectedLanguage.value = item;
       router.go(0);
     };
     const signout = () => {
@@ -158,6 +188,8 @@ export default {
       essentialLinks: linksList,
       leftDrawerOpen: ref(false),
       user: store.state.user,
+      langList,
+      selectedLanguage,
       changeLanguage,
       signout,
     };
@@ -167,4 +199,9 @@ export default {
 
 <style lang="scss">
 @import "../styles/app.scss";
+
+.q-header .q-btn-dropdown__arrow {
+  margin-left: -4px;
+}
+
 </style>

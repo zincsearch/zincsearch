@@ -3,51 +3,41 @@ module github.com/zinclabs/zinc
 go 1.16
 
 require (
-	github.com/aws/aws-sdk-go-v2/config v1.11.0
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.22.0
+	github.com/aws/aws-sdk-go-v2/config v1.15.11
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.11
 	github.com/blugelabs/bluge v0.1.9
 	github.com/blugelabs/bluge_segment_api v0.2.0
 	github.com/blugelabs/ice v1.0.0
 	github.com/blugelabs/query_string v0.3.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/cockroachdb/pebble v0.0.0-20220613151633-4a952c0d3bdd
 	github.com/dgraph-io/badger/v3 v3.2103.2
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.7.7
-	github.com/go-ego/gse v0.70.0
-	github.com/goccy/go-json v0.9.6
-	github.com/google/go-cmp v0.5.8 // indirect
-	github.com/google/uuid v1.3.0 // indirect
+	github.com/go-ego/gse v0.70.2
+	github.com/goccy/go-json v0.9.7
 	github.com/joho/godotenv v1.4.0
-	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/minio/minio-go/v7 v7.0.21
-	github.com/prometheus/client_golang v1.12.0 // indirect
-	github.com/pyroscope-io/client v0.2.3
-	github.com/robfig/cron/v3 v3.0.0
-	github.com/rs/zerolog v1.26.1
-	github.com/segmentio/backo-go v1.0.0 // indirect
+	github.com/minio/minio-go/v7 v7.0.30
+	github.com/pyroscope-io/client v0.3.0
+	github.com/robfig/cron/v3 v3.0.1
+	github.com/rs/zerolog v1.27.0
+	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/stretchr/testify v1.7.1
-	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
-	github.com/swaggo/gin-swagger v1.4.3
-	github.com/swaggo/swag v1.8.2
-	github.com/tklauser/go-sysconf v0.3.9 // indirect
-	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
+	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe
+	github.com/swaggo/gin-swagger v1.5.0
+	github.com/swaggo/swag v1.8.3
+	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	github.com/zsais/go-gin-prometheus v0.0.0-20200217150448-2199a42d96c1
+	github.com/zsais/go-gin-prometheus v0.1.0
 	go.etcd.io/bbolt v1.3.6
 	go.etcd.io/etcd/client/v3 v3.5.4
-	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f
 	golang.org/x/text v0.3.7
-	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
-	google.golang.org/genproto v0.0.0-20220518221133-4f43b3371335 // indirect
-	gopkg.in/segmentio/analytics-go.v3 v3.1.0
-	gopkg.in/yaml.v3 v3.0.0 // indirect
+
 )
 
 replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v1.1.5
