@@ -227,7 +227,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex(indexName, "disk", nil)
+		index, err = NewIndex(indexName, "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 
@@ -264,7 +264,7 @@ func TestIndex_Settings(t *testing.T) {
 	indexName := "TestIndex_Settings.index_1"
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex(indexName, "disk", nil)
+		index, err = NewIndex(indexName, "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 
