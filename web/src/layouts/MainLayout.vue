@@ -105,7 +105,8 @@
 <script lang="ts">
 import MenuLink from "../components/MenuLink.vue";
 import { useI18n } from "vue-i18n";
-import { setLanguage, getLanguage } from "../utils/cookies";
+import { getLocale } from "../locales";
+import { setLanguage } from "../utils/cookies";
 
 
 import { ref } from "vue";
@@ -162,13 +163,12 @@ export default {
       }
     ]
 
-    const language = ref(getLanguage());
+    const local = ref(getLocale());
     const selectedLanguage = ref(langList.find((l) =>
-      l.value == language.value
+      l.value == local.value
     ));
 
     if (!selectedLanguage || !selectedLanguage.value) {
-      language.value = "en"
       selectedLanguage.value = langList[0]
     }
 
