@@ -102,16 +102,20 @@ export default defineComponent({
       });
     };
 
-    const selectFn = (index) => {
-      if (!index || !index.value) {
-        return;
+    const getSelectedIndexName = ()=>{
+      if(selectedIndex && selectedIndex.value && selectedIndex.value.value){
+        return selectedIndex.value.value;
       }
+      return "";
+    };
+
+    const selectFn = (index) => {
       selectedFields.value = [];
       indexFields.value = defaultFields();
       cachedFields.value = {};
 
       emit("updated", {
-        name: index.value,
+        name: getSelectedIndexName(),
         columns: [],
       });
     };
@@ -147,13 +151,13 @@ export default defineComponent({
         selectedFields.value.push(row);
       }
       emit("updated", {
-        name: selectedIndex.value.value,
+        name: getSelectedIndexName(),
         columns: selectedFields.value.map((v) => v.name),
       });
     };
     const selectedFieldFn = () => {
       emit("updated", {
-        name: selectedIndex.value.value,
+        name: getSelectedIndexName(),
         columns: selectedFields.value.map((v) => v.name),
       });
     };

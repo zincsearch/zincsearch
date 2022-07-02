@@ -445,7 +445,7 @@ export default defineComponent({
       const query = buildSearch(queryData);
 
       if (!indexData.name) {
-        indexData.name = ""
+        indexData.name = "";
       }
 
       searchService
@@ -484,7 +484,7 @@ export default defineComponent({
             // rerender the chart
             nextTick(() => {
               if(!res.data.aggregations){
-                console.log("res.data.aggregations is null")
+                console.log("res.data.aggregations is null");
                 return
               }
               const interval = res.data.aggregations.histogram["interval"];
