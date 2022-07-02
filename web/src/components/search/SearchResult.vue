@@ -443,6 +443,11 @@ export default defineComponent({
       }
       searchLoading.value = true;
       const query = buildSearch(queryData);
+
+      if (!indexData.name) {
+        indexData.name = ""
+      }
+
       searchService
         .search({ index: indexData.name, query: query })
         .then((res) => {
@@ -478,6 +483,10 @@ export default defineComponent({
 
             // rerender the chart
             nextTick(() => {
+              if(!res.data.aggregations){
+                console.log("res.data.aggregations is null")
+                return
+              }
               const interval = res.data.aggregations.histogram["interval"];
               if (interval) {
                 if (interval.includes("s")) {
