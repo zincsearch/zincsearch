@@ -483,9 +483,9 @@ export default defineComponent({
 
             // rerender the chart
             nextTick(() => {
-              if(!res.data.aggregations){
+              if (!res.data.aggregations) {
                 console.log("res.data.aggregations is null");
-                return
+                return;
               }
               const interval = res.data.aggregations.histogram["interval"];
               if (interval) {

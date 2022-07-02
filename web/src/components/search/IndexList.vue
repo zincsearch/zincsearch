@@ -102,8 +102,8 @@ export default defineComponent({
       });
     };
 
-    const getSelectedIndexName = ()=>{
-      if(selectedIndex && selectedIndex.value && selectedIndex.value.value){
+    const getSelectedIndexName = () => {
+      if (selectedIndex && selectedIndex.value && selectedIndex.value.value) {
         return selectedIndex.value.value;
       }
       return "";
