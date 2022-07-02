@@ -26,7 +26,9 @@
           dense
           color="primary"
           label=""
+          title="Search"
           :icon="refreshIcon"
+          :loading="searching"
           class="q-pa-sm"
           @click="searchData"
         />
