@@ -48,18 +48,18 @@
             </q-td>
             <template v-for="col in props.cols" :key="col.name" :props="props">
               <q-td v-if="col.name == '@timestamp'" width="238">
-                {{ col.value }}
+                <span v-html="col.value"></span>
               </q-td>
               <q-td v-else>
-                {{ col.value }}
+                <span v-html="col.value"></span>
               </q-td>
             </template>
           </q-tr>
           <q-tr v-show="props.expand" :props="props">
             <q-td colspan="100%">
-              <pre class="expanded">{{
-                JSON.stringify(props.row, null, 2)
-              }}</pre>
+              <pre class="expanded">
+<span v-html="JSON.stringify(props.row, null, 2)"></span>
+              </pre>
             </q-td>
           </q-tr>
         </template>
@@ -435,6 +435,67 @@ export default defineComponent({
       searchTable.value.setPagination(pagination.value);
     };
 
+    // eg.1: Gold => ['Gold']
+    // eg.2: City:Paris => ['Paris']
+    // eg.3: City:Paris Gold => ['Paris', 'Gold']
+    // eg.4: City:par* => ['par']
+    // eg.5: "Paris Gold" => ['Paris Gold']
+    const getKeywords = (queryString) => {
+      if (!queryString || queryString.trim().length == 0) {
+        return [];
+      }
+
+      let arr = [];
+      // queryString + " " is for special split regular
+      // split by space, but ignore double quotation marks
+      const groups = (queryString + " ").split(/ s*(?![^"]*"\ )/);
+      for (let i = 0; i < groups.length - 1; i++) {
+        const group = groups[i];
+        if (!group || group.trim().length == 0) {
+          continue;
+        }
+        // group + ":" is for special split regular
+        // split by :, but ignore "
+        const fieldWordArr = (group + ":").split(/:s*(?![^"]*"\:)/);
+        let keyword = group;
+        if (fieldWordArr.length > 2) {
+          keyword = fieldWordArr[1];
+        }
+        // delete start and end of * and "
+        keyword = keyword.replace(/(^\**)|(\**$)/g,"").replace(/(^"*)|("*$)/g,"");
+        if (keyword.trim().length > 0) {
+          // make sure key not empty or not space
+          arr.push(keyword);
+        }
+      }
+      return arr;
+    };
+
+    const highlightResultValue = (value, keywords) => {
+      if (!value) {
+        return value;
+      }
+
+      if (typeof value == "string") {
+        for (const idx in keywords) {
+          const keyword = keywords[idx];
+          const highlightText = "<span class='highlight'>" + keyword + "</span>";
+          value = value.replaceAll(keyword, highlightText);
+        }
+      } else if (Array.isArray(value)) {
+        for (let i = 0; i < value.length; i++) {
+          value[i] = highlightResultValue(value[i], keywords);
+        }
+      } else if (typeof value == "object") {
+        for (const key in value) {
+          value[key] = highlightResultValue(value[key], keywords);
+        }
+      } else {
+        // other type direct return value.
+      }
+      return value;
+    };
+
     let lastIndexName = "";
     const searchLoading = ref(false);
     const searchData = (indexData, queryData) => {
@@ -448,6 +509,7 @@ export default defineComponent({
         indexData.name = "";
       }
 
+      let keywords = getKeywords(queryData.query);
       searchService
         .search({ index: indexData.name, query: query })
         .then((res) => {
@@ -461,10 +523,15 @@ export default defineComponent({
             results = res.data.hits.hits;
             // update index fields
             let fields = {};
-            res.data.hits.hits.forEach((row) => {
+            results.forEach((row) => {
               let keys = Object.deepKeys(row._source);
-              for (var i in keys) {
+              for (let i in keys) {
                 fields[keys[i]] = {};
+              }
+
+              if (keywords && keywords.length > 0) {
+                // highlight keyword
+                row._source = highlightResultValue(row._source, keywords);
               }
             });
             emit("updated:fields", Object.keys(fields));
@@ -619,6 +686,9 @@ export default defineComponent({
       word-wrap: break-word;
       word-break: break-all;
     }
+  }
+  .highlight {
+    background-color: yellow;
   }
 }
 </style>
