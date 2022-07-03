@@ -2,6 +2,7 @@
   <div class="col column q-my-md q-ml-md">
     <div class="search-list">
       <q-table
+        data-cy="search-result-area"
         ref="searchTable"
         v-model:expanded="searchResult._source"
         :rows="searchResult"
