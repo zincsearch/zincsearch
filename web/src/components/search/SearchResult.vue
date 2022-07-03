@@ -471,13 +471,29 @@ export default defineComponent({
       return arr;
     };
 
-    const highlightResultValue = (text, keywords) => {
-      for (const idx in keywords) {
-        const keyword = keywords[idx];
-        const highlightText = "<span class='highlight'>" + keyword + "</span>";
-        text = text.replaceAll(keyword, highlightText);
+    const highlightResultValue = (value, keywords) => {
+      if (!value) {
+        return value;
       }
-      return text;
+
+      if (typeof value == "string") {
+        for (const idx in keywords) {
+          const keyword = keywords[idx];
+          const highlightText = "<span class='highlight'>" + keyword + "</span>";
+          value = value.replaceAll(keyword, highlightText);
+        }
+      } else if (Array.isArray(value)) {
+        for (let i = 0; i < value.length; i++) {
+          value[i] = highlightResultValue(value[i], keywords);
+        }
+      } else if (typeof value == "object") {
+        for (const key in value) {
+          value[key] = highlightResultValue(value[key], keywords);
+        }
+      } else {
+        // other type direct return value.
+      }
+      return value;
     };
 
     let lastIndexName = "";
@@ -509,10 +525,12 @@ export default defineComponent({
             let fields = {};
             results.forEach((row) => {
               let keys = Object.deepKeys(row._source);
-              for (var i in keys) {
-                let key = keys[i]
-                fields[key] = {};
-                if (keywords && keywords.length > 0) {
+              for (let i in keys) {
+                fields[keys[i]] = {};
+              }
+
+              if (keywords && keywords.length > 0) {
+                for (const key in row._source) {
                   // highlight keyword
                   row._source[key] = highlightResultValue(row._source[key], keywords);
                 }
