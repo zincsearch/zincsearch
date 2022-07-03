@@ -2,14 +2,7 @@
 
 describe("Search Page", () => {
     beforeEach(() => {
-        cy.visit("http://localhost:8080");
-
-        cy.get('[data-cy="login-user-id"]').type('admin')
-
-        // login
-        cy.get('[data-cy="login-password"]').type('admin')
-        cy.get('[data-cy="login-sign-in"]').click()
-        cy.contains('admin').should('be.visible')
+        cy.login();
     })
 
     it("should have basic fields", () => {

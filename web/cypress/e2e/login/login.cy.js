@@ -34,18 +34,6 @@ describe('login', () => {
   })
 
   it('should be able to login', () => {
-
-    // user id
-    cy.get('[data-cy="login-user-id"]').type('admin')
-
-    // password
-    cy.get('[data-cy="login-password"]').type('admin')
-
-    // sign in
-    cy.get('[data-cy="login-sign-in"]').click()
-
-    // check if the user is logged in
-    cy.contains('admin').should('be.visible')
-
+    cy.login();
   })
 })
