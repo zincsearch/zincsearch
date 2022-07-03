@@ -530,10 +530,8 @@ export default defineComponent({
               }
 
               if (keywords && keywords.length > 0) {
-                for (const key in row._source) {
-                  // highlight keyword
-                  row._source[key] = highlightResultValue(row._source[key], keywords);
-                }
+                // highlight keyword
+                row._source = highlightResultValue(row._source, keywords);
               }
             });
             emit("updated:fields", Object.keys(fields));
