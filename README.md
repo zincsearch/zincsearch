@@ -41,7 +41,7 @@ Note: Do not store sensitive data on this server as its available to everyone on
 4. Compatibility with Elasticsearch APIs for ingestion of data (single record and bulk API)
 5. Out of the box authentication
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
-7. Index storage in s3 and minio (experimental)
+7. Index storage in disk (default), s3 or minio (experimental)
 8. aggregation support
 
 # Roadmap items:
@@ -79,6 +79,10 @@ Check [bulk ingestion docs](https://docs.zincsearch.com/ingestion/bulk-ingestion
 ### Fluent bit
 
 Check [fluent-bit ingestion docs](https://docs.zincsearch.com/ingestion/fluent-bit/)
+
+### Fluentd
+
+Check [fluentd ingestion docs](https://docs.zincsearch.com/ingestion/fluentd/)
 
 ### Syslog-ng
 
