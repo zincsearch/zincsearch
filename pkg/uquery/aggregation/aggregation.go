@@ -68,6 +68,8 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 				subreq = zincaggregation.NewTermsAggregation(search.Field(agg.Terms.Field), zincaggregation.TextValueSource, agg.Terms.Size)
 			case "numeric":
 				subreq = zincaggregation.NewTermsAggregation(search.Field(agg.Terms.Field), zincaggregation.NumericValueSource, agg.Terms.Size)
+			case "bool", "boolean":
+				subreq = zincaggregation.NewTermsAggregation(search.Field(agg.Terms.Field), zincaggregation.BooleanValueSource, agg.Terms.Size)
 			default:
 				return errors.New(
 					errors.ErrorTypeParsingException,

@@ -57,6 +57,41 @@ func Create(c *gin.Context) {
 	})
 }
 
+// @Summary Create index for compatible ES
+// @Tags    Index
+// @Produce json
+// @Param   index body meta.IndexSimple true "Index data"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} meta.HTTPResponse
+// @Router /es/:target [put]
+func CreateES(c *gin.Context) {
+	indexName := c.Param("target")
+
+	var newIndex meta.IndexSimple
+	if err := c.BindJSON(&newIndex); err != nil {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		return
+	}
+
+	// TODO: migrate ES settings to Zinc specific
+	newIndex.Settings = nil
+
+	// default the storage_type to disk, to provide the best possible integration
+	newIndex.StorageType = "disk"
+
+	err := CreateIndexWorker(&newIndex, indexName)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"acknowledged":        true,
+		"shards_acknowledged": true,
+		"index":               newIndex.Name,
+	})
+}
+
 func CreateIndexWorker(newIndex *meta.IndexSimple, indexName string) error {
 	if newIndex.Name == "" && indexName != "" {
 		newIndex.Name = indexName

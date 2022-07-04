@@ -45,7 +45,8 @@ func RangeQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Qu
 		case "date", "time":
 			return RangeQueryTime(field, vv, mappings)
 		default:
-			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[range] %s only support values of [numeric, time]", field))
+			return nil, errors.New(errors.ErrorTypeXContentParseException,
+				fmt.Sprintf("[range] %s only support values of [numeric, time], got %q", field, prop.Type))
 		}
 	}
 
@@ -151,13 +152,15 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 		}
 	}
 
+	var v float64
+
 	min := time.Time{}
 	max := time.Time{}
 	minInclusive := false
 	maxInclusive := false
 	if value.GT != nil {
 		if format == "epoch_millis" {
-			v, _ := zutils.ToFloat64(value.GT)
+			v, err = zutils.ToFloat64(value.GT)
 			min = time.UnixMilli(int64(v))
 		} else {
 			v, _ := zutils.ToString(value.GT)
@@ -170,7 +173,7 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 	if value.GTE != nil {
 		minInclusive = true
 		if format == "epoch_millis" {
-			v, _ := zutils.ToFloat64(value.GTE)
+			v, err = zutils.ToFloat64(value.GTE)
 			min = time.UnixMilli(int64(v))
 		} else {
 			v, _ := zutils.ToString(value.GTE)
@@ -182,7 +185,7 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 	}
 	if value.LT != nil {
 		if format == "epoch_millis" {
-			v, _ := zutils.ToFloat64(value.LT)
+			v, err = zutils.ToFloat64(value.LT)
 			max = time.UnixMilli(int64(v))
 		} else {
 			v, _ := zutils.ToString(value.LT)
@@ -195,7 +198,7 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 	if value.LTE != nil {
 		maxInclusive = true
 		if format == "epoch_millis" {
-			v, _ := zutils.ToFloat64(value.LTE)
+			v, err = zutils.ToFloat64(value.LTE)
 			max = time.UnixMilli(int64(v))
 		} else {
 			v, _ := zutils.ToString(value.LTE)
