@@ -175,7 +175,7 @@ func TestIndex_Search(t *testing.T) {
 			},
 		},
 		{
-			name: "Search Query - fuzzy fussiness AUTO",
+			name: "Search Query - fuzzy fuzziness AUTO",
 			args: args{
 				iQuery: &meta.ZincQuery{
 					Query: &meta.Query{
@@ -209,7 +209,7 @@ func TestIndex_Search(t *testing.T) {
 			},
 		},
 		{
-			name: "Search Query - fuzzy fussiness AUTO",
+			name: "Search Query - fuzzy fuzziness AUTO",
 			args: args{
 				iQuery: &meta.ZincQuery{
 					Query: &meta.Query{
@@ -243,7 +243,7 @@ func TestIndex_Search(t *testing.T) {
 			},
 		},
 		{
-			name: "Search Query - fuzzy fussiness 2",
+			name: "Search Query - fuzzy fuzziness 2",
 			args: args{
 				iQuery: &meta.ZincQuery{
 					Query: &meta.Query{

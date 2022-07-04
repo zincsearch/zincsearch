@@ -62,7 +62,7 @@ func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
 
 	subq := bluge.NewFuzzyQuery(value.Value).SetField(field)
 	if value.Fuzziness != nil {
-		v := ParseFussiness(value.Fuzziness, len(value.Value))
+		v := ParseFuzziness(value.Fuzziness, len(value.Value))
 		if v > 0 {
 			subq.SetFuzziness(v)
 		}
@@ -77,8 +77,8 @@ func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
 	return subq, nil
 }
 
-func ParseFussiness(fussiness interface{}, n int) int {
-	val, _ := zutils.ToString(fussiness)
+func ParseFuzziness(fuzziness interface{}, n int) int {
+	val, _ := zutils.ToString(fuzziness)
 	val = strings.ToUpper(val)
 	if !strings.HasPrefix(val, "AUTO") {
 		v, _ := zutils.ToInt(val)

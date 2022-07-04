@@ -100,7 +100,7 @@ func MatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers
 	}
 	if value.Fuzziness != nil {
 		if value.Fuzziness != nil {
-			v := ParseFussiness(value.Fuzziness, len(value.Query))
+			v := ParseFuzziness(value.Fuzziness, len(value.Query))
 			if v > 0 {
 				subq.SetFuzziness(v)
 			}
