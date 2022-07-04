@@ -25,6 +25,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func MatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
@@ -45,17 +46,17 @@ func MatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers
 				k := strings.ToLower(k)
 				switch k {
 				case "query":
-					value.Query = v.(string)
+					value.Query, _ = zutils.ToString(v)
 				case "analyzer":
-					value.Analyzer = v.(string)
+					value.Analyzer, _ = zutils.ToString(v)
 				case "operator":
-					value.Operator = v.(string)
+					value.Operator, _ = zutils.ToString(v)
 				case "fuzziness":
-					value.Fuzziness = v.(string)
+					value.Fuzziness = v
 				case "prefix_length":
-					value.PrefixLength = v.(float64)
+					value.PrefixLength, _ = zutils.ToFloat64(v)
 				case "boost":
-					value.Boost = v.(float64)
+					value.Boost, _ = zutils.ToFloat64(v)
 				default:
 					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[match] unknown field [%s]", k))
 				}
@@ -98,11 +99,11 @@ func MatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers
 		}
 	}
 	if value.Fuzziness != nil {
-		switch v := value.Fuzziness.(type) {
-		case string:
-			// TODO: support other fuzziness: AUTO
-		case float64:
-			subq.SetFuzziness(int(v))
+		if value.Fuzziness != nil {
+			v := ParseFuzziness(value.Fuzziness, len(value.Query))
+			if v > 0 {
+				subq.SetFuzziness(v)
+			}
 		}
 	}
 	if value.PrefixLength > 0 {
