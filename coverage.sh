@@ -11,17 +11,43 @@ rm -f coverage.out
 
 go test ./... -race -covermode=atomic -coverprofile=coverage.out
 
-# Check discussion at https://github.com/golang/go/issues/25989
+# If test fails exit the pipeline # Check discussion at https://github.com/golang/go/issues/25989
 rc=$?
 if [ $rc -ne 0 ]; then
   echo "testing failed" >&2
   exit $rc
 fi
 
+
+########## codecov starts ########3
 # make sure to set CODECOV_TOKEN env variable before doing this
-# codecov -f coverage.out
-# or 
-# bash <(curl -s https://codecov.io/bash) 
+os=`uname -s`
+
+if ! command -v codecov &> /dev/null
+then
+    # codecov uploader does not exist. Most likely in a CI environment.
+    if [ $os == "Darwin" ]; then
+    url="https://uploader.codecov.io/latest/macos/codecov"
+    elif [ $os == "Linux" ]; then
+        url="https://uploader.codecov.io/latest/linux/codecov"
+    elif [ $os == "Windows" ]; then
+        url="https://uploader.codecov.io/latest/linux/codecov"
+    else
+        echo "Unknown OS"
+        continue
+    fi
+
+    curl -Os $url
+    chmod +x codecov
+
+    ./codecov -t ${CODECOV_TOKEN} -f coverage.out
+    rm codecov
+else
+    codecov -t ${CODECOV_TOKEN} -f coverage.out
+fi
+
+########## codecov ends ########3
+
 
 # Example setup https://github.com/lluuiissoo/go-testcoverage/blob/main/.github/workflows/ci.yml
 
