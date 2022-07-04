@@ -2,6 +2,7 @@
   <div class="column index-menu">
     <div>
       <q-select
+        data-cy="index-dropdown"
         v-model="selectedIndex"
         :options="options"
         filled
@@ -39,6 +40,7 @@
       >
         <template #top-right>
           <q-input
+            data-cy="index-field-search-input"
             v-model="filterField"
             filled
             borderless

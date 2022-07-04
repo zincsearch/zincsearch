@@ -1,6 +1,7 @@
 <template>
   <div icon="info" class="justify-between">
     <q-btn
+      data-cy="date-time-button"
       outline
       no-caps
       :label="displayValue"
