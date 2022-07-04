@@ -57,9 +57,9 @@
           </q-tr>
           <q-tr v-show="props.expand" :props="props">
             <q-td colspan="100%">
-              <pre class="expanded">{{
-                JSON.stringify(props.row, null, 2)
-              }}</pre>
+              <pre class="expanded">
+<span v-html="JSON.stringify(props.row, null, 2)"></span>
+              </pre>
             </q-td>
           </q-tr>
         </template>
