@@ -106,6 +106,10 @@ func (a *TermsCalculator) Consume(d *search.DocumentMatch) {
 		a.consumeNumericValueSource(d)
 	case NumericValuesSource:
 		a.consumeNumericValuesSource(d)
+	case BooleanValueSource:
+		a.consumeBooleanValueSource(d)
+	case BooleanValuesSource:
+		a.consumeBooleanValuesSource(d)
 	default:
 		// not supoort
 	}
@@ -165,6 +169,47 @@ func (a *TermsCalculator) consumeNumericValuesSource(d *search.DocumentMatch) {
 	src := a.src.(search.NumericValuesSource)
 	for _, term := range src.Numbers(d) {
 		termStr := strconv.FormatFloat(term, 'f', -1, 64)
+		bucket, ok := a.bucketsMap[termStr]
+		if ok {
+			bucket.Consume(d)
+		} else {
+			newBucket := search.NewBucket(termStr, a.aggregations)
+			newBucket.Consume(d)
+			a.bucketsMap[termStr] = newBucket
+			a.bucketsList = append(a.bucketsList, newBucket)
+		}
+	}
+}
+
+func (a *TermsCalculator) consumeBooleanValueSource(d *search.DocumentMatch) {
+	a.total++
+	src := a.src.(search.NumericValueSource)
+	term := src.Number(d)
+	termStr := "false"
+	if term != 0 {
+		termStr = "true"
+	}
+
+	bucket, ok := a.bucketsMap[termStr]
+	if ok {
+		bucket.Consume(d)
+	} else {
+		newBucket := search.NewBucket(termStr, a.aggregations)
+		newBucket.Consume(d)
+		a.bucketsMap[termStr] = newBucket
+		a.bucketsList = append(a.bucketsList, newBucket)
+	}
+}
+
+func (a *TermsCalculator) consumeBooleanValuesSource(d *search.DocumentMatch) {
+	a.total++
+	src := a.src.(search.NumericValuesSource)
+	for _, term := range src.Numbers(d) {
+		termStr := "false"
+		if term != 0 {
+			termStr = "true"
+		}
+
 		bucket, ok := a.bucketsMap[termStr]
 		if ok {
 			bucket.Consume(d)

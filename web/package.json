@@ -8,7 +8,10 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "lint": "eslint --ext .js,.vue ./src/ && stylelint **/*.vue"
+    "lint": "eslint --ext .js,.vue ./src/ && stylelint **/*.vue",
+    "e2evite": "vite e2e",
+    "e2e": "./node_modules/cypress/bin/cypress open",
+    "e2e-ci": "./node_modules/cypress/bin/cypress run --headless"
   },
   "dependencies": {
     "@quasar/extras": "^1.14.0",
@@ -28,6 +31,9 @@
     "@quasar/vite-plugin": "^1.0.10",
     "@types/js-cookie": "^3.0.2",
     "@vitejs/plugin-vue": "^2.3.3",
+    "@cypress/vue": "^3.1.0",
+    "@cypress/webpack-dev-server": "^2.0.0",
+    "cypress": "^10.3.0",
     "sass": "^1.32.0",
     "sass-loader": "^10.2.1",
     "typescript": "^4.5.4",
