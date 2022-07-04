@@ -23,6 +23,7 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
@@ -43,13 +44,13 @@ func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
 				k := strings.ToLower(k)
 				switch k {
 				case "value":
-					value.Value = v.(string)
+					value.Value, _ = zutils.ToString(v)
 				case "fuzziness":
-					value.Fuzziness = v.(string)
+					value.Fuzziness = v
 				case "prefix_length":
-					value.PrefixLength = v.(float64)
+					value.PrefixLength, _ = zutils.ToFloat64(v)
 				case "boost":
-					value.Boost = v.(float64)
+					value.Boost, _ = zutils.ToFloat64(v)
 				default:
 					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[fuzzy] unknown field [%s]", k))
 				}
@@ -61,11 +62,9 @@ func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
 
 	subq := bluge.NewFuzzyQuery(value.Value).SetField(field)
 	if value.Fuzziness != nil {
-		switch v := value.Fuzziness.(type) {
-		case string:
-			// TODO: support other fuzziness: AUTO
-		case float64:
-			subq.SetFuzziness(int(v))
+		v := ParseFuzziness(value.Fuzziness, len(value.Value))
+		if v > 0 {
+			subq.SetFuzziness(v)
 		}
 	}
 	if value.PrefixLength > 0 {
@@ -76,4 +75,35 @@ func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
 	}
 
 	return subq, nil
+}
+
+func ParseFuzziness(fuzziness interface{}, n int) int {
+	val, _ := zutils.ToString(fuzziness)
+	val = strings.ToUpper(val)
+	if !strings.HasPrefix(val, "AUTO") {
+		v, _ := zutils.ToInt(val)
+		return v
+	}
+
+	n1 := 3
+	n2 := 6
+	if strings.Contains(val, ":") && strings.Contains(val, ",") {
+		val := strings.TrimPrefix(val, "AUTO:")
+		vals := strings.Split(val, ",")
+		if len(vals) == 2 {
+			n1, _ = zutils.ToInt(vals[0])
+			n2, _ = zutils.ToInt(vals[1])
+			if n1 < 2 || n1 >= n2 {
+				return 0
+			}
+		}
+	}
+
+	v := 0
+	if n >= n2 {
+		v = 2
+	} else if n >= n1 {
+		v = 1
+	}
+	return v
 }

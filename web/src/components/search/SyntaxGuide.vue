@@ -1,5 +1,6 @@
 <template>
   <q-btn
+    data-cy="syntax-guide-button"
     size="md"
     unelevated
     class="q-pa-sm syntax-menu-button"
