@@ -21,7 +21,11 @@ fi
 # make sure to set CODECOV_TOKEN env variable before doing this
 # codecov -f coverage.out
 # or 
-bash <(curl -s https://codecov.io/bash) 
+# bash <(curl -s https://codecov.io/bash) 
+curl -Os https://uploader.codecov.io/latest/linux/codecov
+chmod +x codecov
+./codecov -t ${CODECOV_TOKEN} -f coverage.out
+rm codecov
 
 # Example setup https://github.com/lluuiissoo/go-testcoverage/blob/main/.github/workflows/ci.yml
 
