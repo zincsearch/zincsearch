@@ -17,11 +17,236 @@ package core
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zinclabs/zinc/pkg/bluge/aggregation"
 	"github.com/zinclabs/zinc/pkg/meta"
 )
+
+func TestDateLayoutDetection(t *testing.T) {
+	type args struct {
+		layout string
+		input  string
+	}
+	tests := []args{
+		{
+			layout: "2006-01-02 15:04:05",
+			input:  "2009-11-10 23:00:00",
+		},
+		{
+			layout: "2006-01-02T15:04:05",
+			input:  "2009-11-10T23:00:00",
+		},
+		{
+			layout: time.RFC3339,
+			input:  "2022-06-28T13:27:30+02:00",
+		},
+		{
+			layout: "2006-01-02T15:04:05.999Z07:00",
+			input:  "2022-06-28T13:27:30.789+02:00",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.layout, func(t *testing.T) {
+			out := detectTimeLayout(tt.input)
+			assert.Equal(t, out, tt.layout)
+		})
+	}
+}
+
+func TestIndex_CreateUpdateDocumentWithDateField(t *testing.T) {
+	type fields struct {
+		Name     string
+		EpochMax int
+		EpochMin int
+	}
+	type args struct {
+		docID  string
+		doc    map[string]interface{}
+		update bool
+	}
+	tests := []struct {
+		name         string
+		fields       fields
+		isRange      bool
+		withResult   bool
+		args         args
+		wantQueryErr bool
+	}{
+		{
+			name: "Document with invalid date type as string",
+			fields: fields{
+				Name: "updated_at",
+			},
+			withResult:   false,
+			wantQueryErr: true,
+			args: args{
+				docID: "test_bad",
+				doc: map[string]interface{}{
+					"updated_at": "20091110 23:00:00",
+				},
+				update: true,
+			},
+		},
+		{
+			name: "Document with date type as string",
+			fields: fields{
+				Name:     "created_at",
+				EpochMax: 1655972500041,
+				EpochMin: 1243807200000,
+			},
+			withResult: true,
+			args: args{
+				docID: "test",
+				doc: map[string]interface{}{
+					"created_at": "2009-11-10T23:00:00",
+				},
+				update: true,
+			},
+		},
+		{
+			name: "Document with simple date type as string",
+			fields: fields{
+				Name:     "created_at_2",
+				EpochMax: 1655972500041,
+				EpochMin: 1243807200000,
+			},
+			withResult: true,
+			args: args{
+				docID: "test",
+				doc: map[string]interface{}{
+					"created_at_2": "2009-11-10 23:00:00",
+				},
+				update: true,
+			},
+		},
+		{
+			name: "Document with date array type as string",
+			fields: fields{
+				Name:     "time_range",
+				EpochMax: 1669849200000,
+				EpochMin: 1243807200000,
+			},
+			withResult: true,
+			isRange:    true,
+			args: args{
+				docID: "test",
+				doc: map[string]interface{}{
+					"time_range": []interface{}{
+						"2009-11-10T23:00:00",
+						"2022-06-28T10:57:00",
+					},
+				},
+				update: true,
+			},
+		},
+		{
+			name: "Document with simple date array type as string",
+			fields: fields{
+				Name:     "time_range_2",
+				EpochMax: 1669849200000,
+				EpochMin: 1243807200000,
+			},
+			withResult: true,
+			isRange:    true,
+			args: args{
+				docID: "test",
+				doc: map[string]interface{}{
+					"time_range_2": []interface{}{
+						"2009-11-10 23:00:00",
+						"2022-06-28 10:57:00",
+					},
+				},
+				update: true,
+			},
+		},
+	}
+
+	indexName := "TestDocument.index_1"
+	var index *Index
+	var err error
+	t.Run("prepare", func(t *testing.T) {
+		index, err = NewIndex(indexName, "disk")
+		assert.NoError(t, err)
+		assert.NotNil(t, index)
+	})
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := index.CreateDocument(tt.args.docID, tt.args.doc, tt.args.update)
+			assert.NoError(t, err)
+
+			var query *meta.ZincQuery
+			if tt.isRange {
+				query = &meta.ZincQuery{
+					Aggregations: map[string]meta.Aggregations{
+						"agg_res": meta.Aggregations{
+							DateHistogram: &meta.AggregationDateHistogram{
+								Field:         tt.fields.Name,
+								Format:        "epoch_millis",
+								FixedInterval: "1d",
+								ExtendedBounds: &aggregation.HistogramBound{
+									Min: float64(tt.fields.EpochMin),
+									Max: float64(tt.fields.EpochMax),
+								},
+							},
+						},
+					},
+				}
+			} else {
+				query = &meta.ZincQuery{
+					Query: &meta.Query{
+						Range: map[string]*meta.RangeQuery{
+							tt.fields.Name: &meta.RangeQuery{
+								Format: "epoch_millis",
+								GTE:    tt.fields.EpochMin,
+							},
+						},
+					},
+					Aggregations: map[string]meta.Aggregations{
+						"agg_res": meta.Aggregations{
+							DateHistogram: &meta.AggregationDateHistogram{
+								Field:         tt.fields.Name,
+								Format:        "epoch_millis",
+								FixedInterval: "1d",
+								ExtendedBounds: &aggregation.HistogramBound{
+									Min: float64(tt.fields.EpochMin),
+									Max: float64(tt.fields.EpochMax),
+								},
+							},
+						},
+					},
+				}
+			}
+
+			res, err := index.Search(query)
+			if tt.wantQueryErr {
+				assert.Error(t, err)
+				return
+
+			}
+			assert.NoError(t, err)
+
+			no := 0
+			if tt.withResult {
+				no = 1
+				if tt.isRange {
+					no = 2
+				}
+			}
+
+			assert.Equal(t, no, res.Hits.Total.Value)
+		})
+	}
+
+	t.Run("cleanup", func(t *testing.T) {
+		err = DeleteIndex(indexName)
+		assert.NoError(t, err)
+	})
+}
 
 func TestIndex_CreateUpdateDocument(t *testing.T) {
 	type fields struct {
