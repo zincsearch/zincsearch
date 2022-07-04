@@ -175,6 +175,108 @@ func TestIndex_Search(t *testing.T) {
 			},
 		},
 		{
+			name: "Search Query - fuzzy fuzziness AUTO",
+			args: args{
+				iQuery: &meta.ZincQuery{
+					Query: &meta.Query{
+						Fuzzy: map[string]*meta.FuzzyQuery{
+							"_all": {
+								Value:     "fransisco", // note the wrong spelling,
+								Fuzziness: "AUTO",
+							},
+						},
+					},
+					Size: 10,
+				},
+			},
+			data: []map[string]interface{}{
+				{
+					"name": "Prabhat Sharma",
+					"address": map[string]interface{}{
+						"city":  "San Francisco",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+				{
+					"name": "Leonardo DiCaprio",
+					"address": map[string]interface{}{
+						"city":  "Los angeles",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+			},
+		},
+		{
+			name: "Search Query - fuzzy fuzziness AUTO",
+			args: args{
+				iQuery: &meta.ZincQuery{
+					Query: &meta.Query{
+						Fuzzy: map[string]*meta.FuzzyQuery{
+							"_all": {
+								Value:     "fransisco", // note the wrong spelling,
+								Fuzziness: "AUTO:3,6",
+							},
+						},
+					},
+					Size: 10,
+				},
+			},
+			data: []map[string]interface{}{
+				{
+					"name": "Prabhat Sharma",
+					"address": map[string]interface{}{
+						"city":  "San Francisco",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+				{
+					"name": "Leonardo DiCaprio",
+					"address": map[string]interface{}{
+						"city":  "Los angeles",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+			},
+		},
+		{
+			name: "Search Query - fuzzy fuzziness 2",
+			args: args{
+				iQuery: &meta.ZincQuery{
+					Query: &meta.Query{
+						Fuzzy: map[string]*meta.FuzzyQuery{
+							"_all": {
+								Value:     "fransisco", // note the wrong spelling,
+								Fuzziness: 2,
+							},
+						},
+					},
+					Size: 10,
+				},
+			},
+			data: []map[string]interface{}{
+				{
+					"name": "Prabhat Sharma",
+					"address": map[string]interface{}{
+						"city":  "San Francisco",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+				{
+					"name": "Leonardo DiCaprio",
+					"address": map[string]interface{}{
+						"city":  "Los angeles",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+			},
+		},
+		{
 			name: "Search Query - querystring",
 			args: args{
 				iQuery: &meta.ZincQuery{
