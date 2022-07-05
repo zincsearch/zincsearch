@@ -15,6 +15,7 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
+      - run: cd web && npm i && npm run build && cd ..
       - run: go test ./... -race -covermode=atomic -coverprofile=coverage.out
       - name: Codecov
         uses: codecov/codecov-action@v3.1.0
