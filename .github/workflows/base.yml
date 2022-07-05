@@ -1,5 +1,5 @@
-name: GitHub Actions Demo
-on: [pull_request]
+name: Zinc actions
+on: [ push ]
 jobs:
   Codecov-coverage:
     runs-on: ubuntu-latest
