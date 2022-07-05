@@ -183,7 +183,7 @@ func TestIndex_CreateUpdateDocumentWithDateField(t *testing.T) {
 			if tt.isRange {
 				query = &meta.ZincQuery{
 					Aggregations: map[string]meta.Aggregations{
-						"agg_res": meta.Aggregations{
+						"agg_res": {
 							DateHistogram: &meta.AggregationDateHistogram{
 								Field:         tt.fields.Name,
 								Format:        "epoch_millis",
@@ -200,14 +200,14 @@ func TestIndex_CreateUpdateDocumentWithDateField(t *testing.T) {
 				query = &meta.ZincQuery{
 					Query: &meta.Query{
 						Range: map[string]*meta.RangeQuery{
-							tt.fields.Name: &meta.RangeQuery{
+							tt.fields.Name: {
 								Format: "epoch_millis",
 								GTE:    tt.fields.EpochMin,
 							},
 						},
 					},
 					Aggregations: map[string]meta.Aggregations{
-						"agg_res": meta.Aggregations{
+						"agg_res": {
 							DateHistogram: &meta.AggregationDateHistogram{
 								Field:         tt.fields.Name,
 								Format:        "epoch_millis",
