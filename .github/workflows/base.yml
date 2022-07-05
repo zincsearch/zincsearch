@@ -1,7 +1,7 @@
 name: GitHub Actions Demo
 on: [pull_request]
 jobs:
-  Explore-GitHub-Actions:
+  Codecov-coverage:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -16,7 +16,7 @@ jobs:
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
       - run: cd web && npm i && npm run build && cd ..
-      - run: go test ./... -race -covermode=atomic -coverprofile=coverage.out
+      - run: ZINC_FIRST_ADMIN_USER=admin ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123 go test ./... -race -covermode=atomic -coverprofile=coverage.out
       - name: Codecov
         uses: codecov/codecov-action@v3.1.0
 
