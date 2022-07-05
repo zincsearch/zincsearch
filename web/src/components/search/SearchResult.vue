@@ -187,7 +187,7 @@ export default defineComponent({
       let results = [];
       let keys = Object.keys(o);
       for (var i in keys) {
-        if (o[keys[i]].length) {
+        if (o[keys[i]] == undefined || o[keys[i]].length) {
           results.push(keys[i]);
         } else {
           let subKeys = Object.deepKeys(o[keys[i]]);
