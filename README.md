@@ -1,5 +1,5 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/zinclabs/zinc)](https://goreportcard.com/report/github.com/zinclabs/zinc)
-![](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoid3creXFaUHdOZmJvWWFXM0RZckJqV0xhZG4vT1ZWUkREK05oZExmT3JMMitGNGJwOHVIdCtKdjNEQzVqWXpLQlY1QjF2QXRIa0dIRjUvTzBsTE9LR0c0PSIsIml2UGFyYW1ldGVyU3BlYyI6IjRzdjc5bWZxU2hJYXNYNzciLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
+<!-- ![](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoid3creXFaUHdOZmJvWWFXM0RZckJqV0xhZG4vT1ZWUkREK05oZExmT3JMMitGNGJwOHVIdCtKdjNEQzVqWXpLQlY1QjF2QXRIa0dIRjUvTzBsTE9LR0c0PSIsIml2UGFyYW1ldGVyU3BlYyI6IjRzdjc5bWZxU2hJYXNYNzciLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main) -->
 
 # Zinc Search Engine
 
