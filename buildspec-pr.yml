@@ -5,7 +5,7 @@ phases:
     commands:
       # - GORELEASER_LATEST_VERSION=(curl -sL -o /dev/null -w %{url_effective} "https://github.com/goreleaser/goreleaser/releases/latest" | rev | cut -f1 -d'/'| rev)
       - GORELEASER_LATEST_VERSION=v1.10.1-pro
-      - wget https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_LATEST_VERSION/goreleaser_$(uname -s)_$(uname -m).tar.gz
+      - wget https://github.com/goreleaser/goreleaser-pro/releases/download/$GORELEASER_LATEST_VERSION/goreleaser_$(uname -s)_$(uname -m).tar.gz
       - tar -xzf goreleaser_$(uname -s)_$(uname -m).tar.gz
       - sudo mv goreleaser /usr/local/bin/goreleaser
       
