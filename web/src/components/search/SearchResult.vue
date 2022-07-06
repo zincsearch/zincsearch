@@ -49,10 +49,10 @@
             </q-td>
             <template v-for="col in props.cols" :key="col.name" :props="props">
               <q-td v-if="col.name == '@timestamp'" width="238">
-                <span v-html="col.value"></span>
+                <span v-text="col.value"></span>
               </q-td>
               <q-td v-else>
-                <span v-html="col.value"></span>
+                <span v-text="col.value"></span>
               </q-td>
             </template>
           </q-tr>
