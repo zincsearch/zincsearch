@@ -16,12 +16,14 @@
 package index
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/zinclabs/zinc/pkg/core"
-	"github.com/zinclabs/zinc/pkg/meta"
 	"net/http"
 	"sort"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 // @Id ListIndexes
@@ -52,8 +54,8 @@ func List(c *gin.Context) {
 
 // @Id IndexNameList
 // @Summary List index Name
-// @Tags    IndexName
-// @Param   name  path  string  true  "IndexName"
+// @Tags    Index
+// @Param   name  query  string  true  "IndexName"
 // @Produce json
 // @Success 200 {object} []string
 // @Router /api/index_name [get]
