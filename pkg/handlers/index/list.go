@@ -55,7 +55,7 @@ func List(c *gin.Context) {
 // @Id IndexNameList
 // @Summary List index Name
 // @Tags    Index
-// @Param   name  query  string  true  "IndexName"
+// @Param   name  query  string  false  "IndexName"
 // @Produce json
 // @Success 200 {object} []string
 // @Router /api/index_name [get]
