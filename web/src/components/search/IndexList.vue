@@ -78,7 +78,6 @@ export default defineComponent({
     const getIndexData = (field) => props.data[field];
     const selectedIndex = ref(getIndexData("name"));
     const selectedFields = ref(getIndexData("columns"));
-    const indexList = ref([]);
     const indexFields = ref([]);
     const cachedFields = ref({});
     const options = ref([]);
@@ -89,18 +88,19 @@ export default defineComponent({
 
     // index operation
     const filterFn = (val, update) => {
-      if (val === "") {
+      indexService.nameList(val).then((res) => {
+        let indexList = [];
+        if (res.data) {
+          res.data.map((item) => {
+            indexList.push({
+              label: item,
+              value: item,
+            });
+          });
+        }
         update(() => {
-          options.value = indexList.value;
+          options.value = indexList;
         });
-        return;
-      }
-
-      update(() => {
-        const needle = val.toLowerCase();
-        options.value = indexList.value.filter((v) =>
-          v.value.toLowerCase().includes(needle)
-        );
       });
     };
 
@@ -164,21 +164,6 @@ export default defineComponent({
       });
     };
 
-    // get the list of indices from server when the component is mounted
-    const getIndexList = () => {
-      indexList.value = [];
-      indexService.list().then((res) => {
-        res.data.map((item) => {
-          indexList.value.push({
-            label: item.name,
-            value: item.name,
-          });
-        });
-      });
-    };
-
-    getIndexList();
-
     return {
       t,
       selectedIndex,
@@ -187,7 +172,6 @@ export default defineComponent({
       filterFn,
       selectFn,
       indexFields,
-      getIndexList,
       cachedFields,
       filterField,
       filterFieldFn,

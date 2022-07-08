@@ -90,6 +90,7 @@ func SetRoutes(r *gin.Engine) {
 
 	// index
 	r.GET("/api/index", AuthMiddleware, index.List)
+	r.GET("/api/index_name", AuthMiddleware, index.IndexNameList)
 	r.POST("/api/index", AuthMiddleware, index.Create)
 	r.PUT("/api/index", AuthMiddleware, index.Create)
 	r.PUT("/api/index/:target", AuthMiddleware, index.Create)

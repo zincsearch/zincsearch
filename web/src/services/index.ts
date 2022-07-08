@@ -10,6 +10,9 @@ var index = {
   delete: (names: string) => {
     return http().delete("/api/index/" + names);
   },
+  nameList: (name: string) => {
+    return http().get("/api/index_name?name=" + name);
+  },
 };
 
 export default index;

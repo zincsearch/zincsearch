@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { defineComponent, onUpdated, ref } from "vue";
+import { defineComponent, ref } from "vue";
 
 import SearchBar from "../components/search/SearchBar.vue";
 import IndexList from "../components/search/IndexList.vue";
@@ -31,10 +31,6 @@ export default defineComponent({
   },
 
   setup() {
-    onUpdated(() => {
-      updateIndexList(); // update the index list without hard page refresh whenever the page is updated
-    });
-
     const indexData = ref({
       name: "",
       columns: [],
@@ -59,11 +55,6 @@ export default defineComponent({
     const searchData = () => {
       searchResultRef.value.searchData(indexData.value, queryData.value);
     };
-
-    const updateIndexList = () => {
-      indexListRef.value.getIndexList();
-    };
-
 
     const resetColumns = () => {
       searchResultRef.value.resetColumns(indexData.value);
