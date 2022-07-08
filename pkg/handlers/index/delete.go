@@ -28,14 +28,14 @@ import (
 // Delete deletes a zinc index and its associated data. Be careful using thus as you ca't undo this action.
 
 // @Id DeleteIndex
-// @Summary Delete index
+// @Summary Delete indexes
 // @Tags    Index
 // @Produce json
-// @Param   indexs  path  string  true  "IndexName1,IndexName2"
+// @Param   indexes  path  string  true  "indexes"
 // @Success 200 {object} meta.HTTPResponseIndex
 // @Failure 400 {object} meta.HTTPResponseError
 // @Failure 500 {object} meta.HTTPResponseError
-// @Router /api/index/{indexs} [delete]
+// @Router /api/index/{indexes} [delete]
 func Delete(c *gin.Context) {
 	indexNames := c.Param("target")
 	if indexNames == "" || len(indexNames) == 0 {
@@ -57,7 +57,7 @@ func Delete(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, meta.HTTPResponseIndex{
+	c.JSON(http.StatusOK, meta.HTTPResponse{
 		Message: "deleted",
 	})
 }
