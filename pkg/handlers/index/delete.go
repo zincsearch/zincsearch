@@ -38,8 +38,8 @@ import (
 // @Router /api/index/{indexes} [delete]
 func Delete(c *gin.Context) {
 	indexNames := c.Param("target")
-	if indexNames == "" || len(indexNames) == 0 {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "indexName cannot be empty"})
+	if indexNames == "" {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index name cannot be empty"})
 		return
 	}
 

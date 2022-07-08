@@ -51,7 +51,7 @@ func TestDelete(t *testing.T) {
 			args: args{
 				code:   http.StatusBadRequest,
 				params: map[string]string{"target": ""},
-				result: "indexName cannot be empty",
+				result: "index name cannot be empty",
 			},
 			wantErr: false,
 		},
