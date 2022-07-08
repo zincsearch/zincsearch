@@ -17,6 +17,7 @@ package index
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -30,29 +31,33 @@ import (
 // @Summary Delete index
 // @Tags    Index
 // @Produce json
-// @Param   index  path  string  true  "Index"
+// @Param   indexs  path  string  true  "IndexName1,IndexName2"
 // @Success 200 {object} meta.HTTPResponseIndex
 // @Failure 400 {object} meta.HTTPResponseError
 // @Failure 500 {object} meta.HTTPResponseError
-// @Router /api/index/{index} [delete]
+// @Router /api/index/{indexs} [delete]
 func Delete(c *gin.Context) {
-	indexName := c.Param("target")
-
-	index, exists := core.GetIndex(indexName)
-	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
+	indexNames := c.Param("target")
+	if indexNames == "" || len(indexNames) == 0 {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "indexName cannot be empty"})
 		return
 	}
 
-	// delete meta
-	if err := core.DeleteIndex(index.Name); err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
-		return
+	for _, indexName := range strings.Split(indexNames, ",") {
+		index, exists := core.GetIndex(indexName)
+		if !exists {
+			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
+			return
+		}
+
+		// delete meta
+		if err := core.DeleteIndex(index.Name); err != nil {
+			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, meta.HTTPResponseIndex{
-		Message:     "deleted",
-		Index:       index.Name,
-		StorageType: index.StorageType,
+		Message: "deleted",
 	})
 }
