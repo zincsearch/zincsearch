@@ -1,23 +1,26 @@
 # syntax=docker/dockerfile:experimental
 ############################
-# STEP 1 build web dist
+# STEP 1 build web dist - This is built outside of docker and can be reused for other binaries and other docker images too.
+# No need to do this in dockerfile
 ############################
-FROM node:13.8.0-slim as webBuilder
-WORKDIR /web
-COPY ./web /web/
+# FROM node:13.8.0-slim as webBuilder
+# WORKDIR /web
+# COPY ./web /web/
 
-RUN npm install
-RUN npm run build
+# RUN npm install
+# RUN npm run build
 
 
 ############################
 # STEP 2 build executable binary
 ############################
 # FROM golang:alpine AS builder
-FROM public.ecr.aws/docker/library/golang:1.18 as builder
+FROM --platform=$BUILDPLATFORM public.ecr.aws/docker/library/golang:1.18 as builder
 ARG VERSION
 ARG COMMIT_HASH
 ARG BUILD_DATE
+ARG TARGETOS
+ARG TARGETARCH
 
 RUN update-ca-certificates
 # RUN apk update && apk add --no-cache git
@@ -34,8 +37,10 @@ RUN adduser \
     --uid "${UID}" \
     "${USER}"
 WORKDIR $GOPATH/src/github.com/zinclabs/zinc/
-COPY . .
-COPY --from=webBuilder /web/dist web/dist
+
+# Copy the whole repo to the current directory. This includes prebuilt front end assets. in web/dist folder
+COPY . .    
+# COPY --from=webBuilder /web/dist web/dist
 
 # Fetch dependencies.
 # Using go get.
@@ -55,7 +60,7 @@ ENV VERSION=$VERSION
 ENV COMMIT_HASH=$COMMIT_HASH
 ENV BUILD_DATE=$BUILD_DATE
 
-RUN CGO_ENABLED=0 go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
 ############################
 # STEP 3 build a small image
 ############################
