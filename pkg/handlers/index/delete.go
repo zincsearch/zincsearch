@@ -44,15 +44,9 @@ func Delete(c *gin.Context) {
 	}
 
 	for _, indexName := range strings.Split(indexNames, ",") {
-		index, exists := core.GetIndex(indexName)
-		if !exists {
-			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
-			return
-		}
-
 		// delete meta
-		if err := core.DeleteIndex(index.Name); err != nil {
-			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		if err := core.DeleteIndex(indexName); err != nil {
+			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 			return
 		}
 	}
