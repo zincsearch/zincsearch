@@ -14,12 +14,10 @@ RUN npm run build
 # STEP 2 build executable binary
 ############################
 # FROM golang:alpine AS builder
-FROM --platform=$BUILDPLATFORM public.ecr.aws/docker/library/golang:1.18 as builder
+FROM public.ecr.aws/docker/library/golang:1.18 as builder
 ARG VERSION
 ARG COMMIT_HASH
 ARG BUILD_DATE
-ARG TARGETOS
-ARG TARGETARCH
 
 RUN update-ca-certificates
 # RUN apk update && apk add --no-cache git
@@ -57,7 +55,7 @@ ENV VERSION=$VERSION
 ENV COMMIT_HASH=$COMMIT_HASH
 ENV BUILD_DATE=$BUILD_DATE
 
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
+RUN CGO_ENABLED=0 go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
 ############################
 # STEP 3 build a small image
 ############################

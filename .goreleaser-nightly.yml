@@ -7,7 +7,13 @@ before:
     - go mod tidy
     # you may remove this if you don't need go generate
     # - go generate ./...
-
+nightly:
+  # Allows you to change the version of the generated nightly release.
+  #
+  # Note that some pipes require this to be semantic version compliant (nfpm, for example).
+  #
+  # Default is `{{ incpatch .Version }}-{{ .ShortCommit }}-dev`.
+  name_template: "{{ incpatch .Version }}-{{ .ShortCommit }}-nightly"
 builds:
   - 
     id: zinc_binaries
@@ -42,7 +48,7 @@ archives:
 checksum:
   name_template: "checksums.txt"
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  name_template: "{{ incpatch .Version }}-nightly"
 changelog:
   sort: asc
   filters:
@@ -52,8 +58,8 @@ changelog:
 dockers:
   - image_templates:
       - public.ecr.aws/zinclabs/zinc:{{ .Version }}-amd64
-    dockerfile: Dockerfile
     use: buildx
+    dockerfile: Dockerfile
     skip_push: "false"
     build_flag_templates:
     - "--build-arg=VERSION={{.Version}}"
@@ -172,24 +178,24 @@ docker_manifests:
   - public.ecr.aws/zinclabs/zinc:{{ .Version }}-amd64
   - public.ecr.aws/zinclabs/zinc:{{ .Version }}-arm64
   - public.ecr.aws/zinclabs/zinc:{{ .Version }}-armv7
-- id: zinc-latest
+# - id: zinc-latest
 
-  # Name template for the manifest.
-  # Defaults to empty.
-  name_template: public.ecr.aws/zinclabs/zinc:latest
+#   # Name template for the manifest.
+#   # Defaults to empty.
+#   name_template: public.ecr.aws/zinclabs/zinc:latest
 
-  # Image name templates to be added to this manifest.
-  # Defaults to empty.
-  image_templates:
-  - public.ecr.aws/zinclabs/zinc:latest-amd64
-  - public.ecr.aws/zinclabs/zinc:latest-arm64
-  - public.ecr.aws/zinclabs/zinc:latest-armv7
+#   # Image name templates to be added to this manifest.
+#   # Defaults to empty.
+#   image_templates:
+#   - public.ecr.aws/zinclabs/zinc:latest-amd64
+#   - public.ecr.aws/zinclabs/zinc:latest-arm64
+#   - public.ecr.aws/zinclabs/zinc:latest-armv7
 # https://goreleaser.com/customization/homebrew/
 brews:
   - name: zinc
     tap:
       owner: zinclabs
-      name: homebrew-tap
+      name: homebrew-tap-nightly
       # token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     folder: Formula
     homepage: "https://github.com/zinclabs/zinc"
@@ -205,7 +211,6 @@ brews:
       data using APIs and searching using kibana (Kibana is not supported with
       zinc. Zinc provides its own UI).
     license: "Apache-2.0"
-
 blobs:
   - provider: s3
     region: us-west-2
@@ -216,7 +221,6 @@ blobs:
     extra_files:
       - glob: ./dist/*.tar.gz
       - glob: ./dist/CHANGELOG.md
-      
 # snapcrafts:
 #   - id: zinc-snap
 #     name: zinc-snap
