@@ -19,32 +19,33 @@ if [ $rc -ne 0 ]; then
 fi
 
 
-########## codecov starts ########3
+# codecov moved to separate github action to avoid running it when run locally
+########## codecov starts ########
 # make sure to set CODECOV_TOKEN env variable before doing this
-os=`uname -s`
+# os=`uname -s`
 
-if ! command -v codecov &> /dev/null
-then
-    # codecov uploader does not exist. Most likely in a CI environment.
-    if [ $os == "Darwin" ]; then
-    url="https://uploader.codecov.io/latest/macos/codecov"
-    elif [ $os == "Linux" ]; then
-        url="https://uploader.codecov.io/latest/linux/codecov"
-    elif [ $os == "Windows" ]; then
-        url="https://uploader.codecov.io/latest/linux/codecov"
-    else
-        echo "Unknown OS"
-        continue
-    fi
+# if ! command -v codecov &> /dev/null
+# then
+#     # codecov uploader does not exist. Most likely in a CI environment.
+#     if [ $os == "Darwin" ]; then
+#     url="https://uploader.codecov.io/latest/macos/codecov"
+#     elif [ $os == "Linux" ]; then
+#         url="https://uploader.codecov.io/latest/linux/codecov"
+#     elif [ $os == "Windows" ]; then
+#         url="https://uploader.codecov.io/latest/linux/codecov"
+#     else
+#         echo "Unknown OS"
+#         continue
+#     fi
 
-    curl -Os $url
-    chmod +x codecov
+#     curl -Os $url
+#     chmod +x codecov
 
-    ./codecov -t ${CODECOV_TOKEN} -f coverage.out
-    rm codecov
-else
-    codecov -t ${CODECOV_TOKEN} -f coverage.out
-fi
+#     ./codecov -t ${CODECOV_TOKEN} -f coverage.out
+#     rm codecov
+# else
+#     codecov -t ${CODECOV_TOKEN} -f coverage.out
+# fi
 
 ########## codecov ends ########3
 

@@ -58,13 +58,17 @@ func SearchDSL(c *gin.Context) {
 		return
 	}
 
-	eventData := make(map[string]interface{})
-	eventData["search_type"] = "query_dsl"
-	eventData["search_index_storage"] = "disk"
-	eventData["search_index_size_in_mb"] = 0.0
-	eventData["time_taken_to_search_in_ms"] = resp.Took
-	eventData["aggregations_count"] = len(query.Aggregations)
-	core.Telemetry.Event("search", eventData)
+	if indexName != "" {
+		idx, _ := core.ZINC_INDEX_LIST.Get(indexName)
+
+		eventData := make(map[string]interface{})
+		eventData["search_type"] = "query_dsl"
+		eventData["search_index_storage"] = idx.StorageType
+		eventData["search_index_size_in_mb"] = idx.StorageSize / 1024 / 1024
+		eventData["time_taken_to_search_in_ms"] = resp.Took
+		eventData["aggregations_count"] = len(query.Aggregations)
+		core.Telemetry.Event("search", eventData)
+	}
 
 	c.JSON(http.StatusOK, resp)
 }
