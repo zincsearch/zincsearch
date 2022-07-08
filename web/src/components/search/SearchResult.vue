@@ -148,7 +148,7 @@ import { date } from "quasar";
 import { useI18n } from "vue-i18n";
 
 import searchService from "../../services/search";
-import {getKeywords, highlightAndSpecialChars, highlightResultValue} from "../../utils/highlight";
+import { getKeywords, highlightAndSpecialChars } from "../../utils/highlight";
 
 export default defineComponent({
   name: "ComponentSearchSearchList",
