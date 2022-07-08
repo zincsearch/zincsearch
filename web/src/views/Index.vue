@@ -247,7 +247,7 @@ export default defineComponent({
           color: "warning",
           textColor: "white",
           icon: "warning",
-          message: "Please select index for delete",
+          message: "Please select index for deletion",
         })
         return
       }
