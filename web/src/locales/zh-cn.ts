@@ -45,6 +45,7 @@ export default {
     index: {
       header: "索引管理",
       add: "添加",
+      delete: "删除",
       search: "查询",
     },
     template: {

@@ -4,8 +4,11 @@
       :title="t('index.header')"
       :rows="indexes"
       :columns="resultColumns"
-      row-key="id"
+      row-key="name"
       :pagination="pagination"
+      selection="multiple"
+      :loading="loading"
+      v-model:selected="selectedIndexes"
       :filter="filterQuery"
       :filter-method="filterData"
     >
@@ -27,6 +30,13 @@
           icon="add"
           :label="t('index.add')"
           @click="addIndex"
+        />
+        <q-btn
+          class="q-ml-sm"
+          color="negative"
+          icon="delete"
+          :label="t('index.delete')"
+          @click="deleteSelectedIndexes"
         />
       </template>
 
@@ -67,6 +77,7 @@
           />
         </q-td>
       </template>
+
     </q-table>
 
     <q-dialog
@@ -91,7 +102,7 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import {defineComponent, nextTick, ref} from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 import { useI18n } from "vue-i18n";
@@ -110,9 +121,11 @@ export default defineComponent({
     const store = useStore();
     const $q = useQuasar();
     const { t } = useI18n();
-
+    const loading = ref(false);
+    const selectedIndexes = ref([]);
     const indexes = ref([]);
     const getIndexes = () => {
+      loading.value = true;
       indexService.list().then((res) => {
         var counter = 1;
         indexes.value = res.data.map((data) => {
@@ -133,6 +146,7 @@ export default defineComponent({
             },
           };
         });
+        loading.value = false;
       });
     };
 
@@ -221,7 +235,38 @@ export default defineComponent({
         html: true,
       }).onOk(() => {
         indexService.delete(props.row.name).then(() => {
-          getIndexes();
+          nextTick(getIndexes);
+        });
+      });
+    };
+
+    const deleteSelectedIndexes = () => {
+      if (!selectedIndexes || selectedIndexes.value.length == 0) {
+        $q.notify({
+          position: "top",
+          color: "warning",
+          textColor: "white",
+          icon: "warning",
+          message: "Please select index for delete",
+        })
+        return
+      }
+
+      const showText = selectedIndexes.value.map(r=> "<li>" + r.name + "</li>").join("")
+      $q.dialog({
+        title: "Delete indexes",
+        message:
+          "You are about to delete these indexes: <ul>" +
+          showText +
+          "</ul>",
+        cancel: true,
+        persistent: true,
+        html: true,
+      }).onOk(() => {
+        const indexNames = selectedIndexes.value.map(r=> r.name).join(",")
+        indexService.delete(indexNames).then((res) => {
+          selectedIndexes.value = []
+          nextTick(getIndexes);
         });
       });
     };
@@ -232,6 +277,9 @@ export default defineComponent({
       showPreviewIndexDialog,
       resultColumns,
       index,
+      loading,
+      selectedIndexes,
+      deleteSelectedIndexes,
       indexes,
       pagination: {
         rowsPerPage: 20,
