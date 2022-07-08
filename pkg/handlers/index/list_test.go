@@ -47,3 +47,26 @@ func TestList(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+func TestIndexNameList(t *testing.T) {
+	t.Run("prepare", func(t *testing.T) {
+		index, err := core.NewIndex("TestIndexNameList.index_1", "disk")
+		assert.NoError(t, err)
+		assert.NotNil(t, index)
+
+		err = core.StoreIndex(index)
+		assert.NoError(t, err)
+	})
+
+	t.Run("list", func(t *testing.T) {
+		c, w := utils.NewGinContext()
+		IndexNameList(c)
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Contains(t, w.Body.String(), "TestIndexNameList.index_1")
+	})
+
+	t.Run("cleanup", func(t *testing.T) {
+		err := core.DeleteIndex("TestIndexNameList.index_1")
+		assert.NoError(t, err)
+	})
+}

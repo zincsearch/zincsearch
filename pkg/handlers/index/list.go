@@ -18,6 +18,7 @@ package index
 import (
 	"net/http"
 	"sort"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -49,4 +50,38 @@ func List(c *gin.Context) {
 	})
 
 	c.JSON(http.StatusOK, items)
+}
+
+// @Id IndexNameList
+// @Summary List index Name
+// @Tags    Index
+// @Param   name  query  string  false  "IndexName"
+// @Produce json
+// @Success 200 {object} []string
+// @Router /api/index_name [get]
+func IndexNameList(c *gin.Context) {
+	queryName := strings.ToLower(c.DefaultQuery("name", ""))
+	var items []string
+	if queryName != "" {
+		for _, index := range core.ZINC_INDEX_LIST.List() {
+			if strings.Contains(strings.ToLower(index.Name), queryName) {
+				items = append(items, index.Name)
+			}
+		}
+	} else {
+		for _, index := range core.ZINC_INDEX_LIST.List() {
+			items = append(items, index.Name)
+		}
+	}
+
+	sort.Slice(items, func(i, j int) bool {
+		return items[i] < items[j]
+	})
+
+	count := 30
+	if len(items) > count {
+		c.JSON(http.StatusOK, items[0:count])
+	} else {
+		c.JSON(http.StatusOK, items)
+	}
 }
