@@ -52,8 +52,8 @@ changelog:
 dockers:
   - image_templates:
       - public.ecr.aws/zinclabs/zinc:{{ .Version }}-amd64
-    dockerfile: Dockerfile
     use: buildx
+    dockerfile: Dockerfile.ci
     skip_push: "false"
     build_flag_templates:
     - "--build-arg=VERSION={{.Version}}"
@@ -72,6 +72,7 @@ dockers:
   - image_templates:
       - public.ecr.aws/zinclabs/zinc:{{ .Version }}-arm64
     use: buildx
+    dockerfile: Dockerfile.ci
     skip_push: "false"
     build_flag_templates:
     - "--build-arg=VERSION={{.Version}}"
@@ -90,6 +91,7 @@ dockers:
   - image_templates:
       - public.ecr.aws/zinclabs/zinc:{{ .Version }}-armv7 
     use: buildx
+    dockerfile: Dockerfile.ci
     skip_push: "false"
     build_flag_templates:
     - "--build-arg=VERSION={{.Version}}"
@@ -108,6 +110,7 @@ dockers:
   - image_templates:
       - public.ecr.aws/zinclabs/zinc:latest-amd64
     use: buildx
+    dockerfile: Dockerfile.ci
     skip_push: "false"
     build_flag_templates:
     - "--build-arg=VERSION={{.Version}}"
@@ -126,6 +129,7 @@ dockers:
   - image_templates:
       - public.ecr.aws/zinclabs/zinc:latest-arm64
     use: buildx
+    dockerfile: Dockerfile.ci
     skip_push: "false"
     build_flag_templates:
     - "--build-arg=VERSION={{.Version}}"
@@ -144,6 +148,7 @@ dockers:
   - image_templates:
       - public.ecr.aws/zinclabs/zinc:latest-armv7 
     use: buildx
+    dockerfile: Dockerfile.ci
     skip_push: "false"
     build_flag_templates:
     - "--build-arg=VERSION={{.Version}}"
