@@ -17,6 +17,7 @@ package index
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -36,23 +37,20 @@ import (
 // @Failure 500 {object} meta.HTTPResponseError
 // @Router /api/index/{index} [delete]
 func Delete(c *gin.Context) {
-	indexName := c.Param("target")
-
-	index, exists := core.GetIndex(indexName)
-	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
+	indexNames := c.Param("target")
+	if indexNames == "" {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index name cannot be empty"})
 		return
 	}
 
-	// delete meta
-	if err := core.DeleteIndex(index.Name); err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
-		return
+	for _, indexName := range strings.Split(indexNames, ",") {
+		if err := core.DeleteIndex(indexName); err != nil {
+			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+			return
+		}
 	}
 
-	c.JSON(http.StatusOK, meta.HTTPResponseIndex{
-		Message:     "deleted",
-		Index:       index.Name,
-		StorageType: index.StorageType,
+	c.JSON(http.StatusOK, meta.HTTPResponse{
+		Message: "deleted",
 	})
 }

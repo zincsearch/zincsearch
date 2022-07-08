@@ -47,6 +47,7 @@ export default {
     index: {
       header: "Indexes",
       add: "Add Index",
+      delete: "Delete Index",
       search: "Search Index",
     },
     template: {

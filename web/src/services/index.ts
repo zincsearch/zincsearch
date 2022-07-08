@@ -7,8 +7,8 @@ var index = {
   update: (data: any) => {
     return http().put("/api/index/" + data.name, data);
   },
-  delete: (name: string) => {
-    return http().delete("/api/index/" + name);
+  delete: (names: string) => {
+    return http().delete("/api/index/" + names);
   },
   nameList: (name: string) => {
     return http().get("/api/index_name?name=" + name);
