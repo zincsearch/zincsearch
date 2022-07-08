@@ -89,8 +89,8 @@ export default defineComponent({
     // index operation
     const filterFn = (val, update) => {
       indexService.nameList(val).then((res) => {
-        let indexList = []
-        if (res.data){
+        let indexList = [];
+        if (res.data) {
           res.data.map((item) => {
             indexList.push({
               label: item,
