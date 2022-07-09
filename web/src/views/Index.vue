@@ -1,6 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <q-table
+      v-model:selected="selectedIndexes"
       :title="t('index.header')"
       :rows="indexes"
       :columns="resultColumns"
@@ -8,7 +9,6 @@
       :pagination="pagination"
       selection="multiple"
       :loading="loading"
-      v-model:selected="selectedIndexes"
       :filter="filterQuery"
       :filter-method="filterData"
     >
@@ -77,7 +77,6 @@
           />
         </q-td>
       </template>
-
     </q-table>
 
     <q-dialog
@@ -102,7 +101,7 @@
 </template>
 
 <script>
-import {defineComponent, nextTick, ref} from "vue";
+import { defineComponent, nextTick, ref } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 import { useI18n } from "vue-i18n";
@@ -241,31 +240,31 @@ export default defineComponent({
     };
 
     const deleteSelectedIndexes = () => {
-      if (!selectedIndexes || selectedIndexes.value.length == 0) {
+      if (!selectedIndexes.value || selectedIndexes.value.length == 0) {
         $q.notify({
           position: "top",
           color: "warning",
           textColor: "white",
           icon: "warning",
           message: "Please select index for deletion",
-        })
-        return
+        });
+        return;
       }
 
-      const showText = selectedIndexes.value.map(r=> "<li>" + r.name + "</li>").join("")
+      const showText = selectedIndexes.value
+        .map((r) => "<li>" + r.name + "</li>")
+        .join("");
       $q.dialog({
         title: "Delete indexes",
         message:
-          "You are about to delete these indexes: <ul>" +
-          showText +
-          "</ul>",
+          "You are about to delete these indexes: <ul>" + showText + "</ul>",
         cancel: true,
         persistent: true,
         html: true,
       }).onOk(() => {
-        const indexNames = selectedIndexes.value.map(r=> r.name).join(",")
+        const indexNames = selectedIndexes.value.map((r) => r.name).join(",");
         indexService.delete(indexNames).then((res) => {
-          selectedIndexes.value = []
+          selectedIndexes.value = [];
           nextTick(getIndexes);
         });
       });

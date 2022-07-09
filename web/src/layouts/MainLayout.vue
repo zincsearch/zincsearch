@@ -27,12 +27,20 @@
         <div>
           <q-btn-dropdown unelevated no-caps padding="xs sm">
             <template #label>
-              <div class="row no-wrap" >{{ selectedLanguage.label }}</div>
+              <div class="row no-wrap">{{ selectedLanguage.label }}</div>
             </template>
             <q-list>
-              <q-item v-ripple v-close-popup clickable v-for="lang in langList" :key="lang.value" v-bind="lang" @click="changeLanguage(lang)">
+              <q-item
+                v-for="lang in langList"
+                :key="lang.value"
+                v-ripple
+                v-close-popup
+                clickable
+                v-bind="lang"
+                @click="changeLanguage(lang)"
+              >
                 <q-item-section>
-                  <q-item-label>{{lang.label}}</q-item-label>
+                  <q-item-label>{{ lang.label }}</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -63,7 +71,6 @@
             </q-list>
           </q-btn-dropdown>
         </div>
-
       </q-toolbar>
     </q-header>
 
@@ -108,7 +115,6 @@ import { useI18n } from "vue-i18n";
 import { getLocale } from "../locales";
 import { setLanguage } from "../utils/cookies";
 
-
 import { ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
@@ -137,17 +143,17 @@ export default {
         link: "/index",
       },
       {
-        title:  t("menu.template"),
+        title: t("menu.template"),
         icon: "apps",
         link: "/template",
       },
       {
-        title:  t("menu.user"),
+        title: t("menu.user"),
         icon: "people",
         link: "/user",
       },
       {
-        title:  t("menu.about"),
+        title: t("menu.about"),
         icon: "info",
         link: "/about",
       },
@@ -155,21 +161,20 @@ export default {
 
     const langList = [
       {
-        "label": "English",
-        "value":  "en",
-      },{
-        "label": "简体中文",
-        "value":  "zh-cn",
-      }
-    ]
+        label: "English",
+        value: "en",
+      },
+      {
+        label: "简体中文",
+        value: "zh-cn",
+      },
+    ];
 
     const local = ref(getLocale());
-    const selectedLanguage = ref(langList.find((l) =>
-      l.value == local.value
-    ));
+    const selectedLanguage = ref(langList.find((l) => l.value == local.value));
 
-    if (!selectedLanguage || !selectedLanguage.value) {
-      selectedLanguage.value = langList[0]
+    if (!selectedLanguage.value || !selectedLanguage.value) {
+      selectedLanguage.value = langList[0];
     }
 
     const changeLanguage = (item: any) => {
@@ -203,5 +208,4 @@ export default {
 .q-header .q-btn-dropdown__arrow {
   margin-left: -4px;
 }
-
 </style>

@@ -11,7 +11,7 @@
     <q-menu>
       <q-card flat>
         <q-card-section class="syntax-guide-title">
-          <div class="text-h6">{{t('search.syntaxGuide')}}</div>
+          <div class="text-h6">{{ t("search.syntaxGuide") }}</div>
         </q-card-section>
         <q-separator />
         <q-card-section class="q-pt-none answers">
@@ -62,7 +62,6 @@
     </q-menu>
   </q-btn>
 </template>
-
 
 <script>
 import { defineComponent } from "vue";

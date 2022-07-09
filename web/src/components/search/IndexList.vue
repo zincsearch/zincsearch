@@ -2,8 +2,8 @@
   <div class="column index-menu">
     <div>
       <q-select
-        data-cy="index-dropdown"
         v-model="selectedIndex"
+        data-cy="index-dropdown"
         :options="options"
         filled
         dense
@@ -17,7 +17,9 @@
       >
         <template #no-option>
           <q-item>
-            <q-item-section class="text-grey"> {{ t("search.noResult") }}</q-item-section>
+            <q-item-section class="text-grey">
+              {{ t("search.noResult") }}</q-item-section
+            >
           </q-item>
         </template>
       </q-select>
@@ -40,8 +42,8 @@
       >
         <template #top-right>
           <q-input
-            data-cy="index-field-search-input"
             v-model="filterField"
+            data-cy="index-field-search-input"
             filled
             borderless
             dense
@@ -105,7 +107,7 @@ export default defineComponent({
     };
 
     const getSelectedIndexName = () => {
-      if (selectedIndex && selectedIndex.value && selectedIndex.value.value) {
+      if (selectedIndex.value && selectedIndex.value.value) {
         return selectedIndex.value.value;
       }
       return "";
