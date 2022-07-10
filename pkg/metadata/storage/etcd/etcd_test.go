@@ -16,6 +16,7 @@
 package etcd
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,9 +26,10 @@ import (
 
 func TestMain(m *testing.M) {
 	if config.Global.Etcd.Endpoints == nil {
+		os.Exit(0)
 		return
 	}
-	m.Run()
+	os.Exit(m.Run())
 }
 
 func Test_etcdStorage_List(t *testing.T) {
@@ -63,7 +65,8 @@ func Test_etcdStorage_List(t *testing.T) {
 	store := New("/zinc/test")
 	defer store.Close()
 	t.Run("prepare", func(t *testing.T) {
-		store.Set("/test/foo", []byte("bar"))
+		err := store.Set("/test/foo", []byte("bar"))
+		assert.NoError(t, err)
 	})
 
 	for _, tt := range tests {
@@ -109,7 +112,8 @@ func Test_etcdStorage_Get(t *testing.T) {
 	store := New("/zinc/test")
 	defer store.Close()
 	t.Run("prepare", func(t *testing.T) {
-		store.Set("/test/foo", []byte("bar"))
+		err := store.Set("/test/foo", []byte("bar"))
+		assert.NoError(t, err)
 	})
 
 	for _, tt := range tests {

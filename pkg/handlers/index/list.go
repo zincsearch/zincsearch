@@ -16,6 +16,7 @@
 package index
 
 import (
+	"fmt"
 	"net/http"
 	"sort"
 	"strings"
@@ -42,7 +43,10 @@ func List(c *gin.Context) {
 			index.Mappings = meta.NewMappings()
 		}
 		// update metadata while listing
-		index.UpdateMetadata()
+		err := index.UpdateMetadata()
+		if err != nil {
+			fmt.Println("Error updating metadata: ", err)
+		}
 	}
 
 	sort.Slice(items, func(i, j int) bool {
