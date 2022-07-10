@@ -49,9 +49,10 @@
             </q-td>
             <template v-for="col in props.cols" :key="col.name" :props="props">
               <q-td v-if="col.name == '@timestamp'" width="238">
-                <span v-html="col.value"></span>
+                <span v-text="col.value"></span>
               </q-td>
               <q-td v-else>
+                <!-- eslint-disable-next-line vue/no-v-html -->
                 <span v-html="col.value"></span>
               </q-td>
             </template>
@@ -59,7 +60,8 @@
           <q-tr v-show="props.expand" :props="props">
             <q-td colspan="100%">
               <pre class="expanded">
-                <span v-html="JSON.stringify(props.row, null, 2)"></span>
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <span v-html="JSON.stringify(props.row, null, 2)"></span> 
               </pre>
             </q-td>
           </q-tr>
@@ -628,7 +630,7 @@ export default defineComponent({
     }
   }
   .highlight {
-    background-color: yellow;
+    background-color: rgb(255, 213, 0);
   }
 }
 </style>

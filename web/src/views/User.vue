@@ -29,6 +29,7 @@
         />
       </template>
 
+      <!-- eslint-disable-next-line vue/no-lone-template -->
       <template v-slot:body-cell-#="props">
         <q-td :props="props" width="80">
           {{ props.value }}
