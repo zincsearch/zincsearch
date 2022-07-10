@@ -1,6 +1,6 @@
 export default {
   search: {
-    selectIndex: "Select Index First",
+    selectIndex: "Select Index first",
     typeSearch: "Type your search query here",
     searchField: "Search for a field",
     maxRecords: "Max records to return",
@@ -19,7 +19,7 @@ export default {
     signOut: "Sign Out",
     account: "Account",
     feedback: "Feedback",
-    zincSearch: "Zinc Search",
+    zincSearch: "ZincSearch",
     documentation: "Docs",
   },
   about: {

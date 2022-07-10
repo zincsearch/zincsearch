@@ -173,7 +173,7 @@ export default {
     const local = ref(getLocale());
     const selectedLanguage = ref(langList.find((l) => l.value == local.value));
 
-    if (!selectedLanguage.value || !selectedLanguage.value) {
+    if (!selectedLanguage.value && langList.length > 0) {
       selectedLanguage.value = langList[0];
     }
 
