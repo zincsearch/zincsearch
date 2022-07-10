@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "lint": "eslint --ext .js,.vue ./src/ && stylelint **/*.vue",
+    "lint": "eslint --ext .js,.vue,.ts ./src/ && stylelint **/*.vue",
+    "lint-autofix": "eslint --ext .js,.vue,.ts ./src/ --fix && stylelint **/*.vue --fix",
     "e2evite": "vite e2e",
     "e2e": "./node_modules/cypress/bin/cypress open",
     "e2e-ci": "./node_modules/cypress/bin/cypress run --headless"

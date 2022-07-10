@@ -1,12 +1,11 @@
-
 // eg.1: Gold => ['Gold']
 // eg.2: City:Paris => ['Paris']
 // eg.3: City:Paris Gold => ['Paris', 'Gold']
 // eg.4: City:par* => ['par']
 // eg.5: "Paris Gold" => ['Paris Gold']
-import {htmlSpecialChars} from "./html";
+import { htmlSpecialChars } from "./html";
 
-export function getKeywords (queryString: string) {
+export function getKeywords(queryString: string) {
   if (!queryString || queryString.trim().length == 0) {
     return [];
   }
@@ -28,22 +27,22 @@ export function getKeywords (queryString: string) {
       keyword = fieldWordArr[1];
     }
     // delete start and end of * and "
-    keyword = keyword.replace(/(^\**)|(\**$)/g,"").replace(/(^"*)|("*$)/g,"");
+    keyword = keyword.replace(/(^\**)|(\**$)/g, "").replace(/(^"*)|("*$)/g, "");
     if (keyword.trim().length > 0) {
       // make sure key not empty or not space
       arr.push(keyword);
     }
   }
   return arr;
-};
+}
 
-export function highlightAndSpecialChars (value: any, keywords:[]) {
+export function highlightAndSpecialChars(value: any, keywords: []) {
   if (!value) {
     return value;
   }
 
   if (typeof value == "string") {
-    value = htmlSpecialChars(value)
+    value = htmlSpecialChars(value);
     for (const idx in keywords) {
       const keyword = htmlSpecialChars(keywords[idx]);
       const highlightText = "<span class='highlight'>" + keyword + "</span>";
@@ -61,4 +60,4 @@ export function highlightAndSpecialChars (value: any, keywords:[]) {
     // other type direct return value.
   }
   return value;
-};
+}

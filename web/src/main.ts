@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import { createApp } from "vue";
 import { Quasar, Dialog, Notify } from "quasar";
 import VueApexCharts from "vue3-apexcharts";
 
@@ -17,9 +17,11 @@ import store from "./store";
 
 const myApp = createApp(App);
 
-myApp.use(Quasar, {
-  plugins: [Dialog, Notify], // import Quasar plugins and add here
-}).use(i18n);
+myApp
+  .use(Quasar, {
+    plugins: [Dialog, Notify], // import Quasar plugins and add here
+  })
+  .use(i18n);
 
 myApp.use(VueApexCharts);
 

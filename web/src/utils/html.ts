@@ -1,5 +1,4 @@
 export function htmlSpecialChars(str: string) {
-
   if (!str || str.length == 0) {
     return "";
   }
@@ -24,7 +23,7 @@ export function htmlSpecialChars(str: string) {
           s += " ";
         }
         break;
-      case "\"":
+      case '"':
         s += "&quot;";
         break;
       case "'":
