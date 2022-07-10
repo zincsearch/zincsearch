@@ -49,6 +49,7 @@ phases:
       - echo "Building front end..."
       - cd web
       - npm install
+      - npm run lint
       - npm run build
       - cd ..
       - ./coverage.sh
