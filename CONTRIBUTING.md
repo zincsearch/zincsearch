@@ -118,7 +118,7 @@ Make sure that you have [docker](https://docs.docker.com/get-docker/).
 Simple build:
 
 ```shell
-docker build --tag zinc:latest . -f Dockerfile.hub
+docker build --tag zinc:latest . -f Dockerfile
 ````
 
 Multi-arch build
@@ -129,6 +129,19 @@ In order to build multi-arch builds you will need [buildx](https://docs.docker.c
 docker buildx build --platform linux/amd64 --tag zinc:latest-linux-amd64 . -f Dockerfile.hub
 ```
 
+# Checks in CI pipeline
+
+We check for following in CI pipeline for any pull requests.
+
+1. Unit test code coverage for go code.
+    - If code coverage is less than 81% (according to go test) the CI tests will fail.
+    - You can test coverage yourself by running `./coverage.sh` 
+    - We use codecov for visualizing code coverage of go code, codecov updates coverage for every PR through a comment. It allows you to see missing coverage for any lines.
+1. Linting in Javascript for GUI
+    - We run eslint for javacript anf any linting failures will result in build failures.
+    - You can test for linting failures by running `./lint.sh` in web folder.
+    - You can also fix automatically fixable linting error by running `npm run lint-autofix`
+
 
 ## How to contribute code
 
@@ -138,3 +151,4 @@ docker buildx build --platform linux/amd64 --tag zinc:latest-linux-amd64 . -f Do
 1. Make the changes to code.
 1. Push the code to your repo.
 1. Create a PR
+1. Make sure that the automatic CI checks pass for your PR.
