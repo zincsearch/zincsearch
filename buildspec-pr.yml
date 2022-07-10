@@ -53,7 +53,6 @@ phases:
       - npm run build
       - cd ..
       - echo "golangci-lint ..."
-      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.46.2
       - ./golangci-lint.sh
       - echo "golangci-lint done ..."
       - ./coverage.sh
