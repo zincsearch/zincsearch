@@ -49,9 +49,13 @@ phases:
       - echo "Building front end..."
       - cd web
       - npm install
-      - ./lint.sh
+      - ./eslint.sh
       - npm run build
       - cd ..
+      - echo "golangci-lint ..."
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.46.2
+      - ./golangci-lint.sh
+      - echo "golangci-lint done ..."
       - ./coverage.sh
       # - go build -o main cmd/zinc/main.go
       # Build binary and container images using goreleaser
