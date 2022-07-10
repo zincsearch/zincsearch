@@ -54,7 +54,8 @@ func Test_badgerStorage_List(t *testing.T) {
 	store := New("/zinc/test")
 	defer store.Close()
 	t.Run("prepare", func(t *testing.T) {
-		store.Set("/test/foo", []byte("bar"))
+		err := store.Set("/test/foo", []byte("bar"))
+		assert.NoError(t, err)
 	})
 
 	for _, tt := range tests {
@@ -100,7 +101,8 @@ func Test_badgerStorage_Get(t *testing.T) {
 	store := New("/zinc/test")
 	defer store.Close()
 	t.Run("prepare", func(t *testing.T) {
-		store.Set("/test/foo", []byte("bar"))
+		err := store.Set("/test/foo", []byte("bar"))
+		assert.NoError(t, err)
 	})
 
 	for _, tt := range tests {

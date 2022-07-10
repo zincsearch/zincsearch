@@ -29,6 +29,7 @@
         />
       </template>
 
+      <!-- eslint-disable-next-line vue/no-lone-template -->
       <template v-slot:body-cell-#="props">
         <q-td :props="props" width="80">
           {{ props.value }}
@@ -98,14 +99,8 @@ export default defineComponent({
             id: data._id,
             name: data.name || data._id,
             role: data.role,
-            created: date.formatDate(
-              data.created_at,
-              "YYYY-MM-DDTHH:mm:ssZ"
-            ),
-            updated: date.formatDate(
-              data.updated_at,
-              "YYYY-MM-DDTHH:mm:ssZ"
-            ),
+            created: date.formatDate(data.created_at, "YYYY-MM-DDTHH:mm:ssZ"),
+            updated: date.formatDate(data.updated_at, "YYYY-MM-DDTHH:mm:ssZ"),
             actions: "",
           };
         });

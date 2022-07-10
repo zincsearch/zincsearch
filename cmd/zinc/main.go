@@ -141,7 +141,7 @@ func profiling() {
 		ProfileID = strings.ToLower(core.Telemetry.GetInstanceID())
 	}
 
-	pyroscope.Start(pyroscope.Config{
+	_, err := pyroscope.Start(pyroscope.Config{
 		ApplicationName: "zincsearch-" + ProfileID,
 
 		// replace this with the address of pyroscope server
@@ -165,6 +165,11 @@ func profiling() {
 			pyroscope.ProfileInuseSpace,
 		},
 	})
+
+	if err != nil {
+		log.Print("pyroscope.Start: ", err.Error())
+	}
+
 }
 
 //shutdown support twice signal must exit

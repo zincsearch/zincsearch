@@ -49,8 +49,12 @@ phases:
       - echo "Building front end..."
       - cd web
       - npm install
+      - ./eslint.sh
       - npm run build
       - cd ..
+      - echo "golangci-lint ..."
+      - ./golangci-lint.sh
+      - echo "golangci-lint done ..."
       - ./coverage.sh
       # - go build -o main cmd/zinc/main.go
       # Build binary and container images using goreleaser

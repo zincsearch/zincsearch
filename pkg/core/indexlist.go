@@ -16,6 +16,7 @@
 package core
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/rs/zerolog/log"
@@ -35,7 +36,10 @@ func init() {
 	// check version
 	version, _ := metadata.KV.Get("version")
 	if version == nil {
-		metadata.KV.Set("version", []byte(meta.Version))
+		err := metadata.KV.Set("version", []byte(meta.Version))
+		if err != nil {
+			fmt.Println("error:", err)
+		}
 		// } else {
 		// version := string(version)
 		// if version != meta.Version {

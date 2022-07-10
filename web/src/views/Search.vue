@@ -8,8 +8,15 @@
         @refresh="searchData"
       />
       <div class="row">
-        <index-list ref="indexListRef" :data="indexData" @updated="indexUpdated" />
-        <search-result ref="searchResultRef" @updated:fields="updateIndexFields" />
+        <index-list
+          ref="indexListRef"
+          :data="indexData"
+          @updated="indexUpdated"
+        />
+        <search-result
+          ref="searchResultRef"
+          @updated:fields="updateIndexFields"
+        />
       </div>
     </div>
   </q-page>

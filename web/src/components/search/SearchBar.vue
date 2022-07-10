@@ -3,8 +3,8 @@
     <div class="col row justify-between">
       <div class="col">
         <q-input
-          data-cy="search-bar-input"
           v-model="searchQuery"
+          data-cy="search-bar-input"
           :placeholder="t('search.typeSearch')"
           dense
           filled

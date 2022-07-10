@@ -2,9 +2,9 @@
   <div class="col column q-my-md q-ml-md">
     <div class="search-list">
       <q-table
-        data-cy="search-result-area"
         ref="searchTable"
         v-model:expanded="searchResult._source"
+        data-cy="search-result-area"
         :rows="searchResult"
         :columns="resultColumns"
         :loading="searchLoading"
@@ -49,9 +49,10 @@
             </q-td>
             <template v-for="col in props.cols" :key="col.name" :props="props">
               <q-td v-if="col.name == '@timestamp'" width="238">
-                <span v-html="col.value"></span>
+                <span v-text="col.value"></span>
               </q-td>
               <q-td v-else>
+                <!-- eslint-disable-next-line vue/no-v-html -->
                 <span v-html="col.value"></span>
               </q-td>
             </template>
@@ -59,7 +60,8 @@
           <q-tr v-show="props.expand" :props="props">
             <q-td colspan="100%">
               <pre class="expanded">
-<span v-html="JSON.stringify(props.row, null, 2)"></span>
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <span v-html="JSON.stringify(props.row, null, 2)"></span> 
               </pre>
             </q-td>
           </q-tr>
@@ -350,7 +352,7 @@ export default defineComponent({
               "@timestamp": {
                 gte: timestamps.start_time.toISOString(),
                 lt: timestamps.end_time.toISOString(),
-                format: "2006-01-02T15:04:05Z07:00"
+                format: "2006-01-02T15:04:05Z07:00",
               },
             },
           });
@@ -532,7 +534,8 @@ export default defineComponent({
             });
           });
         })
-        .catch((err) => { // handle the errors so as to continue using the applications
+        .catch((err) => {
+          // handle the errors so as to continue using the applications
           console.log(err.message);
           searchLoading.value = false;
         });
@@ -627,7 +630,7 @@ export default defineComponent({
     }
   }
   .highlight {
-    background-color: yellow;
+    background-color: rgb(255, 213, 0);
   }
 }
 </style>
