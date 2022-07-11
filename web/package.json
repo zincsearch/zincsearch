@@ -21,7 +21,7 @@
     "buffer": "^6.0.3",
     "js-cookie": "^3.0.1",
     "jsoneditor": "^9.9.0",
-    "quasar": "^2.7.3",
+    "quasar": "^2.7.5",
     "vue": "^3.2.37",
     "vue-i18n": "^9.1.10",
     "vue-router": "^4.1.1",
