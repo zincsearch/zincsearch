@@ -25,9 +25,9 @@ require (
 	github.com/rs/zerolog v1.27.0
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/shirou/gopsutil/v3 v3.22.6
-	github.com/stretchr/testify v1.7.5
+	github.com/stretchr/testify v1.8.0
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe
-	github.com/swaggo/gin-swagger v1.5.0
+	github.com/swaggo/gin-swagger v1.5.1
 	github.com/swaggo/swag v1.8.3
 	github.com/zsais/go-gin-prometheus v0.1.0
 	go.etcd.io/bbolt v1.3.6
