@@ -40,11 +40,12 @@ export default defineComponent({
     },
   },
   mounted() {
+    this.keywords = this.getKeywords(this.queryString);
     this.init();
   },
   methods: {
     init() {
-      this.list = this.splitToList(this.content, keywords);
+      this.list = this.splitToList(this.content, this.keywords);
     },
     splitToList(content, keywords) {
       let arr = [
@@ -83,7 +84,7 @@ export default defineComponent({
       }
       return arr;
     },
-    getKeywords(queryString: string) {
+    getKeywords(queryString) {
       if (!queryString || queryString.trim().length == 0) {
         return [];
       }
