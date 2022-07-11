@@ -52,16 +52,20 @@
                 <span v-text="col.value"></span>
               </q-td>
               <q-td v-else>
-                <!-- eslint-disable-next-line vue/no-v-html -->
-                <span v-html="col.value"></span>
+                <high-light
+                  :content="col.value"
+                  :query-string="queryString"
+                ></high-light>
               </q-td>
             </template>
           </q-tr>
           <q-tr v-show="props.expand" :props="props">
             <q-td colspan="100%">
               <pre class="expanded">
-                <!-- eslint-disable-next-line vue/no-v-html -->
-                <span v-html="JSON.stringify(props.row, null, 2)"></span> 
+                 <high-light
+                   :content="JSON.stringify(props.row, null, 2)"
+                   :query-string="queryString"
+                 ></high-light>
               </pre>
             </q-td>
           </q-tr>
@@ -150,10 +154,13 @@ import { date } from "quasar";
 import { useI18n } from "vue-i18n";
 
 import searchService from "../../services/search";
-import { getKeywords, highlightAndSpecialChars } from "../../utils/highlight";
+import HighLight from "../HighLight.vue";
 
 export default defineComponent({
   name: "ComponentSearchSearchList",
+  components: {
+    HighLight,
+  },
   props: {
     data: {
       type: Object,
@@ -231,6 +238,7 @@ export default defineComponent({
     const resultCount = ref("");
     const resultTotal = ref(0);
     const resultColumns = ref(defaultColumns());
+    const queryString = ref("");
 
     // get the normalized date and time from the dateVal object
     const getDateConsumableDateTime = function (dateVal) {
@@ -452,7 +460,7 @@ export default defineComponent({
         indexData.name = "";
       }
 
-      let keywords = getKeywords(queryData.query);
+      queryString.value = queryData.query;
       searchService
         .search({ index: indexData.name, query: query })
         .then((res) => {
@@ -471,9 +479,6 @@ export default defineComponent({
               for (let i in keys) {
                 fields[keys[i]] = {};
               }
-
-              // highlight keyword and htmlSpecialChars
-              row._source = highlightAndSpecialChars(row._source, keywords);
             });
             emit("updated:fields", Object.keys(fields));
           }
@@ -587,6 +592,7 @@ export default defineComponent({
       changePagination,
       chartHistogram,
       chartOptions,
+      queryString,
     };
   },
 });
