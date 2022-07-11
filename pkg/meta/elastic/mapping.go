@@ -2,8 +2,9 @@ package elastic
 
 import (
 	"bytes"
-	"encoding/json"
 	"sync"
+
+	"github.com/goccy/go-json"
 )
 
 // Mappings holds the index mappings.

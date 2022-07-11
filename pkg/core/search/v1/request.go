@@ -15,12 +15,24 @@
 
 package v1
 
-import "github.com/blugelabs/bluge"
+import (
+	"github.com/blugelabs/bluge"
+
+	"github.com/zinclabs/zinc/pkg/uquery/highlight"
+)
 
 // buildRequest combines the ZincQuery with the bluge Query to create a SearchRequest
 func buildRequest(iQuery *ZincQuery, query bluge.Query) bluge.SearchRequest {
-	return bluge.NewTopNSearch(iQuery.MaxResults, query).
+	request := bluge.NewTopNSearch(iQuery.MaxResults, query).
 		SetFrom(iQuery.From).
 		SortBy(iQuery.SortFields).
 		WithStandardAggregations()
+
+	// parse highlight
+	if iQuery.Highlight != nil {
+		_ = highlight.Request(iQuery.Highlight)
+		request.IncludeLocations()
+	}
+
+	return request
 }

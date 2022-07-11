@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/search/highlight"
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/config"
@@ -44,6 +45,16 @@ func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
 			if fv, ok := field.(string); ok {
 				sourceCtl.Fields[fv] = true
 			}
+		}
+	}
+
+	// highlight
+	var highlighter *highlight.SimpleHighlighter
+	if iQuery.Highlight != nil {
+		if len(iQuery.Highlight.PreTags) > 0 && len(iQuery.Highlight.PostTags) > 0 {
+			highlighter = highlight.NewHTMLHighlighterTags(iQuery.Highlight.PreTags[0], iQuery.Highlight.PostTags[0])
+		} else {
+			highlighter = highlight.NewHTMLHighlighter()
 		}
 	}
 
@@ -114,6 +125,10 @@ func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
 		var result map[string]interface{}
 		var id string
 		var timestamp time.Time
+		var highlightData map[string]interface{}
+		if iQuery.Highlight != nil {
+			highlightData = make(map[string]interface{})
+		}
 		err = next.VisitStoredFields(func(field string, value []byte) bool {
 			switch field {
 			case "_id":
@@ -123,6 +138,19 @@ func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
 			case "_source":
 				result = HandleSource(sourceCtl, value)
 			default:
+				// highlight
+				if iQuery.Highlight != nil && iQuery.Highlight.Fields != nil {
+					if options, ok := iQuery.Highlight.Fields[field]; ok {
+						if v, ok := next.Locations[field]; ok {
+							if len(options.PreTags) > 0 && len(options.PostTags) > 0 {
+								highlighter := highlight.NewHTMLHighlighterTags(options.PreTags[0], options.PostTags[0])
+								highlightData[field] = highlighter.BestFragments(v, value, options.NumberOfFragments)
+							} else {
+								highlightData[field] = highlighter.BestFragments(v, value, options.NumberOfFragments)
+							}
+						}
+					}
+				}
 			}
 			return true
 		})
@@ -137,6 +165,7 @@ func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
 			Score:     next.Score,
 			Timestamp: timestamp,
 			Source:    result,
+			Highlight: highlightData,
 		}
 		hits = append(hits, hit)
 
