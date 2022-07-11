@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/aws/aws-sdk-go-v2/config v1.15.13
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.11
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.27.1
 	github.com/blugelabs/bluge v0.1.9
 	github.com/blugelabs/bluge_segment_api v0.2.0
 	github.com/blugelabs/ice v1.0.0
@@ -13,11 +13,11 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dgraph-io/badger/v3 v3.2103.2
 	github.com/getsentry/sentry-go v0.13.0
-	github.com/gin-contrib/cors v1.3.1
-	github.com/gin-contrib/pprof v1.3.0
+	github.com/gin-contrib/cors v1.4.0
+	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-ego/gse v0.70.2
-	github.com/goccy/go-json v0.9.7
+	github.com/goccy/go-json v0.9.8
 	github.com/joho/godotenv v1.4.0
 	github.com/minio/minio-go/v7 v7.0.31
 	github.com/pyroscope-io/client v0.3.0
@@ -25,9 +25,9 @@ require (
 	github.com/rs/zerolog v1.27.0
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/shirou/gopsutil/v3 v3.22.6
-	github.com/stretchr/testify v1.7.5
+	github.com/stretchr/testify v1.8.0
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe
-	github.com/swaggo/gin-swagger v1.5.0
+	github.com/swaggo/gin-swagger v1.5.1
 	github.com/swaggo/swag v1.8.3
 	github.com/zsais/go-gin-prometheus v0.1.0
 	go.etcd.io/bbolt v1.3.6
