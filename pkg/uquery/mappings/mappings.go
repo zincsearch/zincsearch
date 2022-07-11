@@ -16,11 +16,11 @@
 package mappings
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/blugelabs/bluge/analysis"
+	"github.com/goccy/go-json"
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"

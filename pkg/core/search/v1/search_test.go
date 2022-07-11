@@ -289,6 +289,45 @@ func TestSearch(t *testing.T) {
 			},
 		},
 		{
+			name: "Search Query - highlight",
+			args: args{
+				iQuery: &ZincQuery{
+					SearchType: "querystring",
+					Query: QueryParams{
+						Term:  "angeles",
+						Field: "address.city",
+					},
+					MaxResults: 10,
+					Highlight: &meta.Highlight{
+						Fields: map[string]*meta.Highlight{
+							"address.city": {
+								PreTags:  []string{"<b>"},
+								PostTags: []string{"</b>"},
+							},
+						},
+					},
+				},
+			},
+			data: []map[string]interface{}{
+				{
+					"name": "Prabhat Sharma",
+					"address": map[string]interface{}{
+						"city":  "San Francisco",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+				{
+					"name": "Leonardo DiCaprio",
+					"address": map[string]interface{}{
+						"city":  "Los angeles",
+						"state": "California",
+					},
+					"hobby": "chess",
+				},
+			},
+		},
+		{
 			name: "Search Query - aggs",
 			args: args{
 				iQuery: &ZincQuery{

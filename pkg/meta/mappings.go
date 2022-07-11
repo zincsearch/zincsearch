@@ -17,8 +17,9 @@ package meta
 
 import (
 	"bytes"
-	"encoding/json"
 	"sync"
+
+	"github.com/goccy/go-json"
 )
 
 // Timestamp field name

@@ -618,6 +618,17 @@ definitions:
         type: boolean
       analyzer:
         type: string
+      fields:
+        additionalProperties:
+          $ref: '#/definitions/meta.Property'
+        description: |-
+          Fields allow the same string value to be indexed in multiple ways for different purposes,
+          such as one field for search and a multi-field for sorting and aggregations,
+          or the same string value analyzed by different analyzers.
+          If the Fields property is defined within a sub-field, it will be ignored.
+
+          Currently, only "text" fields support the Fields parameter.
+        type: object
       format:
         description: date format yyyy-MM-dd HH:mm:ss || yyyy-MM-dd || epoch_millis
         type: string
@@ -631,6 +642,9 @@ definitions:
         type: boolean
       store:
         type: boolean
+      time_zone:
+        description: date format time_zone
+        type: string
       type:
         description: text, keyword, date, numeric, boolean, geo_point
         type: string
@@ -998,6 +1012,9 @@ definitions:
       _source: {}
       _type:
         type: string
+      highlight:
+        additionalProperties: true
+        type: object
     type: object
   v1.Hits:
     properties:
@@ -1009,15 +1026,6 @@ definitions:
         type: number
       total:
         $ref: '#/definitions/v1.Total'
-    type: object
-  v1.QueryHighlight:
-    properties:
-      fields:
-        items:
-          type: string
-        type: array
-      style:
-        type: string
     type: object
   v1.QueryParams:
     properties:
@@ -1076,7 +1084,7 @@ definitions:
       from:
         type: integer
       highlight:
-        $ref: '#/definitions/v1.QueryHighlight'
+        $ref: '#/definitions/meta.Highlight'
       max_results:
         type: integer
       query:
@@ -1572,6 +1580,26 @@ paths:
       summary: Resfresh index
       tags:
       - Index
+  /api/index_name:
+    get:
+      operationId: IndexNameList
+      parameters:
+      - description: IndexName
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: List index Name
+      tags:
+      - Index
   /api/login:
     post:
       consumes:
@@ -1698,6 +1726,76 @@ paths:
       summary: Delete user
       tags:
       - User
+  /es/:target:
+    head:
+      parameters:
+      - description: Index data
+        in: body
+        name: index
+        required: true
+        schema:
+          $ref: '#/definitions/meta.IndexSimple'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+      summary: Checks if the index exists for compatible ES
+      tags:
+      - Index
+    put:
+      parameters:
+      - description: Index data
+        in: body
+        name: index
+        required: true
+        schema:
+          $ref: '#/definitions/meta.IndexSimple'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+      summary: Create index for compatible ES
+      tags:
+      - Index
+  /es/:target/_mapping:
+    get:
+      parameters:
+      - description: Index
+        in: path
+        name: target
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+      summary: Get index mappings for compatible ES
+      tags:
+      - Index
   /es/_bulk:
     post:
       consumes:

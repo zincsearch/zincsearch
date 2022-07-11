@@ -15,7 +15,11 @@
 
 package v1
 
-import "time"
+import (
+	"time"
+
+	"github.com/zinclabs/zinc/pkg/meta"
+)
 
 // ZincQuery is the query object for the zinc index. All search requests should send this struct
 type ZincQuery struct {
@@ -24,7 +28,7 @@ type ZincQuery struct {
 	MaxResults   int                          `json:"max_results"`
 	From         int                          `json:"from"`
 	Explain      bool                         `json:"explain"`
-	Highlight    QueryHighlight               `json:"highlight"`
+	Highlight    *meta.Highlight              `json:"highlight"`
 	Query        QueryParams                  `json:"query"`
 	Aggregations map[string]AggregationParams `json:"aggs"`
 	SortFields   []string                     `json:"sort_fields"`
@@ -37,7 +41,7 @@ type ZincQueryForSDK struct {
 	MaxResults   int                          `json:"max_results"`
 	From         int                          `json:"from"`
 	Explain      bool                         `json:"explain"`
-	Highlight    QueryHighlight               `json:"highlight"`
+	Highlight    *meta.Highlight              `json:"highlight"`
 	Query        QueryParams                  `json:"query"`
 	Aggregations map[string]AggregationParams `json:"aggs"`
 	SortFields   []string                     `json:"sort_fields"`
@@ -110,12 +114,13 @@ type Hits struct {
 }
 
 type Hit struct {
-	Index     string      `json:"_index"`
-	Type      string      `json:"_type"`
-	ID        string      `json:"_id"`
-	Score     float64     `json:"_score"`
-	Timestamp time.Time   `json:"@timestamp"`
-	Source    interface{} `json:"_source"`
+	Index     string                 `json:"_index"`
+	Type      string                 `json:"_type"`
+	ID        string                 `json:"_id"`
+	Score     float64                `json:"_score"`
+	Timestamp time.Time              `json:"@timestamp"`
+	Source    interface{}            `json:"_source"`
+	Highlight map[string]interface{} `json:"highlight,omitempty"`
 }
 
 type Total struct {

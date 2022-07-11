@@ -238,6 +238,37 @@
                 }
             }
         },
+        "/api/index_name": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "List index Name",
+                "operationId": "IndexNameList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "IndexName",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/login": {
             "post": {
                 "consumes": [
@@ -915,6 +946,113 @@
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/es/:target": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Create index for compatible ES",
+                "parameters": [
+                    {
+                        "description": "Index data",
+                        "name": "index",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.IndexSimple"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            },
+            "head": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Checks if the index exists for compatible ES",
+                "parameters": [
+                    {
+                        "description": "Index data",
+                        "name": "index",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.IndexSimple"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/es/:target/_mapping": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Get index mappings for compatible ES",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "target",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -2187,6 +2325,13 @@
                 "analyzer": {
                     "type": "string"
                 },
+                "fields": {
+                    "description": "Fields allow the same string value to be indexed in multiple ways for different purposes,\nsuch as one field for search and a multi-field for sorting and aggregations,\nor the same string value analyzed by different analyzers.\nIf the Fields property is defined within a sub-field, it will be ignored.\n\nCurrently, only \"text\" fields support the Fields parameter.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/meta.Property"
+                    }
+                },
                 "format": {
                     "description": "date format yyyy-MM-dd HH:mm:ss || yyyy-MM-dd || epoch_millis",
                     "type": "string"
@@ -2205,6 +2350,10 @@
                 },
                 "store": {
                     "type": "boolean"
+                },
+                "time_zone": {
+                    "description": "date format time_zone",
+                    "type": "string"
                 },
                 "type": {
                     "description": "text, keyword, date, numeric, boolean, geo_point",
@@ -2745,6 +2894,10 @@
                 "_source": {},
                 "_type": {
                     "type": "string"
+                },
+                "highlight": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         },
@@ -2762,20 +2915,6 @@
                 },
                 "total": {
                     "$ref": "#/definitions/v1.Total"
-                }
-            }
-        },
-        "v1.QueryHighlight": {
-            "type": "object",
-            "properties": {
-                "fields": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "style": {
-                    "type": "string"
                 }
             }
         },
@@ -2864,7 +3003,7 @@
                     "type": "integer"
                 },
                 "highlight": {
-                    "$ref": "#/definitions/v1.QueryHighlight"
+                    "$ref": "#/definitions/meta.Highlight"
                 },
                 "max_results": {
                     "type": "integer"
