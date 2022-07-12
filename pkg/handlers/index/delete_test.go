@@ -64,6 +64,15 @@ func TestDelete(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "index does not exist",
+			args: args{
+				code:   http.StatusBadRequest,
+				params: map[string]string{"target": "Index-Not-Exists"},
+				result: "index Index-Not-Exists does not exists",
+			},
+			wantErr: false,
+		},
 	}
 
 	t.Run("prepare", func(t *testing.T) {
