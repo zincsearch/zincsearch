@@ -17,6 +17,7 @@ package index
 
 import (
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -43,7 +44,17 @@ func Delete(c *gin.Context) {
 		return
 	}
 
+	indexList := core.ZINC_INDEX_LIST.List()
+
 	for _, indexName := range strings.Split(indexNames, ",") {
+		if strings.Contains(indexName, "*") { // check for wildcard
+			err := deleteIndexWithWildcard(indexName, indexList)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+				return
+			}
+			continue
+		}
 		if err := core.DeleteIndex(indexName); err != nil {
 			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 			return
@@ -53,4 +64,30 @@ func Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, meta.HTTPResponse{
 		Message: "deleted",
 	})
+}
+
+func deleteIndexWithWildcard(indexName string, indexList []*core.Index) error {
+	parts := strings.Split(indexName, "*")
+	pattern := ""
+	for i, part := range parts {
+		pattern += part
+		if i < len(parts)-1 {
+			pattern += "[[:ascii:]]"
+		}
+	}
+
+	p, err := regexp.Compile(pattern)
+	if err != nil {
+		return err
+	}
+
+	for _, i := range indexList {
+		if p.MatchString(i.Name) {
+			if err := core.DeleteIndex(i.Name); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

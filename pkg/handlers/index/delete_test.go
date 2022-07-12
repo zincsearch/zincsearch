@@ -47,6 +47,15 @@ func TestDelete(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "normal with wildcards",
+			args: args{
+				code:   http.StatusOK,
+				params: map[string]string{"target": "log-*-TestDelete"},
+				result: "deleted",
+			},
+			wantErr: false,
+		},
+		{
 			name: "empty",
 			args: args{
 				code:   http.StatusBadRequest,
@@ -58,12 +67,10 @@ func TestDelete(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err := core.NewIndex("TestDelete.index_1", "disk")
-		assert.NoError(t, err)
-		assert.NotNil(t, index)
-
-		err = core.StoreIndex(index)
-		assert.NoError(t, err)
+		prepareIndex(t, "TestDelete.index_1", "disk")
+		prepareIndex(t, "log-3342-44-TestDelete", "disk")
+		prepareIndex(t, "log-3122-44-TestDelete", "disk")
+		prepareIndex(t, "log-vvs323-44-TestDelete", "disk")
 	})
 
 	for _, tt := range tests {
@@ -79,4 +86,13 @@ func TestDelete(t *testing.T) {
 			assert.NoError(t, err)
 		})
 	}
+}
+
+func prepareIndex(t *testing.T, name, storageType string) {
+	index, err := core.NewIndex(name, storageType)
+	assert.NoError(t, err)
+	assert.NotNil(t, index)
+
+	err = core.StoreIndex(index)
+	assert.NoError(t, err)
 }
