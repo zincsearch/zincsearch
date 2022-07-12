@@ -72,7 +72,7 @@ func deleteIndexWithWildcard(indexName string, indexList []*core.Index) error {
 	for i, part := range parts {
 		pattern += part
 		if i < len(parts)-1 {
-			pattern += "[[:ascii:]]"
+			pattern += "[[:ascii:]]+"
 		}
 	}
 
