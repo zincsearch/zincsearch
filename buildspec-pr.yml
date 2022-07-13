@@ -1,51 +1,30 @@
 version: 0.2
 
 phases:
-  pre_build:
+  install:
     commands:
       # - GORELEASER_LATEST_VERSION=(curl -sL -o /dev/null -w %{url_effective} "https://github.com/goreleaser/goreleaser/releases/latest" | rev | cut -f1 -d'/'| rev)
       - GORELEASER_LATEST_VERSION=v1.10.1-pro
       - wget https://github.com/goreleaser/goreleaser-pro/releases/download/$GORELEASER_LATEST_VERSION/goreleaser-pro_$(uname -s)_$(uname -m).tar.gz
       - tar -xzf goreleaser-pro_$(uname -s)_$(uname -m).tar.gz
       - sudo mv goreleaser /usr/local/bin/goreleaser
-      
-      # - echo Logging in to Amazon ECR...
-      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/zinclabs
-      # Install AWS CLI
-      # - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      # - unzip awscliv2.zip
-      # - ./aws/install
-      # - rm awscliv2.zip
-      # - rm -rf aws
-
       # install buildx
       - wget https://github.com/docker/buildx/releases/download/v0.7.1/buildx-v0.7.1.linux-amd64
       - chmod +x buildx-v0.7.1.linux-amd64
       - mkdir -p ~/.docker/cli-plugins
       - mv buildx-v0.7.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
-
-      # - Install Go
-      # - cd /root/.goenv/plugins/go-build/../.. && git pull && cd -
-      # - goenv install 1.18.3
-      # - goenv rehash
-      # - goenv global 1.18.3
-
       # install prerequisites
-      # - yum install bc -y
       - apt-get update  && apt-get install bc -y
-
-      - export DOCKER_CLI_EXPERIMENTAL=enabled
-      # - export DOCKER_BUILDKIT=1
       # update npm
       - npm install --location=global npm@latest
+  pre_build:
+    commands:
+      # - echo Logging in to Amazon ECR...
+      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/zinclabs
+      - export DOCKER_CLI_EXPERIMENTAL=enabled
+      # - export DOCKER_BUILDKIT=1
   build:
     commands:
-      # - echo install snap
-      # - apt update
-      # - apt install snapd -y
-      # - snap install snapcraft --classic
-      # - docker run -v "$PWD":/build -w /build snapcore/snapcraft:stable snapcraft
-      
       # Build vujes UI
       - echo "Building front end..."
       - cd web
@@ -61,11 +40,6 @@ phases:
       # Build binary and container images using goreleaser
       - echo Build started on `date`
       - GIT_TAG="$(git describe --tags --abbrev=0)"
-      # - GORELEASER_LATEST_VERSION=(curl -sL -o /dev/null -w %{url_effective} "https://github.com/goreleaser/goreleaser/releases/latest" | rev | cut -f1 -d'/'| rev)
-      # - GORELEASER_LATEST_VERSION=v1.9.2
-      # - wget https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_LATEST_VERSION/goreleaser_$(uname -s)_$(uname -m).tar.gz
-      # - tar -xzf goreleaser_$(uname -s)_$(uname -m).tar.gz
-      # - sudo mv goreleaser /usr/local/bin/goreleaser
       - goreleaser release --nightly -f .goreleaser-dev.yml 
   # post_build:
   #   commands:
