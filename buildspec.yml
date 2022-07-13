@@ -20,10 +20,10 @@ phases:
       - mv buildx-v0.7.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
 
       # - Install Go
-      - cd /root/.goenv/plugins/go-build/../.. && git pull && cd -
-      - goenv install 1.18.3
-      - goenv rehash
-      - goenv global 1.18.3
+      # - cd /root/.goenv/plugins/go-build/../.. && git pull && cd -
+      # - goenv install 1.18.3
+      # - goenv rehash
+      # - goenv global 1.18.3
 
       - export DOCKER_CLI_EXPERIMENTAL=enabled
       # - export DOCKER_BUILDKIT=1
