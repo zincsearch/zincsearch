@@ -26,25 +26,24 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
 
-
 Cypress.Commands.add("login", () => {
-    cy.visit("http://localhost:8080");
+  cy.visit("http://localhost:8080");
 
-    cy.get('[data-cy="login-user-id"]').type('admin')
+  cy.get('[data-cy="login-user-id"]').type("admin");
 
-    // login
-    cy.get('[data-cy="login-password"]').type('admin')
-    cy.get('[data-cy="login-sign-in"]').click()
-    cy.contains('admin').should('be.visible')
+  // login
+  cy.get('[data-cy="login-password"]').type("admin");
+  cy.get('[data-cy="login-sign-in"]').click();
+  cy.contains("admin").should("be.visible");
 });
 
 declare global {
   namespace Cypress {
     interface Chainable {
-      login(): Chainable<void>
-    //   drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-    //   dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-    //   visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
+      login(): Chainable<void>;
+      //   drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+      //   dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+      //   visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
     }
   }
 }
