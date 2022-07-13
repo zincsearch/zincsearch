@@ -23,6 +23,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/uquery/template"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id ListTemplates
@@ -85,7 +86,7 @@ func CreateTemplate(c *gin.Context) {
 	}
 
 	var data map[string]interface{}
-	if err := c.BindJSON(&data); err != nil {
+	if err := zutils.GinBindJSON(c, &data); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}

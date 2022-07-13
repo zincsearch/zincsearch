@@ -18,6 +18,7 @@ package auth
 import (
 	"encoding/base64"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/crypto/argon2"
@@ -71,7 +72,14 @@ func CreateUser(id, name, plaintextPassword, role string) (*meta.User, error) {
 	return newUser, nil
 }
 
+// Cache for password generation
+var _cacheGeneratePassword = sync.Map{}
+
 func GeneratePassword(password, salt string) string {
+	key := password + ":" + salt
+	if v, ok := _cacheGeneratePassword.Load(key); ok {
+		return v.(string)
+	}
 	params := &Argon2Params{
 		Memory:      2 * 1024,
 		Iterations:  3,
@@ -82,7 +90,9 @@ func GeneratePassword(password, salt string) string {
 		Threads:     1,
 	}
 	hash := argon2.IDKey([]byte(password), []byte(salt), params.Time, params.Memory, params.Threads, params.KeyLength)
-	return base64.StdEncoding.EncodeToString(hash)
+	val := base64.StdEncoding.EncodeToString(hash)
+	_cacheGeneratePassword.Store(key, val)
+	return val
 }
 
 func GenerateSalt() string {

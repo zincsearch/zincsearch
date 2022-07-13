@@ -75,6 +75,10 @@ func TestIndex_CheckShards(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := index.CreateDocument(tt.args.docID, tt.args.doc, false)
 			assert.NoError(t, err)
+
+			// wait for WAL write to index
+			time.Sleep(time.Second)
+
 			if err := index.CheckShards(); (err != nil) != tt.wantErr {
 				t.Errorf("Index.CheckShards() error = %v, wantErr %v", err, tt.wantErr)
 			}

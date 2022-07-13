@@ -239,6 +239,13 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.init()
+			doc, err := index.CheckDocument(tt.args.docID, tt.args.doc, false, 0)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.Nil(t, err)
+			assert.NotNil(t, doc)
 			got, err := index.BuildBlugeDocumentFromJSON(tt.args.docID, tt.args.doc)
 			if tt.wantErr {
 				assert.Error(t, err)

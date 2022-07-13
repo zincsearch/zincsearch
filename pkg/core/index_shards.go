@@ -45,7 +45,7 @@ func (index *Index) CheckShards() error {
 func (index *Index) NewShard() error {
 	log.Info().Str("index", index.Name).Int("shard", index.ShardNum).Msg("init new shard")
 	// update current shard
-	index.UpdateMetadataByShard(index.ShardNum - 1)
+	index.UpdateMetadataByShard(index.GetLatestShardID())
 	index.lock.Lock()
 	index.Shards[index.ShardNum-1].DocTimeMin = index.DocTimeMin
 	index.Shards[index.ShardNum-1].DocTimeMax = index.DocTimeMax
@@ -53,14 +53,15 @@ func (index *Index) NewShard() error {
 	index.DocTimeMax = 0
 	// create new shard
 	index.ShardNum++
-	index.Shards = append(index.Shards, &meta.IndexShard{ID: index.ShardNum - 1})
+	index.Shards = append(index.Shards, &meta.IndexShard{ID: index.GetLatestShardID()})
 	index.lock.Unlock()
 	// store update
-	err := metadata.Index.Set(index.Name, index.Index)
-	if err != nil {
-		return err
-	}
-	return index.openWriter(index.ShardNum - 1)
+	metadata.Index.Set(index.Name, index.Index)
+	return index.openWriter(index.GetLatestShardID())
+}
+
+func (index *Index) GetLatestShardID() int {
+	return index.ShardNum - 1
 }
 
 // GetWriter return the newest shard writer or special shard writer
@@ -69,16 +70,16 @@ func (index *Index) GetWriter(shards ...int) (*bluge.Writer, error) {
 	if len(shards) == 1 {
 		shard = shards[0]
 	} else {
-		shard = index.ShardNum - 1
+		shard = index.GetLatestShardID()
 	}
 	if shard >= index.ShardNum || shard < 0 {
 		return nil, errors.New(errors.ErrorTypeRuntimeException, "shard not found")
 	}
 	index.lock.RLock()
-	w := index.Shards[shard].Writer
+	s := index.Shards[shard]
 	index.lock.RUnlock()
-	if w != nil {
-		return w, nil
+	if s.Writer != nil {
+		return s.Writer, nil
 	}
 
 	// open writer
@@ -86,17 +87,13 @@ func (index *Index) GetWriter(shards ...int) (*bluge.Writer, error) {
 		return nil, err
 	}
 
-	index.lock.RLock()
-	w = index.Shards[shard].Writer
-	index.lock.RUnlock()
-
-	return w, nil
+	return s.Writer, nil
 }
 
 // GetWriters return all shard writers
 func (index *Index) GetWriters() ([]*bluge.Writer, error) {
 	ws := make([]*bluge.Writer, 0, index.ShardNum)
-	for i := index.ShardNum - 1; i >= 0; i-- {
+	for i := 0; i < index.ShardNum; i++ {
 		w, err := index.GetWriter(i)
 		if err != nil {
 			return nil, err
@@ -110,19 +107,15 @@ func (index *Index) GetWriters() ([]*bluge.Writer, error) {
 func (index *Index) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error) {
 	rs := make([]*bluge.Reader, 0, 1)
 	chs := make(chan *bluge.Reader, index.ShardNum)
-	egLimit := make(chan struct{}, 10)
 	eg := errgroup.Group{}
-	for i := index.ShardNum - 1; i >= 0; i-- {
+	eg.SetLimit(config.Global.ReadGorutineNum)
+	for i := index.GetLatestShardID(); i >= 0; i-- {
 		if (timeMin > 0 && index.Shards[i].DocTimeMax > 0 && index.Shards[i].DocTimeMax < timeMin) ||
 			(timeMax > 0 && index.Shards[i].DocTimeMin > 0 && index.Shards[i].DocTimeMin > timeMax) {
 			continue
 		}
 		var i = i
-		egLimit <- struct{}{}
 		eg.Go(func() error {
-			defer func() {
-				<-egLimit
-			}()
 			w, err := index.GetWriter(i)
 			if err != nil {
 				return err
@@ -153,11 +146,16 @@ func (index *Index) openWriter(shard int) error {
 	if index.Analyzers != nil {
 		defaultSearchAnalyzer = index.Analyzers["default"]
 	}
-
-	indexName := fmt.Sprintf("%s/%06x", index.Name, shard)
+	index.lock.RLock()
+	s := index.Shards[shard]
+	index.lock.RUnlock()
+	s.Lock.Lock()
+	defer s.Lock.Unlock()
+	if s.Writer != nil {
+		return nil
+	}
 	var err error
-	index.lock.Lock()
-	index.Shards[shard].Writer, err = OpenIndexWriter(indexName, index.StorageType, defaultSearchAnalyzer, 0, 0)
-	index.lock.Unlock()
+	indexName := fmt.Sprintf("%s/%06x", index.Name, shard)
+	s.Writer, err = OpenIndexWriter(indexName, index.StorageType, defaultSearchAnalyzer, 0, 0)
 	return err
 }

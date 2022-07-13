@@ -28,6 +28,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // SearchDSL searches the index for the given http request from end user
@@ -46,7 +47,7 @@ func SearchDSL(c *gin.Context) {
 	indexName := c.Param("target")
 
 	query := &meta.ZincQuery{Size: 10}
-	if err := c.BindJSON(query); err != nil {
+	if err := zutils.GinBindJSON(c, query); err != nil {
 		log.Printf("handlers.search.searchDSL: %s", err.Error())
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return

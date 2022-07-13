@@ -64,6 +64,12 @@
                 {{ indexData.storage_type }}
               </div>
             </div>
+            <div class="row items-center q-mb-md">
+              <div class="col-sm-3 col-12">WAL Entries</div>
+              <div class="col-sm-9 col-12 q-mb-none q-pl-md q-pt-sm q-pb-sm">
+                {{ indexData.wal_size }}
+              </div>
+            </div>
           </div>
         </q-tab-panel>
 
@@ -135,6 +141,7 @@ export default defineComponent({
       this.indexData["shard_num"] = this.modelValue.shard_num;
       this.indexData["storage_type"] = this.modelValue.storage_type;
       this.indexData["storage_size"] = this.modelValue.storage_size;
+      this.indexData["wal_size"] = this.modelValue.wal_size || 0;
       this.indexData["settings"] = this.modelValue.settings || {};
       this.indexData["mappings"] = this.modelValue.mappings || {};
     }

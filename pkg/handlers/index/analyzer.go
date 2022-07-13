@@ -40,7 +40,7 @@ import (
 // @Router /api/_analyze [post]
 func Analyze(c *gin.Context) {
 	var query AnalyzeRequest
-	if err := c.BindJSON(&query); err != nil {
+	if err := zutils.GinBindJSON(c, &query); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}

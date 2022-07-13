@@ -22,8 +22,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zinclabs/zinc/pkg/bluge/aggregation"
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/meta"
 )
+
+func TestMain(m *testing.M) {
+	config.Global.WalSyncInterval = "10ms"
+	m.Run()
+}
 
 func TestDateLayoutDetection(t *testing.T) {
 	type args struct {
@@ -179,6 +185,9 @@ func TestIndex_CreateUpdateDocumentWithDateField(t *testing.T) {
 			err := index.CreateDocument(tt.args.docID, tt.args.doc, tt.args.update)
 			assert.NoError(t, err)
 
+			// wait for WAL write to index
+			time.Sleep(time.Second)
+
 			var query *meta.ZincQuery
 			if tt.isRange {
 				query = &meta.ZincQuery{
@@ -316,6 +325,9 @@ func TestIndex_CreateUpdateDocument(t *testing.T) {
 				return
 			}
 
+			// wait for WAL write to index
+			time.Sleep(time.Second)
+
 			assert.NoError(t, err)
 			query := &meta.ZincQuery{
 				Query: &meta.Query{
@@ -392,6 +404,9 @@ func TestIndex_UpdateDocument(t *testing.T) {
 			"time": float64(1579098983),
 		}, false)
 		assert.NoError(t, err)
+
+		// wait for WAL write to index
+		time.Sleep(time.Second)
 	})
 
 	for _, tt := range tests {

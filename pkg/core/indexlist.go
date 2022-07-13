@@ -70,6 +70,33 @@ func (t *IndexList) Get(name string) (*Index, bool) {
 	return idx, ok
 }
 
+func (t *IndexList) GetOrCreate(name, storageType string) (*Index, bool, error) {
+	t.lock.RLock()
+	idx, ok := t.Indexes[name]
+	t.lock.RUnlock()
+	if ok {
+		return idx, true, nil
+	}
+	t.lock.Lock()
+	defer t.lock.Unlock()
+	// maybe someone else created it while we were waiting for the lock
+	idx, ok = t.Indexes[name]
+	if ok {
+		return idx, true, nil
+	}
+	// okay, let's create new index
+	idx, err := NewIndex(name, storageType)
+	if err != nil {
+		return nil, false, err
+	}
+	if err = storeIndex(idx); err != nil {
+		return nil, false, err
+	}
+	// cache it
+	t.Indexes[idx.Name] = idx
+	return idx, false, nil
+}
+
 func (t *IndexList) Delete(name string) {
 	t.lock.Lock()
 	if idx, ok := t.Indexes[name]; ok {
@@ -104,5 +131,11 @@ func (t *IndexList) Close() error {
 			return err
 		}
 	}
+	return nil
+}
+
+// GC auto close unused indexes what unactive for a long time (10m)
+func (t *IndexList) GC() error {
+	// TODO: implement GC
 	return nil
 }

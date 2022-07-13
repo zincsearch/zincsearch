@@ -23,6 +23,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/uquery/mappings"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id GetMapping
@@ -69,7 +70,7 @@ func SetMapping(c *gin.Context) {
 	}
 
 	var mappingRequest map[string]interface{}
-	if err := c.BindJSON(&mappingRequest); err != nil {
+	if err := zutils.GinBindJSON(c, &mappingRequest); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
@@ -80,9 +81,14 @@ func SetMapping(c *gin.Context) {
 		return
 	}
 
-	index, exists := core.GetIndex(indexName)
+	index, exists, err := core.GetOrCreateIndex(indexName, "")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		return
+	}
+
+	// check if mapping field is exists
 	if exists {
-		// check if mapping field is exists
 		if index.Mappings != nil && index.Mappings.Len() > 0 {
 			for field := range mappings.ListProperty() {
 				if _, ok := index.Mappings.GetProperty(field); ok {
@@ -96,13 +102,6 @@ func SetMapping(c *gin.Context) {
 			index.Mappings.SetProperty(field, prop)
 		}
 		mappings = index.Mappings
-	} else {
-		// create index
-		index, err = core.NewIndex(indexName, "")
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
-			return
-		}
 	}
 
 	// update mappings

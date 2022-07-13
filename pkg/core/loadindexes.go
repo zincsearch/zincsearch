@@ -69,6 +69,12 @@ func LoadZincIndexesFromMetadata() error {
 				return errors.New(errors.ErrorTypeRuntimeException, "parse stored analysis error").Cause(err)
 			}
 		}
+
+		// load WAL
+		if err := index.OpenWAL(); err != nil {
+			return err
+		}
+
 		// load in memory
 		ZINC_INDEX_LIST.Add(index)
 	}

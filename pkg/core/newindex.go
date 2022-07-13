@@ -52,6 +52,11 @@ func NewIndex(name, storageType string) (*Index, error) {
 		return nil, err
 	}
 
+	// load WAL
+	if err := index.OpenWAL(); err != nil {
+		return nil, err
+	}
+
 	// init shards writer
 	for i := 0; i < index.ShardNum; i++ {
 		index.Shards = append(index.Shards, &meta.IndexShard{ID: i})
@@ -94,6 +99,16 @@ func getOpenConfig(name string, storageType string, defaultSearchAnalyzer *analy
 
 // storeIndex stores the index to metadata
 func StoreIndex(index *Index) error {
+	// store index
+	if err := storeIndex(index); err != nil {
+		return err
+	}
+	// cache index
+	ZINC_INDEX_LIST.Add(index)
+	return nil
+}
+
+func storeIndex(index *Index) error {
 	if index.Settings == nil {
 		index.Settings = new(meta.IndexSettings)
 	}
@@ -101,7 +116,11 @@ func StoreIndex(index *Index) error {
 		index.Analyzers = make(map[string]*analysis.Analyzer)
 	}
 	if index.Mappings == nil {
+		// set default mappings
 		index.Mappings = meta.NewMappings()
+		if err := index.SetMappings(index.Mappings); err != nil {
+			return err
+		}
 	}
 
 	index.UpdateAt = time.Now()
@@ -110,12 +129,13 @@ func StoreIndex(index *Index) error {
 		return fmt.Errorf("core.StoreIndex: index: %s, error: %s", index.Name, err.Error())
 	}
 
-	// cache index
-	ZINC_INDEX_LIST.Add(index)
-
 	return nil
 }
 
 func GetIndex(name string) (*Index, bool) {
 	return ZINC_INDEX_LIST.Get(name)
+}
+
+func GetOrCreateIndex(name, storageType string) (*Index, bool, error) {
+	return ZINC_INDEX_LIST.GetOrCreate(name, storageType)
 }

@@ -78,8 +78,8 @@ func (index *Index) SetAnalyzers(analyzers map[string]*analysis.Analyzer) error 
 }
 
 func (index *Index) SetMappings(mappings *meta.Mappings) error {
-	if mappings == nil || mappings.Len() == 0 {
-		return nil
+	if mappings == nil {
+		mappings = meta.NewMappings()
 	}
 
 	// custom analyzer just for text field
@@ -183,9 +183,9 @@ func (index *Index) Reopen() error {
 func (index *Index) Close() error {
 	var err error
 	// update metadata before close
-	if err = index.UpdateMetadata(); err != nil {
-		return err
-	}
+	// if err = index.UpdateMetadata(); err != nil {
+	// 	return err
+	// }
 	index.lock.Lock()
 	for _, shard := range index.Shards {
 		if shard.Writer == nil {

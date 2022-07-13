@@ -16,9 +16,12 @@
 package meta
 
 import (
+	"sync"
 	"time"
 
 	"github.com/blugelabs/bluge"
+
+	"github.com/zinclabs/zinc/pkg/wal"
 )
 
 type Index struct {
@@ -30,6 +33,8 @@ type Index struct {
 	DocTimeMax  int64          `json:"doc_time_max"`
 	ShardNum    int            `json:"shard_num"`
 	Shards      []*IndexShard  `json:"shards"`
+	WAL         *wal.Log       `json:"-"`
+	WALSize     uint64         `json:"wal_size"`
 	Settings    *IndexSettings `json:"settings,omitempty"`
 	Mappings    *Mappings      `json:"mappings,omitempty"`
 	CreateAt    time.Time      `json:"create_at"`
@@ -43,6 +48,7 @@ type IndexShard struct {
 	DocNum      uint64        `json:"doc_num"`
 	StorageSize uint64        `json:"storage_size"`
 	Writer      *bluge.Writer `json:"-"`
+	Lock        sync.Mutex    `json:"-"`
 }
 
 type IndexSimple struct {

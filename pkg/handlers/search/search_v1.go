@@ -23,6 +23,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	v1 "github.com/zinclabs/zinc/pkg/core/search/v1"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // SearchV1 searches the index for the given http request from end user
@@ -47,7 +48,7 @@ func SearchV1(c *gin.Context) {
 
 	var iQuery v1.ZincQuery
 	iQuery.MaxResults = 10
-	if err := c.BindJSON(&iQuery); err != nil {
+	if err := zutils.GinBindJSON(c, &iQuery); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}

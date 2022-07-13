@@ -23,6 +23,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id GetSettings
@@ -68,7 +69,7 @@ func SetSettings(c *gin.Context) {
 	}
 
 	var settings *meta.IndexSettings
-	if err := c.BindJSON(&settings); err != nil {
+	if err := zutils.GinBindJSON(c, &settings); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
@@ -84,7 +85,11 @@ func SetSettings(c *gin.Context) {
 		return
 	}
 
-	index, exists := core.GetIndex(indexName)
+	index, exists, err := core.GetOrCreateIndex(indexName, "")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		return
+	}
 	if exists {
 		// it can only change settings.NumberOfReplicas when index exists
 		if settings.NumberOfReplicas > 0 {
@@ -101,12 +106,6 @@ func SetSettings(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok"})
-		return
-	}
-
-	index, err = core.NewIndex(indexName, "")
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
