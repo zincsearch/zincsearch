@@ -8,8 +8,8 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "lint": "eslint --ext .js,.vue,.ts ./src/ && stylelint **/*.vue",
-    "lint-autofix": "eslint --ext .js,.vue,.ts ./src/ --fix && stylelint **/*.vue --fix",
+    "lint": "eslint --ext .js,.vue,.ts ./src/ ./cypress/ && stylelint **/*.vue",
+    "lint-autofix": "eslint --ext .js,.vue,.ts ./src/ ./cypress/ --fix && stylelint **/*.vue --fix",
     "e2evite": "vite e2e",
     "e2e": "./node_modules/cypress/bin/cypress open",
     "e2e-ci": "./node_modules/cypress/bin/cypress run --headless"
@@ -29,12 +29,12 @@
     "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@cypress/vue": "^3.1.0",
+    "@cypress/vue": "^4.0.0",
     "@cypress/webpack-dev-server": "^2.0.0",
     "@quasar/vite-plugin": "^1.0.10",
     "@types/js-cookie": "^3.0.2",
-    "@typescript-eslint/eslint-plugin": "^5.14.0",
-    "@typescript-eslint/parser": "^5.30.5",
+    "@typescript-eslint/eslint-plugin": "^5.30.6",
+    "@typescript-eslint/parser": "^5.30.6",
     "@vitejs/plugin-vue": "^2.3.3",
     "cypress": "^10.3.0",
     "eslint": "^8.19.0",
