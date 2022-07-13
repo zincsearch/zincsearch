@@ -32,7 +32,7 @@ phases:
 
       # install prerequisites
       # - yum install bc -y
-      - apt install bc -y
+      - apt update  && apt install bc -y
 
       - export DOCKER_CLI_EXPERIMENTAL=enabled
       # - export DOCKER_BUILDKIT=1
