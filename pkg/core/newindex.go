@@ -85,12 +85,6 @@ func OpenIndexWriter(name string, storageType string, defaultSearchAnalyzer *ana
 	return bluge.OpenWriter(cfg)
 }
 
-// OpenIndexReader load the index reader from the storage
-func OpenIndexReader(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) (*bluge.Reader, error) {
-	cfg := getOpenConfig(name, storageType, defaultSearchAnalyzer, timeRange...)
-	return bluge.OpenReader(cfg)
-}
-
 func getOpenConfig(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) bluge.Config {
 	var dataPath string
 	var cfg bluge.Config

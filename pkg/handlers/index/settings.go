@@ -42,7 +42,7 @@ func GetSettings(c *gin.Context) {
 		return
 	}
 
-	settings := index.Settings
+	settings := index.GetSettings()
 	if settings == nil {
 		settings = new(meta.IndexSettings)
 	}

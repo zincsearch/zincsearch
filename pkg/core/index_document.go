@@ -210,13 +210,13 @@ func (index *Index) CheckDocument(docID string, doc map[string]interface{}, upda
 
 		switch v := value.(type) {
 		case []interface{}:
-			for _, v := range v {
-				if err := index.checkField(mappings, flatDoc, key, v); err != nil {
+			for i, v := range v {
+				if err := index.checkField(mappings, flatDoc, key, v, i, true); err != nil {
 					return nil, err
 				}
 			}
 		default:
-			if err := index.checkField(mappings, flatDoc, key, v); err != nil {
+			if err := index.checkField(mappings, flatDoc, key, v, 0, false); err != nil {
 				return nil, err
 			}
 		}
@@ -257,7 +257,7 @@ func (index *Index) CheckDocument(docID string, doc map[string]interface{}, upda
 	return json.Marshal(flatDoc)
 }
 
-func (index *Index) checkField(mappings *meta.Mappings, data map[string]interface{}, key string, value interface{}) error {
+func (index *Index) checkField(mappings *meta.Mappings, data map[string]interface{}, key string, value interface{}, id int, array bool) error {
 	var err error
 	var v interface{}
 	prop, _ := mappings.GetProperty(key)
@@ -289,7 +289,13 @@ func (index *Index) checkField(mappings *meta.Mappings, data map[string]interfac
 		}
 		v = t.UnixNano()
 	}
-	data[key] = v
+	if array {
+		sub := data[key].([]interface{})
+		sub[id] = v
+		data[key] = sub
+	} else {
+		data[key] = v
+	}
 
 	return nil
 }

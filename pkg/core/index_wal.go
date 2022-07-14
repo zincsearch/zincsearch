@@ -43,7 +43,6 @@ func (index *Index) OpenWAL() error {
 		return err
 	}
 	go index.ConsumeWAL()
-	// go index.CheckStatusWAL()
 	return nil
 }
 
@@ -222,23 +221,6 @@ func (index *Index) ConsumeWAL() {
 		//  update metadata
 		if err = index.UpdateMetadata(); err != nil {
 			log.Error().Err(err).Str("index", index.Name).Msg("consume index.UpdateMetadata()")
-		}
-	}
-}
-
-func (index *Index) CheckStatusWAL() {
-	tick := time.Tick(time.Second * 1)
-	isZero := false
-	for range tick {
-		n, _ := index.WAL.Len()
-		n--
-		if n > 0 || !isZero {
-			log.Debug().Uint64("length", n).Str("index", index.Name).Msg("check wal length")
-		}
-		if n == 0 {
-			isZero = true
-		} else {
-			isZero = false
 		}
 	}
 }

@@ -29,6 +29,35 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+func TestIndex_Index(t *testing.T) {
+	indexName := "TestIndex_Index.index_1"
+	index, err := NewIndex(indexName, "disk")
+	assert.NoError(t, err)
+	assert.NotNil(t, index)
+
+	err = StoreIndex(index)
+	assert.NoError(t, err)
+
+	got, err := json.Marshal(index)
+	assert.NoError(t, err)
+	assert.NotNil(t, got)
+
+	name := index.GetName()
+	assert.Equal(t, indexName, name)
+
+	settings := index.GetSettings()
+	assert.NotNil(t, settings)
+
+	mappings := index.GetMappings()
+	assert.NotNil(t, mappings)
+
+	analyzers := index.GetAnalyzers()
+	assert.NotNil(t, analyzers)
+
+	err = index.Reopen()
+	assert.NoError(t, err)
+}
+
 func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 	var index *Index
 	var err error

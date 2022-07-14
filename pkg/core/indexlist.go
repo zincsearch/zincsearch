@@ -169,6 +169,5 @@ func (t *IndexList) Close() error {
 
 // GC auto close unused indexes what unactive for a long time (10m)
 func (t *IndexList) GC() error {
-	// TODO: implement GC
-	return nil
+	return nil // TODO: implement GC
 }

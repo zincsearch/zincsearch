@@ -57,6 +57,10 @@ func TestIndex_CreateUpdateDocument(t *testing.T) {
 				doc: map[string]interface{}{
 					"name": "Hello",
 					"test": "Hello",
+					"attr": []interface{}{
+						"test",
+						"test2",
+					},
 				},
 				update: false,
 			},
