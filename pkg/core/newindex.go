@@ -17,6 +17,7 @@ package core
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -29,14 +30,27 @@ import (
 	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-// NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
-func NewIndex(name, storageType string) (*Index, error) {
+var indexNameRe = regexp.MustCompile(`^[a-zA-Z0-9_.-]+$`)
+
+func CheckIndexName(name string) error {
 	if name == "" {
-		return nil, fmt.Errorf("core.NewIndex: index name cannot be empty")
+		return fmt.Errorf("index name cannot be empty")
 	}
 	if strings.HasPrefix(name, "_") {
-		return nil, fmt.Errorf("core.NewIndex: index name cannot start with _")
+		return fmt.Errorf("index name cannot start with _")
 	}
+	if !indexNameRe.Match([]byte(name)) {
+		return fmt.Errorf("index name [%s] is invalid", name)
+	}
+	return nil
+}
+
+// NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
+func NewIndex(name, storageType string) (*Index, error) {
+	if err := CheckIndexName(name); err != nil {
+		return nil, err
+	}
+
 	if storageType == "" {
 		storageType = "disk"
 	}
