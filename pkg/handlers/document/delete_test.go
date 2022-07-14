@@ -98,7 +98,7 @@ func TestDelete(t *testing.T) {
 	assert.Contains(t, w.Body.String(), `"id":"1"`)
 
 	// wait for WAL write to index
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 2)
 
 	for _, tt := range tests {
 		c, w := utils.NewGinContext()
