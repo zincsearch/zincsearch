@@ -113,6 +113,8 @@ func TestDelete(t *testing.T) {
 	}
 
 	t.Run("cleanup", func(t *testing.T) {
+		// wait for WAL write to index
+		time.Sleep(time.Second * 3)
 		err := core.DeleteIndex("TestDocumentDelete.index_1")
 		assert.NoError(t, err)
 	})
