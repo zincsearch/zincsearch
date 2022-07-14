@@ -114,12 +114,14 @@ func Test_walMergeDocs_WriteTo(t *testing.T) {
 
 	t.Run("writeTo", func(t *testing.T) {
 		batch := blugeindex.NewBatch()
-		docs.WriteTo(index, batch, false)
+		err := docs.WriteTo(index, batch, false)
+		assert.NoError(t, err)
 	})
 
 	t.Run("rollback", func(t *testing.T) {
 		batch := blugeindex.NewBatch()
-		docs.WriteTo(index, batch, true)
+		err := docs.WriteTo(index, batch, true)
+		assert.NoError(t, err)
 	})
 
 	t.Run("Cleanup", func(t *testing.T) {
