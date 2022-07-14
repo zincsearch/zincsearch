@@ -114,7 +114,7 @@ func (l *Log) Write(index uint64, data []byte) error {
 		l.index[index] = offset
 	}
 	// sync to disk
-	l.f.Seek(0, io.SeekStart)
+	_, _ = l.f.Seek(0, io.SeekStart)
 	_, err := l.f.Write(l.data)
 	if err != nil {
 		return err

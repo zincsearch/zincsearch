@@ -167,7 +167,8 @@ func TestIndex_UpdateDocument(t *testing.T) {
 		prop := meta.NewProperty("date")
 		mappings := index.GetMappings()
 		mappings.SetProperty("time", prop)
-		index.SetMappings(mappings)
+		err = index.SetMappings(mappings)
+		assert.NoError(t, err)
 
 		err = index.CreateDocument("1", map[string]interface{}{
 			"name": "Hello",
@@ -186,6 +187,11 @@ func TestIndex_UpdateDocument(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("cleanup", func(t *testing.T) {
+		err = DeleteIndex("TestIndex_UpdateDocument.index_1")
+		assert.NoError(t, err)
+	})
 }
 
 func TestDateLayoutDetection(t *testing.T) {
@@ -267,7 +273,7 @@ func TestIndex_CreateUpdateDocumentWithDateField(t *testing.T) {
 				doc: map[string]interface{}{
 					"created_at": "2009-11-10T23:00:00",
 				},
-				update: true,
+				update: false,
 			},
 		},
 		{

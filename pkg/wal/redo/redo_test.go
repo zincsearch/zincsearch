@@ -17,6 +17,7 @@ package redo
 
 import (
 	"log"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,6 +37,15 @@ func TestMain(m *testing.M) {
 	if err = l.Close(); err != nil {
 		log.Fatal(err)
 	}
+
+	os.Exit(0)
+}
+
+func TestOpenClose(t *testing.T) {
+	l, err := Open("data/redoTest2", nil)
+	assert.NoError(t, err)
+	err = l.Close()
+	assert.NoError(t, err)
 }
 
 func TestLog(t *testing.T) {

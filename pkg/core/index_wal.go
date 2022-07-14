@@ -192,8 +192,8 @@ func (index *Index) ConsumeWAL() {
 		if docs.MaxShardLen() > 0 {
 			if err = index.writeRedoLog(RedoActionRead, startID, minID); err != nil {
 				log.Error().Err(err).Str("index", index.Name).Str("stage", "read").Msg("consume wal.redolog.Write()")
-				errFound = true
-				break // need retry
+				errFound = true //nolint
+				break           // need retry
 			}
 			if err := docs.WriteTo(index, batch, false); err != nil {
 				log.Error().Err(err).Str("index", index.Name).Msg("consume wal.docs.WriteTo()")
@@ -201,8 +201,8 @@ func (index *Index) ConsumeWAL() {
 			}
 			if err = index.writeRedoLog(RedoActionWrite, startID, minID); err != nil {
 				log.Error().Err(err).Str("index", index.Name).Str("stage", "write").Msg("consume wal.redolog.Write()")
-				errFound = true
-				break // need retry
+				errFound = true //nolint
+				break           // need retry
 			}
 		}
 		if errFound {

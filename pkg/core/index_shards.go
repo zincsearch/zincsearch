@@ -57,7 +57,9 @@ func (index *Index) NewShard() error {
 	index.Shards = append(index.Shards, &meta.IndexShard{ID: index.GetLatestShardID()})
 	index.lock.Unlock()
 	// store update
-	metadata.Index.Set(index.Name, index.Index)
+	if err := metadata.Index.Set(index.Name, index.Index); err != nil {
+		return err
+	}
 	return index.openWriter(index.GetLatestShardID())
 }
 
