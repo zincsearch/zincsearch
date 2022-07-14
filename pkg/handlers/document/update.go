@@ -38,12 +38,8 @@ import (
 // @Failure 500 {object} meta.HTTPResponseError
 // @Router /api/{index}/_update/{id} [post]
 func Update(c *gin.Context) {
-	docID := c.Param("id")
-	if docID == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "id is empty"})
-	}
-
 	indexName := c.Param("target")
+	docID := c.Param("id")
 	insert := c.Query("insert") // true or false
 	insertBool, _ := zutils.ToBool(insert)
 

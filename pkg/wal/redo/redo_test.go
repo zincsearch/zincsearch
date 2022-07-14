@@ -26,7 +26,7 @@ var l *Log
 
 func TestMain(m *testing.M) {
 	var err error
-	l, err = Open("data/test", nil)
+	l, err = Open("data/redoTest", nil)
 	if err != nil {
 		log.Fatal(err)
 	}

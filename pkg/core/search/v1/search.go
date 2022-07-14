@@ -96,7 +96,8 @@ func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
 	}
 
 	// handle aggregations
-	err = AddAggregations(searchRequest, iQuery.Aggregations, index.Mappings)
+	mappings := index.GetMappings()
+	err = AddAggregations(searchRequest, iQuery.Aggregations, mappings)
 	if err != nil {
 		resp.Error = err.Error()
 		return resp, err

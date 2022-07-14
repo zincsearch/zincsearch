@@ -27,7 +27,7 @@ import (
 
 func TestList(t *testing.T) {
 	t.Run("prepare", func(t *testing.T) {
-		index, err := core.NewIndex("TestList.index_1", "disk")
+		index, err := core.NewIndex("TestIndexList.index_1", "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 
@@ -43,7 +43,7 @@ func TestList(t *testing.T) {
 	})
 
 	t.Run("cleanup", func(t *testing.T) {
-		err := core.DeleteIndex("TestList.index_1")
+		err := core.DeleteIndex("TestIndexList.index_1")
 		assert.NoError(t, err)
 	})
 }

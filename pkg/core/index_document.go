@@ -40,10 +40,7 @@ import (
 // then it creates the mapping for the missing fields.
 func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]interface{}) (*bluge.Document, error) {
 	// Pick the index mapping from the cache if it already exists
-	mappings := index.Mappings
-	if mappings == nil {
-		mappings = meta.NewMappings()
-	}
+	mappings := index.GetMappings()
 
 	delete(doc, meta.ActionFieldName)
 	delete(doc, meta.IDFieldName)
@@ -102,7 +99,7 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 	switch prop.Type {
 	case "text":
 		field = bluge.NewTextField(key, value.(string)).SearchTermPositions()
-		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.Analyzers, index.Mappings, key)
+		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.Analyzers, mappings, key)
 		if fieldAnalyzer != nil {
 			field.WithAnalyzer(fieldAnalyzer)
 		}
@@ -142,12 +139,9 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 }
 
 // CheckDocument checks if the document is valid.
-func (index *Index) CheckDocument(docID string, doc map[string]interface{}, update bool, shard int) ([]byte, error) {
+func (index *Index) CheckDocument(docID string, doc map[string]interface{}, update bool, shard int64) ([]byte, error) {
 	// Pick the index mapping from the cache if it already exists
-	mappings := index.Mappings
-	if mappings == nil {
-		mappings = meta.NewMappings()
-	}
+	mappings := index.GetMappings()
 
 	mappingsNeedsUpdate := false
 
@@ -171,10 +165,8 @@ func (index *Index) CheckDocument(docID string, doc map[string]interface{}, upda
 					if config.Global.EnableTextKeywordMapping {
 						p := meta.NewProperty("keyword")
 						newProp.AddField("keyword", p)
-
 						mappings.SetProperty(key+".keyword", p)
 					}
-
 					mappings.SetProperty(key, newProp)
 				}
 			case int, int64, float64:
@@ -195,10 +187,8 @@ func (index *Index) CheckDocument(docID string, doc map[string]interface{}, upda
 								if config.Global.EnableTextKeywordMapping {
 									p := meta.NewProperty("keyword")
 									newProp.AddField("keyword", p)
-
 									mappings.SetProperty(key+".keyword", p)
 								}
-
 								mappings.SetProperty(key, newProp)
 							}
 						case float64:
@@ -354,14 +344,14 @@ func (index *Index) DeleteDocument(docID string) error {
 }
 
 // FindShardByDocID finds docID in which shard and returns the shard id
-func (index *Index) FindShardByDocID(docID string) (int, error) {
+func (index *Index) FindShardByDocID(docID string) (int64, error) {
 	query := bluge.NewBooleanQuery()
 	query.AddMust(bluge.NewTermQuery(docID).SetField("_id"))
 	request := bluge.NewTopNSearch(1, query).WithStandardAggregations()
 	ctx := context.Background()
 
 	// check id store by which shard
-	shardID := -1
+	shardID := int64(-1)
 	writers, err := index.GetWriters()
 	if err != nil {
 		return shardID, err
@@ -369,19 +359,19 @@ func (index *Index) FindShardByDocID(docID string) (int, error) {
 
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.SetLimit(config.Global.ReadGorutineNum)
-	for id := len(writers) - 1; id >= 0; id-- {
+	for id := int64(len(writers)) - 1; id >= 0; id-- {
 		id := id
 		w := writers[id]
 		eg.Go(func() error {
 			r, err := w.Reader()
 			if err != nil {
-				log.Error().Err(err).Int("shard", id).Str("index", index.Name).Msg("failed to get reader")
+				log.Error().Err(err).Int64("shard", id).Str("index", index.Name).Msg("failed to get reader")
 				return nil // not check err, if returns err with cancel all gorutines.
 			}
 			defer r.Close()
 			dmi, err := r.Search(ctx, request)
 			if err != nil {
-				log.Error().Err(err).Int("shard", id).Str("index", index.Name).Msg("failed to do search")
+				log.Error().Err(err).Int64("shard", id).Str("index", index.Name).Msg("failed to do search")
 				return nil // not check err, if returns err with cancel all gorutines.
 			}
 			if dmi.Aggregations().Count() > 0 {

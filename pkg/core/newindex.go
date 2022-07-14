@@ -58,7 +58,7 @@ func NewIndex(name, storageType string) (*Index, error) {
 	}
 
 	// init shards writer
-	for i := 0; i < index.ShardNum; i++ {
+	for i := int64(0); i < index.ShardNum; i++ {
 		index.Shards = append(index.Shards, &meta.IndexShard{ID: i})
 	}
 
@@ -109,6 +109,9 @@ func StoreIndex(index *Index) error {
 }
 
 func storeIndex(index *Index) error {
+	index.lock.Lock()
+	defer index.lock.Unlock()
+
 	if index.Settings == nil {
 		index.Settings = new(meta.IndexSettings)
 	}
@@ -118,9 +121,7 @@ func storeIndex(index *Index) error {
 	if index.Mappings == nil {
 		// set default mappings
 		index.Mappings = meta.NewMappings()
-		if err := index.SetMappings(index.Mappings); err != nil {
-			return err
-		}
+		index.Mappings.SetProperty(meta.TimeFieldName, meta.NewProperty("date"))
 	}
 
 	index.UpdateAt = time.Now()

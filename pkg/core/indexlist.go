@@ -17,6 +17,7 @@ package core
 
 import (
 	"fmt"
+	"sort"
 	"sync"
 
 	"github.com/rs/zerolog/log"
@@ -100,7 +101,9 @@ func (t *IndexList) GetOrCreate(name, storageType string) (*Index, bool, error) 
 func (t *IndexList) Delete(name string) {
 	t.lock.Lock()
 	if idx, ok := t.Indexes[name]; ok {
-		_ = idx.Close()
+		if err := idx.Close(); err != nil {
+			log.Error().Err(err).Msgf("Error Delete index[%s]", name)
+		}
 	}
 	delete(t.Indexes, name)
 	t.lock.Unlock()
@@ -121,6 +124,36 @@ func (t *IndexList) List() []*Index {
 	}
 	t.lock.RUnlock()
 	return indexes
+}
+
+func (t *IndexList) ListStat() []*Index {
+	items := t.List()
+	for _, index := range items {
+		index.lock.Lock()
+		size, _ := index.WAL.Len()
+		index.WALSize = size
+		index.lock.Unlock()
+	}
+
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].GetName() < items[j].GetName()
+	})
+
+	return items
+}
+
+func (t *IndexList) ListName() []string {
+	items := t.List()
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].GetName() < items[j].GetName()
+	})
+
+	names := make([]string, 0, len(items))
+	for _, index := range items {
+		names = append(names, index.GetName())
+	}
+
+	return names
 }
 
 func (t *IndexList) Close() error {

@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/blugelabs/bluge"
@@ -34,7 +35,7 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 	var mappings *meta.Mappings
 	var analyzers map[string]*analysis.Analyzer
 	var readers []*bluge.Reader
-	var shardNum int
+	var shardNum int64
 
 	timeMin, timeMax := timerange.Query(query.Query)
 	isMatched := false
@@ -42,7 +43,7 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 	for _, index := range ZINC_INDEX_LIST.List() {
 		if len(indexNames) > 0 {
 			for _, indexName := range indexNames {
-				isMatched = isMatchIndex(index.Name, indexName)
+				isMatched = isMatchIndex(index.GetName(), indexName)
 				if isMatched {
 					hasIndex = true
 					break
@@ -58,10 +59,10 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 			return nil, err
 		}
 		readers = append(readers, reader...)
-		shardNum += index.ShardNum
+		shardNum += atomic.LoadInt64(&index.ShardNum)
 		if mappings == nil {
-			mappings = index.Mappings
-			analyzers = index.Analyzers
+			mappings = index.GetMappings()
+			analyzers = index.GetAnalyzers()
 		}
 
 	}
@@ -104,7 +105,7 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 		return nil, err
 	}
 
-	return searchV2(shardNum, len(readers), dmi, query, mappings)
+	return searchV2(shardNum, int64(len(readers)), dmi, query, mappings)
 }
 
 // isMatchIndex("abc", "a")  false

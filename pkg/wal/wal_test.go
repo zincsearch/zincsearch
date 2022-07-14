@@ -26,7 +26,7 @@ var l *Log
 
 func TestMain(m *testing.M) {
 	var err error
-	l, err = Open("test")
+	l, err = Open("data/walTest")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -2,6 +2,8 @@
 
 export ZINC_FIRST_ADMIN_USER=admin  
 export ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
+export ZINC_WAL_SYNC_INTERVAL=10ms
+export ZINC_WAL_REDOLOG_NO_SYNC=true
 
 # clean up
 find ./pkg -name data -type d|xargs rm -fR

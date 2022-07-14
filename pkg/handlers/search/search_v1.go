@@ -17,6 +17,7 @@ package search
 
 import (
 	"net/http"
+	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
 
@@ -59,10 +60,11 @@ func SearchV1(c *gin.Context) {
 		return
 	}
 
+	storageSize := atomic.LoadUint64(&index.StorageSize)
 	eventData := make(map[string]interface{})
 	eventData["search_type"] = iQuery.SearchType
 	eventData["search_index_storage"] = index.StorageType
-	eventData["search_index_size_in_mb"] = index.StorageSize
+	eventData["search_index_size_in_mb"] = storageSize / 1024 / 1024
 	eventData["time_taken_to_search_in_ms"] = res.Took
 	eventData["aggregations_count"] = len(iQuery.Aggregations)
 	core.Telemetry.Event("search", eventData)

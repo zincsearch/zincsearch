@@ -34,7 +34,6 @@ func TestSearch(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		data    []map[string]interface{}
 		want    *SearchResponse
 		wantErr bool
 	}{
@@ -50,16 +49,6 @@ func TestSearch(t *testing.T) {
 					MaxResults: 10,
 				},
 			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-			},
 		},
 		{
 			name: "Search Query - Term",
@@ -73,24 +62,6 @@ func TestSearch(t *testing.T) {
 					MaxResults: 10,
 				},
 			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-				{
-					"name": "Leonardo DiCaprio",
-					"address": map[string]interface{}{
-						"city":  "Los angeles",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-			},
 		},
 		{
 			name: "Search Query - MatchAll",
@@ -101,16 +72,6 @@ func TestSearch(t *testing.T) {
 					MaxResults: 10,
 				},
 			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-			},
 		},
 		{
 			name: "Search Query - alldocuments",
@@ -118,16 +79,6 @@ func TestSearch(t *testing.T) {
 				iQuery: &ZincQuery{
 					SearchType: "alldocuments",
 					MaxResults: 10,
-				},
-			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
 				},
 			},
 		},
@@ -142,16 +93,6 @@ func TestSearch(t *testing.T) {
 					MaxResults: 10,
 				},
 			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-			},
 		},
 		{
 			name: "Search Query - prefix",
@@ -162,16 +103,6 @@ func TestSearch(t *testing.T) {
 						Term: "sa",
 					},
 					MaxResults: 10,
-				},
-			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco California Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
 				},
 			},
 		},
@@ -186,16 +117,6 @@ func TestSearch(t *testing.T) {
 					MaxResults: 10,
 				},
 			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-			},
 		},
 		{
 			name: "Search Query - fuzzy",
@@ -206,24 +127,6 @@ func TestSearch(t *testing.T) {
 						Term: "fransisco", // note the wrong spelling
 					},
 					MaxResults: 10,
-				},
-			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-				{
-					"name": "Leonardo DiCaprio",
-					"address": map[string]interface{}{
-						"city":  "Los angeles",
-						"state": "California",
-					},
-					"hobby": "chess",
 				},
 			},
 		},
@@ -238,24 +141,6 @@ func TestSearch(t *testing.T) {
 					MaxResults: 10,
 				},
 			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-				{
-					"name": "Leonardo DiCaprio",
-					"address": map[string]interface{}{
-						"city":  "Los angeles",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-			},
 		},
 		{
 			name: "Search Query - data range",
@@ -267,24 +152,6 @@ func TestSearch(t *testing.T) {
 						EndTime:   time.Now().UTC().Add(time.Hour),
 					},
 					MaxResults: 10,
-				},
-			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-				{
-					"name": "Leonardo DiCaprio",
-					"address": map[string]interface{}{
-						"city":  "Los angeles",
-						"state": "California",
-					},
-					"hobby": "chess",
 				},
 			},
 		},
@@ -306,24 +173,6 @@ func TestSearch(t *testing.T) {
 							},
 						},
 					},
-				},
-			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-				{
-					"name": "Leonardo DiCaprio",
-					"address": map[string]interface{}{
-						"city":  "Los angeles",
-						"state": "California",
-					},
-					"hobby": "chess",
 				},
 			},
 		},
@@ -349,58 +198,66 @@ func TestSearch(t *testing.T) {
 					},
 				},
 			},
-			data: []map[string]interface{}{
-				{
-					"name": "Prabhat Sharma",
-					"address": map[string]interface{}{
-						"city":  "San Francisco",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-				{
-					"name": "Leonardo DiCaprio",
-					"address": map[string]interface{}{
-						"city":  "Los angeles",
-						"state": "California",
-					},
-					"hobby": "chess",
-				},
-			},
 		},
 	}
 
-	indexName := "Search.index_1"
+	prepareData := []map[string]interface{}{
+		{
+			"name": "Prabhat Sharma",
+			"address": map[string]interface{}{
+				"city":  "San Francisco",
+				"state": "California",
+			},
+			"hobby": "chess",
+		},
+		{
+			"name": "Leonardo DiCaprio",
+			"address": map[string]interface{}{
+				"city":  "Los angeles",
+				"state": "California",
+			},
+			"hobby": "chess",
+		},
+	}
+
+	var err error
+	var index *core.Index
+	indexName := "Search.v1.index_1"
+	t.Run("Prepare", func(t *testing.T) {
+		index, err = core.NewIndex(indexName, "disk")
+		assert.NoError(t, err)
+		assert.NotNil(t, index)
+		err = core.StoreIndex(index)
+		assert.NoError(t, err)
+
+		index.Mappings.SetProperty("address.city", meta.Property{
+			Type:          "text",
+			Index:         true,
+			Store:         true,
+			Highlightable: true,
+		})
+
+		for _, d := range prepareData {
+			rand.Seed(time.Now().UnixNano())
+			docId := rand.Intn(1000)
+			err := index.CreateDocument(strconv.Itoa(docId), d, false)
+			assert.NoError(t, err)
+		}
+
+		// wait for WAL write to index
+		time.Sleep(time.Second)
+	})
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			index, err := core.NewIndex(indexName, "disk")
-			assert.NoError(t, err)
-			assert.NotNil(t, index)
-			err = core.StoreIndex(index)
-			assert.NoError(t, err)
-
-			if (index.Mappings) == nil {
-				index.Mappings = meta.NewMappings()
-			}
-			index.Mappings.SetProperty("address.city", meta.Property{
-				Type:          "text",
-				Index:         true,
-				Store:         true,
-				Highlightable: true,
-			})
-
-			for _, d := range tt.data {
-				rand.Seed(time.Now().UnixNano())
-				docId := rand.Intn(1000)
-				err := index.CreateDocument(strconv.Itoa(docId), d, true)
-				assert.NoError(t, err)
-			}
 			got, err := Search(index, tt.args.iQuery)
 			assert.NoError(t, err)
 			assert.GreaterOrEqual(t, got.Hits.Total.Value, 1)
-
-			err = core.DeleteIndex(indexName)
-			assert.NoError(t, err)
 		})
 	}
+
+	t.Run("Cleanup", func(t *testing.T) {
+		err = core.DeleteIndex(indexName)
+		assert.NoError(t, err)
+	})
 }

@@ -43,10 +43,7 @@ func GetMapping(c *gin.Context) {
 	}
 
 	// format mappings
-	mappings := index.Mappings
-	if mappings == nil {
-		mappings = meta.NewMappings()
-	}
+	mappings := index.GetMappings()
 
 	c.JSON(http.StatusOK, gin.H{index.Name: gin.H{"mappings": mappings}})
 }

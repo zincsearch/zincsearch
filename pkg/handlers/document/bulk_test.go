@@ -39,14 +39,14 @@ func TestBulk(t *testing.T) {
 			name: "bulk",
 			args: args{
 				code: http.StatusOK,
-				data: `{ "index" : { "_index" : "olympics" } } 
+				data: `{ "index" : { "_index" : "document.bulk" } } 
 				{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "HAJOS, Alfred", "Country": "HUN", "Gender": "Men", "Event": "100M Freestyle", "Medal": "Gold", "Season": "summer"}
-				{ "create" : { "_index" : "olympics" } } 
+				{ "create" : { "_index" : "document.bulk" } } 
 				{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "HERSCHMANN, Otto", "Country": "AUT", "Gender": "Men", "Event": "100M Freestyle", "Medal": "Silver", "Season": "summer"}
-				{ "update" : { "_index" : "olympics", "_id": "1" } } 
+				{ "update" : { "_index" : "document.bulk", "_id": "1" } } 
 				{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "HERSCHMANN, Otto", "Country": "AUT", "Gender": "Men", "Event": "100M Freestyle", "Medal": "Silver", "Season": "summer"}
-				{ "delete" : { "_index" : "olympics", "_id": "1" } } `,
-				params: map[string]string{"target": "olympics"},
+				{ "delete" : { "_index" : "document.bulk", "_id": "1" } } `,
+				params: map[string]string{"target": "document.bulk"},
 				result: "",
 			},
 		},
@@ -54,10 +54,10 @@ func TestBulk(t *testing.T) {
 			name: "error",
 			args: args{
 				code: http.StatusOK,
-				data: `{ "index" : { "_index" : "olympics.bulk" } } 
+				data: `{ "index" : { "_index" : "document.bulk" } } 
 				{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "HAJOS, Alfred", "Country": "HUN", "Gender": "Men", "Event": "100M Freestyle", "Medal": "Gold", "Season": "summer"}
-				{ "delete" : { "_index" : "olympics.delete", "_id": "1"x } } `,
-				params: map[string]string{"target": "olympics"},
+				{ "delete" : { "_index" : "document.bulk", "_id": "1"x } } `,
+				params: map[string]string{"target": "document.bulk"},
 				result: "",
 			},
 		},
@@ -88,14 +88,14 @@ func TestESBulk(t *testing.T) {
 			name: "bulk",
 			args: args{
 				code: http.StatusOK,
-				data: `{ "index" : { "_index" : "olympics" } } 
+				data: `{ "index" : { "_index" : "document.esbulk" } } 
 				{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "HAJOS, Alfred", "Country": "HUN", "Gender": "Men", "Event": "100M Freestyle", "Medal": "Gold", "Season": "summer"}
-				{ "create" : { "_index" : "olympics" } } 
+				{ "create" : { "_index" : "document.esbulk" } } 
 				{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "HERSCHMANN, Otto", "Country": "AUT", "Gender": "Men", "Event": "100M Freestyle", "Medal": "Silver", "Season": "summer"}
-				{ "update" : { "_index" : "olympics", "_id": "1" } } 
+				{ "update" : { "_index" : "document.esbulk", "_id": "1" } } 
 				{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "HERSCHMANN, Otto", "Country": "AUT", "Gender": "Men", "Event": "100M Freestyle", "Medal": "Silver", "Season": "summer"}
-				{ "delete" : { "_index" : "olympics", "_id": "1" } } `,
-				params: map[string]string{"target": "olympics"},
+				{ "delete" : { "_index" : "document.esbulk", "_id": "1" } } `,
+				params: map[string]string{"target": "document.esbulk"},
 				result: "",
 			},
 		},
@@ -103,10 +103,10 @@ func TestESBulk(t *testing.T) {
 			name: "error",
 			args: args{
 				code: http.StatusOK,
-				data: `{ "index" : { "_index" : "olympics.esbulk" } } 
+				data: `{ "index" : { "_index" : "document.esbulk" } } 
 				{"Year": 1896, "City": "Athens", "Sport": "Aquatics", "Discipline": "Swimming", "Athlete": "HAJOS, Alfred", "Country": "HUN", "Gender": "Men", "Event": "100M Freestyle", "Medal": "Gold", "Season": "summer"}
-				{ "delete" : { "_index" : "olympics.delete", "_id": "1"x } } `,
-				params: map[string]string{"target": "olympics"},
+				{ "delete" : { "_index" : "document.esbulk", "_id": "1"x } } `,
+				params: map[string]string{"target": "document.esbulk"},
 				result: "",
 			},
 		},

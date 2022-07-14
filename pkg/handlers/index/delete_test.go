@@ -41,7 +41,7 @@ func TestDelete(t *testing.T) {
 			name: "normal",
 			args: args{
 				code:   http.StatusOK,
-				params: map[string]string{"target": "TestDelete.index_1"},
+				params: map[string]string{"target": "TestIndexDelete.index_1"},
 				result: "deleted",
 			},
 			wantErr: false,
@@ -50,7 +50,7 @@ func TestDelete(t *testing.T) {
 			name: "normal with wildcards",
 			args: args{
 				code:   http.StatusOK,
-				params: map[string]string{"target": "log-*-TestDelete"},
+				params: map[string]string{"target": "log-*-TestIndexDelete"},
 				result: "deleted",
 			},
 			wantErr: false,
@@ -76,10 +76,10 @@ func TestDelete(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		prepareIndex(t, "TestDelete.index_1", "disk")
-		prepareIndex(t, "log-3342-44-TestDelete", "disk")
-		prepareIndex(t, "log-3122-44-TestDelete", "disk")
-		prepareIndex(t, "log-vvs323-44-TestDelete", "disk")
+		prepareIndex(t, "TestIndexDelete.index_1", "disk")
+		prepareIndex(t, "log-3342-44-TestIndexDelete", "disk")
+		prepareIndex(t, "log-3122-44-TestIndexDelete", "disk")
+		prepareIndex(t, "log-vvs323-44-TestIndexDelete", "disk")
 	})
 
 	for _, tt := range tests {

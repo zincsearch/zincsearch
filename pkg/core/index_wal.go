@@ -38,6 +38,7 @@ func (index *Index) OpenWAL() error {
 	if index.WAL, err = wal.Open(index.Name); err != nil {
 		return err
 	}
+	index.close = make(chan struct{})
 	if err = index.Rollback(); err != nil {
 		return err
 	}
@@ -115,12 +116,20 @@ func (index *Index) ConsumeWAL() {
 		log.Fatal().Err(err).Str("index", index.Name).Msg("consume wal.Head()")
 	}
 	// log.Info().Uint64("id", minID).Str("index", index.Name).Msg("consume wal.Head()")
-	interval, err := index.ParseInterval(config.Global.WalSyncInterval)
+	interval, err := parseInterval(config.Global.WalSyncInterval)
 	if err != nil {
 		log.Fatal().Err(err).Str("index", index.Name).Msg("consume ParseInterval")
 	}
 	tick := time.NewTicker(interval)
-	for range tick.C {
+	for {
+		select {
+		case <-tick.C:
+			// continue
+		case <-index.close:
+			tick.Stop()
+			return
+		}
+
 		if err = index.WAL.Sync(); err != nil {
 			log.Error().Err(err).Uint64("id", minID).Str("index", index.Name).Msg("consume wal.Sync()")
 		}
@@ -234,24 +243,6 @@ func (index *Index) CheckStatusWAL() {
 	}
 }
 
-// ParseInterval parse interval string to time.Duration: 1s, 10ms
-func (index *Index) ParseInterval(v string) (time.Duration, error) {
-	if v == "" {
-		return time.Second, nil
-	}
-	v = strings.ToLower(v)
-	if strings.HasSuffix(v, "ms") {
-		i, err := strconv.Atoi(v[:len(v)-2])
-		return time.Millisecond * time.Duration(i), err
-	}
-	if strings.HasSuffix(v, "s") {
-		i, err := strconv.Atoi(v[:len(v)-1])
-		return time.Second * time.Duration(i), err
-	}
-	i, err := strconv.Atoi(v)
-	return time.Second * time.Duration(i), err
-}
-
 const (
 	RedoActionRead     = uint64(1)
 	RedoActionWrite    = uint64(2)
@@ -289,7 +280,7 @@ type walDocument struct {
 	data    map[string]interface{}
 }
 
-type walMergeDocs map[int]map[string]*walDocument
+type walMergeDocs map[int64]map[string]*walDocument
 
 func (w *walMergeDocs) MaxShardLen() int {
 	n := 0
@@ -312,7 +303,7 @@ func (w *walMergeDocs) Reset() {
 func (w *walMergeDocs) AddDocument(data map[string]interface{}) {
 	action := data[meta.ActionFieldName].(string)
 	docID := data[meta.IDFieldName].(string)
-	shardID := int(data[meta.ShardFieldName].(float64))
+	shardID := int64(data[meta.ShardFieldName].(float64))
 	shard, ok := (*w)[shardID]
 	if !ok {
 		shard = make(map[string]*walDocument)
@@ -347,7 +338,7 @@ func (w *walMergeDocs) WriteTo(index *Index, batch *blugeindex.Batch, rollback b
 	return nil
 }
 
-func (w *walMergeDocs) WriteToShard(index *Index, shardID int, batch *blugeindex.Batch) error {
+func (w *walMergeDocs) WriteToShard(index *Index, shardID int64, batch *blugeindex.Batch) error {
 	docs, ok := (*w)[shardID]
 	if !ok {
 		return nil
@@ -422,7 +413,7 @@ func (w *walMergeDocs) WriteToShard(index *Index, shardID int, batch *blugeindex
 	return writer.Batch(batch)
 }
 
-func (w *walMergeDocs) WriteToShardRollback(index *Index, shardID int, batch *blugeindex.Batch) error {
+func (w *walMergeDocs) WriteToShardRollback(index *Index, shardID int64, batch *blugeindex.Batch) error {
 	docs, ok := (*w)[shardID]
 	if !ok {
 		return nil
@@ -455,4 +446,22 @@ func (w *walMergeDocs) WriteToShardRollback(index *Index, shardID int, batch *bl
 	}
 
 	return writer.Batch(batch)
+}
+
+// parseInterval parse interval string to time.Duration: 1s, 10ms
+func parseInterval(v string) (time.Duration, error) {
+	if v == "" {
+		return time.Second, nil
+	}
+	v = strings.ToLower(v)
+	if strings.HasSuffix(v, "ms") {
+		i, err := strconv.Atoi(v[:len(v)-2])
+		return time.Millisecond * time.Duration(i), err
+	}
+	if strings.HasSuffix(v, "s") {
+		i, err := strconv.Atoi(v[:len(v)-1])
+		return time.Second * time.Duration(i), err
+	}
+	i, err := strconv.Atoi(v)
+	return time.Second * time.Duration(i), err
 }

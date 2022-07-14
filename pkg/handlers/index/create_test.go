@@ -43,7 +43,7 @@ func TestCreate(t *testing.T) {
 			name: "create by json",
 			args: args{
 				code:   http.StatusOK,
-				data:   `{"name":"TestCreate.index_1","disk":"disk"}`,
+				data:   `{"name":"TestIndexCreate.index_1","disk":"disk"}`,
 				params: map[string]string{"target": ""},
 				result: `"message":"ok"`,
 			},
@@ -54,7 +54,7 @@ func TestCreate(t *testing.T) {
 			args: args{
 				code:   http.StatusOK,
 				data:   `{"name":"","disk":"disk"}`,
-				params: map[string]string{"target": "TestCreate.index_2"},
+				params: map[string]string{"target": "TestIndexCreate.index_2"},
 				result: `"message":"ok"`,
 			},
 			wantErr: false,
@@ -63,9 +63,9 @@ func TestCreate(t *testing.T) {
 			name: "create by error json",
 			args: args{
 				code:   http.StatusBadRequest,
-				data:   `{"name":"TestCreate.index_3"x,"disk":"disk"}`,
+				data:   `{"name":"TestIndexCreate.index_3"x,"disk":"disk"}`,
 				params: map[string]string{"target": ""},
-				result: "invalid character",
+				result: `"error":`,
 			},
 			wantErr: true,
 		},
@@ -83,7 +83,7 @@ func TestCreate(t *testing.T) {
 			name: "create with analyzer",
 			args: args{
 				code:   http.StatusOK,
-				data:   `{"name":"TestCreate.index_5","disk":"disk","settings":{"analysis":{"analyzer":{"test_analyzer":{"type":"custom","tokenizer":"standard","filter":["lowercase"]}}}}}`,
+				data:   `{"name":"TestIndexCreate.index_5","disk":"disk","settings":{"analysis":{"analyzer":{"test_analyzer":{"type":"custom","tokenizer":"standard","filter":["lowercase"]}}}}}`,
 				params: map[string]string{"target": ""},
 				result: `"message":"ok"`,
 			},
@@ -93,7 +93,7 @@ func TestCreate(t *testing.T) {
 			name: "create with sub-fields",
 			args: args{
 				code:       http.StatusOK,
-				data:       `{"name":"TestCreate.index_6","disk":"disk","mappings":{"properties":{"@timestamp":{"type":"date"},"Athlete":{"type":"text","fields":{"my_keyword":{"type":"keyword"}}}}}}`,
+				data:       `{"name":"TestIndexCreate.index_6","disk":"disk","mappings":{"properties":{"@timestamp":{"type":"date"},"Athlete":{"type":"text","fields":{"my_keyword":{"type":"keyword"}}}}}}`,
 				mappingRes: `"Athlete.my_keyword":{"type":"keyword"`,
 				params:     map[string]string{"target": ""},
 				result:     `"message":"ok"`,
@@ -147,7 +147,7 @@ func TestCreateES(t *testing.T) {
 			name: "create by json",
 			args: args{
 				code:   http.StatusOK,
-				data:   `{"name":"TestCreate.index_1"}`,
+				data:   `{"name":"TestIndexCreate.index_1"}`,
 				params: map[string]string{"target": ""},
 				result: `"acknowledged":true`,
 			},
@@ -158,7 +158,7 @@ func TestCreateES(t *testing.T) {
 			args: args{
 				code:   http.StatusOK,
 				data:   `{"name":""}`,
-				params: map[string]string{"target": "TestCreate.index_2"},
+				params: map[string]string{"target": "TestIndexCreate.index_2"},
 				result: `"acknowledged":true`,
 			},
 			wantErr: false,
@@ -168,7 +168,7 @@ func TestCreateES(t *testing.T) {
 			args: args{
 				code:   http.StatusOK,
 				data:   `{"name":""}`,
-				params: map[string]string{"target": "TestCreate.index_3"},
+				params: map[string]string{"target": "TestIndexCreate.index_3"},
 				result: `"acknowledged":true`,
 			},
 			wantErr: false,
@@ -177,9 +177,9 @@ func TestCreateES(t *testing.T) {
 			name: "create by error json",
 			args: args{
 				code:   http.StatusBadRequest,
-				data:   `{"name":"TestCreate.index_4"x}`,
+				data:   `{"name":"TestIndexCreate.index_4"x}`,
 				params: map[string]string{"target": ""},
-				result: "invalid character",
+				result: `"error":`,
 			},
 			wantErr: true,
 		},
@@ -197,7 +197,7 @@ func TestCreateES(t *testing.T) {
 			name: "create with analyzer",
 			args: args{
 				code:   http.StatusOK,
-				data:   `{"name":"TestCreate.index_6","disk":"disk","settings":{"analysis":{"analyzer":{"test_analyzer":{"type":"custom","tokenizer":"standard","filter":["lowercase"]}}}}}`,
+				data:   `{"name":"TestIndexCreate.index_6","disk":"disk","settings":{"analysis":{"analyzer":{"test_analyzer":{"type":"custom","tokenizer":"standard","filter":["lowercase"]}}}}}`,
 				params: map[string]string{"target": ""},
 				result: `"acknowledged":true`,
 			},

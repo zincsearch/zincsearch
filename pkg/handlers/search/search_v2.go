@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
@@ -61,11 +62,11 @@ func SearchDSL(c *gin.Context) {
 
 	if indexName != "" {
 		idx, _ := core.ZINC_INDEX_LIST.Get(indexName)
-
+		storageSize := atomic.LoadUint64(&idx.StorageSize)
 		eventData := make(map[string]interface{})
 		eventData["search_type"] = "query_dsl"
 		eventData["search_index_storage"] = idx.StorageType
-		eventData["search_index_size_in_mb"] = idx.StorageSize / 1024 / 1024
+		eventData["search_index_size_in_mb"] = storageSize / 1024 / 1024
 		eventData["time_taken_to_search_in_ms"] = resp.Took
 		eventData["aggregations_count"] = len(query.Aggregations)
 		core.Telemetry.Event("search", eventData)

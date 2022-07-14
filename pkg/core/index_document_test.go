@@ -22,13 +22,170 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zinclabs/zinc/pkg/bluge/aggregation"
-	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-func TestMain(m *testing.M) {
-	config.Global.WalSyncInterval = "10ms"
-	m.Run()
+func TestIndex_CreateUpdateDocument(t *testing.T) {
+	type fields struct {
+		Name string
+	}
+	type args struct {
+		docID  string
+		doc    map[string]interface{}
+		update bool
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Document with generated ID",
+			args: args{
+				doc: map[string]interface{}{
+					"name": "Hello",
+					"test": "bool",
+				},
+				update: false,
+			},
+		},
+		{
+			name: "Document with provided ID",
+			args: args{
+				docID: "test1",
+				doc: map[string]interface{}{
+					"name": "Hello",
+					"test": "Hello",
+				},
+				update: false,
+			},
+		},
+		{
+			name: "Document with type conflict",
+			args: args{
+				docID: "test1",
+				doc: map[string]interface{}{
+					"name": "Hello",
+					"test": true,
+				},
+				update: true,
+			},
+			wantErr: false,
+		},
+	}
+
+	indexName := "TestDocument.index_1"
+	var index *Index
+	var err error
+	t.Run("prepare", func(t *testing.T) {
+		index, err = NewIndex(indexName, "disk")
+		assert.NoError(t, err)
+		assert.NotNil(t, index)
+		err = StoreIndex(index)
+		assert.NoError(t, err)
+	})
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := index.CreateDocument(tt.args.docID, tt.args.doc, tt.args.update)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+
+			// wait for WAL write to index
+			time.Sleep(time.Second)
+
+			assert.NoError(t, err)
+			query := &meta.ZincQuery{
+				Query: &meta.Query{
+					Match: map[string]*meta.MatchQuery{
+						"_all": {
+							Query: "Hello",
+						},
+					},
+				},
+			}
+			res, err := index.Search(query)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, res.Hits.Total.Value, 1)
+		})
+	}
+
+	t.Run("cleanup", func(t *testing.T) {
+		err = DeleteIndex(indexName)
+		assert.NoError(t, err)
+	})
+}
+
+func TestIndex_UpdateDocument(t *testing.T) {
+	type args struct {
+		docID  string
+		doc    map[string]interface{}
+		insert bool
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "update",
+			args: args{
+				docID: "1",
+				doc: map[string]interface{}{
+					"name": "HelloUpdate",
+					"time": float64(1579098983),
+				},
+				insert: false,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Insert",
+			args: args{
+				docID: "2",
+				doc: map[string]interface{}{
+					"name": "HelloUpdate",
+					"time": float64(1579098983),
+				},
+				insert: true,
+			},
+			wantErr: false,
+		},
+	}
+
+	var index *Index
+	var err error
+	t.Run("prepare", func(t *testing.T) {
+		index, err = NewIndex("TestIndex_UpdateDocument.index_1", "disk")
+		assert.NoError(t, err)
+		assert.NotNil(t, index)
+		err = StoreIndex(index)
+		assert.NoError(t, err)
+		prop := meta.NewProperty("date")
+		mappings := index.GetMappings()
+		mappings.SetProperty("time", prop)
+		index.SetMappings(mappings)
+
+		err = index.CreateDocument("1", map[string]interface{}{
+			"name": "Hello",
+			"time": float64(1579098983),
+		}, false)
+		assert.NoError(t, err)
+
+		// wait for WAL write to index
+		time.Sleep(time.Second)
+	})
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := index.UpdateDocument(tt.args.docID, tt.args.doc, tt.args.insert); (err != nil) != tt.wantErr {
+				t.Errorf("Index.UpdateDocument() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }
 
 func TestDateLayoutDetection(t *testing.T) {
@@ -94,7 +251,7 @@ func TestIndex_CreateUpdateDocumentWithDateField(t *testing.T) {
 				doc: map[string]interface{}{
 					"updated_at": "20091110 23:00:00",
 				},
-				update: true,
+				update: false,
 			},
 		},
 		{
@@ -171,13 +328,15 @@ func TestIndex_CreateUpdateDocumentWithDateField(t *testing.T) {
 		},
 	}
 
-	indexName := "TestDocument.index_1"
+	indexName := "TestDocument.WithDateField.index_1"
 	var index *Index
 	var err error
 	t.Run("prepare", func(t *testing.T) {
 		index, err = NewIndex(indexName, "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
+		err = StoreIndex(index)
+		assert.NoError(t, err)
 	})
 
 	for _, tt := range tests {
@@ -255,165 +414,4 @@ func TestIndex_CreateUpdateDocumentWithDateField(t *testing.T) {
 		err = DeleteIndex(indexName)
 		assert.NoError(t, err)
 	})
-}
-
-func TestIndex_CreateUpdateDocument(t *testing.T) {
-	type fields struct {
-		Name string
-	}
-	type args struct {
-		docID  string
-		doc    map[string]interface{}
-		update bool
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "Document with generated ID",
-			args: args{
-				docID: "test1",
-				doc: map[string]interface{}{
-					"name": "Hello",
-					"test": "bool",
-				},
-				update: false,
-			},
-		},
-		{
-			name: "Document with provided ID",
-			args: args{
-				docID: "test1",
-				doc: map[string]interface{}{
-					"name": "Hello",
-					"test": "Hello",
-				},
-				update: true,
-			},
-		},
-		{
-			name: "Document with type conflict",
-			args: args{
-				docID: "test1",
-				doc: map[string]interface{}{
-					"name": "Hello",
-					"test": true,
-				},
-				update: true,
-			},
-			wantErr: false,
-		},
-	}
-
-	indexName := "TestDocument.index_1"
-	var index *Index
-	var err error
-	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex(indexName, "disk")
-		assert.NoError(t, err)
-		assert.NotNil(t, index)
-	})
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := index.CreateDocument(tt.args.docID, tt.args.doc, tt.args.update)
-			if tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-
-			// wait for WAL write to index
-			time.Sleep(time.Second)
-
-			assert.NoError(t, err)
-			query := &meta.ZincQuery{
-				Query: &meta.Query{
-					Match: map[string]*meta.MatchQuery{
-						"_all": {
-							Query: "Hello",
-						},
-					},
-				},
-			}
-			res, err := index.Search(query)
-			assert.NoError(t, err)
-			assert.Equal(t, 1, res.Hits.Total.Value)
-		})
-	}
-
-	t.Run("cleanup", func(t *testing.T) {
-		err = DeleteIndex(indexName)
-		assert.NoError(t, err)
-	})
-}
-
-func TestIndex_UpdateDocument(t *testing.T) {
-	type args struct {
-		docID  string
-		doc    map[string]interface{}
-		insert bool
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "update",
-			args: args{
-				docID: "1",
-				doc: map[string]interface{}{
-					"name": "HelloUpdate",
-					"time": float64(1579098983),
-				},
-				insert: false,
-			},
-			wantErr: false,
-		},
-		{
-			name: "Insert",
-			args: args{
-				docID: "2",
-				doc: map[string]interface{}{
-					"name": "HelloUpdate",
-					"time": float64(1579098983),
-				},
-				insert: true,
-			},
-			wantErr: false,
-		},
-	}
-
-	var index *Index
-	var err error
-	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex("TestIndex_UpdateDocument.index_1", "disk")
-		assert.NoError(t, err)
-		assert.NotNil(t, index)
-
-		err = StoreIndex(index)
-		assert.NoError(t, err)
-		prop := meta.NewProperty("date")
-		index.Mappings.SetProperty("time", prop)
-
-		err = index.CreateDocument("1", map[string]interface{}{
-			"name": "Hello",
-			"time": float64(1579098983),
-		}, false)
-		assert.NoError(t, err)
-
-		// wait for WAL write to index
-		time.Sleep(time.Second)
-	})
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := index.UpdateDocument(tt.args.docID, tt.args.doc, tt.args.insert); (err != nil) != tt.wantErr {
-				t.Errorf("Index.UpdateDocument() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
 }

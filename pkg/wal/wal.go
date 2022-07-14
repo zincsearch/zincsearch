@@ -34,16 +34,22 @@ func Open(indexName string) (*Log, error) {
 	var err error
 	l := new(Log)
 	l.name = indexName
-	opt := wal.DefaultOptions
-	opt.NoSync = true
-	opt.NoCopy = true
-	opt.FillID = true
+	opt := &wal.Options{
+		NoSync:           true,       // Fsync after every write
+		SegmentSize:      16777216,   // 16 MB log segment files.
+		LogFormat:        wal.Binary, // Binary format is small and fast.
+		SegmentCacheSize: 2,          // Number of cached in-memory segments
+		NoCopy:           true,       // Make a new copy of data for every Read call.
+		DirPerms:         0750,       // Permissions for the created directories
+		FilePerms:        0640,       // Permissions for the created data files
+		FillID:           true,       // Allow writes with a zero ID
+	}
 	l.log, err = wal.Open(path.Join(config.Global.DataPath, indexName, "wal"), opt)
 	if err != nil {
 		return nil, errors.New(errors.ErrorTypeRuntimeException, "open wal error").Cause(err)
 	}
 
-	redoOpt := redo.DefaultOptions
+	redoOpt := redo.DefaultOptions()
 	redoOpt.NoSync = config.Global.WalRedoLogNoSync
 	redoOpt.NoCopy = true
 	l.Redo, err = redo.Open(path.Join(config.Global.DataPath, indexName, "redo"), redoOpt)

@@ -38,6 +38,7 @@ func Delete(c *gin.Context) {
 	docID := c.Param("id")
 	if docID == "" {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "id is empty"})
+		return
 	}
 
 	indexName := c.Param("target")
@@ -49,7 +50,7 @@ func Delete(c *gin.Context) {
 
 	err := index.DeleteDocument(docID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, meta.HTTPResponseDocument{Message: "deleted", Index: indexName, ID: docID})

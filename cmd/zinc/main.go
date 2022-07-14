@@ -78,12 +78,7 @@ func main() {
 		Handler: app,
 	}
 	shutdown(func(grace bool) {
-		// close indexes
-		err := core.ZINC_INDEX_LIST.Close()
-		log.Info().Err(err).Msgf("Index closed")
-		// close metadata
-		err = metadata.Close()
-		log.Info().Err(err).Msgf("Metadata closed")
+		// close http server
 		if grace {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 			defer cancel()
@@ -93,6 +88,12 @@ func main() {
 		} else {
 			server.Close()
 		}
+		// close indexes
+		err := core.ZINC_INDEX_LIST.Close()
+		log.Info().Err(err).Msgf("Index closed")
+		// close metadata
+		err = metadata.Close()
+		log.Info().Err(err).Msgf("Metadata closed")
 	})
 
 	if err := server.ListenAndServe(); err != nil {

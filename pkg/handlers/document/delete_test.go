@@ -18,6 +18,7 @@ package document
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -40,7 +41,7 @@ func TestDelete(t *testing.T) {
 			args: args{
 				code: http.StatusOK,
 				params: map[string]string{
-					"target": "TestDelete.index_1",
+					"target": "TestDocumentDelete.index_1",
 					"id":     "1",
 				},
 				result: `"id":"1"`,
@@ -49,22 +50,22 @@ func TestDelete(t *testing.T) {
 		{
 			name: "empty id",
 			args: args{
-				code: http.StatusOK,
+				code: http.StatusBadRequest,
 				params: map[string]string{
-					"target": "TestDelete.index_1",
+					"target": "TestDocumentDelete.index_1",
 				},
-				result: `"message":"deleted"`,
+				result: `"id is empty"`,
 			},
 		},
 		{
 			name: "not exists id",
 			args: args{
-				code: http.StatusOK,
+				code: http.StatusBadRequest,
 				params: map[string]string{
-					"target": "TestDelete.index_1",
+					"target": "TestDocumentDelete.index_1",
 					"id":     "2",
 				},
-				result: `"id":"2"`,
+				result: `"id not found"`,
 			},
 		},
 		{
@@ -72,7 +73,7 @@ func TestDelete(t *testing.T) {
 			args: args{
 				code: http.StatusBadRequest,
 				params: map[string]string{
-					"target": "TestDelete.index_2",
+					"target": "TestDocumentDelete.index_2",
 					"id":     "1",
 				},
 				result: "index does not exists",
@@ -88,7 +89,7 @@ func TestDelete(t *testing.T) {
 			"role": "create",
 		}
 		params := map[string]string{
-			"target": "TestDelete.index_1",
+			"target": "TestDocumentDelete.index_1",
 		}
 		c, w := utils.NewGinContext()
 		utils.SetGinRequestData(c, data)
@@ -96,6 +97,9 @@ func TestDelete(t *testing.T) {
 		CreateUpdate(c)
 		assert.Equal(t, http.StatusOK, w.Code)
 		assert.Contains(t, w.Body.String(), `"id":"1"`)
+
+		// wait for WAL write to index
+		time.Sleep(time.Second)
 	})
 
 	for _, tt := range tests {
@@ -109,7 +113,7 @@ func TestDelete(t *testing.T) {
 	}
 
 	t.Run("cleanup", func(t *testing.T) {
-		err := core.DeleteIndex("TestDelete.index_1")
+		err := core.DeleteIndex("TestDocumentDelete.index_1")
 		assert.NoError(t, err)
 	})
 }

@@ -27,10 +27,7 @@ func GetESMapping(c *gin.Context) {
 	}
 
 	// format mappings
-	mappings := index.Mappings
-	if mappings == nil {
-		mappings = meta.NewMappings()
-	}
+	mappings := index.GetMappings()
 
 	// NOTE: Zinc currently "converts" object array fields to "field.index.sub_field"
 	// Example Input Document:

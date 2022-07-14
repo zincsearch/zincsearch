@@ -50,7 +50,9 @@ type Options struct {
 	NoCopy bool
 }
 
-var DefaultOptions = &Options{}
+func DefaultOptions() *Options {
+	return &Options{}
+}
 
 func Open(name string, opt *Options) (*Log, error) {
 	err := os.MkdirAll(path.Dir(name), 0755)
@@ -83,7 +85,7 @@ func Open(name string, opt *Options) (*Log, error) {
 	}
 
 	if opt == nil {
-		opt = DefaultOptions
+		opt = DefaultOptions()
 	}
 
 	return &Log{f: f, opt: opt, data: data, index: index}, nil

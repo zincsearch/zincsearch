@@ -68,7 +68,7 @@ func TestSearchDSL(t *testing.T) {
 			args: args{
 				code:   http.StatusBadRequest,
 				data:   `{"query":{"match_all":{x}},"size":10}`,
-				params: map[string]string{"target": "olympics"},
+				params: map[string]string{"target": indexName},
 				result: "invalid character",
 			},
 		},
