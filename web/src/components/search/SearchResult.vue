@@ -4,14 +4,16 @@
       <q-table
         ref="searchTable"
         v-model:expanded="searchResult._source"
+        v-model:pagination="pagination"
         data-cy="search-result-area"
         :rows="searchResult"
         :columns="resultColumns"
         :loading="searchLoading"
-        :pagination="pagination"
+        :rows-per-page-options="[5, 10, 20, 50, 100, 500, 1000, 5000, 10000]"
         wrap-cells
         :title="t('search.searchResult')"
         row-key="_id"
+        @request="onRequest"
       >
         <template #top>
           <div class="chart">
@@ -69,79 +71,6 @@
               </pre>
             </q-td>
           </q-tr>
-        </template>
-
-        <template #bottom="scope">
-          <div class="q-table__control full-width row justify-between">
-            <div class="max-result">
-              <q-input
-                v-model="maxRecordToReturn"
-                :label="t('search.maxRecords')"
-                dense
-                filled
-                square
-                type="search"
-                class="search-field"
-              />
-            </div>
-            <div class="q-table__control">
-              <span class="q-table__bottom-item">Records per page:</span>
-              <q-select
-                v-model="pagination.rowsPerPage"
-                borderless
-                :options="perPageOptions"
-                @update:modelValue="changePagination"
-              />
-
-              <span class="q-table__bottom-item"
-                >{{
-                  (scope.pagination.page - 1) * scope.pagination.rowsPerPage +
-                  1
-                }}-{{ scope.pagination.page * scope.pagination.rowsPerPage }} of
-                {{ resultTotal }}</span
-              >
-              <q-btn
-                icon="first_page"
-                color="grey-8"
-                size="sm"
-                round
-                dense
-                flat
-                :disable="scope.isFirstPage"
-                @click="scope.firstPage"
-              />
-              <q-btn
-                icon="chevron_left"
-                color="grey-8"
-                size="sm"
-                round
-                dense
-                flat
-                :disable="scope.isFirstPage"
-                @click="scope.prevPage"
-              />
-              <q-btn
-                icon="chevron_right"
-                color="grey-8"
-                size="sm"
-                round
-                dense
-                flat
-                :disable="scope.isLastPage"
-                @click="scope.nextPage"
-              />
-              <q-btn
-                icon="last_page"
-                color="grey-8"
-                size="sm"
-                round
-                dense
-                flat
-                :disable="scope.isLastPage"
-                @click="scope.lastPage"
-              />
-            </div>
-          </div>
         </template>
       </q-table>
     </div>
@@ -236,10 +165,16 @@ export default defineComponent({
     const searchTable = ref(null);
     const searchResult = ref([]);
     const resultCount = ref("");
-    const resultTotal = ref(0);
     const resultColumns = ref(defaultColumns());
     const queryString = ref("");
 
+    const pagination = ref({
+      rowsPerPage: 20,
+      sortBy: "desc",
+      descending: false,
+      page: 1,
+      rowsNumber: 0,
+    });
     // get the normalized date and time from the dateVal object
     const getDateConsumableDateTime = function (dateVal) {
       if (dateVal.tab == "relative") {
@@ -331,18 +266,18 @@ export default defineComponent({
     };
 
     const buildSearch = (queryData) => {
-      var req = {
+      let req = {
         query: {
           bool: {
             must: [],
           },
         },
         sort: ["-@timestamp"],
-        from: 0,
-        size: parseInt(maxRecordToReturn.value, 10),
+        from: pagination.value.page,
+        size: pagination.value.rowsPerPage,
       };
 
-      var timestamps = getDateConsumableDateTime(queryData.time);
+      let timestamps = getDateConsumableDateTime(queryData.time);
       if (timestamps.start_time || timestamps.end_time) {
         if (queryData.time.selectedFullTime) {
           chartKeyFormat.value = "HH:mm:ss";
@@ -428,31 +363,16 @@ export default defineComponent({
       return req;
     };
 
-    const maxRecordToReturn = ref(100);
-    const selectedPerPage = ref("20");
-    const perPageOptions = [
-      { label: "5", value: 5 },
-      { label: "10", value: 10 },
-      { label: "20", value: 20 },
-      { label: "50", value: 50 },
-      { label: "100", value: 100 },
-      { label: "All", value: 0 },
-    ];
-    const pagination = ref({
-      rowsPerPage: 20,
-    });
-    const changePagination = (val) => {
-      selectedPerPage.value = val.label;
-      pagination.value.rowsPerPage = val.value;
-      searchTable.value.setPagination(pagination.value);
-    };
-
     let lastIndexName = "";
     const searchLoading = ref(false);
+    let lastIndexData = {};
+    let lastQueryData = {};
     const searchData = (indexData, queryData) => {
       if (searchLoading.value) {
         return false;
       }
+      lastIndexData = indexData;
+      lastQueryData = queryData;
       searchLoading.value = true;
       const query = buildSearch(queryData);
 
@@ -469,9 +389,10 @@ export default defineComponent({
           }
           lastIndexName = indexData.name;
 
-          var results = [];
-          if (res.data.hits.hits) {
-            results = res.data.hits.hits;
+          let results = [];
+          const hits = res.data.hits;
+          if (hits.hits) {
+            results = hits.hits;
             // update index fields
             let fields = {};
             results.forEach((row) => {
@@ -485,14 +406,10 @@ export default defineComponent({
 
           nextTick(() => {
             searchResult.value = results;
-            resultTotal.value = results.length;
-            resultCount.value =
-              "Found " +
-              res.data.hits.total.value.toLocaleString() +
-              " hits in " +
-              res.data.took +
-              " ms";
+            resultCount.value = `Found ${hits.total.value} hits in ${res.data.took} ms`;
             searchLoading.value = false;
+
+            pagination.value.rowsNumber = hits.total.value;
 
             // rerender the chart
             nextTick(() => {
@@ -546,6 +463,15 @@ export default defineComponent({
         });
     };
 
+    const onRequest = (props) => {
+      const { page, rowsPerPage, sortBy, descending } = props.pagination;
+      pagination.value.page = page;
+      pagination.value.rowsPerPage = rowsPerPage;
+      pagination.value.sortBy = sortBy;
+      pagination.value.descending = descending;
+      searchData(lastIndexData, lastQueryData);
+    };
+
     const resetColumns = (indexData) => {
       resultColumns.value = defaultColumns();
       if (indexData.columns.length == 0) {
@@ -582,14 +508,10 @@ export default defineComponent({
       resetColumns,
       resultColumns,
       searchResult,
-      resultTotal,
       resultCount,
       searchLoading,
-      selectedPerPage,
-      maxRecordToReturn,
-      perPageOptions,
       pagination,
-      changePagination,
+      onRequest,
       chartHistogram,
       chartOptions,
       queryString,
