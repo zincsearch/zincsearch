@@ -24,6 +24,8 @@ import (
 
 	"github.com/blugelabs/bluge"
 	"github.com/goccy/go-json"
+	"github.com/rs/zerolog/log"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
@@ -38,76 +40,18 @@ import (
 // then it creates the mapping for the missing fields.
 func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]interface{}) (*bluge.Document, error) {
 	// Pick the index mapping from the cache if it already exists
-	mappings := index.Mappings
-	if mappings == nil {
-		mappings = meta.NewMappings()
-	}
+	mappings := index.GetMappings()
 
-	mappingsNeedsUpdate := false
+	delete(doc, meta.ActionFieldName)
+	delete(doc, meta.IDFieldName)
+	delete(doc, meta.ShardFieldName)
 
 	// Create a new bluge document
 	bdoc := bluge.NewDocument(docID)
-	flatDoc, _ := flatten.Flatten(doc, "")
 	// Iterate through each field and add it to the bluge document
-	for key, value := range flatDoc {
+	for key, value := range doc {
 		if value == nil || key == meta.TimeFieldName {
 			continue
-		}
-
-		if _, ok := mappings.GetProperty(key); !ok {
-			// try to find the type of the value and use it to define default mapping
-			switch v := value.(type) {
-			case string:
-				if layout, ok := isDateProperty(v); ok {
-					prop := meta.NewProperty("date")
-					prop.Format = layout
-					mappings.SetProperty(key, prop)
-				} else {
-					newProp := meta.NewProperty("text")
-					if config.Global.EnableTextKeywordMapping {
-						p := meta.NewProperty("keyword")
-						newProp.AddField("keyword", p)
-
-						mappings.SetProperty(key+".keyword", p)
-					}
-
-					mappings.SetProperty(key, newProp)
-				}
-			case int, int64, float64:
-				mappings.SetProperty(key, meta.NewProperty("numeric"))
-			case bool:
-				mappings.SetProperty(key, meta.NewProperty("bool"))
-			case []interface{}:
-				if v, ok := value.([]interface{}); ok {
-					for _, vv := range v {
-						switch val := vv.(type) {
-						case string:
-							if layout, ok := isDateProperty(val); ok {
-								prop := meta.NewProperty("date")
-								prop.Format = layout
-								mappings.SetProperty(key, prop)
-							} else {
-								newProp := meta.NewProperty("text")
-								if config.Global.EnableTextKeywordMapping {
-									p := meta.NewProperty("keyword")
-									newProp.AddField("keyword", p)
-
-									mappings.SetProperty(key+".keyword", p)
-								}
-
-								mappings.SetProperty(key, newProp)
-							}
-						case float64:
-							mappings.SetProperty(key, meta.NewProperty("numeric"))
-						case bool:
-							mappings.SetProperty(key, meta.NewProperty("bool"))
-						}
-						break
-					}
-				}
-			}
-
-			mappingsNeedsUpdate = true
 		}
 
 		if prop, ok := mappings.GetProperty(key); ok && !prop.Index {
@@ -128,21 +72,11 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 		}
 	}
 
-	if mappingsNeedsUpdate {
-		_ = index.SetMappings(mappings)
-		_ = StoreIndex(index)
-	}
-
 	// set timestamp
 	timestamp := time.Now()
-	if value, ok := flatDoc[meta.TimeFieldName]; ok {
+	if value, ok := doc[meta.TimeFieldName]; ok {
 		delete(doc, meta.TimeFieldName)
-		prop, _ := mappings.GetProperty(meta.TimeFieldName)
-		v, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)
-		if err != nil {
-			return nil, fmt.Errorf("field [%s] value [%v] parse err: %s", meta.TimeFieldName, value, err.Error())
-		}
-		timestamp = v
+		timestamp = time.Unix(0, int64(value.(float64)))
 	}
 	bdoc.AddField(bluge.NewDateTimeField(meta.TimeFieldName, timestamp).StoreValue().Sortable().Aggregatable())
 
@@ -161,44 +95,22 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 
 func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, key string, value interface{}) error {
 	var field *bluge.TermField
-
 	prop, _ := mappings.GetProperty(key)
 	switch prop.Type {
 	case "text":
-		v, err := zutils.ToString(value)
-		if err != nil {
-			return fmt.Errorf("field [%s] was set type to [text] but the value [%v] can't convert to string", key, value)
-		}
-
-		field = bluge.NewTextField(key, v).SearchTermPositions()
-		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.Analyzers, index.Mappings, key)
+		field = bluge.NewTextField(key, value.(string)).SearchTermPositions()
+		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(index.Analyzers, mappings, key)
 		if fieldAnalyzer != nil {
 			field.WithAnalyzer(fieldAnalyzer)
 		}
 	case "numeric":
-		v, err := zutils.ToFloat64(value)
-		if err != nil {
-			return fmt.Errorf("field [%s] was set type to [numeric] but the value [%v] can't convert to int", key, value)
-		}
-		field = bluge.NewNumericField(key, v)
+		field = bluge.NewNumericField(key, value.(float64))
 	case "keyword":
-		v, err := zutils.ToString(value)
-		if err != nil {
-			return fmt.Errorf("field [%s] was set type to [keyword] but the value [%v] can't convert to string", key, value)
-		}
-		field = bluge.NewKeywordField(key, v)
+		field = bluge.NewKeywordField(key, value.(string))
 	case "bool":
-		v, err := zutils.ToBool(value)
-		if err != nil {
-			return fmt.Errorf("field [%s] was set type to [bool] but the value [%v] can't convert to boolean", key, value)
-		}
-		field = bluge.NewKeywordField(key, strconv.FormatBool(v))
+		field = bluge.NewKeywordField(key, strconv.FormatBool(value.(bool)))
 	case "date", "time":
-		v, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)
-		if err != nil {
-			return fmt.Errorf("field [%s] value [%v] parse err: %s", key, value, err.Error())
-		}
-		field = bluge.NewDateTimeField(key, v)
+		field = bluge.NewDateTimeField(key, time.Unix(0, int64(value.(float64))))
 	}
 	if prop.Store || prop.Highlightable {
 		field.StoreValue()
@@ -226,77 +138,269 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 	return nil
 }
 
+// CheckDocument checks if the document is valid.
+func (index *Index) CheckDocument(docID string, doc map[string]interface{}, update bool, shard int64) ([]byte, error) {
+	// Pick the index mapping from the cache if it already exists
+	mappings := index.GetMappings()
+
+	mappingsNeedsUpdate := false
+
+	flatDoc, _ := flatten.Flatten(doc, "")
+	// Iterate through each field and add it to the bluge document
+	for key, value := range flatDoc {
+		if value == nil || key == meta.TimeFieldName {
+			continue
+		}
+
+		if _, ok := mappings.GetProperty(key); !ok {
+			// try to find the type of the value and use it to define default mapping
+			switch v := value.(type) {
+			case string:
+				if layout, ok := isDateProperty(v); ok {
+					prop := meta.NewProperty("date")
+					prop.Format = layout
+					mappings.SetProperty(key, prop)
+				} else {
+					newProp := meta.NewProperty("text")
+					if config.Global.EnableTextKeywordMapping {
+						p := meta.NewProperty("keyword")
+						newProp.AddField("keyword", p)
+						mappings.SetProperty(key+".keyword", p)
+					}
+					mappings.SetProperty(key, newProp)
+				}
+			case int, int64, float64:
+				mappings.SetProperty(key, meta.NewProperty("numeric"))
+			case bool:
+				mappings.SetProperty(key, meta.NewProperty("bool"))
+			case []interface{}:
+				if v, ok := value.([]interface{}); ok {
+					for _, vv := range v {
+						switch val := vv.(type) {
+						case string:
+							if layout, ok := isDateProperty(val); ok {
+								prop := meta.NewProperty("date")
+								prop.Format = layout
+								mappings.SetProperty(key, prop)
+							} else {
+								newProp := meta.NewProperty("text")
+								if config.Global.EnableTextKeywordMapping {
+									p := meta.NewProperty("keyword")
+									newProp.AddField("keyword", p)
+									mappings.SetProperty(key+".keyword", p)
+								}
+								mappings.SetProperty(key, newProp)
+							}
+						case float64:
+							mappings.SetProperty(key, meta.NewProperty("numeric"))
+						case bool:
+							mappings.SetProperty(key, meta.NewProperty("bool"))
+						}
+						break
+					}
+				}
+			}
+
+			mappingsNeedsUpdate = true
+		}
+
+		if prop, ok := mappings.GetProperty(key); ok && !prop.Index {
+			continue // not index, skip
+		}
+
+		switch v := value.(type) {
+		case []interface{}:
+			for i, v := range v {
+				if err := index.checkField(mappings, flatDoc, key, v, i, true); err != nil {
+					return nil, err
+				}
+			}
+		default:
+			if err := index.checkField(mappings, flatDoc, key, v, 0, false); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	var err error
+	if mappingsNeedsUpdate {
+		if err = index.SetMappings(mappings); err != nil {
+			return nil, err
+		}
+		if err = StoreIndex(index); err != nil {
+			return nil, err
+		}
+	}
+
+	// set timestamp
+	timestamp := time.Now()
+	if value, ok := flatDoc[meta.TimeFieldName]; ok {
+		delete(doc, meta.TimeFieldName)
+		prop, _ := mappings.GetProperty(meta.TimeFieldName)
+		v, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)
+		if err != nil {
+			return nil, fmt.Errorf("field [%s] value [%v] parse err: %s", meta.TimeFieldName, value, err.Error())
+		}
+		timestamp = v
+	}
+
+	// prepare for wal
+	action := meta.ActionTypeInsert
+	if update {
+		action = meta.ActionTypeUpdate
+	}
+	flatDoc[meta.ActionFieldName] = action
+	flatDoc[meta.IDFieldName] = docID
+	flatDoc[meta.ShardFieldName] = shard
+	flatDoc[meta.TimeFieldName] = timestamp.UnixNano()
+
+	return json.Marshal(flatDoc)
+}
+
+func (index *Index) checkField(mappings *meta.Mappings, data map[string]interface{}, key string, value interface{}, id int, array bool) error {
+	var err error
+	var v interface{}
+	prop, _ := mappings.GetProperty(key)
+	switch prop.Type {
+	case "text":
+		v, err = zutils.ToString(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [text] but the value [%v] can't convert to string", key, value)
+		}
+	case "numeric":
+		v, err = zutils.ToFloat64(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [numeric] but the value [%v] can't convert to int", key, value)
+		}
+	case "keyword":
+		v, err = zutils.ToString(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [keyword] but the value [%v] can't convert to string", key, value)
+		}
+	case "bool":
+		v, err = zutils.ToBool(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [bool] but the value [%v] can't convert to boolean", key, value)
+		}
+	case "date", "time":
+		t, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)
+		if err != nil {
+			return fmt.Errorf("field [%s] value [%v] parse err: %s", key, value, err.Error())
+		}
+		v = t.UnixNano()
+	}
+	if array {
+		sub := data[key].([]interface{})
+		sub[id] = v
+		data[key] = sub
+	} else {
+		data[key] = v
+	}
+
+	return nil
+}
+
 // CreateDocument inserts or updates a document in the zinc index
 func (index *Index) CreateDocument(docID string, doc map[string]interface{}, update bool) error {
-	bdoc, err := index.BuildBlugeDocumentFromJSON(docID, doc)
+	data, err := index.CheckDocument(docID, doc, update, index.GetLatestShardID())
 	if err != nil {
 		return err
 	}
 
-	// Finally update the document on disk
-	writer, err := index.GetWriter()
-	if err != nil {
-		return err
-	}
-	if update {
-		err = writer.Update(bdoc.ID(), bdoc)
-	} else {
-		err = writer.Insert(bdoc)
-	}
-	return err
+	return index.WAL.Write(data)
 }
 
 // UpdateDocument updates a document in the zinc index
 func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, insert bool) error {
-	writer, err := index.FindID(docID)
+	update := true
+	shardID, err := index.FindShardByDocID(docID)
 	if err != nil {
 		if insert && err == errors.ErrorIDNotFound {
-			return index.CreateDocument(docID, doc, false)
+			update = false
+		} else {
+			return err
 		}
-		return err
 	}
 
-	bdoc, err := index.BuildBlugeDocumentFromJSON(docID, doc)
+	data, err := index.CheckDocument(docID, doc, update, shardID)
 	if err != nil {
 		return err
 	}
-	return writer.Update(bdoc.ID(), bdoc)
+
+	return index.WAL.Write(data)
 }
 
-func (index *Index) FindID(id string) (*bluge.Writer, error) {
+// DeleteDocument deletes a document in the zinc index
+func (index *Index) DeleteDocument(docID string) error {
+	shardID, err := index.FindShardByDocID(docID)
+	if err != nil {
+		return err
+	}
+
+	data := map[string]interface{}{
+		meta.IDFieldName:     docID,
+		meta.ActionFieldName: meta.ActionTypeDelete,
+		meta.ShardFieldName:  shardID,
+	}
+	jstr, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return index.WAL.Write(jstr)
+}
+
+// FindShardByDocID finds docID in which shard and returns the shard id
+func (index *Index) FindShardByDocID(docID string) (int64, error) {
 	query := bluge.NewBooleanQuery()
-	query.AddMust(bluge.NewTermQuery(id).SetField("_id"))
+	query.AddMust(bluge.NewTermQuery(docID).SetField("_id"))
 	request := bluge.NewTopNSearch(1, query).WithStandardAggregations()
 	ctx := context.Background()
 
 	// check id store by which shard
+	shardID := int64(-1)
 	writers, err := index.GetWriters()
 	if err != nil {
-		return nil, err
+		return shardID, err
 	}
 
-	for _, w := range writers {
-		r, err := w.Reader()
-		if err != nil {
-			return nil, err
-		}
-		defer r.Close()
-		dmi, err := r.Search(ctx, request)
-		if err != nil {
-			return nil, err
-		}
-		if dmi.Aggregations().Count() > 0 {
-			return w, nil
-		}
+	eg, ctx := errgroup.WithContext(ctx)
+	eg.SetLimit(config.Global.ReadGorutineNum)
+	for id := int64(len(writers)) - 1; id >= 0; id-- {
+		id := id
+		w := writers[id]
+		eg.Go(func() error {
+			r, err := w.Reader()
+			if err != nil {
+				log.Error().Err(err).Int64("shard", id).Str("index", index.Name).Msg("failed to get reader")
+				return nil // not check err, if returns err with cancel all gorutines.
+			}
+			defer r.Close()
+			dmi, err := r.Search(ctx, request)
+			if err != nil {
+				log.Error().Err(err).Int64("shard", id).Str("index", index.Name).Msg("failed to do search")
+				return nil // not check err, if returns err with cancel all gorutines.
+			}
+			if dmi.Aggregations().Count() > 0 {
+				shardID = id
+				return errors.ErrCancelSignal // check err, if returns err with cancel other all gorutines.
+			}
+			return nil
+		})
 	}
-	return nil, errors.ErrorIDNotFound
+	_ = eg.Wait()
+	if shardID == -1 {
+		return shardID, errors.ErrorIDNotFound
+	}
+	return shardID, nil
 }
 
 // isDateProperty returns true if the given value matches the default date format.
 func isDateProperty(value string) (string, bool) {
 	layout := detectTimeLayout(value)
+	if layout == "" {
+		return "", false
+	}
 	_, err := time.Parse(layout, value)
-
 	return layout, err == nil
 }
 

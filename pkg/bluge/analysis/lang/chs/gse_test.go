@@ -56,13 +56,6 @@ func TestLoadDict(t *testing.T) {
 				embed:  "BIG",
 			},
 		},
-		{
-			name: "enable=true,embed=small,customDict",
-			args: args{
-				enable: true,
-				embed:  "SMALL",
-			},
-		},
 	}
 
 	t.Run("prepare dict", func(t *testing.T) {

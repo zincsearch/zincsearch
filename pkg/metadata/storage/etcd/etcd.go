@@ -79,7 +79,7 @@ func (t *etcdStorage) Get(key string) ([]byte, error) {
 
 func (t *etcdStorage) Set(key string, value []byte) error {
 	if key == "" {
-		return errors.ErrEmptyKey
+		return errors.ErrKeyEmpty
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -89,7 +89,7 @@ func (t *etcdStorage) Set(key string, value []byte) error {
 
 func (t *etcdStorage) Delete(key string) error {
 	if key == "" {
-		return errors.ErrEmptyKey
+		return errors.ErrKeyEmpty
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

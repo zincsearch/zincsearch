@@ -28,10 +28,10 @@ type SearchResponse struct {
 }
 
 type Shards struct {
-	Total      int `json:"total"`
-	Successful int `json:"successful"`
-	Skipped    int `json:"skipped"`
-	Failed     int `json:"failed"`
+	Total      int64 `json:"total"`
+	Successful int64 `json:"successful"`
+	Skipped    int64 `json:"skipped"`
+	Failed     int64 `json:"failed"`
 }
 
 type Hits struct {

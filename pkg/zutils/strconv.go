@@ -26,6 +26,8 @@ func ToString(v interface{}) (string, error) {
 		return v, nil
 	case float64:
 		return strconv.FormatFloat(v, 'f', -1, 64), nil
+	case uint64:
+		return strconv.FormatUint(v, 10), nil
 	case int64:
 		return strconv.FormatInt(v, 10), nil
 	case int:
@@ -41,6 +43,8 @@ func ToFloat64(v interface{}) (float64, error) {
 	switch v := v.(type) {
 	case float64:
 		return v, nil
+	case uint64:
+		return float64(v), nil
 	case int64:
 		return float64(v), nil
 	case int:
@@ -58,14 +62,39 @@ func ToFloat64(v interface{}) (float64, error) {
 	}
 }
 
+func ToUint64(v interface{}) (uint64, error) {
+	switch v := v.(type) {
+	case uint64:
+		return v, nil
+	case float64:
+		return uint64(v), nil
+	case int64:
+		return uint64(v), nil
+	case int:
+		return uint64(v), nil
+	case string:
+		return strconv.ParseUint(v, 10, 64)
+	case bool:
+		if v {
+			return 1, nil
+		} else {
+			return 0, nil
+		}
+	default:
+		return 0, fmt.Errorf("ToInt: unknown supported type %T", v)
+	}
+}
+
 func ToInt(v interface{}) (int, error) {
 	switch v := v.(type) {
+	case int:
+		return v, nil
 	case float64:
+		return int(v), nil
+	case uint64:
 		return int(v), nil
 	case int64:
 		return int(v), nil
-	case int:
-		return v, nil
 	case string:
 		return strconv.Atoi(v)
 	case bool:
@@ -86,6 +115,12 @@ func ToBool(v interface{}) (bool, error) {
 	case string:
 		return strconv.ParseBool(v)
 	case float64:
+		if v == 0 {
+			return false, nil
+		} else {
+			return true, nil
+		}
+	case uint64:
 		if v == 0 {
 			return false, nil
 		} else {

@@ -25,6 +25,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/uquery/mappings"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id CreateIndex
@@ -38,7 +39,7 @@ import (
 // @Router /api/index [post]
 func Create(c *gin.Context) {
 	var newIndex meta.IndexSimple
-	if err := c.BindJSON(&newIndex); err != nil {
+	if err := zutils.GinBindJSON(c, &newIndex); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
@@ -68,7 +69,7 @@ func CreateES(c *gin.Context) {
 	indexName := c.Param("target")
 
 	var newIndex meta.IndexSimple
-	if err := c.BindJSON(&newIndex); err != nil {
+	if err := zutils.GinBindJSON(c, &newIndex); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}

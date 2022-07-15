@@ -217,7 +217,7 @@ blobs:
     bucket: zincsearch-releases
     ids:
       - zinc_binaries
-    folder: "zincsearch/{{.Version}}"
+    folder: "tagged/{{.Version}}"
     extra_files:
       - glob: ./dist/*.tar.gz
       - glob: ./dist/CHANGELOG.md

@@ -137,3 +137,42 @@ func TestGetIndex(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+func TestCheckIndexName(t *testing.T) {
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "normal",
+			args: args{
+				name: "TestCheckIndexName.index_1",
+			},
+		},
+		{
+			name: "error",
+			args: args{
+				name: "_TestCheckIndexName.index_1",
+			},
+			wantErr: true,
+		},
+		{
+			name: "error",
+			args: args{
+				name: "_TestCheckIndexName.index_*",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := CheckIndexName(tt.args.name); (err != nil) != tt.wantErr {
+				t.Errorf("CheckIndexName() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

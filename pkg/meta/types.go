@@ -13,11 +13,18 @@
 * limitations under the License.
  */
 
-package errors
+package meta
 
-import "errors"
+// Default field name
+const (
+	TimeFieldName   = "@timestamp"
+	IDFieldName     = "@_id"
+	ActionFieldName = "@_action"
+	ShardFieldName  = "@_shard"
+)
 
-var ErrCancelSignal = errors.New("cancelled") // just for cancel notice
-var ErrNotFound = errors.New("not found")
-var ErrKeyNotFound = errors.New("key not found")
-var ErrKeyEmpty = errors.New("key is be empty")
+const (
+	ActionTypeInsert = "insert"
+	ActionTypeUpdate = "update"
+	ActionTypeDelete = "delete"
+)

@@ -217,6 +217,7 @@ export default defineComponent({
         shard_num: props.row.shard_num,
         storage_size: props.row.storage_size,
         storage_type: props.row.storage_type,
+        wal_size: props.row.wal_size,
         settings: props.row.actions.settings,
         mappings: props.row.actions.mappings,
       };

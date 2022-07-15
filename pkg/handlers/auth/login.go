@@ -22,6 +22,7 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/auth"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id Login
@@ -36,7 +37,7 @@ import (
 func Login(c *gin.Context) {
 	// Read login input
 	var loginInput LoginRequest
-	if err := c.ShouldBindJSON(&loginInput); err != nil {
+	if err := zutils.GinBindJSON(c, &loginInput); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}

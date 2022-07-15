@@ -57,7 +57,7 @@ changelog:
       - "^test:"
 dockers:
   - image_templates:
-      - public.ecr.aws/zinclabs/zinc:{{ .Version }}-amd64
+      - public.ecr.aws/zinclabs/zinc-nightly:{{ .Version }}-amd64
     use: buildx
     dockerfile: Dockerfile.ci
     skip_push: "false"
@@ -76,7 +76,7 @@ dockers:
       - web
       - embed.go
   - image_templates:
-      - public.ecr.aws/zinclabs/zinc:{{ .Version }}-arm64
+      - public.ecr.aws/zinclabs/zinc-nightly:{{ .Version }}-arm64
     use: buildx
     dockerfile: Dockerfile.ci
     skip_push: "false"
@@ -95,7 +95,7 @@ dockers:
       - web
       - embed.go
   - image_templates:
-      - public.ecr.aws/zinclabs/zinc:{{ .Version }}-armv7 
+      - public.ecr.aws/zinclabs/zinc-nightly:{{ .Version }}-armv7 
     use: buildx
     dockerfile: Dockerfile.ci
     skip_push: "false"
@@ -118,14 +118,14 @@ docker_manifests:
 
   # Name template for the manifest.
   # Defaults to empty.
-  name_template: public.ecr.aws/zinclabs/zinc:{{ .Version }}
+  name_template: public.ecr.aws/zinclabs/zinc-nightly:{{ .Version }}
 
   # Image name templates to be added to this manifest.
   # Defaults to empty.
   image_templates:
-  - public.ecr.aws/zinclabs/zinc:{{ .Version }}-amd64
-  - public.ecr.aws/zinclabs/zinc:{{ .Version }}-arm64
-  - public.ecr.aws/zinclabs/zinc:{{ .Version }}-armv7
+  - public.ecr.aws/zinclabs/zinc-nightly:{{ .Version }}-amd64
+  - public.ecr.aws/zinclabs/zinc-nightly:{{ .Version }}-arm64
+  - public.ecr.aws/zinclabs/zinc-nightly:{{ .Version }}-armv7
 
 # https://goreleaser.com/customization/homebrew/
 brews:
@@ -154,7 +154,7 @@ blobs:
     bucket: zincsearch-releases
     ids:
       - zinc_binaries
-    folder: "zincsearch/{{.Version}}-{{.Date}}"
+    folder: "nightly/{{.Version}}-{{.Date}}"
     extra_files:
       - glob: ./dist/*.tar.gz
       - glob: ./dist/CHANGELOG.md

@@ -16,13 +16,11 @@ func TestESMapping_GetConverted(t *testing.T) {
 	config.Global.EnableTextKeywordMapping = true
 
 	t.Run("create index", func(t *testing.T) {
-		index, err := core.NewIndex("TestMapping.index_1", "disk")
+		index, err := core.NewIndex("TestEsMapping.index_1", "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 
 		err = core.StoreIndex(index)
-		assert.NoError(t, err)
-		err = index.Close()
 		assert.NoError(t, err)
 	})
 
@@ -95,7 +93,7 @@ func TestESMapping_GetConverted(t *testing.T) {
 							},
 						},
 					},
-					target: "TestMapping.index_1",
+					target: "TestEsMapping.index_1",
 					result: `{"message":"ok"}`,
 				},
 				wantErr: false,
@@ -133,7 +131,7 @@ func TestESMapping_GetConverted(t *testing.T) {
 				name: "normal",
 				args: args{
 					code:   http.StatusOK,
-					target: "TestMapping.index_1",
+					target: "TestEsMapping.index_1",
 					result: `{"@timestamp":{"type":"date"}`,
 				},
 				wantErr: false,
@@ -161,7 +159,7 @@ func TestESMapping_GetConverted(t *testing.T) {
 
 	t.Run("delete index", func(t *testing.T) {
 		for i := 0; i < 10; i++ {
-			_ = core.DeleteIndex(fmt.Sprintf("TestMapping.index_%d", i))
+			_ = core.DeleteIndex(fmt.Sprintf("TestEsMapping.index_%d", i))
 		}
 	})
 

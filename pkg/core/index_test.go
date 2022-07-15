@@ -23,10 +23,40 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/analyzer"
+	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zinclabs/zinc/pkg/meta"
 )
+
+func TestIndex_Index(t *testing.T) {
+	indexName := "TestIndex_Index.index_1"
+	index, err := NewIndex(indexName, "disk")
+	assert.NoError(t, err)
+	assert.NotNil(t, index)
+
+	err = StoreIndex(index)
+	assert.NoError(t, err)
+
+	got, err := json.Marshal(index)
+	assert.NoError(t, err)
+	assert.NotNil(t, got)
+
+	name := index.GetName()
+	assert.Equal(t, indexName, name)
+
+	settings := index.GetSettings()
+	assert.NotNil(t, settings)
+
+	mappings := index.GetMappings()
+	assert.NotNil(t, mappings)
+
+	analyzers := index.GetAnalyzers()
+	assert.NotNil(t, analyzers)
+
+	err = index.Reopen()
+	assert.NoError(t, err)
+}
 
 func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 	var index *Index
@@ -239,15 +269,26 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.init()
-			got, err := index.BuildBlugeDocumentFromJSON(tt.args.docID, tt.args.doc)
+			got, err := index.CheckDocument(tt.args.docID, tt.args.doc, false, 0)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
 			}
 			assert.Nil(t, err)
 			assert.NotNil(t, got)
+			var doc map[string]interface{}
+			err = json.Unmarshal(got, &doc)
+			assert.NoError(t, err)
+			assert.NotNil(t, doc)
+			got2, err := index.BuildBlugeDocumentFromJSON(tt.args.docID, doc)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.Nil(t, err)
+			assert.NotNil(t, got2)
 			wantType := reflect.TypeOf(tt.want)
-			gotType := reflect.TypeOf(got)
+			gotType := reflect.TypeOf(got2)
 			assert.Equal(t, wantType, gotType)
 		})
 	}

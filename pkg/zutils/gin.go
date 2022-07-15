@@ -13,11 +13,20 @@
 * limitations under the License.
  */
 
-package errors
+package zutils
 
-import "errors"
+import (
+	"io"
 
-var ErrCancelSignal = errors.New("cancelled") // just for cancel notice
-var ErrNotFound = errors.New("not found")
-var ErrKeyNotFound = errors.New("key not found")
-var ErrKeyEmpty = errors.New("key is be empty")
+	"github.com/gin-gonic/gin"
+	"github.com/goccy/go-json"
+)
+
+func GinBindJSON(c *gin.Context, obj interface{}) error {
+	body, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		return err
+	}
+	defer c.Request.Body.Close()
+	return json.Unmarshal(body, obj)
+}

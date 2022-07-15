@@ -92,7 +92,7 @@ func (t *badgerStorage) Get(key string) ([]byte, error) {
 
 func (t *badgerStorage) Set(key string, value []byte) error {
 	if key == "" {
-		return errors.ErrEmptyKey
+		return errors.ErrKeyEmpty
 	}
 	return t.db.Update(func(txn *badger.Txn) error {
 		return txn.Set([]byte(key), value)
@@ -101,7 +101,7 @@ func (t *badgerStorage) Set(key string, value []byte) error {
 
 func (t *badgerStorage) Delete(key string) error {
 	if key == "" {
-		return errors.ErrEmptyKey
+		return errors.ErrKeyEmpty
 	}
 	return t.db.Update(func(txn *badger.Txn) error {
 		return txn.Delete([]byte(key))

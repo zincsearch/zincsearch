@@ -39,13 +39,13 @@ import (
 // @Router /api/{index}/_update/{id} [post]
 func Update(c *gin.Context) {
 	indexName := c.Param("target")
-	docID := c.Param("id")      // ID for the document to be updated provided in URL path
+	docID := c.Param("id")
 	insert := c.Query("insert") // true or false
 	insertBool, _ := zutils.ToBool(insert)
 
 	var err error
 	var doc map[string]interface{}
-	if err = c.BindJSON(&doc); err != nil {
+	if err = zutils.GinBindJSON(c, &doc); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
@@ -55,14 +55,14 @@ func Update(c *gin.Context) {
 		docID = id.(string)
 	}
 	if docID == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "_id field is required"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "id is empty"})
 		return
 	}
 
 	// If the index does not exist, then create it
-	index, exists := core.GetIndex(indexName)
-	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index does not exists"})
+	index, _, err := core.GetOrCreateIndex(indexName, "")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -71,6 +71,5 @@ func Update(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, meta.HTTPResponseID{Message: "ok", ID: docID})
 }

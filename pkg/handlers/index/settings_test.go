@@ -111,7 +111,7 @@ func TestSettings(t *testing.T) {
 					code:    http.StatusBadRequest,
 					rawData: `{"x":y}`,
 					target:  "TestSettings.index_4",
-					result:  `{"error":"invalid character 'y' looking for beginning of value"}`,
+					result:  `{"error":"json: null unexpected end of JSON input"}`,
 				},
 				wantErr: true,
 			},

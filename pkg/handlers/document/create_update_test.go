@@ -47,7 +47,7 @@ func TestCreateUpdate(t *testing.T) {
 					"role": "create",
 				},
 				params: map[string]string{
-					"target": "TestCreateUpdate.index_1",
+					"target": "TestDocumentCreateUpdate.index_1",
 				},
 				result: `"id":"1"`,
 			},
@@ -62,7 +62,7 @@ func TestCreateUpdate(t *testing.T) {
 					"role": "update1",
 				},
 				params: map[string]string{
-					"target": "TestCreateUpdate.index_1",
+					"target": "TestDocumentCreateUpdate.index_1",
 				},
 				result: `"id":"1"`,
 			},
@@ -76,7 +76,7 @@ func TestCreateUpdate(t *testing.T) {
 					"role": "update2",
 				},
 				params: map[string]string{
-					"target": "TestCreateUpdate.index_1",
+					"target": "TestDocumentCreateUpdate.index_1",
 					"id":     "1",
 				},
 				result: `"id":"1"`,
@@ -91,7 +91,7 @@ func TestCreateUpdate(t *testing.T) {
 					"role": "update2",
 				},
 				params: map[string]string{
-					"target": "TestCreateUpdate.index_1",
+					"target": "TestDocumentCreateUpdate.index_1",
 				},
 				result: `"id":`,
 			},
@@ -102,7 +102,7 @@ func TestCreateUpdate(t *testing.T) {
 				code:    http.StatusBadRequest,
 				rawData: `{"name": "user", "role": "create", }`,
 				params: map[string]string{
-					"target": "TestCreateUpdate.index_1",
+					"target": "TestDocumentCreateUpdate.index_1",
 				},
 				result: `"error":`,
 			},
@@ -136,7 +136,7 @@ func TestCreateUpdate(t *testing.T) {
 	}
 
 	t.Run("cleanup", func(t *testing.T) {
-		err := core.DeleteIndex("TestCreateUpdate.index_1")
+		err := core.DeleteIndex("TestDocumentCreateUpdate.index_1")
 		assert.NoError(t, err)
 	})
 }
