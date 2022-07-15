@@ -40,7 +40,7 @@ func CheckIndexName(name string) error {
 		return fmt.Errorf("index name cannot start with _")
 	}
 	if !indexNameRe.Match([]byte(name)) {
-		return fmt.Errorf("index name [%s] is invalid", name)
+		return fmt.Errorf("index name [%s] is invalid, just accept [a-zA-Z0-9_.-]", name)
 	}
 	return nil
 }

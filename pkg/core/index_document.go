@@ -54,7 +54,8 @@ func (index *Index) BuildBlugeDocumentFromJSON(docID string, doc map[string]inte
 			continue
 		}
 
-		if prop, ok := mappings.GetProperty(key); ok && !prop.Index {
+		prop, ok := mappings.GetProperty(key)
+		if !ok || !prop.Index {
 			continue // not index, skip
 		}
 
@@ -110,7 +111,11 @@ func (index *Index) buildField(mappings *meta.Mappings, bdoc *bluge.Document, ke
 	case "bool":
 		field = bluge.NewKeywordField(key, strconv.FormatBool(value.(bool)))
 	case "date", "time":
-		field = bluge.NewDateTimeField(key, time.Unix(0, int64(value.(float64))))
+		v, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)
+		if err != nil {
+			return fmt.Errorf("field [%s] value [%v] parse err: %s", key, value, err.Error())
+		}
+		field = bluge.NewDateTimeField(key, v)
 	}
 	if prop.Store || prop.Highlightable {
 		field.StoreValue()
@@ -148,7 +153,7 @@ func (index *Index) CheckDocument(docID string, doc map[string]interface{}, upda
 	flatDoc, _ := flatten.Flatten(doc, "")
 	// Iterate through each field and add it to the bluge document
 	for key, value := range flatDoc {
-		if value == nil || key == meta.TimeFieldName {
+		if value == nil {
 			continue
 		}
 
@@ -204,7 +209,8 @@ func (index *Index) CheckDocument(docID string, doc map[string]interface{}, upda
 			mappingsNeedsUpdate = true
 		}
 
-		if prop, ok := mappings.GetProperty(key); ok && !prop.Index {
+		prop, ok := mappings.GetProperty(key)
+		if !ok || !prop.Index {
 			continue // not index, skip
 		}
 
@@ -283,11 +289,11 @@ func (index *Index) checkField(mappings *meta.Mappings, data map[string]interfac
 			return fmt.Errorf("field [%s] was set type to [bool] but the value [%v] can't convert to boolean", key, value)
 		}
 	case "date", "time":
-		t, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)
+		_, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)
 		if err != nil {
 			return fmt.Errorf("field [%s] value [%v] parse err: %s", key, value, err.Error())
 		}
-		v = t.UnixNano()
+		v = value
 	}
 	if array {
 		sub := data[key].([]interface{})
