@@ -131,6 +131,9 @@ func (t *IndexList) ListStat() []*Index {
 	for _, index := range items {
 		index.lock.Lock()
 		size, _ := index.WAL.Len()
+		if size == 1 {
+			size = 0
+		}
 		index.WALSize = size
 		index.lock.Unlock()
 	}

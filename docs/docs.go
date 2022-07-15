@@ -1495,6 +1495,9 @@ const docTemplate = `{
                 },
                 "update_at": {
                     "type": "string"
+                },
+                "wal_size": {
+                    "type": "integer"
                 }
             }
         },
