@@ -9,7 +9,7 @@
         :rows="searchResult"
         :columns="resultColumns"
         :loading="searchLoading"
-        :rows-per-page-options="[5, 10, 20, 50, 100, 500, 1000, 5000, 10000]"
+        :rows-per-page-options="rowsPerPageOptions"
         wrap-cells
         :title="t('search.searchResult')"
         row-key="_id"
@@ -167,7 +167,7 @@ export default defineComponent({
     const resultCount = ref("");
     const resultColumns = ref(defaultColumns());
     const queryString = ref("");
-
+    const rowsPerPageOptions = ref([5, 10, 20, 50, 100]);
     const pagination = ref({
       rowsPerPage: 20,
       sortBy: "desc",
@@ -510,6 +510,7 @@ export default defineComponent({
       searchResult,
       resultCount,
       searchLoading,
+      rowsPerPageOptions,
       pagination,
       onRequest,
       chartHistogram,
