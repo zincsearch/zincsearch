@@ -18,7 +18,6 @@ package document
 import (
 	"net/http"
 
-	"github.com/blugelabs/bluge"
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
@@ -36,27 +35,23 @@ import (
 // @Failure 500 {object} meta.HTTPResponseError
 // @Router /api/{index}/_doc/{id} [delete]
 func Delete(c *gin.Context) {
-	indexName := c.Param("target")
 	docID := c.Param("id")
+	if docID == "" {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "id is empty"})
+		return
+	}
 
+	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index does not exists"})
 		return
 	}
 
-	bdoc := bluge.NewDocument(docID)
-	writers, err := index.GetWriters()
+	err := index.DeleteDocument(docID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
-	}
-	for _, w := range writers {
-		err = w.Delete(bdoc.ID())
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
-			return
-		}
 	}
 	c.JSON(http.StatusOK, meta.HTTPResponseDocument{Message: "deleted", Index: indexName, ID: docID})
 }

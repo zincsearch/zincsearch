@@ -22,9 +22,6 @@ import (
 	"github.com/goccy/go-json"
 )
 
-// Timestamp field name
-const TimeFieldName = "@timestamp"
-
 type Mappings struct {
 	Properties map[string]Property `json:"properties,omitempty"`
 	lock       sync.RWMutex

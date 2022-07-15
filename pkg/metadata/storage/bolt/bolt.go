@@ -92,7 +92,7 @@ func (t *boltStorage) Get(key string) ([]byte, error) {
 
 func (t *boltStorage) Set(key string, value []byte) error {
 	if key == "" {
-		return errors.ErrEmptyKey
+		return errors.ErrKeyEmpty
 	}
 	bucket, name := t.splitBucketAndKey(key)
 	return t.db.Update(func(txn *bbolt.Tx) error {
@@ -106,7 +106,7 @@ func (t *boltStorage) Set(key string, value []byte) error {
 
 func (t *boltStorage) Delete(key string) error {
 	if key == "" {
-		return errors.ErrEmptyKey
+		return errors.ErrKeyEmpty
 	}
 	bucket, name := t.splitBucketAndKey(key)
 	return t.db.Update(func(Tx *bbolt.Tx) error {

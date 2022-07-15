@@ -18,6 +18,7 @@ package document
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -47,7 +48,8 @@ func TestUpdate(t *testing.T) {
 					"role": "create",
 				},
 				params: map[string]string{
-					"target": "TestUpdate.index_1",
+					"target": "TestDocumentUpdate.index_1",
+					"id":     "1",
 				},
 				result: `"id":"1"`,
 			},
@@ -58,7 +60,7 @@ func TestUpdate(t *testing.T) {
 				code:    http.StatusBadRequest,
 				rawData: `{"_id":"1","name":"user","role":"create}`,
 				params: map[string]string{
-					"target": "TestUpdate.index_1",
+					"target": "TestDocumentUpdate.index_1",
 				},
 				result: `"error":`,
 			},
@@ -69,7 +71,7 @@ func TestUpdate(t *testing.T) {
 				code:    http.StatusBadRequest,
 				rawData: `{"_id":"","name":"user","role":"create"}`,
 				params: map[string]string{
-					"target": "TestUpdate.index_1",
+					"target": "TestDocumentUpdate.index_1",
 				},
 				result: `"error":`,
 			},
@@ -77,10 +79,10 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "not exists index",
 			args: args{
-				code:    http.StatusBadRequest,
+				code:    http.StatusInternalServerError,
 				rawData: `{"_id":"1","name":"user","role":"create"}`,
 				params: map[string]string{
-					"target": "TestUpdate.index_2",
+					"target": "TestDocumentUpdate.index_2",
 				},
 				result: `"error":`,
 			},
@@ -90,10 +92,13 @@ func TestUpdate(t *testing.T) {
 	t.Run("prepare", func(t *testing.T) {
 		c, w := utils.NewGinContext()
 		utils.SetGinRequestData(c, `{"_id":"1","name":"user","role":"create"}`)
-		utils.SetGinRequestParams(c, map[string]string{"target": "TestUpdate.index_1"})
+		utils.SetGinRequestParams(c, map[string]string{"target": "TestDocumentUpdate.index_1"})
 		CreateUpdate(c)
 		assert.Equal(t, http.StatusOK, w.Code)
 		assert.Contains(t, w.Body.String(), "")
+
+		// wait for WAL write to index
+		time.Sleep(time.Second)
 	})
 
 	for _, tt := range tests {
@@ -115,7 +120,7 @@ func TestUpdate(t *testing.T) {
 	}
 
 	t.Run("cleanup", func(t *testing.T) {
-		err := core.DeleteIndex("TestUpdate.index_1")
+		err := core.DeleteIndex("TestDocumentUpdate.index_1")
 		assert.NoError(t, err)
 	})
 }

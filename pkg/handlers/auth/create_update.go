@@ -22,6 +22,7 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/auth"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id CreateUser
@@ -36,7 +37,7 @@ import (
 // @Router /api/user [post]
 func CreateUpdate(c *gin.Context) {
 	var user meta.User
-	if err := c.BindJSON(&user); err != nil {
+	if err := zutils.GinBindJSON(c, &user); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}

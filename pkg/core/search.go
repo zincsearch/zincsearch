@@ -17,6 +17,7 @@ package core
 
 import (
 	"context"
+	"sync/atomic"
 	"time"
 
 	"github.com/blugelabs/bluge"
@@ -32,7 +33,9 @@ import (
 )
 
 func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) {
-	searchRequest, err := uquery.ParseQueryDSL(query, index.Mappings, index.Analyzers)
+	mappings := index.GetMappings()
+	analyzers := index.GetAnalyzers()
+	searchRequest, err := uquery.ParseQueryDSL(query, mappings, analyzers)
 	if err != nil {
 		return nil, err
 	}
@@ -69,10 +72,10 @@ func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) 
 		return nil, err
 	}
 
-	return searchV2(index.ShardNum, len(readers), dmi, query, index.Mappings)
+	return searchV2(atomic.LoadInt64(&index.ShardNum), int64(len(readers)), dmi, query, mappings)
 }
 
-func searchV2(shardNum, readerNum int, dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings *meta.Mappings) (*meta.SearchResponse, error) {
+func searchV2(shardNum, readerNum int64, dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings *meta.Mappings) (*meta.SearchResponse, error) {
 	resp := &meta.SearchResponse{
 		Hits: meta.Hits{Hits: []meta.Hit{}},
 	}

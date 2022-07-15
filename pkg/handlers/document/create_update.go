@@ -23,6 +23,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id IndexDocument
@@ -42,7 +43,7 @@ func CreateUpdate(c *gin.Context) {
 
 	var err error
 	var doc map[string]interface{}
-	if err = c.BindJSON(&doc); err != nil {
+	if err = zutils.GinBindJSON(c, &doc); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
@@ -59,16 +60,10 @@ func CreateUpdate(c *gin.Context) {
 	}
 
 	// If the index does not exist, then create it
-	index, exists := core.GetIndex(indexName)
-	if !exists {
-		// Create a new index with disk storage as default
-		index, err = core.NewIndex(indexName, "")
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
-			return
-		}
-		// store index
-		_ = core.StoreIndex(index)
+	index, _, err := core.GetOrCreateIndex(indexName, "")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		return
 	}
 
 	err = index.CreateDocument(docID, doc, update)
@@ -76,10 +71,6 @@ func CreateUpdate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
-
-	// check shards
-	_ = index.CheckShards()
-
 	c.JSON(http.StatusOK, meta.HTTPResponseID{Message: "ok", ID: docID})
 }
 

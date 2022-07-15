@@ -16,15 +16,12 @@
 package index
 
 import (
-	"fmt"
 	"net/http"
-	"sort"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
-	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 // @Id ListIndexes
@@ -34,25 +31,7 @@ import (
 // @Success 200 {object} []core.Index
 // @Router /api/index [get]
 func List(c *gin.Context) {
-	items := core.ZINC_INDEX_LIST.List()
-	for _, index := range items {
-		if index.Settings == nil {
-			index.Settings = new(meta.IndexSettings)
-		}
-		if index.Mappings == nil {
-			index.Mappings = meta.NewMappings()
-		}
-		// update metadata while listing
-		err := index.UpdateMetadata()
-		if err != nil {
-			fmt.Println("Error updating metadata: ", err)
-		}
-	}
-
-	sort.Slice(items, func(i, j int) bool {
-		return items[i].Name < items[j].Name
-	})
-
+	items := core.ZINC_INDEX_LIST.ListStat()
 	c.JSON(http.StatusOK, items)
 }
 
@@ -66,21 +45,16 @@ func List(c *gin.Context) {
 func IndexNameList(c *gin.Context) {
 	queryName := strings.ToLower(c.DefaultQuery("name", ""))
 	var items []string
-	if queryName != "" {
-		for _, index := range core.ZINC_INDEX_LIST.List() {
-			if strings.Contains(strings.ToLower(index.Name), queryName) {
-				items = append(items, index.Name)
+	names := core.ZINC_INDEX_LIST.ListName()
+	if queryName == "" {
+		items = names
+	} else {
+		for _, name := range names {
+			if strings.Contains(strings.ToLower(name), queryName) {
+				items = append(items, name)
 			}
 		}
-	} else {
-		for _, index := range core.ZINC_INDEX_LIST.List() {
-			items = append(items, index.Name)
-		}
 	}
-
-	sort.Slice(items, func(i, j int) bool {
-		return items[i] < items[j]
-	})
 
 	count := 30
 	if len(items) > count {

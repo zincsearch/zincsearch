@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
@@ -108,9 +109,11 @@ func TestDocument(t *testing.T) {
 		})
 		t.Run("delete document with exist indexName not exist id", func(t *testing.T) {
 			resp := request("DELETE", "/api/"+indexName+"/_doc/notexist", nil)
-			assert.Equal(t, http.StatusOK, resp.Code)
+			assert.Equal(t, http.StatusBadRequest, resp.Code)
 		})
 		t.Run("delete document with exist indexName and exist id", func(t *testing.T) {
+			// wait for WAL write to index
+			time.Sleep(time.Second)
 			resp := request("DELETE", "/api/"+indexName+"/_doc/1111", nil)
 			assert.Equal(t, http.StatusOK, resp.Code)
 		})

@@ -17,6 +17,7 @@ package core
 
 import (
 	"fmt"
+	"sort"
 	"sync"
 
 	"github.com/rs/zerolog/log"
@@ -70,10 +71,39 @@ func (t *IndexList) Get(name string) (*Index, bool) {
 	return idx, ok
 }
 
+func (t *IndexList) GetOrCreate(name, storageType string) (*Index, bool, error) {
+	t.lock.RLock()
+	idx, ok := t.Indexes[name]
+	t.lock.RUnlock()
+	if ok {
+		return idx, true, nil
+	}
+	t.lock.Lock()
+	defer t.lock.Unlock()
+	// maybe someone else created it while we were waiting for the lock
+	idx, ok = t.Indexes[name]
+	if ok {
+		return idx, true, nil
+	}
+	// okay, let's create new index
+	idx, err := NewIndex(name, storageType)
+	if err != nil {
+		return nil, false, err
+	}
+	if err = storeIndex(idx); err != nil {
+		return nil, false, err
+	}
+	// cache it
+	t.Indexes[idx.Name] = idx
+	return idx, false, nil
+}
+
 func (t *IndexList) Delete(name string) {
 	t.lock.Lock()
 	if idx, ok := t.Indexes[name]; ok {
-		_ = idx.Close()
+		if err := idx.Close(); err != nil {
+			log.Error().Err(err).Msgf("Error Delete index[%s]", name)
+		}
 	}
 	delete(t.Indexes, name)
 	t.lock.Unlock()
@@ -96,6 +126,36 @@ func (t *IndexList) List() []*Index {
 	return indexes
 }
 
+func (t *IndexList) ListStat() []*Index {
+	items := t.List()
+	for _, index := range items {
+		index.lock.Lock()
+		size, _ := index.WAL.Len()
+		index.WALSize = size
+		index.lock.Unlock()
+	}
+
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].GetName() < items[j].GetName()
+	})
+
+	return items
+}
+
+func (t *IndexList) ListName() []string {
+	items := t.List()
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].GetName() < items[j].GetName()
+	})
+
+	names := make([]string, 0, len(items))
+	for _, index := range items {
+		names = append(names, index.GetName())
+	}
+
+	return names
+}
+
 func (t *IndexList) Close() error {
 	t.lock.Lock()
 	defer t.lock.Unlock()
@@ -105,4 +165,9 @@ func (t *IndexList) Close() error {
 		}
 	}
 	return nil
+}
+
+// GC auto close unused indexes what unactive for a long time (10m)
+func (t *IndexList) GC() error {
+	return nil // TODO: implement GC
 }

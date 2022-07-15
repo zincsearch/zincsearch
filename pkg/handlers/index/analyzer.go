@@ -40,7 +40,7 @@ import (
 // @Router /api/_analyze [post]
 func Analyze(c *gin.Context) {
 	var query AnalyzeRequest
-	if err := c.BindJSON(&query); err != nil {
+	if err := zutils.GinBindJSON(c, &query); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
@@ -56,8 +56,9 @@ func Analyze(c *gin.Context) {
 			return
 		}
 		if query.Filed != "" && query.Analyzer == "" {
-			if index.Mappings != nil && index.Mappings.Len() > 0 {
-				if prop, ok := index.Mappings.GetProperty(query.Filed); ok {
+			mappings := index.GetMappings()
+			if mappings != nil && mappings.Len() > 0 {
+				if prop, ok := mappings.GetProperty(query.Filed); ok {
 					if query.Analyzer == "" && prop.SearchAnalyzer != "" {
 						query.Analyzer = prop.SearchAnalyzer
 					}

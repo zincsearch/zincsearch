@@ -17,6 +17,7 @@ package core
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -29,14 +30,27 @@ import (
 	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-// NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
-func NewIndex(name, storageType string) (*Index, error) {
+var indexNameRe = regexp.MustCompile(`^[a-zA-Z0-9_.-]+$`)
+
+func CheckIndexName(name string) error {
 	if name == "" {
-		return nil, fmt.Errorf("core.NewIndex: index name cannot be empty")
+		return fmt.Errorf("index name cannot be empty")
 	}
 	if strings.HasPrefix(name, "_") {
-		return nil, fmt.Errorf("core.NewIndex: index name cannot start with _")
+		return fmt.Errorf("index name cannot start with _")
 	}
+	if !indexNameRe.Match([]byte(name)) {
+		return fmt.Errorf("index name [%s] is invalid", name)
+	}
+	return nil
+}
+
+// NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
+func NewIndex(name, storageType string) (*Index, error) {
+	if err := CheckIndexName(name); err != nil {
+		return nil, err
+	}
+
 	if storageType == "" {
 		storageType = "disk"
 	}
@@ -52,8 +66,13 @@ func NewIndex(name, storageType string) (*Index, error) {
 		return nil, err
 	}
 
+	// load WAL
+	if err := index.OpenWAL(); err != nil {
+		return nil, err
+	}
+
 	// init shards writer
-	for i := 0; i < index.ShardNum; i++ {
+	for i := int64(0); i < index.ShardNum; i++ {
 		index.Shards = append(index.Shards, &meta.IndexShard{ID: i})
 	}
 
@@ -64,12 +83,6 @@ func NewIndex(name, storageType string) (*Index, error) {
 func OpenIndexWriter(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) (*bluge.Writer, error) {
 	cfg := getOpenConfig(name, storageType, defaultSearchAnalyzer, timeRange...)
 	return bluge.OpenWriter(cfg)
-}
-
-// OpenIndexReader load the index reader from the storage
-func OpenIndexReader(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) (*bluge.Reader, error) {
-	cfg := getOpenConfig(name, storageType, defaultSearchAnalyzer, timeRange...)
-	return bluge.OpenReader(cfg)
 }
 
 func getOpenConfig(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) bluge.Config {
@@ -94,6 +107,19 @@ func getOpenConfig(name string, storageType string, defaultSearchAnalyzer *analy
 
 // storeIndex stores the index to metadata
 func StoreIndex(index *Index) error {
+	// store index
+	if err := storeIndex(index); err != nil {
+		return err
+	}
+	// cache index
+	ZINC_INDEX_LIST.Add(index)
+	return nil
+}
+
+func storeIndex(index *Index) error {
+	index.lock.Lock()
+	defer index.lock.Unlock()
+
 	if index.Settings == nil {
 		index.Settings = new(meta.IndexSettings)
 	}
@@ -101,7 +127,9 @@ func StoreIndex(index *Index) error {
 		index.Analyzers = make(map[string]*analysis.Analyzer)
 	}
 	if index.Mappings == nil {
+		// set default mappings
 		index.Mappings = meta.NewMappings()
+		index.Mappings.SetProperty(meta.TimeFieldName, meta.NewProperty("date"))
 	}
 
 	index.UpdateAt = time.Now()
@@ -110,12 +138,13 @@ func StoreIndex(index *Index) error {
 		return fmt.Errorf("core.StoreIndex: index: %s, error: %s", index.Name, err.Error())
 	}
 
-	// cache index
-	ZINC_INDEX_LIST.Add(index)
-
 	return nil
 }
 
 func GetIndex(name string) (*Index, bool) {
 	return ZINC_INDEX_LIST.Get(name)
+}
+
+func GetOrCreateIndex(name, storageType string) (*Index, bool, error) {
+	return ZINC_INDEX_LIST.GetOrCreate(name, storageType)
 }

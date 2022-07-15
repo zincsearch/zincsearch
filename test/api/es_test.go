@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
@@ -167,6 +168,8 @@ func TestApiES(t *testing.T) {
 				assert.Equal(t, http.StatusOK, resp.Code)
 			})
 			t.Run("delete document with exist indexName and exist id", func(t *testing.T) {
+				// wait for WAL write to index
+				time.Sleep(time.Second)
 				resp := request("DELETE", "/es/"+indexName+"/_doc/1111", nil)
 				assert.Equal(t, http.StatusOK, resp.Code)
 			})
@@ -176,7 +179,7 @@ func TestApiES(t *testing.T) {
 			t.Run("update document with not exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
-				resp := request("PUT", "/es/notExistIndexCreate/_create/1111", body)
+				resp := request("PUT", "/es/notExistIndexCreate1/_create/1111", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
 			})
 			t.Run("update document with exist indexName", func(t *testing.T) {
@@ -209,7 +212,7 @@ func TestApiES(t *testing.T) {
 			t.Run("update document with not exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
-				resp := request("POST", "/es/notExistIndexCreate/_create/1111", body)
+				resp := request("POST", "/es/notExistIndexCreate2/_create/1111", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
 			})
 			t.Run("update document with exist indexName", func(t *testing.T) {
@@ -242,10 +245,12 @@ func TestApiES(t *testing.T) {
 			t.Run("update document with not exist indexName", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
-				resp := request("POST", "/es/notExistIndexCreate/_update/1111", body)
-				assert.Equal(t, http.StatusOK, resp.Code)
+				resp := request("POST", "/es/notExistIndexCreate3/_update/1111", body)
+				assert.Equal(t, http.StatusInternalServerError, resp.Code)
 			})
 			t.Run("update document with exist indexName", func(t *testing.T) {
+				// wait for WAL write to index
+				time.Sleep(time.Second)
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/"+indexName+"/_update/1111", body)

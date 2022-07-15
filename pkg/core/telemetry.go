@@ -18,6 +18,7 @@ package core
 import (
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -153,7 +154,7 @@ func (t *telemetry) TotalIndexSize() uint64 {
 
 func (t *telemetry) GetIndexSize(indexName string) uint64 {
 	if index, ok := ZINC_INDEX_LIST.Get(indexName); ok {
-		return index.StorageSize / 1024 / 1024 // convert to MB
+		return atomic.LoadUint64(&index.StorageSize) / 1024 / 1024 // convert to MB
 	}
 	return 0
 }

@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
@@ -28,6 +29,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // SearchDSL searches the index for the given http request from end user
@@ -46,7 +48,7 @@ func SearchDSL(c *gin.Context) {
 	indexName := c.Param("target")
 
 	query := &meta.ZincQuery{Size: 10}
-	if err := c.BindJSON(query); err != nil {
+	if err := zutils.GinBindJSON(c, query); err != nil {
 		log.Printf("handlers.search.searchDSL: %s", err.Error())
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
@@ -60,11 +62,11 @@ func SearchDSL(c *gin.Context) {
 
 	if indexName != "" {
 		idx, _ := core.ZINC_INDEX_LIST.Get(indexName)
-
+		storageSize := atomic.LoadUint64(&idx.StorageSize)
 		eventData := make(map[string]interface{})
 		eventData["search_type"] = "query_dsl"
 		eventData["search_index_storage"] = idx.StorageType
-		eventData["search_index_size_in_mb"] = idx.StorageSize / 1024 / 1024
+		eventData["search_index_size_in_mb"] = storageSize / 1024 / 1024
 		eventData["time_taken_to_search_in_ms"] = resp.Took
 		eventData["aggregations_count"] = len(query.Aggregations)
 		core.Telemetry.Event("search", eventData)
