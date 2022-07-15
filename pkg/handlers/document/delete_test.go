@@ -82,36 +82,33 @@ func TestDelete(t *testing.T) {
 	}
 
 	// create a document
-	t.Run("prepare", func(t *testing.T) {
-		data := map[string]interface{}{
-			"_id":  "1",
-			"name": "user",
-			"role": "create",
-		}
-		params := map[string]string{
-			"target": "TestDocumentDelete.index_1",
-		}
-		c, w := utils.NewGinContext()
-		utils.SetGinRequestData(c, data)
-		utils.SetGinRequestParams(c, params)
-		CreateUpdate(c)
-		assert.Equal(t, http.StatusOK, w.Code)
-		assert.Contains(t, w.Body.String(), `"id":"1"`)
+	data := map[string]interface{}{
+		"_id":  "1",
+		"name": "user",
+		"role": "create",
+	}
+	params := map[string]string{
+		"target": "TestDocumentDelete.index_1",
+	}
+	c, w := utils.NewGinContext()
+	utils.SetGinRequestData(c, data)
+	utils.SetGinRequestParams(c, params)
+	CreateUpdate(c)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Body.String(), `"id":"1"`)
 
-		// wait for WAL write to index
-		time.Sleep(time.Second * 5)
-	})
+	// wait for WAL write to index
+	time.Sleep(time.Second * 8)
 
 	for _, tt := range tests {
 		c, w := utils.NewGinContext()
 		utils.SetGinRequestParams(c, tt.args.params)
 		Delete(c)
-		assert.GreaterOrEqual(t, w.Code, tt.args.code)
-		// assert.Contains(t, w.Body.String(), tt.args.result)
+		assert.Equal(t, w.Code, tt.args.code)
+		assert.Contains(t, w.Body.String(), tt.args.result)
 	}
 
-	t.Run("cleanup", func(t *testing.T) {
-		err := core.DeleteIndex("TestDocumentDelete.index_1")
-		assert.NoError(t, err)
-	})
+	err := core.DeleteIndex("TestDocumentDelete.index_1")
+	assert.NoError(t, err)
+
 }
