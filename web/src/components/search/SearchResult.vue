@@ -273,7 +273,7 @@ export default defineComponent({
           },
         },
         sort: ["-@timestamp"],
-        from: pagination.value.page,
+        from: pagination.value.page - 1,
         size: pagination.value.rowsPerPage,
       };
 
