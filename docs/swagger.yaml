@@ -60,6 +60,8 @@ definitions:
         type: string
       update_at:
         type: string
+      wal_size:
+        type: integer
     type: object
   index.AnalyzeResponse:
     properties:
