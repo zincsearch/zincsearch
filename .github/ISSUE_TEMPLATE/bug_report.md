@@ -25,20 +25,22 @@ If you think you’ve found a potential security issue, please do not post it in
 
 -->
 
-**Tell us about your request**
-What do you want to see in Zinc?
+**What were you trying to achieve?**
+
+**What action did you take?**
+
+**What action/response/output did you expect?**
+
+**What actually happened?**
+
+**How to reproduce the issue?**
+
+**What version of ZincSearch are you using?**
+
+**Anything else that you can tell that will help us diagnose and resolve the issue efficiently?**
+
+**Any attachments/screenshots?**
 
 **Which service(s) is this relate to?**
 This could be GUI or API
 
-**Tell us about the problem you're trying to solve. What are you trying to do, and why is it hard or not doable?**
-What outcome are you trying to achieve, ultimately, and why is it hard/impossible to do right now? What is the impact of not having this problem solved? The more details you can provide, the better we'll be able to understand and solve the problem.
-
-**Are you currently working around this issue?**
-How are you currently solving this problem?
-
-**Additional context**
-Anything else we should know?
-
-**Attachments**
-If you think you might have additional information that you'd like to include via an attachment, please do - we'll take a look. (Remember to remove any personally-identifiable information.)
