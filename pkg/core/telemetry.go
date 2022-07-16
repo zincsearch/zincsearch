@@ -160,7 +160,11 @@ func (t *telemetry) GetIndexSize(indexName string) uint64 {
 }
 
 func (t *telemetry) HeartBeat() {
-	m, _ := mem.VirtualMemory()
+	m, err := mem.VirtualMemory()
+	if err != nil {
+		log.Error().Err(err).Msg("core.Telemetry.HeartBeat: error getting memory info")
+		return
+	}
 	data := make(map[string]interface{})
 	data["index_count"] = ZINC_INDEX_LIST.Len()
 	data["total_index_size_mb"] = t.TotalIndexSize()
