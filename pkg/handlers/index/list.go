@@ -17,22 +17,101 @@ package index
 
 import (
 	"net/http"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 // @Id ListIndexes
 // @Summary List indexes
 // @Tags    Index
+// @Param   page_num  query  integer  false  "page num"
+// @Param   page_size  query  integer  false  "page size"
+// @Param   sort_by  query  string  false  "sort by"
+// @Param   descending  query  boolen  false  "descending"
+// @Param   filter  query  string  false  "filter"
 // @Produce json
-// @Success 200 {object} []core.Index
+// @Success 200 {object} {list:[]core.Index, page: meta.Page}
 // @Router /api/index [get]
 func List(c *gin.Context) {
+	page := meta.NewPage(c)
+	sortBy := c.DefaultQuery("sort_by", "")
+	descending, _ := strconv.ParseBool(c.DefaultQuery("descending", "false"))
+	filter := c.DefaultQuery("filter", "")
+
 	items := core.ZINC_INDEX_LIST.ListStat()
-	c.JSON(http.StatusOK, items)
+
+	if len(filter) > 0 {
+		var res []*core.Index
+		for _, item := range items {
+			if strings.Contains(item.Name, filter) {
+				res = append(res, item)
+			}
+		}
+		items = res
+	}
+
+	if len(sortBy) > 0 {
+		if sortBy == "name" {
+			sort.Slice(items, func(i, j int) bool {
+				if descending {
+					return items[i].GetName() > items[j].GetName()
+				} else {
+					return items[i].GetName() < items[j].GetName()
+				}
+			})
+		} else if sortBy == "doc_num" {
+			sort.Slice(items, func(i, j int) bool {
+				if descending {
+					return items[i].DocNum > items[j].DocNum
+				} else {
+					return items[i].DocNum < items[j].DocNum
+				}
+			})
+		} else if sortBy == "shard_num" {
+			sort.Slice(items, func(i, j int) bool {
+				if descending {
+					return items[i].ShardNum > items[j].ShardNum
+				} else {
+					return items[i].ShardNum < items[j].ShardNum
+				}
+			})
+		} else if sortBy == "storage_size" {
+			sort.Slice(items, func(i, j int) bool {
+				if descending {
+					return items[i].StorageSize > items[j].StorageSize
+				} else {
+					return items[i].StorageSize < items[j].StorageSize
+				}
+			})
+		} else if sortBy == "storage_type" {
+			sort.Slice(items, func(i, j int) bool {
+				if descending {
+					return items[i].StorageType > items[j].StorageType
+				} else {
+					return items[i].StorageType < items[j].StorageType
+				}
+			})
+		}
+	}
+
+	page.Total = int64(len(items))
+	startIndex, endIndex := page.GetStartEndIndex()
+	if endIndex > 0 {
+		items = items[startIndex:endIndex]
+	} else {
+		items = []*core.Index{}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"list": items,
+		"page": page,
+	})
 }
 
 // @Id IndexNameList
