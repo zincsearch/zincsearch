@@ -13,7 +13,7 @@ type Page struct {
 }
 
 func NewPage(c *gin.Context) *Page {
-	pageNum, _ := strconv.ParseInt(c.DefaultQuery("page_num", "0"), 10, 64)
+	pageNum, _ := strconv.ParseInt(c.DefaultQuery("page_num", "1"), 10, 64)
 	pageSize, _ := strconv.ParseInt(c.DefaultQuery("page_size", "0"), 10, 64)
 	return &Page{
 		PageNum:  pageNum,
