@@ -162,7 +162,7 @@ func (t *telemetry) GetIndexSize(indexName string) uint64 {
 func (t *telemetry) HeartBeat() {
 	m, err := mem.VirtualMemory()
 	if err != nil {
-		log.Err(err).Msg("core.Telemetry.HeartBeat: error getting memory info")
+		log.Error().Err(err).Msg("core.Telemetry.HeartBeat: error getting memory info")
 		return
 	}
 	data := make(map[string]interface{})
