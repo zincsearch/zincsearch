@@ -37,6 +37,14 @@ func TestList(t *testing.T) {
 
 	t.Run("list", func(t *testing.T) {
 		c, w := utils.NewGinContext()
+		params := map[string]string{
+			"page_num":   "0",
+			"page_size":  "20",
+			"sort_by":    "name",
+			"descending": "false",
+			"filter":     "",
+		}
+		utils.SetGinRequestParams(c, params)
 		List(c)
 		assert.Equal(t, http.StatusOK, w.Code)
 		assert.Contains(t, w.Body.String(), "")
