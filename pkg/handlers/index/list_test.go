@@ -44,7 +44,7 @@ func TestList(t *testing.T) {
 			"descending": "false",
 			"filter":     "",
 		}
-		utils.SetGinRequestParams(c, params)
+		utils.SetGinRequestURL(c, "/api/index", params)
 		List(c)
 		assert.Equal(t, http.StatusOK, w.Code)
 		assert.Contains(t, w.Body.String(), "")
