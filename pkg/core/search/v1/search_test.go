@@ -245,7 +245,7 @@ func TestSearch(t *testing.T) {
 		}
 
 		// wait for WAL write to index
-		time.Sleep(time.Second)
+		time.Sleep(time.Second * 3)
 	})
 
 	for _, tt := range tests {

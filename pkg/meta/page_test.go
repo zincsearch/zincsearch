@@ -1,7 +1,6 @@
 package meta
 
 import (
-	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,7 +16,6 @@ func TestNewPage(t *testing.T) {
 	}
 	utils.SetGinRequestURL(c, "/", params)
 	page := NewPage(c)
-	log.Println("page:", page)
 	assert.Equal(t, page.PageNum, int64(0))
 	assert.Equal(t, page.PageSize, int64(20))
 }
