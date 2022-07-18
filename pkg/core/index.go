@@ -152,15 +152,15 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 func (index *Index) SetTimestamp(t int64) {
 	index.lock.Lock()
 	defer index.lock.Unlock()
-	if index.DocTimeMin == 0 {
-		index.DocTimeMin = t
-		index.DocTimeMax = t
+	if atomic.LoadInt64(&index.DocTimeMin) == 0 {
+		atomic.StoreInt64(&index.DocTimeMin, t)
+		atomic.StoreInt64(&index.DocTimeMax, t)
 		return
 	}
-	if t < index.DocTimeMin {
-		index.DocTimeMin = t
-	} else if t > index.DocTimeMax {
-		index.DocTimeMax = t
+	if t < atomic.LoadInt64(&index.DocTimeMin) {
+		atomic.StoreInt64(&index.DocTimeMin, t)
+	} else if t > atomic.LoadInt64(&index.DocTimeMax) {
+		atomic.StoreInt64(&index.DocTimeMax, t)
 	}
 }
 
