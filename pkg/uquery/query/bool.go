@@ -120,7 +120,7 @@ func BoolQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers 
 				if err != nil {
 					return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s type string convert to int error: %s", k, err))
 				}
-				boolQuery.SetMinShould(int(vi))
+				boolQuery.SetMinShould(int(vi)) // lgtm[go/hardcoded-credentials]
 			case int:
 				boolQuery.SetMinShould(v)
 			case float64:
