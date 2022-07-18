@@ -46,7 +46,7 @@ func Bulk(c *gin.Context) {
 
 	defer c.Request.Body.Close()
 
-	_, ret, err := BulkWorker(target, c.Request.Body)
+	ret, err := BulkWorker(target, c.Request.Body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
@@ -70,7 +70,7 @@ func ESBulk(c *gin.Context) {
 	defer c.Request.Body.Close()
 
 	startTime := time.Now()
-	_, ret, err := BulkWorker(target, c.Request.Body)
+	ret, err := BulkWorker(target, c.Request.Body)
 	ret.Took = int(time.Since(startTime) / time.Millisecond)
 	if err != nil {
 		ret.Error = err.Error()
@@ -82,9 +82,8 @@ func ESBulk(c *gin.Context) {
 	c.JSON(http.StatusOK, ret)
 }
 
-func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkResponse, error) {
+func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 	bulkRes := &BulkResponse{Items: []map[string]BulkResponseItem{}}
-	bulkIndexes := make(map[string]struct{})
 
 	// Prepare to read the entire raw text of the body
 	scanner := bufio.NewScanner(body)
@@ -146,12 +145,12 @@ func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkRespon
 
 			newIndex, _, err := core.GetOrCreateIndex(indexName, "")
 			if err != nil {
-				return bulkIndexes, bulkRes, err
+				return bulkRes, err
 			}
 
 			err = newIndex.CreateDocument(docID, doc, update)
 			if err != nil {
-				return bulkIndexes, bulkRes, err
+				return bulkRes, err
 			}
 
 		} else { // This branch will process the metadata line in the request. Each metadata line is preceded by a data line.
@@ -159,7 +158,7 @@ func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkRespon
 			for k, v := range doc {
 				vm, ok := v.(map[string]interface{})
 				if !ok {
-					return nil, nil, errors.New("bulk index data format error")
+					return nil, errors.New("bulk index data format error")
 				}
 				for k := range lastLineMetaData {
 					delete(lastLineMetaData, k)
@@ -174,7 +173,7 @@ func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkRespon
 						lastLineMetaData["_index"] = target
 					}
 					if lastLineMetaData["_index"] == "" {
-						return nil, nil, errors.New("bulk index data format error")
+						return nil, errors.New("bulk index data format error")
 					}
 					lastLineMetaData["_id"] = vm["_id"]
 				} else if k == "delete" {
@@ -185,12 +184,12 @@ func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkRespon
 						indexName = vm["_index"].(string)
 					}
 					if indexName == "" {
-						return nil, nil, errors.New("bulk index data format error")
+						return nil, errors.New("bulk index data format error")
 					}
 
 					newIndex, _, err := core.GetOrCreateIndex(indexName, "")
 					if err != nil {
-						return bulkIndexes, bulkRes, err
+						return bulkRes, err
 					}
 
 					// delete
@@ -205,10 +204,10 @@ func BulkWorker(target string, body io.Reader) (map[string]struct{}, *BulkRespon
 	}
 
 	if err := scanner.Err(); err != nil {
-		return bulkIndexes, bulkRes, err
+		return bulkRes, err
 	}
 
-	return bulkIndexes, bulkRes, nil
+	return bulkRes, nil
 }
 
 // DoesExistInThisRequest takes a slice and looks for an element in it. If found it will

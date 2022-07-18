@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/blugelabs/bluge"
@@ -33,16 +34,31 @@ import (
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
+// OpenWAL open WAL for index
 func (index *Index) OpenWAL() error {
+	index.lock.RLock()
+	w := index.WAL
+	index.lock.RUnlock()
+	if w != nil {
+		return nil
+	}
+
+	index.lock.Lock()
+	if index.WAL != nil {
+		index.lock.Unlock()
+		return nil
+	}
 	var err error
 	if index.WAL, err = wal.Open(index.Name); err != nil {
+		index.lock.Unlock()
 		return err
 	}
-	index.close = make(chan struct{})
+	index.lock.Unlock()
 	if err = index.Rollback(); err != nil {
 		return err
 	}
-	go index.ConsumeWAL()
+	ZINC_INDEX_WAL_LIST.Add(index)
+	atomic.StoreUint32(&index.open, 1)
 	return nil
 }
 
@@ -106,122 +122,105 @@ func (index *Index) Rollback() error {
 }
 
 func (index *Index) ConsumeWAL() {
+	select {
+	case <-index.close:
+		return
+	default:
+		// continue
+	}
+
+	if err := index.WAL.Sync(); err != nil {
+		log.Error().Err(err).Str("index", index.Name).Msg("consume wal.Sync()")
+	}
+
 	var err error
-	var errFound bool
 	var entry []byte
 	var minID, maxID, startID uint64
-	minID, err = index.WAL.FirstIndex()
+	maxID, err = index.WAL.LastIndex()
 	if err != nil {
-		log.Fatal().Err(err).Str("index", index.Name).Msg("consume wal.Head()")
+		log.Error().Err(err).Str("index", index.Name).Msg("consume wal.LastIndex()")
+		return
 	}
-	// log.Info().Uint64("id", minID).Str("index", index.Name).Msg("consume wal.Head()")
-	interval, err := parseInterval(config.Global.WalSyncInterval)
-	if err != nil {
-		log.Fatal().Err(err).Str("index", index.Name).Msg("consume ParseInterval")
+	// read last committed ID
+	_, minID, err = index.readRedoLog(RedoActionWrite)
+	if err != nil && err.Error() != errors.ErrNotFound.Error() {
+		log.Error().Err(err).Str("index", index.Name).Msg("consume wal.readRedoLog()")
+		return
 	}
-	tick := time.NewTicker(interval)
-	for {
-		select {
-		case <-tick.C:
-			// continue
-		case <-index.close:
-			tick.Stop()
+	if minID == maxID {
+		return // no new entries
+	}
+	log.Debug().Str("index", index.GetName()).Uint64("minID", minID).Uint64("maxID", maxID).Msg("consume wal")
+
+	batch := blugeindex.NewBatch()
+	docs := make(walMergeDocs)
+	minID++
+	for startID = minID; minID <= maxID; minID++ {
+		entry, err = index.WAL.Read(minID)
+		if err != nil {
+			log.Error().Err(err).Str("index", index.Name).Msg("consume wal.Read()")
 			return
 		}
 
-		if err = index.WAL.Sync(); err != nil {
-			log.Error().Err(err).Uint64("id", minID).Str("index", index.Name).Msg("consume wal.Sync()")
-		}
-
-		maxID, err = index.WAL.LastIndex()
+		doc := make(map[string]interface{})
+		err = json.Unmarshal(entry, &doc)
 		if err != nil {
-			log.Error().Err(err).Str("index", index.Name).Msg("consume wal.Tail()")
-			continue
+			log.Error().Err(err).Str("index", index.Name).Msg("consume wal.entry.Unmarshal()")
+			return
 		}
-		if maxID-minID == 0 {
-			continue // no new entries
-		}
-		// log.Debug().Uint64("Len", maxID-minID).Str("index", index.Name).Msg("consume wal.Len()")
-
-		errFound = false
-		batch := blugeindex.NewBatch()
-		docs := make(walMergeDocs)
-		minID++
-		for startID = minID; minID <= maxID; minID++ {
-			entry, err = index.WAL.Read(minID)
-			if err != nil {
-				log.Error().Err(err).Str("index", index.Name).Msg("consume wal.Read()")
-				errFound = true
-				break // need retry
-			}
-			// fmt.Printf("minID: %d, maxID: %d, body: %d, err: %v\n", minID, maxID, len(entry), err)
-
-			doc := make(map[string]interface{})
-			err = json.Unmarshal(entry, &doc)
-			if err != nil {
-				log.Error().Err(err).Str("index", index.Name).Msg("consume wal.entry.Unmarshal()")
-				errFound = true
-				break // need retry
-			}
-			docs.AddDocument(doc)
-			if docs.MaxShardLen() >= config.Global.BatchSize {
-				if err = index.writeRedoLog(RedoActionRead, startID, minID); err != nil {
-					log.Error().Err(err).Str("index", index.Name).Str("stage", "read").Msg("consume wal.redolog.Write()")
-					errFound = true
-					break // need retry
-				}
-				if err = docs.WriteTo(index, batch, false); err != nil {
-					log.Error().Err(err).Str("index", index.Name).Msg("consume wal.docs.WriteTo()")
-					errFound = true
-					break // need retry
-				}
-				if err = index.writeRedoLog(RedoActionWrite, startID, minID); err != nil {
-					log.Error().Err(err).Str("index", index.Name).Str("stage", "write").Msg("consume wal.redolog.Write()")
-					errFound = true
-					break // need retry
-				}
-				// Reset startID to nextID
-				startID = minID + 1
-			}
-		}
-
-		minID-- // need reduce one, because the next loop add one
-
-		// check if there is any docs to write
-		if docs.MaxShardLen() > 0 {
+		docs.AddDocument(doc)
+		if docs.MaxShardLen() >= config.Global.BatchSize {
 			if err = index.writeRedoLog(RedoActionRead, startID, minID); err != nil {
 				log.Error().Err(err).Str("index", index.Name).Str("stage", "read").Msg("consume wal.redolog.Write()")
-				errFound = true //nolint
-				break           // need retry
+				return
 			}
-			if err := docs.WriteTo(index, batch, false); err != nil {
+			if err = docs.WriteTo(index, batch, false); err != nil {
 				log.Error().Err(err).Str("index", index.Name).Msg("consume wal.docs.WriteTo()")
-				errFound = true
+				return
 			}
 			if err = index.writeRedoLog(RedoActionWrite, startID, minID); err != nil {
 				log.Error().Err(err).Str("index", index.Name).Str("stage", "write").Msg("consume wal.redolog.Write()")
-				errFound = true //nolint
-				break           // need retry
+				return
 			}
+			// Reset startID to nextID
+			startID = minID + 1
 		}
-		if errFound {
-			continue // skip this batch and retry
-		}
+	}
 
-		// Truncate log
-		if err = index.WAL.TruncateFront(minID); err != nil {
-			log.Error().Err(err).Uint64("id", minID).Str("index", index.Name).Msg("consume wal.Truncate()")
-		}
+	minID-- // need reduce one, because the next loop add one
 
-		// check shards
-		if err = index.CheckShards(); err != nil {
-			log.Error().Err(err).Str("index", index.Name).Msg("consume index.CheckShards()")
+	// check if there is any docs to write
+	if docs.MaxShardLen() > 0 {
+		if err = index.writeRedoLog(RedoActionRead, startID, minID); err != nil {
+			log.Error().Err(err).Str("index", index.Name).Str("stage", "read").Msg("consume wal.redolog.Write()")
+			return
 		}
+		if err := docs.WriteTo(index, batch, false); err != nil {
+			log.Error().Err(err).Str("index", index.Name).Msg("consume wal.docs.WriteTo()")
+			return
+		}
+		if err = index.writeRedoLog(RedoActionWrite, startID, minID); err != nil {
+			log.Error().Err(err).Str("index", index.Name).Str("stage", "write").Msg("consume wal.redolog.Write()")
+			return
+		}
+	}
 
-		//  update metadata
-		if err = index.UpdateMetadata(); err != nil {
-			log.Error().Err(err).Str("index", index.Name).Msg("consume index.UpdateMetadata()")
-		}
+	// Truncate log
+	if err = index.WAL.TruncateFront(minID); err != nil {
+		log.Error().Err(err).Uint64("id", minID).Str("index", index.Name).Msg("consume wal.Truncate()")
+		return
+	}
+
+	// check shards
+	if err = index.CheckShards(); err != nil {
+		log.Error().Err(err).Str("index", index.Name).Msg("consume index.CheckShards()")
+		return
+	}
+
+	//  update metadata
+	if err = index.UpdateMetadata(); err != nil {
+		log.Error().Err(err).Str("index", index.Name).Msg("consume index.UpdateMetadata()")
+		return
 	}
 }
 
@@ -326,14 +325,22 @@ func (w *walMergeDocs) WriteToShard(index *Index, shardID int64, batch *blugeind
 		return nil
 	}
 	var writer *bluge.Writer
-	var err error
+	otherWriters := make([]*bluge.Writer, 0)
+	otherBatch := blugeindex.NewBatch()
 	if shardID >= 0 {
-		writer, err = index.GetWriter(shardID)
+		w, err := index.GetWriter(shardID)
+		if err != nil {
+			return err
+		}
+		writer = w
 	} else {
-		writer, err = index.GetWriter() // get latest shard
-	}
-	if err != nil {
-		return err
+		ws, err := index.GetWriters() // get all shard
+		if err != nil {
+			return err
+		}
+		writer = ws[len(ws)-1]
+		otherWriters = append(otherWriters, ws...)
+		otherWriters = otherWriters[:len(ws)-1]
 	}
 	var firstAction, lastAction string
 	for _, doc := range docs {
@@ -362,29 +369,37 @@ func (w *walMergeDocs) WriteToShard(index *Index, shardID int64, batch *blugeind
 		case meta.ActionTypeUpdate:
 			if len(doc.actions) == 1 {
 				batch.Update(bdoc.ID(), bdoc)
+				otherBatch.Delete(bdoc.ID())
 			} else {
 				lastAction = doc.actions[len(doc.actions)-1]
 				switch lastAction {
 				case meta.ActionTypeInsert:
 					batch.Update(bdoc.ID(), bdoc)
+					otherBatch.Delete(bdoc.ID())
 				case meta.ActionTypeUpdate:
 					batch.Update(bdoc.ID(), bdoc)
+					otherBatch.Delete(bdoc.ID())
 				case meta.ActionTypeDelete:
 					batch.Delete(bdoc.ID())
+					otherBatch.Delete(bdoc.ID())
 				}
 			}
 		case meta.ActionTypeDelete:
 			if len(doc.actions) == 1 {
 				batch.Delete(bdoc.ID())
+				otherBatch.Delete(bdoc.ID())
 			} else {
 				lastAction = doc.actions[len(doc.actions)-1]
 				switch lastAction {
 				case meta.ActionTypeInsert:
 					batch.Update(bdoc.ID(), bdoc)
+					otherBatch.Delete(bdoc.ID())
 				case meta.ActionTypeUpdate:
 					batch.Update(bdoc.ID(), bdoc)
+					otherBatch.Delete(bdoc.ID())
 				case meta.ActionTypeDelete:
 					batch.Delete(bdoc.ID())
+					otherBatch.Delete(bdoc.ID())
 				}
 			}
 		default:
@@ -392,7 +407,15 @@ func (w *walMergeDocs) WriteToShard(index *Index, shardID int64, batch *blugeind
 		}
 	}
 
-	return writer.Batch(batch)
+	if err := writer.Batch(batch); err != nil {
+		return err
+	}
+	for _, writer := range otherWriters {
+		if err := writer.Batch(otherBatch); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (w *walMergeDocs) WriteToShardRollback(index *Index, shardID int64, batch *blugeindex.Batch) error {
@@ -405,7 +428,7 @@ func (w *walMergeDocs) WriteToShardRollback(index *Index, shardID int64, batch *
 	if shardID >= 0 {
 		writer, err = index.GetWriter(shardID)
 	} else {
-		writer, err = index.GetWriter() // get latest shard
+		return nil // no insert
 	}
 	if err != nil {
 		return err
