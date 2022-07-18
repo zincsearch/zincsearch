@@ -182,8 +182,8 @@ func (index *Index) UpdateMetadata() error {
 	}
 	// update docTime
 	s := index.Shards[index.GetLatestShardID()]
-	atomic.StoreInt64(&s.DocTimeMin, index.DocTimeMin)
-	atomic.StoreInt64(&s.DocTimeMax, index.DocTimeMax)
+	atomic.StoreInt64(&s.DocTimeMin, atomic.LoadInt64(&index.DocTimeMin))
+	atomic.StoreInt64(&s.DocTimeMax, atomic.LoadInt64(&index.DocTimeMax))
 
 	return metadata.Index.Set(index.Name, index.Index)
 }

@@ -48,10 +48,11 @@ func (index *Index) NewShard() error {
 	// update current shard
 	index.UpdateMetadataByShard(index.GetLatestShardID())
 	index.lock.Lock()
-	index.Shards[index.ShardNum-1].DocTimeMin = index.DocTimeMin
-	index.Shards[index.ShardNum-1].DocTimeMax = index.DocTimeMax
-	index.DocTimeMin = 0
-	index.DocTimeMax = 0
+	shard := index.Shards[index.ShardNum-1]
+	atomic.StoreInt64(&shard.DocTimeMin, atomic.LoadInt64(&index.DocTimeMin))
+	atomic.StoreInt64(&shard.DocTimeMax, atomic.LoadInt64(&index.DocTimeMax))
+	atomic.StoreInt64(&index.DocTimeMin, 0)
+	atomic.StoreInt64(&index.DocTimeMax, 0)
 	// create new shard
 	atomic.AddInt64(&index.ShardNum, 1)
 	index.Shards = append(index.Shards, &meta.IndexShard{ID: index.GetLatestShardID()})
