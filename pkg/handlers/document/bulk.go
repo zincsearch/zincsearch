@@ -69,13 +69,13 @@ func ESBulk(c *gin.Context) {
 
 	defer c.Request.Body.Close()
 
-	startTime := time.Now()
 	ret, err := BulkWorker(target, c.Request.Body)
-	ret.Took = int(time.Since(startTime) / time.Millisecond)
 	if err != nil {
 		ret.Error = err.Error()
 	}
 
+	startTime := time.Now()
+	ret.Took = int(time.Since(startTime) / time.Millisecond)
 	// update seqNo
 	atomic.AddInt64(&globalSeqNo, int64(ret.Count))
 
