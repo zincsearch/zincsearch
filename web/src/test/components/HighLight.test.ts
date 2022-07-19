@@ -1,13 +1,13 @@
 import { mount } from "@vue/test-utils";
-import About from "../../views/About.vue";
+import HighLight from "../../components/HighLight.vue";
 import store from "../../store";
 import { Quasar, Dialog, Notify } from "quasar";
 import { expect, it } from "vitest";
 import i18n from "../../locales";
 
 it("should mount component", async () => {
-  const wrapper = mount(About, {
-    shallow: true,
+  const wrapper = mount(HighLight, {
+    shallow: false,
     components: {
       Notify,
       Dialog,
@@ -16,9 +16,9 @@ it("should mount component", async () => {
       plugins: [Quasar, i18n, store],
     },
   });
-  expect(About).toBeTruthy();
+  expect(HighLight).toBeTruthy();
 
-  console.log("About is: ", wrapper.html());
+  console.log("HighLight is: ", wrapper.html());
 
-  // expect(wrapper.text()).toContain("About");
+  // expect(wrapper.text()).toContain("HighLight");
 });
