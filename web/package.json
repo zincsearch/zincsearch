@@ -12,7 +12,11 @@
     "lint-autofix": "eslint --ext .js,.vue,.ts ./src/ ./cypress/ --fix && stylelint **/*.vue --fix",
     "e2evite": "vite e2e",
     "e2e": "./node_modules/cypress/bin/cypress open",
-    "e2e-ci": "./node_modules/cypress/bin/cypress run --headless"
+    "e2e-ci": "./node_modules/cypress/bin/cypress run --headless",
+    "test": "vitest",
+    "test-ui": "vitest --ui",
+    "test-once": "vitest run",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@quasar/extras": "^1.14.3",
@@ -36,11 +40,15 @@
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "@typescript-eslint/parser": "^5.30.6",
     "@vitejs/plugin-vue": "^2.3.3",
+    "@vitest/ui": "^0.18.1",
+    "@vue/test-utils": "^2.0.2",
+    "c8": "^7.11.3",
     "cypress": "^10.3.0",
     "eslint": "^8.19.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^7.0.0",
+    "jsdom": "^20.0.0",
     "prettier": "^2.4.1",
     "sass": "^1.32.0",
     "sass-loader": "^13.0.2",
@@ -48,6 +56,7 @@
     "stylelint-config-recommended-vue": "^1.0.0",
     "typescript": "^4.7.4",
     "vite": "^2.9.14",
+    "vitest": "^0.18.1",
     "vue-tsc": "^0.38.5"
   }
 }
