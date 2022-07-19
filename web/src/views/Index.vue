@@ -139,6 +139,7 @@ export default defineComponent({
             shard_num: data.shard_num,
             storage_size: storage_size,
             storage_type: data.storage_type,
+            wal_size: data.wal_size,
             actions: {
               settings: data.settings,
               mappings: data.mappings,
