@@ -1,7 +1,7 @@
 import User from "../views/User.vue";
 import store from "../store";
 
-import { test, expect, describe } from "vitest";
+import { it, expect } from "vitest";
 import { mount } from "@vue/test-utils";
 import { Quasar, Notify, Dialog, useQuasar } from "quasar";
 import AddUpdateUser from "../components/user/AddUpdateUser.vue";
@@ -19,7 +19,7 @@ const wrapper = mount(User, {
   },
 });
 
-test("mount User", () => {
+it("mount User", () => {
   expect(User).toBeTruthy();
   // const wrapper = wrapperFactory();
 

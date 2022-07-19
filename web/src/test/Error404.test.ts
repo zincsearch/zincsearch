@@ -1,7 +1,7 @@
 import Error404 from "../views/Error404.vue";
 import store from "../store";
 
-import { test, expect, describe } from "vitest";
+import { it, expect } from "vitest";
 import { mount } from "@vue/test-utils";
 import { Quasar, QPage, QPageContainer } from "quasar";
 
@@ -13,8 +13,9 @@ const wrapper = mount(Error404, {
   },
 });
 
-test("mount Error404", () => {
+it("mount Error404", () => {
   expect(Error404).toBeTruthy();
 
-  console.log(wrapper.html());
+  expect(wrapper.html()).toContain("Oops");
+  expect(wrapper.html()).toContain("404");
 });
