@@ -33,23 +33,23 @@ import (
 // @Param   page_num  query  integer  false  "page num"
 // @Param   page_size  query  integer  false  "page size"
 // @Param   sort_by  query  string  false  "sort by"
-// @Param   descending  query  boolen  false  "descending"
-// @Param   filter  query  string  false  "filter"
+// @Param   desc  query  boolen  false  "desc"
+// @Param   name  query  string  false  "name"
 // @Produce json
 // @Success 200 {object} {list:[]core.Index, page: meta.Page}
 // @Router /api/index [get]
 func List(c *gin.Context) {
 	page := meta.NewPage(c)
 	sortBy := c.DefaultQuery("sort_by", "")
-	descending, _ := strconv.ParseBool(c.DefaultQuery("descending", "false"))
-	filter := c.DefaultQuery("filter", "")
+	desc, _ := strconv.ParseBool(c.DefaultQuery("desc", "false"))
+	name := c.DefaultQuery("name", "")
 
 	items := core.ZINC_INDEX_LIST.ListStat()
 
-	if len(filter) > 0 {
+	if len(name) > 0 {
 		var res []*core.Index
 		for _, item := range items {
-			if strings.Contains(item.Name, filter) {
+			if strings.Contains(item.Name, name) {
 				res = append(res, item)
 			}
 		}
@@ -57,46 +57,53 @@ func List(c *gin.Context) {
 	}
 
 	if len(sortBy) > 0 {
-		if sortBy == "name" {
+		switch sortBy {
+		case "doc_num":
 			sort.Slice(items, func(i, j int) bool {
-				if descending {
-					return items[i].GetName() > items[j].GetName()
-				} else {
-					return items[i].GetName() < items[j].GetName()
-				}
-			})
-		} else if sortBy == "doc_num" {
-			sort.Slice(items, func(i, j int) bool {
-				if descending {
+				if desc {
 					return items[i].DocNum > items[j].DocNum
 				} else {
 					return items[i].DocNum < items[j].DocNum
 				}
 			})
-		} else if sortBy == "shard_num" {
+			break
+		case "shard_num":
 			sort.Slice(items, func(i, j int) bool {
-				if descending {
+				if desc {
 					return items[i].ShardNum > items[j].ShardNum
 				} else {
 					return items[i].ShardNum < items[j].ShardNum
 				}
 			})
-		} else if sortBy == "storage_size" {
+			break
+		case "storage_size":
 			sort.Slice(items, func(i, j int) bool {
-				if descending {
+				if desc {
 					return items[i].StorageSize > items[j].StorageSize
 				} else {
 					return items[i].StorageSize < items[j].StorageSize
 				}
 			})
-		} else if sortBy == "storage_type" {
+			break
+		case "storage_type":
 			sort.Slice(items, func(i, j int) bool {
-				if descending {
+				if desc {
 					return items[i].StorageType > items[j].StorageType
 				} else {
 					return items[i].StorageType < items[j].StorageType
 				}
 			})
+			break
+		case "name":
+		default:
+			sort.Slice(items, func(i, j int) bool {
+				if desc {
+					return items[i].Name > items[j].Name
+				} else {
+					return items[i].Name < items[j].Name
+				}
+			})
+			break
 		}
 	}
 
