@@ -9,12 +9,17 @@ import i18n from "../locales";
 // const { t } = useI18n();
 // const store = useStore();
 
-// const wrapper = mount(About, {
-//   global: {
-//     plugins: [Quasar, i18n],
-//   },
-// });
+const wrapper = mount(About, {
+  shallow: true,
+  global: {
+    plugins: [Quasar, i18n, store],
+  },
+});
 
 it("should mount component", async () => {
   expect(About).toBeTruthy();
+
+  console.log("HTML is: ", wrapper.html());
+
+  // expect(wrapper.text()).toContain("About");
 });

@@ -1,28 +1,27 @@
-import { mount } from "@vue/test-utils";
 import User from "../views/User.vue";
-import { useI18n, createI18n } from "vue-i18n";
-import { useStore } from "vuex";
 import store from "../store";
-import { Quasar, Dialog, Notify, QLayout } from "quasar";
-import { expect, it } from "vitest";
+
+import { test, expect, describe } from "vitest";
+import { mount } from "@vue/test-utils";
+import { Quasar, Notify, Dialog, useQuasar } from "quasar";
+import AddUpdateUser from "../components/user/AddUpdateUser.vue";
+
 import i18n from "../locales";
-// const { t } = useI18n();
-// const store = useStore();
+// import { useI18n } from "vue-i18n";
 
-// const wrapper = mount(About, {
-//   global: {
-//     plugins: [Quasar, i18n],
-//   },
-// });
+const wrapper = mount(User, {
+  shallow: true,
+  components: {
+    AddUpdateUser,
+  },
+  global: {
+    plugins: [Quasar, i18n, store],
+  },
+});
 
-it("should mount component", async () => {
+test("mount User", () => {
   expect(User).toBeTruthy();
+  // const wrapper = wrapperFactory();
 
-  // const wrapper = mount(User, {
-  //   global: {
-  //     plugins: [Quasar, i18n],
-  //   },
-  // });
-
-  // expect(wrapper.find("h1").text()).toBe("User");
+  console.log(wrapper.html());
 });
