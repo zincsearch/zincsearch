@@ -35,7 +35,7 @@ func TestNewPage(t *testing.T) {
 				pageSize: "0",
 			},
 			want: &Page{
-				PageNum:  1,
+				PageNum:  0,
 				PageSize: 0,
 			},
 		},
@@ -71,7 +71,7 @@ func TestPage_GetStartEndIndex(t *testing.T) {
 		{
 			name: "normal",
 			fields: fields{
-				PageNum:  1,
+				PageNum:  0,
 				PageSize: 10,
 				Total:    10,
 			},
@@ -81,7 +81,7 @@ func TestPage_GetStartEndIndex(t *testing.T) {
 		{
 			name: "zero page size",
 			fields: fields{
-				PageNum:  1,
+				PageNum:  0,
 				PageSize: 0,
 				Total:    10,
 			},
@@ -105,13 +105,13 @@ func TestPage_GetStartEndIndex(t *testing.T) {
 				PageSize: 10,
 				Total:    10,
 			},
-			wantStartIndex: 0,
-			wantEndIndex:   0,
+			wantStartIndex: 10,
+			wantEndIndex:   10,
 		},
 		{
 			name: "over total",
 			fields: fields{
-				PageNum:  4,
+				PageNum:  3,
 				PageSize: 5,
 				Total:    18,
 			},
