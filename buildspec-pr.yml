@@ -30,6 +30,7 @@ phases:
       - cd web
       - npm install
       - ./eslint.sh
+      - ./uitest.sh
       - npm run build
       - cd ..
       - echo "golangci-lint ..."
