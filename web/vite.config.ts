@@ -13,6 +13,9 @@ export default defineConfig({
     __INTLIFY_PROD_DEVTOOLS__: false,
   },
   test: {
+    coverage: {
+      reporter: ["text", "json", "html"],
+    },
     environment: "jsdom",
     globals: true,
     // ...
