@@ -8,7 +8,7 @@ import { Quasar } from "quasar";
 import i18n from "../../locales";
 import AddUpdateUser from "../../components/user/AddUpdateUser.vue";
 
-it("mount User", async () => {
+it("should mount User view", async () => {
   const wrapper = mount(User, {
     shallow: true,
     components: {
@@ -19,7 +19,6 @@ it("mount User", async () => {
     },
   });
   expect(User).toBeTruthy();
-  // const wrapper = wrapperFactory();
 
-  console.log("User is", wrapper.html());
+  // console.log("User is", wrapper.html());
 });

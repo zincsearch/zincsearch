@@ -9,7 +9,7 @@ import store from "../../store";
 
 const router = useRouter();
 
-it("mount Login", async () => {
+it("should mount Login view", async () => {
   const wrapper = mount(Login, {
     shallow: true,
     components: {
@@ -23,5 +23,5 @@ it("mount Login", async () => {
   expect(Login).toBeTruthy();
   // const wrapper = wrapperFactory();
 
-  console.log("Login is", wrapper.html());
+  // console.log("Login is", wrapper.html());
 });

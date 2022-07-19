@@ -5,7 +5,7 @@ import { Quasar, Dialog, Notify } from "quasar";
 import { expect, it } from "vitest";
 import i18n from "../../locales";
 
-it("should mount component", async () => {
+it("should mount MenuLink component", async () => {
   const wrapper = mount(MenuLink, {
     shallow: false,
     components: {

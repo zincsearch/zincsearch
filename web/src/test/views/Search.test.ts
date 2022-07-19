@@ -6,7 +6,7 @@ import i18n from "../../locales";
 import Search from "../../views/Search.vue";
 import store from "../../store";
 
-it("mount Search", async () => {
+it("should mount Search view", async () => {
   const wrapper = mount(Search, {
     shallow: true,
     global: {
@@ -15,5 +15,5 @@ it("mount Search", async () => {
   });
   expect(Search).toBeTruthy();
 
-  console.log("Search is", wrapper.html());
+  // console.log("Search is", wrapper.html());
 });

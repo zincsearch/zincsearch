@@ -6,9 +6,9 @@ import Error404 from "../../views/Error404.vue";
 import store from "../../store";
 import i18n from "../../locales";
 
-it("mount Error404", async () => {
+it("should mount Error404 view", async () => {
   const wrapper = mount(Error404, {
-    shallow: true,
+    shallow: false,
     components: {
       Notify,
       Dialog,

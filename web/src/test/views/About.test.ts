@@ -5,7 +5,7 @@ import { Quasar, Dialog, Notify } from "quasar";
 import { expect, it } from "vitest";
 import i18n from "../../locales";
 
-it("should mount component", async () => {
+it("should mount About view", async () => {
   const wrapper = mount(About, {
     shallow: true,
     components: {
@@ -18,7 +18,7 @@ it("should mount component", async () => {
   });
   expect(About).toBeTruthy();
 
-  console.log("About is: ", wrapper.html());
+  // console.log("About is: ", wrapper.html());
 
   // expect(wrapper.text()).toContain("About");
 });

@@ -8,7 +8,7 @@ import PreviewTemplate from "../../components/template/PreviewTemplate.vue";
 import Template from "../../views/Template.vue";
 import store from "../../store";
 
-it("mount Template", async () => {
+it("should mount Template view", async () => {
   const wrapper = mount(Template, {
     shallow: true,
     components: {
@@ -22,5 +22,5 @@ it("mount Template", async () => {
   });
   expect(Template).toBeTruthy();
 
-  console.log("Template is", wrapper.html());
+  // console.log("Template is", wrapper.html());
 });

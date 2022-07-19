@@ -7,7 +7,7 @@ import i18n from "../../locales";
 import AddUpdateIndex from "../../components/index/AddUpdateIndex.vue";
 import PreviewIndex from "../../components/index/PreviewIndex.vue";
 
-it("should mount component", async () => {
+it("should mount Index view", async () => {
   const wrapper = mount(Index, {
     shallow: true,
     components: {
@@ -22,7 +22,7 @@ it("should mount component", async () => {
   });
   expect(Index).toBeTruthy();
 
-  console.log("Index is: ", wrapper.html());
+  // console.log("Index is: ", wrapper.html());
 
   // expect(wrapper.text()).toContain("Index");
 });

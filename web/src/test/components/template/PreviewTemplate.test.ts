@@ -5,7 +5,7 @@ import { Quasar, Dialog, Notify } from "quasar";
 import { expect, it } from "vitest";
 import i18n from "../../../locales";
 
-it("should mount component", async () => {
+it("should mount PreviewTemplate component", async () => {
   const wrapper = mount(PreviewTemplate, {
     shallow: false,
     components: {
