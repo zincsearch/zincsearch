@@ -40,7 +40,7 @@ import (
 // @Router /api/index [get]
 func List(c *gin.Context) {
 	page := meta.NewPage(c)
-	sortBy := c.DefaultQuery("sort_by", "")
+	sortBy := c.DefaultQuery("sort_by", "name")
 	desc, _ := strconv.ParseBool(c.DefaultQuery("desc", "false"))
 	name := c.DefaultQuery("name", "")
 
@@ -56,65 +56,63 @@ func List(c *gin.Context) {
 		items = res
 	}
 
-	if len(sortBy) > 0 {
-		switch sortBy {
-		case "doc_num":
-			sort.Slice(items, func(i, j int) bool {
-				if desc {
-					return items[i].DocNum > items[j].DocNum
-				} else {
-					return items[i].DocNum < items[j].DocNum
-				}
-			})
-		case "shard_num":
-			sort.Slice(items, func(i, j int) bool {
-				if desc {
-					return items[i].ShardNum > items[j].ShardNum
-				} else {
-					return items[i].ShardNum < items[j].ShardNum
-				}
-			})
-		case "storage_size":
-			sort.Slice(items, func(i, j int) bool {
-				if desc {
-					return items[i].StorageSize > items[j].StorageSize
-				} else {
-					return items[i].StorageSize < items[j].StorageSize
-				}
-			})
-		case "storage_type":
-			sort.Slice(items, func(i, j int) bool {
-				if desc {
-					return items[i].StorageType > items[j].StorageType
-				} else {
-					return items[i].StorageType < items[j].StorageType
-				}
-			})
-		case "wal_size":
-			sort.Slice(items, func(i, j int) bool {
-				if desc {
-					return items[i].WALSize > items[j].WALSize
-				} else {
-					return items[i].WALSize < items[j].WALSize
-				}
-			})
-		case "name":
-			sort.Slice(items, func(i, j int) bool {
-				if desc {
-					return items[i].GetName() > items[j].GetName()
-				} else {
-					return items[i].GetName() < items[j].GetName()
-				}
-			})
-		default:
-			sort.Slice(items, func(i, j int) bool {
-				if desc {
-					return items[i].GetName() > items[j].GetName()
-				} else {
-					return items[i].GetName() < items[j].GetName()
-				}
-			})
-		}
+	switch sortBy {
+	case "doc_num":
+		sort.Slice(items, func(i, j int) bool {
+			if desc {
+				return items[i].DocNum > items[j].DocNum
+			} else {
+				return items[i].DocNum < items[j].DocNum
+			}
+		})
+	case "shard_num":
+		sort.Slice(items, func(i, j int) bool {
+			if desc {
+				return items[i].ShardNum > items[j].ShardNum
+			} else {
+				return items[i].ShardNum < items[j].ShardNum
+			}
+		})
+	case "storage_size":
+		sort.Slice(items, func(i, j int) bool {
+			if desc {
+				return items[i].StorageSize > items[j].StorageSize
+			} else {
+				return items[i].StorageSize < items[j].StorageSize
+			}
+		})
+	case "storage_type":
+		sort.Slice(items, func(i, j int) bool {
+			if desc {
+				return items[i].StorageType > items[j].StorageType
+			} else {
+				return items[i].StorageType < items[j].StorageType
+			}
+		})
+	case "wal_size":
+		sort.Slice(items, func(i, j int) bool {
+			if desc {
+				return items[i].WALSize > items[j].WALSize
+			} else {
+				return items[i].WALSize < items[j].WALSize
+			}
+		})
+	case "name":
+		sort.Slice(items, func(i, j int) bool {
+			if desc {
+				return items[i].GetName() > items[j].GetName()
+			} else {
+				return items[i].GetName() < items[j].GetName()
+			}
+		})
+	default:
+		sort.Slice(items, func(i, j int) bool {
+			if desc {
+				return items[i].GetName() > items[j].GetName()
+			} else {
+				return items[i].GetName() < items[j].GetName()
+			}
+		})
 	}
 
 	page.Total = int64(len(items))
