@@ -226,13 +226,6 @@ export default defineComponent({
         sortable: true,
       },
       {
-        name: "wal_size",
-        field: (row) => row.wal_size,
-        label: "WAL_SIZE",
-        align: "left",
-        sortable: true,
-      },
-      {
         name: "actions",
         field: (row) => row.actions,
         label: "ACTIONS",
