@@ -31,8 +31,8 @@ type Index struct {
 	meta.Index
 	Analyzers map[string]*analysis.Analyzer `json:"-"`
 	lock      sync.RWMutex                  `json:"-"`
+	open      uint32                        `json:"-"`
 	close     chan struct{}                 `json:"-"`
-	closed    bool                          `json:"-"`
 }
 
 func (index *Index) MarshalJSON() ([]byte, error) {
@@ -182,8 +182,8 @@ func (index *Index) UpdateMetadata() error {
 	}
 	// update docTime
 	s := index.Shards[index.GetLatestShardID()]
-	atomic.StoreInt64(&s.DocTimeMin, index.DocTimeMin)
-	atomic.StoreInt64(&s.DocTimeMax, index.DocTimeMax)
+	atomic.StoreInt64(&s.DocTimeMin, atomic.LoadInt64(&index.DocTimeMin))
+	atomic.StoreInt64(&s.DocTimeMax, atomic.LoadInt64(&index.DocTimeMax))
 
 	return metadata.Index.Set(index.Name, index.Index)
 }
@@ -227,21 +227,15 @@ func (index *Index) Reopen() error {
 	if _, err := index.GetWriter(); err != nil {
 		return err
 	}
-	index.closed = false
 	return nil
 }
 
 func (index *Index) Close() error {
-	// update metadata before close
-	// if err = index.UpdateMetadata(); err != nil {
-	// 	return err
-	// }
-
-	if index.closed {
+	if atomic.LoadUint32(&index.open) == 0 {
 		return nil
 	}
 	index.close <- struct{}{}
-	index.closed = true
+	atomic.StoreUint32(&index.open, 0)
 
 	index.lock.Lock()
 	defer index.lock.Unlock()

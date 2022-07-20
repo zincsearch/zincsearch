@@ -141,7 +141,7 @@ func TestApiES(t *testing.T) {
 			t.Run("create document with exist indexName not exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
-				resp := request("PUT", "/es/"+indexName+"/_doc/notexist", body)
+				resp := request("PUT", "/es/"+indexName+"/_doc/notexist1", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
 			})
 			t.Run("update document with exist indexName and exist id", func(t *testing.T) {
@@ -164,8 +164,8 @@ func TestApiES(t *testing.T) {
 				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
 			t.Run("delete document with exist indexName not exist id", func(t *testing.T) {
-				resp := request("DELETE", "/es/"+indexName+"/_doc/notexist", nil)
-				assert.Equal(t, http.StatusOK, resp.Code)
+				resp := request("DELETE", "/es/"+indexName+"/_doc/notexist2", nil)
+				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
 			t.Run("delete document with exist indexName and exist id", func(t *testing.T) {
 				// wait for WAL write to index

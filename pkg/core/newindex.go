@@ -60,14 +60,10 @@ func NewIndex(name, storageType string) (*Index, error) {
 	index.StorageType = storageType
 	index.ShardNum = 1
 	index.CreateAt = time.Now()
+	index.close = make(chan struct{})
 
 	// use template
 	if err := index.UseTemplate(); err != nil {
-		return nil, err
-	}
-
-	// load WAL
-	if err := index.OpenWAL(); err != nil {
 		return nil, err
 	}
 

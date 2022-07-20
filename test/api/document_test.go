@@ -85,7 +85,7 @@ func TestDocument(t *testing.T) {
 		t.Run("create document with exist indexName not exist id", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(indexData)
-			resp := request("PUT", "/api/"+indexName+"/_doc/notexist", body)
+			resp := request("PUT", "/api/"+indexName+"/_doc/notexist1", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 		})
 		t.Run("update document with exist indexName and exist id", func(t *testing.T) {
@@ -100,6 +100,8 @@ func TestDocument(t *testing.T) {
 			resp := request("PUT", "/api/"+indexName+"/_doc/1111", body)
 			assert.Equal(t, http.StatusBadRequest, resp.Code)
 		})
+		// wait for WAL write to index
+		time.Sleep(time.Second)
 	})
 
 	t.Run("DELETE /api/:target/_doc/:id", func(t *testing.T) {
@@ -108,12 +110,10 @@ func TestDocument(t *testing.T) {
 			assert.Equal(t, http.StatusBadRequest, resp.Code)
 		})
 		t.Run("delete document with exist indexName not exist id", func(t *testing.T) {
-			resp := request("DELETE", "/api/"+indexName+"/_doc/notexist", nil)
+			resp := request("DELETE", "/api/"+indexName+"/_doc/notexist2", nil)
 			assert.Equal(t, http.StatusBadRequest, resp.Code)
 		})
 		t.Run("delete document with exist indexName and exist id", func(t *testing.T) {
-			// wait for WAL write to index
-			time.Sleep(time.Second)
 			resp := request("DELETE", "/api/"+indexName+"/_doc/1111", nil)
 			assert.Equal(t, http.StatusOK, resp.Code)
 		})

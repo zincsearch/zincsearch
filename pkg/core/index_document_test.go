@@ -77,6 +77,18 @@ func TestIndex_CreateUpdateDocument(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "Document with error date format",
+			args: args{
+				docID: "test1",
+				doc: map[string]interface{}{
+					"name":       "Hello",
+					"@timestamp": "2020-01-01T00:00:00Z8",
+				},
+				update: true,
+			},
+			wantErr: true,
+		},
 	}
 
 	indexName := "TestDocument.index_1"
@@ -194,6 +206,66 @@ func TestIndex_UpdateDocument(t *testing.T) {
 
 	t.Run("cleanup", func(t *testing.T) {
 		err = DeleteIndex("TestIndex_UpdateDocument.index_1")
+		assert.NoError(t, err)
+	})
+}
+
+func TestIndex_DeleteDocument(t *testing.T) {
+	type args struct {
+		docID string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "normal",
+			args: args{
+				docID: "1",
+			},
+		},
+		{
+			name: "normal",
+			args: args{
+				docID: "2",
+			},
+			wantErr: true,
+		},
+	}
+	indexName := "TestIndex_DeleteDocument.index_1"
+	var index *Index
+	var err error
+	t.Run("prepare", func(t *testing.T) {
+		index, err = NewIndex(indexName, "disk")
+		assert.NoError(t, err)
+		assert.NotNil(t, index)
+		err = StoreIndex(index)
+		assert.NoError(t, err)
+
+		err = index.CreateDocument("1", map[string]interface{}{
+			"name": "Hello",
+			"time": float64(1579098983),
+		}, false)
+		assert.NoError(t, err)
+
+		// wait for WAL write to index
+		time.Sleep(time.Second)
+	})
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := index.DeleteDocument(tt.args.docID)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+		})
+	}
+
+	t.Run("cleanup", func(t *testing.T) {
+		err = DeleteIndex(indexName)
 		assert.NoError(t, err)
 	})
 }

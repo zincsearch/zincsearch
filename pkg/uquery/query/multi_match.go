@@ -93,7 +93,7 @@ func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, anal
 
 	subq := bluge.NewBooleanQuery()
 	if value.MinimumShouldMatch > 0 {
-		subq.SetMinShould(int(value.MinimumShouldMatch))
+		subq.SetMinShould(int(value.MinimumShouldMatch)) // lgtm[go/hardcoded-credentials]
 	}
 	if value.Boost >= 0 {
 		subq.SetBoost(value.Boost)

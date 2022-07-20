@@ -129,10 +129,13 @@ func (t *IndexList) List() []*Index {
 func (t *IndexList) ListStat() []*Index {
 	items := t.List()
 	for _, index := range items {
+		size := uint64(0)
 		index.lock.Lock()
-		size, _ := index.WAL.Len()
-		if size == 1 {
-			size = 0
+		if index.WAL != nil {
+			size, _ = index.WAL.Len()
+			if size == 1 {
+				size = 0
+			}
 		}
 		index.WALSize = size
 		index.lock.Unlock()

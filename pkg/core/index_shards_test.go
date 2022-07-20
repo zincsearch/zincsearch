@@ -20,11 +20,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/zinclabs/zinc/pkg/config"
 )
 
-func TestIndex_CheckShards(t *testing.T) {
+func TestIndex_Shards(t *testing.T) {
 	type args struct {
 		docID string
 		doc   map[string]interface{}
@@ -61,9 +59,7 @@ func TestIndex_CheckShards(t *testing.T) {
 	var index *Index
 	var err error
 	t.Run("perpare", func(t *testing.T) {
-		config.Global.Shard.MaxSize = 1024
-
-		index, err = NewIndex("TestIndex_CheckShards.index_1", "disk")
+		index, err = NewIndex("TestIndex_Shards.index_1", "disk")
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 
@@ -75,6 +71,13 @@ func TestIndex_CheckShards(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := index.CreateDocument(tt.args.docID, tt.args.doc, false)
 			assert.NoError(t, err)
+
+			// wait for WAL write to index
+			time.Sleep(time.Second)
+
+			if err := index.NewShard(); (err != nil) != tt.wantErr {
+				t.Errorf("Index.NewShard() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
 			if err := index.CheckShards(); (err != nil) != tt.wantErr {
 				t.Errorf("Index.CheckShards() error = %v, wantErr %v", err, tt.wantErr)

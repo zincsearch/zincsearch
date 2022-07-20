@@ -92,16 +92,16 @@ func TestDelete(t *testing.T) {
 		params := map[string]string{
 			"target": indexName,
 		}
-		for i := 0; i < 3; i++ {
-			c, w := utils.NewGinContext()
-			utils.SetGinRequestData(c, data)
-			utils.SetGinRequestParams(c, params)
-			CreateUpdate(c)
-			assert.Equal(t, http.StatusOK, w.Code)
-			assert.Contains(t, w.Body.String(), `"id":"1"`)
-		}
+
+		c, w := utils.NewGinContext()
+		utils.SetGinRequestData(c, data)
+		utils.SetGinRequestParams(c, params)
+		CreateUpdate(c)
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Contains(t, w.Body.String(), `"id":"1"`)
+
 		// wait for WAL write to index
-		time.Sleep(time.Second * 3)
+		time.Sleep(time.Second)
 	})
 
 	for _, tt := range tests {
