@@ -95,6 +95,7 @@ func List(c *gin.Context) {
 			})
 			break
 		case "name":
+			// The name is the default sort
 		default:
 			sort.Slice(items, func(i, j int) bool {
 				if desc {
