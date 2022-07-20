@@ -46,6 +46,8 @@ func LoadZincIndexesFromMetadata() error {
 		index.Mappings = indexes[i].Mappings
 		index.CreateAt = indexes[i].CreateAt
 		index.UpdateAt = indexes[i].UpdateAt
+		index.close = make(chan struct{})
+
 		log.Info().Msgf("Loading  index... [%s:%s] shards[%d]", index.Name, index.StorageType, index.ShardNum)
 
 		// upgrade from version <= 0.2.4
@@ -68,11 +70,6 @@ func LoadZincIndexesFromMetadata() error {
 			if err != nil {
 				return errors.New(errors.ErrorTypeRuntimeException, "parse stored analysis error").Cause(err)
 			}
-		}
-
-		// load WAL
-		if err := index.OpenWAL(); err != nil {
-			return err
 		}
 
 		// load in memory

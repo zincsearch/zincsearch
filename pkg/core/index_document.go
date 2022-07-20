@@ -308,7 +308,16 @@ func (index *Index) checkField(mappings *meta.Mappings, data map[string]interfac
 
 // CreateDocument inserts or updates a document in the zinc index
 func (index *Index) CreateDocument(docID string, doc map[string]interface{}, update bool) error {
-	data, err := index.CheckDocument(docID, doc, update, index.GetLatestShardID())
+	// check WAL
+	if err := index.OpenWAL(); err != nil {
+		return err
+	}
+
+	shardID := index.GetLatestShardID()
+	if update {
+		shardID = -1
+	}
+	data, err := index.CheckDocument(docID, doc, update, shardID)
 	if err != nil {
 		return err
 	}
@@ -318,6 +327,11 @@ func (index *Index) CreateDocument(docID string, doc map[string]interface{}, upd
 
 // UpdateDocument updates a document in the zinc index
 func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, insert bool) error {
+	// check WAL
+	if err := index.OpenWAL(); err != nil {
+		return err
+	}
+
 	update := true
 	shardID, err := index.FindShardByDocID(docID)
 	if err != nil {
@@ -338,6 +352,11 @@ func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, ins
 
 // DeleteDocument deletes a document in the zinc index
 func (index *Index) DeleteDocument(docID string) error {
+	// check WAL
+	if err := index.OpenWAL(); err != nil {
+		return err
+	}
+
 	shardID, err := index.FindShardByDocID(docID)
 	if err != nil {
 		return err
