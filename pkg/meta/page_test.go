@@ -40,7 +40,7 @@ func TestNewPage(t *testing.T) {
 			},
 		},
 		{
-			name: "page num zero",
+			name: "page num zero 1",
 			args: args{
 				pageNum:  "0",
 				pageSize: "0",
@@ -48,6 +48,17 @@ func TestNewPage(t *testing.T) {
 			want: &Page{
 				PageNum:  1,
 				PageSize: 0,
+			},
+		},
+		{
+			name: "page num zero 2",
+			args: args{
+				pageNum:  "0",
+				pageSize: "10",
+			},
+			want: &Page{
+				PageNum:  1,
+				PageSize: 10,
 			},
 		},
 	}
