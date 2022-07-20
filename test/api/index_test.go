@@ -23,6 +23,8 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func TestIndex(t *testing.T) {
@@ -53,10 +55,13 @@ func TestIndex(t *testing.T) {
 			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// data := make(map[string]interface{})
-			data := []interface{}{}
+			data := struct {
+				List []interface{} `json:"list"`
+				Page meta.Page     `json:"page"`
+			}{}
 			err := json.Unmarshal(resp.Body.Bytes(), &data)
 			assert.NoError(t, err)
-			assert.GreaterOrEqual(t, len(data), 1)
+			assert.GreaterOrEqual(t, len(data.List), 1)
 		})
 
 		t.Run("DELETE /api/index/:indexName", func(t *testing.T) {

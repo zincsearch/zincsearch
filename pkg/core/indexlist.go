@@ -140,11 +140,6 @@ func (t *IndexList) ListStat() []*Index {
 		index.WALSize = size
 		index.lock.Unlock()
 	}
-
-	sort.Slice(items, func(i, j int) bool {
-		return items[i].GetName() < items[j].GetName()
-	})
-
 	return items
 }
 

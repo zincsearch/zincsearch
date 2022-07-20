@@ -2,15 +2,16 @@
   <q-page class="q-pa-md">
     <q-table
       v-model:selected="selectedIndexes"
+      v-model:pagination="pagination"
       :title="t('index.header')"
       :rows="indexes"
       :columns="resultColumns"
       row-key="name"
-      :pagination="pagination"
       selection="multiple"
       :loading="loading"
       :filter="filterQuery"
-      :filter-method="filterData"
+      :rows-per-page-options="rowsPerPageOptions"
+      @request="onRequest"
     >
       <template #top-right>
         <q-input
@@ -122,32 +123,61 @@ export default defineComponent({
     const { t } = useI18n();
     const loading = ref(false);
     const selectedIndexes = ref([]);
+    const filterQuery = ref("");
     const indexes = ref([]);
+    const rowsPerPageOptions = ref([5, 10, 20, 50, 100, 500, 1000]);
+    const pagination = ref({
+      rowsPerPage: 20,
+      sortBy: "name",
+      descending: false,
+      page: 1,
+      rowsNumber: 0,
+    });
+    const onRequest = (props) => {
+      const { page, rowsPerPage, sortBy, descending } = props.pagination;
+      pagination.value.page = page;
+      pagination.value.rowsPerPage = rowsPerPage;
+      pagination.value.sortBy = sortBy;
+      pagination.value.descending = descending;
+      getIndexes();
+    };
     const getIndexes = () => {
       loading.value = true;
-      indexService.list().then((res) => {
-        var counter = 1;
-        indexes.value = res.data.map((data) => {
-          let storage_size = (data.storage_size / 1024).toFixed(2) + " KB";
-          if (data.storage_size > 1024 * 1024) {
-            storage_size = (data.storage_size / 1024 / 1024).toFixed(2) + " MB";
-          }
-          return {
-            no: counter++,
-            name: data.name,
-            doc_num: data.doc_num,
-            shard_num: data.shard_num,
-            storage_size: storage_size,
-            storage_type: data.storage_type,
-            wal_size: data.wal_size,
-            actions: {
-              settings: data.settings,
-              mappings: data.mappings,
-            },
-          };
+      let page_num = pagination.value.page;
+      let page_size = pagination.value.rowsPerPage;
+      indexService
+        .list(
+          page_num,
+          page_size,
+          pagination.value.sortBy,
+          pagination.value.descending,
+          filterQuery.value
+        )
+        .then((res) => {
+          var counter = 1;
+          pagination.value.rowsNumber = res.data.page.total;
+          indexes.value = res.data.list.map((data) => {
+            let storage_size = (data.storage_size / 1024).toFixed(2) + " KB";
+            if (data.storage_size > 1024 * 1024) {
+              storage_size =
+                (data.storage_size / 1024 / 1024).toFixed(2) + " MB";
+            }
+            return {
+              no: counter++,
+              name: data.name,
+              doc_num: data.doc_num,
+              shard_num: data.shard_num,
+              storage_size: storage_size,
+              storage_type: data.storage_type,
+              wal_size: data.wal_size,
+              actions: {
+                settings: data.settings,
+                mappings: data.mappings,
+              },
+            };
+          });
+          loading.value = false;
         });
-        loading.value = false;
-      });
     };
 
     getIndexes();
@@ -265,7 +295,9 @@ export default defineComponent({
         html: true,
       }).onOk(() => {
         const indexNames = selectedIndexes.value.map((r) => r.name).join(",");
+        loading.value = true;
         indexService.delete(indexNames).then((res) => {
+          loading.value = false;
           selectedIndexes.value = [];
           nextTick(getIndexes);
         });
@@ -282,20 +314,10 @@ export default defineComponent({
       selectedIndexes,
       deleteSelectedIndexes,
       indexes,
-      pagination: {
-        rowsPerPage: 20,
-      },
-      filterQuery: ref(""),
-      filterData(rows, terms) {
-        var filtered = [];
-        terms = terms.toLowerCase();
-        for (var i = 0; i < rows.length; i++) {
-          if (rows[i]["name"].toLowerCase().includes(terms)) {
-            filtered.push(rows[i]);
-          }
-        }
-        return filtered;
-      },
+      rowsPerPageOptions,
+      pagination,
+      onRequest,
+      filterQuery,
       addIndex,
       deleteIndex,
       previewIndex,
