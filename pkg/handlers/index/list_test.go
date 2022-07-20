@@ -16,10 +16,10 @@
 package index
 
 import (
-	"encoding/json"
 	"net/http"
 	"testing"
 
+	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zinclabs/zinc/pkg/core"
