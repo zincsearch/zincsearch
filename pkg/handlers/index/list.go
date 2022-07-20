@@ -66,7 +66,6 @@ func List(c *gin.Context) {
 					return items[i].DocNum < items[j].DocNum
 				}
 			})
-			break
 		case "shard_num":
 			sort.Slice(items, func(i, j int) bool {
 				if desc {
@@ -75,7 +74,6 @@ func List(c *gin.Context) {
 					return items[i].ShardNum < items[j].ShardNum
 				}
 			})
-			break
 		case "storage_size":
 			sort.Slice(items, func(i, j int) bool {
 				if desc {
@@ -84,7 +82,6 @@ func List(c *gin.Context) {
 					return items[i].StorageSize < items[j].StorageSize
 				}
 			})
-			break
 		case "storage_type":
 			sort.Slice(items, func(i, j int) bool {
 				if desc {
@@ -93,9 +90,14 @@ func List(c *gin.Context) {
 					return items[i].StorageType < items[j].StorageType
 				}
 			})
-			break
 		case "name":
-			// The name is the default sort
+			sort.Slice(items, func(i, j int) bool {
+				if desc {
+					return items[i].GetName() > items[j].GetName()
+				} else {
+					return items[i].GetName() < items[j].GetName()
+				}
+			})
 		default:
 			sort.Slice(items, func(i, j int) bool {
 				if desc {
@@ -104,7 +106,6 @@ func List(c *gin.Context) {
 					return items[i].GetName() < items[j].GetName()
 				}
 			})
-			break
 		}
 	}
 
