@@ -98,13 +98,7 @@ func List(c *gin.Context) {
 			}
 		})
 	case "name":
-		sort.Slice(items, func(i, j int) bool {
-			if desc {
-				return items[i].GetName() > items[j].GetName()
-			} else {
-				return items[i].GetName() < items[j].GetName()
-			}
-		})
+		fallthrough
 	default:
 		sort.Slice(items, func(i, j int) bool {
 			if desc {
