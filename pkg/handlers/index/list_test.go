@@ -39,17 +39,17 @@ func TestList(t *testing.T) {
 
 	t.Run("list", func(t *testing.T) {
 		sort_by := []string{"name", "doc_num", "shard_num", "storage_size", "storage_type"}
-		descending := []string{"false", "true"}
+		descArr := []string{"false", "true"}
 		for _, s := range sort_by {
-			for _, d := range descending {
+			for _, d := range descArr {
 
 				c, w := utils.NewGinContext()
 				params := map[string]string{
-					"page_num":   "0",
-					"page_size":  "20",
-					"sort_by":    s,
-					"descending": d,
-					"filter":     "TestIndexList.index_1",
+					"page_num":  "1",
+					"page_size": "20",
+					"sort_by":   s,
+					"desc":      d,
+					"name":      "TestIndexList.index_1",
 				}
 				utils.SetGinRequestURL(c, "/api/index", params)
 				List(c)
@@ -67,7 +67,7 @@ func TestList(t *testing.T) {
 				assert.Equal(t, len(resp.List), 1)
 				assert.Equal(t, resp.List[0].Name, "TestIndexList.index_1")
 				assert.Equal(t, resp.Page.PageSize, int64(20))
-				assert.Equal(t, resp.Page.PageNum, int64(0))
+				assert.Equal(t, resp.Page.PageNum, int64(1))
 				assert.Equal(t, resp.Page.Total, int64(1))
 				assert.Equal(t, len(resp.List), 1)
 			}

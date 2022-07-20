@@ -143,7 +143,7 @@ export default defineComponent({
     };
     const getIndexes = () => {
       loading.value = true;
-      let page_num = pagination.value.page - 1;
+      let page_num = pagination.value.page;
       let page_size = pagination.value.rowsPerPage;
       indexService
         .list(

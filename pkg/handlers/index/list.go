@@ -49,7 +49,7 @@ func List(c *gin.Context) {
 	if len(name) > 0 {
 		var res []*core.Index
 		for _, item := range items {
-			if strings.Contains(item.Name, name) {
+			if strings.Contains(item.GetName(), name) {
 				res = append(res, item)
 			}
 		}
@@ -98,9 +98,9 @@ func List(c *gin.Context) {
 		default:
 			sort.Slice(items, func(i, j int) bool {
 				if desc {
-					return items[i].Name > items[j].Name
+					return items[i].GetName() > items[j].GetName()
 				} else {
-					return items[i].Name < items[j].Name
+					return items[i].GetName() < items[j].GetName()
 				}
 			})
 			break

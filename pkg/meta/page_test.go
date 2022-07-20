@@ -29,13 +29,24 @@ func TestNewPage(t *testing.T) {
 			},
 		},
 		{
-			name: "zero",
+			name: "page size zero",
+			args: args{
+				pageNum:  "1",
+				pageSize: "0",
+			},
+			want: &Page{
+				PageNum:  1,
+				PageSize: 0,
+			},
+		},
+		{
+			name: "page num zero",
 			args: args{
 				pageNum:  "0",
 				pageSize: "0",
 			},
 			want: &Page{
-				PageNum:  0,
+				PageNum:  1,
 				PageSize: 0,
 			},
 		},
@@ -71,7 +82,7 @@ func TestPage_GetStartEndIndex(t *testing.T) {
 		{
 			name: "normal",
 			fields: fields{
-				PageNum:  0,
+				PageNum:  1,
 				PageSize: 10,
 				Total:    10,
 			},
@@ -79,9 +90,39 @@ func TestPage_GetStartEndIndex(t *testing.T) {
 			wantEndIndex:   10,
 		},
 		{
-			name: "zero page size",
+			name: "normal2",
 			fields: fields{
-				PageNum:  0,
+				PageNum:  1,
+				PageSize: 10,
+				Total:    30,
+			},
+			wantStartIndex: 0,
+			wantEndIndex:   10,
+		},
+		{
+			name: "normal3",
+			fields: fields{
+				PageNum:  4,
+				PageSize: 10,
+				Total:    30,
+			},
+			wantStartIndex: 30,
+			wantEndIndex:   30,
+		},
+		{
+			name: "normal4",
+			fields: fields{
+				PageNum:  4,
+				PageSize: 10,
+				Total:    32,
+			},
+			wantStartIndex: 30,
+			wantEndIndex:   32,
+		},
+		{
+			name: "zero page size 1",
+			fields: fields{
+				PageNum:  1,
 				PageSize: 0,
 				Total:    10,
 			},
@@ -89,14 +130,14 @@ func TestPage_GetStartEndIndex(t *testing.T) {
 			wantEndIndex:   10,
 		},
 		{
-			name: "zero page num",
+			name: "zero page size 2",
 			fields: fields{
-				PageNum:  0,
+				PageNum:  1,
 				PageSize: 0,
-				Total:    10,
+				Total:    11,
 			},
 			wantStartIndex: 0,
-			wantEndIndex:   10,
+			wantEndIndex:   11,
 		},
 		{
 			name: "over total",
@@ -109,9 +150,19 @@ func TestPage_GetStartEndIndex(t *testing.T) {
 			wantEndIndex:   10,
 		},
 		{
-			name: "over total",
+			name: "over total 2",
 			fields: fields{
-				PageNum:  3,
+				PageNum:  4,
+				PageSize: 5,
+				Total:    18,
+			},
+			wantStartIndex: 15,
+			wantEndIndex:   18,
+		},
+		{
+			name: "over total 3",
+			fields: fields{
+				PageNum:  5,
 				PageSize: 5,
 				Total:    18,
 			},
