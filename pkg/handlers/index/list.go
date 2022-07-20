@@ -90,6 +90,14 @@ func List(c *gin.Context) {
 					return items[i].StorageType < items[j].StorageType
 				}
 			})
+		case "wal_size":
+			sort.Slice(items, func(i, j int) bool {
+				if desc {
+					return items[i].WALSize > items[j].WALSize
+				} else {
+					return items[i].WALSize < items[j].WALSize
+				}
+			})
 		case "name":
 			sort.Slice(items, func(i, j int) bool {
 				if desc {

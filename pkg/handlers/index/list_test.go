@@ -38,9 +38,9 @@ func TestList(t *testing.T) {
 	})
 
 	t.Run("list", func(t *testing.T) {
-		sort_by := []string{"name", "doc_num", "shard_num", "storage_size", "storage_type"}
+		sortBy := []string{"name", "doc_num", "shard_num", "storage_size", "storage_type", "wal_size"}
 		descArr := []string{"false", "true"}
-		for _, s := range sort_by {
+		for _, s := range sortBy {
 			for _, d := range descArr {
 
 				c, w := utils.NewGinContext()
