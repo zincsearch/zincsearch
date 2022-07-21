@@ -37,7 +37,7 @@
     "@cypress/webpack-dev-server": "^2.0.0",
     "@quasar/vite-plugin": "^1.0.10",
     "@types/js-cookie": "^3.0.2",
-    "@typescript-eslint/eslint-plugin": "^5.30.6",
+    "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.6",
     "@vitejs/plugin-vue": "^2.3.3",
     "@vitest/ui": "^0.18.1",
