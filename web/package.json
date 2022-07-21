@@ -37,14 +37,14 @@
     "@cypress/webpack-dev-server": "^2.0.0",
     "@quasar/vite-plugin": "^1.0.10",
     "@types/js-cookie": "^3.0.2",
-    "@typescript-eslint/eslint-plugin": "^5.30.6",
-    "@typescript-eslint/parser": "^5.30.6",
+    "@typescript-eslint/eslint-plugin": "^5.30.7",
+    "@typescript-eslint/parser": "^5.30.7",
     "@vitejs/plugin-vue": "^2.3.3",
     "@vitest/ui": "^0.18.1",
     "@vue/test-utils": "^2.0.2",
     "c8": "^7.11.3",
-    "cypress": "^10.3.0",
-    "eslint": "^8.19.0",
+    "cypress": "^10.3.1",
+    "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^7.0.0",
@@ -57,6 +57,6 @@
     "typescript": "^4.7.4",
     "vite": "^2.9.14",
     "vitest": "^0.18.1",
-    "vue-tsc": "^0.38.5"
+    "vue-tsc": "^0.38.9"
   }
 }
