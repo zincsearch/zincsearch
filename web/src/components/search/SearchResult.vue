@@ -157,7 +157,7 @@ import searchService from "../../services/search";
 import HighLight from "../HighLight.vue";
 
 export default defineComponent({
-  name: "ComponentSearchSearchList",
+  name: "SearchResult",
   components: {
     HighLight,
   },

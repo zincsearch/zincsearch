@@ -16,8 +16,10 @@ export default defineConfig({
     coverage: {
       reporter: ["text", "json", "html"],
     },
-    environment: "jsdom",
-    globals: true,
+    environment: "happy-dom",
+    cache: false,
+    maxConcurrency: 20,
+    update: true,
     // ...
   },
 
