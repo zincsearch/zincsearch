@@ -38,7 +38,7 @@
     "@quasar/vite-plugin": "^1.0.10",
     "@types/js-cookie": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
-    "@typescript-eslint/parser": "^5.30.6",
+    "@typescript-eslint/parser": "^5.30.7",
     "@vitejs/plugin-vue": "^2.3.3",
     "@vitest/ui": "^0.18.1",
     "@vue/test-utils": "^2.0.2",
