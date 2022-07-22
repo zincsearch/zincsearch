@@ -1,9 +1,12 @@
 import { mount } from "@vue/test-utils";
-import PreviewIndex from "../../../components/index/PreviewIndex.vue";
-import store from "../../../store";
-import { Quasar, Dialog, Notify } from "quasar";
 import { expect, it } from "vitest";
+
+import { Quasar, Dialog, Notify } from "quasar";
+
 import i18n from "../../../locales";
+import store from "../../../store";
+import PreviewIndex from "../../../components/index/PreviewIndex.vue";
+import JsonEditor from "../../../components/JsonEditor.vue";
 
 it("should mount component", async () => {
   const wrapper = mount(PreviewIndex, {
@@ -11,6 +14,7 @@ it("should mount component", async () => {
     components: {
       Notify,
       Dialog,
+      JsonEditor,
     },
     global: {
       plugins: [Quasar, i18n, store],
@@ -18,7 +22,7 @@ it("should mount component", async () => {
   });
   expect(PreviewIndex).toBeTruthy();
 
-  console.log("PreviewIndex is: ", wrapper.html());
+  // console.log("PreviewIndex is: ", wrapper.html());
 
   // expect(wrapper.text()).toContain("PreviewIndex");
 });

@@ -19,3 +19,7 @@ You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/
 
 Check on the [pinned sass version](https://quasar.dev/start/vite-plugin#introduction). 
 
+## Unit testing
+
+Docs at https://github.com/quasarframework/quasar-testing/tree/dev/packages/unit-vitest still in alpha as of writing this.
+

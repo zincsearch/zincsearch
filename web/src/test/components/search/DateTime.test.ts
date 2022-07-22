@@ -1,24 +1,31 @@
 import { mount } from "@vue/test-utils";
-import DateTime from "../../../components/search/DateTime.vue";
-import store from "../../../store";
-import { Quasar, Dialog, Notify } from "quasar";
-import { expect, it } from "vitest";
-import i18n from "../../../locales";
+import { Quasar, Dialog } from "quasar";
+import { expect, it, describe } from "vitest";
 
-it("should mount DateTime component", async () => {
+import i18n from "../../../locales";
+import DateTime from "../../../components/search/DateTime.vue";
+
+describe("DateTime", () => {
   const wrapper = mount(DateTime, {
     shallow: false,
-    components: {
-      Notify,
-      Dialog,
-    },
+    components: { Dialog },
     global: {
-      plugins: [Quasar, i18n, store],
+      plugins: [Quasar, i18n],
     },
   });
-  expect(DateTime).toBeTruthy();
 
-  console.log("DateTime is: ", wrapper.html());
+  it("should mount DateTime component", async () => {
+    expect(DateTime).toBeTruthy();
+  });
 
-  // expect(wrapper.text()).toContain("DateTime");
+  it("should show Minutes", async () => {
+    const dateTimeButton = wrapper.find("#date-time-button");
+
+    // console.log("item is: ", dateTimeButton);
+
+    // console.log("displayValue: ", wrapper.vm.displayValue);
+    // dateTimeButton.trigger("click");
+    // console.log(wrapper.html());
+    expect(wrapper.text()).toContain("-");
+  });
 });

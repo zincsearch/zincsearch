@@ -1,9 +1,10 @@
 import { mount } from "@vue/test-utils";
+import { expect, it } from "vitest";
+import { Quasar, Dialog, Notify } from "quasar";
+
+import i18n from "../../../locales";
 import SyntaxGuide from "../../../components/search/SyntaxGuide.vue";
 import store from "../../../store";
-import { Quasar, Dialog, Notify } from "quasar";
-import { expect, it } from "vitest";
-import i18n from "../../../locales";
 
 it("should mount SyntaxGuide component", async () => {
   const wrapper = mount(SyntaxGuide, {
@@ -18,7 +19,7 @@ it("should mount SyntaxGuide component", async () => {
   });
   expect(SyntaxGuide).toBeTruthy();
 
-  console.log("SyntaxGuide is: ", wrapper.html());
+  // console.log("SyntaxGuide is: ", wrapper.html());
 
   // expect(wrapper.text()).toContain("SyntaxGuide");
 });

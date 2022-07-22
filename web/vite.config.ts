@@ -20,6 +20,7 @@ export default defineConfig({
     cache: false,
     maxConcurrency: 20,
     update: true,
+    // testNamePattern: "DateTime",
     // ...
   },
 

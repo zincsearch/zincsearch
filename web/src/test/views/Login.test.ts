@@ -6,22 +6,25 @@ import { useRouter } from "vue-router";
 import i18n from "../../locales";
 import Login from "../../views/Login.vue";
 import store from "../../store";
+// import router from "../../router";
 
-const router = useRouter();
+import { installQuasar } from "../helpers/install-quasar-plugin";
+
+installQuasar();
 
 it("should mount Login view", async () => {
+  const router = useRouter();
   const wrapper = mount(Login, {
-    shallow: true,
+    shallow: false,
     components: {
-      Notify,
-      Dialog,
+      // Notify,
+      // Dialog,
     },
     global: {
-      plugins: [Quasar, i18n, store, router],
+      plugins: [i18n, store],
     },
   });
   expect(Login).toBeTruthy();
-  // const wrapper = wrapperFactory();
 
   // console.log("Login is", wrapper.html());
 });
