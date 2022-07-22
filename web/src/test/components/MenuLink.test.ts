@@ -1,24 +1,36 @@
 import { mount } from "@vue/test-utils";
+import { expect, it, describe } from "vitest";
+import { Quasar } from "quasar";
+
+import i18n from "../../locales";
 import MenuLink from "../../components/MenuLink.vue";
 import store from "../../store";
-import { Quasar, Dialog, Notify } from "quasar";
-import { expect, it } from "vitest";
-import i18n from "../../locales";
 
-it("should mount MenuLink component", async () => {
-  const wrapper = mount(MenuLink, {
-    shallow: false,
-    components: {
-      Notify,
-      Dialog,
-    },
-    global: {
-      plugins: [Quasar, i18n, store],
-    },
+describe("MenuLink", () => {
+  it("should be able to mount Menulink component", async () => {
+    const wrapper = mount(MenuLink, {
+      shallow: false,
+      props: {
+        title: "Search",
+      },
+      global: {
+        plugins: [Quasar, i18n, store],
+      },
+    });
+    expect(MenuLink).toBeTruthy();
   });
-  expect(MenuLink).toBeTruthy();
 
-  console.log("MenuLink is: ", wrapper.html());
+  it("should be able to display the titel in Menulink", async () => {
+    const wrapper = mount(MenuLink, {
+      shallow: false,
+      props: {
+        title: "Search",
+      },
+      global: {
+        plugins: [Quasar, i18n, store],
+      },
+    });
 
-  // expect(wrapper.text()).toContain("MenuLink");
+    expect(wrapper.text()).toContain("Search"); // check title
+  });
 });

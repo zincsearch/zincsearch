@@ -7,9 +7,13 @@ import i18n from "../../locales";
 import AddUpdateIndex from "../../components/index/AddUpdateIndex.vue";
 import PreviewIndex from "../../components/index/PreviewIndex.vue";
 
+import { installQuasar } from "../helpers/install-quasar-plugin";
+
+installQuasar();
+
 it("should mount Index view", async () => {
   const wrapper = mount(Index, {
-    shallow: true,
+    shallow: false,
     components: {
       Notify,
       Dialog,
@@ -17,7 +21,7 @@ it("should mount Index view", async () => {
       PreviewIndex,
     },
     global: {
-      plugins: [Quasar, i18n, store],
+      plugins: [i18n, store],
     },
   });
   expect(Index).toBeTruthy();

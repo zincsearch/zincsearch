@@ -1,8 +1,9 @@
 import { mount } from "@vue/test-utils";
-import IndexList from "../../../components/search/IndexList.vue";
-import store from "../../../store";
 import { Quasar, Dialog, Notify } from "quasar";
 import { expect, it } from "vitest";
+
+import IndexList from "../../../components/search/IndexList.vue";
+import store from "../../../store";
 import i18n from "../../../locales";
 
 it("should mount IndexList component", async () => {
@@ -18,7 +19,7 @@ it("should mount IndexList component", async () => {
   });
   expect(IndexList).toBeTruthy();
 
-  console.log("IndexList is: ", wrapper.html());
+  // console.log("IndexList is: ", wrapper.html());
 
   // expect(wrapper.text()).toContain("IndexList");
 });

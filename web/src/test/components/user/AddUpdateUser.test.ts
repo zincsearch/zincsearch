@@ -1,8 +1,9 @@
 import { mount } from "@vue/test-utils";
-import AddUpdateUser from "../../../components/user/AddUpdateUser.vue";
-import store from "../../../store";
 import { Quasar, Dialog, Notify } from "quasar";
 import { expect, it } from "vitest";
+
+import AddUpdateUser from "../../../components/user/AddUpdateUser.vue";
+import store from "../../../store";
 import i18n from "../../../locales";
 
 it("should mount AddUpdateUser component", async () => {
@@ -18,7 +19,7 @@ it("should mount AddUpdateUser component", async () => {
   });
   expect(AddUpdateUser).toBeTruthy();
 
-  console.log("AddUpdateUser is: ", wrapper.html());
+  // console.log("AddUpdateUser is: ", wrapper.html());
 
   // expect(wrapper.text()).toContain("AddUpdateUser");
 });
