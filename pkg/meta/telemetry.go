@@ -16,6 +16,8 @@
 package meta
 
 import (
+	"io/ioutil"
+	"log"
 	"time"
 
 	"github.com/segmentio/analytics-go/v3"
@@ -27,10 +29,13 @@ var (
 )
 
 func init() {
+
 	cf := analytics.Config{
 		Interval:  15 * time.Second,
-		BatchSize: 100,
-		// Endpoint: "http://localhost:8080/api/v1/segment",
+		BatchSize: 10,
+		// Endpoint:  "http://localhost:3090",
+		Verbose: false,
+		Logger:  analytics.StdLogger(log.New(ioutil.Discard, "marker ", log.LstdFlags)), // discard any logs
 	}
 
 	SEGMENT_CLIENT, _ = analytics.NewWithConfig("CGi3aENuM7L0v1jGtSC9QEhnIVmDAEFm", cf)
