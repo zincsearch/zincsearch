@@ -12,6 +12,16 @@
         />
 
         <q-toolbar-title>{{ t("menu.zincSearch") }}</q-toolbar-title>
+        <div class="q-mr-xs">
+          <q-btn
+            unelevated
+            no-caps
+            padding="xs sm"
+            :label="t('menu.openapi')"
+            href="/swagger/index.html"
+            target="_blank"
+          />
+        </div>
 
         <div class="q-mr-xs">
           <q-btn
