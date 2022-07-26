@@ -27,7 +27,7 @@ import (
 )
 
 // SearchV1 searches the index for the given http request from end user
-
+//
 // @Id SearchV1
 // @Summary Search V1
 // @Tags    Search

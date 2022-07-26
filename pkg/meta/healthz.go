@@ -22,7 +22,7 @@ import (
 )
 
 // GetHealthz function gets all events
-
+//
 // @Id Healthz
 // @Summary Get healthz
 // @Produce json

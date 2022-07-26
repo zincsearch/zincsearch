@@ -30,7 +30,8 @@ import (
 )
 
 // Multi accept multiple line json documents
-
+// support use field `_id` set document id
+//
 // @Id Multi
 // @Summary Multi documents
 // @Tags    Document

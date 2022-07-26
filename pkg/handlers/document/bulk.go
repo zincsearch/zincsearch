@@ -33,7 +33,7 @@ import (
 )
 
 // Bulk accept multiple documents, first line index metadata, second line document
-
+//
 // @Id Bulk
 // @Summary Bulk documents
 // @Tags    Document
@@ -58,7 +58,7 @@ func Bulk(c *gin.Context) {
 }
 
 // ESBulk accept multiple documents, first line index metadata, second line document
-
+//
 // @Id ESBulk
 // @Summary ES bulk documents
 // @Tags    Document

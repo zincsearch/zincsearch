@@ -32,7 +32,7 @@ import (
 )
 
 // SearchDSL searches the index for the given http request from end user
-
+//
 // @Id Search
 // @Summary Search V2 DSL for compatible ES
 // @Tags    Search
@@ -75,7 +75,7 @@ func SearchDSL(c *gin.Context) {
 }
 
 // MultipleSearch like bulk searches
-
+//
 // @Id MSearch
 // @Summary Search V2 MultipleSearch for compatible ES
 // @Tags    Search
