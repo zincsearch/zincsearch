@@ -1340,6 +1340,41 @@ paths:
       summary: Set index mappings
       tags:
       - Index
+  /api/{index}/_multi:
+    post:
+      consumes:
+      - text/plain
+      operationId: Multi
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      - description: Query
+        in: body
+        name: query
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseRecordCount'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Multi documents
+      tags:
+      - Document
   /api/{index}/_search:
     post:
       consumes:

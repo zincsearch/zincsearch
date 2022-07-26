@@ -112,6 +112,7 @@ func SetRoutes(r *gin.Engine) {
 	// Document Bulk update/insert
 	r.POST("/api/_bulk", AuthMiddleware, document.Bulk)
 	r.POST("/api/:target/_bulk", AuthMiddleware, document.Bulk)
+	r.POST("/api/:target/_multi", AuthMiddleware, document.Multi)
 	// Document CRUD APIs. Update is same as create.
 	r.POST("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)    // create
 	r.PUT("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)     // create
