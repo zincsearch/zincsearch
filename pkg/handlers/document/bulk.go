@@ -32,6 +32,8 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// Bulk accept multiple documents, first line index metadata, second line document
+
 // @Id Bulk
 // @Summary Bulk documents
 // @Tags    Document
@@ -54,6 +56,8 @@ func Bulk(c *gin.Context) {
 
 	c.JSON(http.StatusOK, meta.HTTPResponseRecordCount{Message: "bulk data inserted", RecordCount: ret.Count})
 }
+
+// ESBulk accept multiple documents, first line index metadata, second line document
 
 // @Id ESBulk
 // @Summary ES bulk documents

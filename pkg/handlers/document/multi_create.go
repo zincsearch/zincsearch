@@ -29,6 +29,8 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// Multi accept multiple line json documents
+
 // @Id Multi
 // @Summary Multi documents
 // @Tags    Document

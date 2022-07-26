@@ -37,6 +37,13 @@ import (
 // HASH default hash function for docID
 var HASH = zutils.NewDefaultHasher()
 
+// IndexShard first layer shard by fixed number shards for index.
+// Use hash algorithm distribute documents to different shards.
+// This shards let we can concurrency write to many shards in same index.
+// The shards num can not be modify, because if change the num
+// hash algorithm will distribute the same docID to another shard,
+// then we will can not found the old document, maybe cause duplicate documents.
+// First layer shard just used for distribute not really store documents.
 type IndexShard struct {
 	name   string // shard name: index/shardID
 	root   *Index
@@ -48,6 +55,14 @@ type IndexShard struct {
 	close  chan struct{}
 }
 
+// IndexSecondShard second layer shard by auto increate shards for index.
+// Under first layer shards, Documents will store in this layer shards.
+// Use a environment `config.ZINC_SHARD_MAX_SIZE` to control second layer shard max size.
+// If the shard size over limit then will auto create a new shard for accept new documents.
+// And we will log time range for this layer shards, when query data we can use time range
+// filter which shards need to find data. We keep one shard size wouldn't over limit,
+// we will fozen old shards, just write new documents to new shards and do merge in new shards
+// this will improve shard performance.
 type IndexSecondShard struct {
 	root   *Index
 	ref    *meta.IndexSecondShard
