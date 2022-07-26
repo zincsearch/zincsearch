@@ -25,7 +25,7 @@ export default {
   },
   about: {
     name: "Zinc",
-    introduction: "A modern search engine.",
+    introduction: "The modern open source search engine.",
   },
   login: {
     userid: "User ID",
