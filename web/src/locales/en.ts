@@ -21,6 +21,7 @@ export default {
     feedback: "Feedback",
     zincSearch: "ZincSearch",
     documentation: "Docs",
+    openapi: "OpenAPI",
   },
   about: {
     name: "Zinc",
