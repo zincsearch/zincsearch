@@ -17,6 +17,7 @@ package search
 
 import (
 	"context"
+	"fmt"
 	"sync/atomic"
 
 	"github.com/blugelabs/bluge"
@@ -77,6 +78,8 @@ func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge
 			if n > atomic.LoadInt64(&docList.size) {
 				atomic.StoreInt64(&docList.size, n)
 			}
+
+			fmt.Println("r", dmi.Aggregations().Duration().Milliseconds())
 
 			return err
 		})
