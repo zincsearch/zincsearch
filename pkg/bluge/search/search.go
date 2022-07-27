@@ -17,9 +17,11 @@ package search
 
 import (
 	"context"
+	"sync/atomic"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/search"
+	"github.com/blugelabs/bluge/search/aggregations"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -31,13 +33,16 @@ func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge
 		return readers[0].Search(ctx, req)
 	}
 
+	bucketAggs := make(map[string]search.Aggregation)
+	bucketAggs["duration"] = aggregations.Duration()
+
 	eg := &errgroup.Group{}
 	eg.SetLimit(10)
-	docs := make(chan *search.DocumentMatch, req.Collector().Size()*len(readers))
+	docs := make(chan *search.DocumentMatch, len(readers)*2)
 	aggs := make(chan *search.Bucket, len(readers))
 
 	docList := &DocumentList{
-		size: req.Collector().Size(),
+		bucket: search.NewBucket("", bucketAggs),
 	}
 	egm := &errgroup.Group{}
 	egm.Go(func() error {
@@ -48,11 +53,7 @@ func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge
 	})
 	egm.Go(func() error {
 		for agg := range aggs {
-			if docList.bucket == nil {
-				docList.bucket = agg
-			} else {
-				docList.bucket.Merge(agg)
-			}
+			docList.bucket.Merge(agg)
 		}
 		return nil
 	})
@@ -60,16 +61,23 @@ func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge
 	for _, r := range readers {
 		r := r
 		eg.Go(func() error {
+			var n int64
 			dmi, err := r.Search(ctx, req)
 			if err != nil {
 				return err
 			}
 			next, err := dmi.Next()
 			for err == nil && next != nil {
+				n++
 				docs <- next
 				next, err = dmi.Next()
 			}
 			aggs <- dmi.Aggregations()
+
+			if n > atomic.LoadInt64(&docList.size) {
+				atomic.StoreInt64(&docList.size, n)
+			}
+
 			return err
 		})
 	}
@@ -89,8 +97,8 @@ func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge
 type DocumentList struct {
 	docs   []*search.DocumentMatch
 	bucket *search.Bucket
-	size   int
-	next   int
+	size   int64
+	next   int64
 }
 
 func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
@@ -98,13 +106,12 @@ func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
 }
 
 func (d *DocumentList) Done() {
-	// sort
-	// merge aggs
+	// TODO: sort
 	d.bucket.Finish()
 }
 
 func (d *DocumentList) Next() (*search.DocumentMatch, error) {
-	if d.next >= d.size || d.next >= len(d.docs) {
+	if d.next >= d.size || d.next >= int64(len(d.docs)) {
 		return nil, nil
 	}
 	doc := d.docs[d.next]
