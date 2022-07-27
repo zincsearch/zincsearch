@@ -34,6 +34,9 @@ import (
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
+// MaxBatchSize used to limit memory
+const MaxBatchSize = 102400
+
 // OpenWAL open WAL for index
 func (s *IndexShard) OpenWAL() error {
 	if atomic.LoadUint32(&s.open) == 1 {
@@ -158,6 +161,11 @@ func (s *IndexShard) ConsumeWAL() {
 		return // no new entries
 	}
 	// log.Debug().Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Uint64("minID", minID).Uint64("maxID", maxID).Msg("consume wal begin")
+
+	// limit max batch size
+	if maxID-minID > MaxBatchSize {
+		maxID = minID + MaxBatchSize
+	}
 
 	batch := blugeindex.NewBatch()
 	docs := make(walMergeDocs)
