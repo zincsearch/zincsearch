@@ -36,15 +36,17 @@ func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge
 	docs := make(chan *search.DocumentMatch, req.Collector().Size()*len(readers))
 	aggs := make(chan *search.Bucket, len(readers))
 
-	docList := &DocumentList{}
-	eg2 := &errgroup.Group{}
-	eg2.Go(func() error {
+	docList := &DocumentList{
+		size: req.Collector().Size(),
+	}
+	egm := &errgroup.Group{}
+	egm.Go(func() error {
 		for doc := range docs {
 			docList.addDocument(doc)
 		}
 		return nil
 	})
-	eg2.Go(func() error {
+	egm.Go(func() error {
 		for agg := range aggs {
 			if docList.bucket == nil {
 				docList.bucket = agg
@@ -77,7 +79,7 @@ func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge
 
 	close(docs)
 	close(aggs)
-	_ = eg2.Wait()
+	_ = egm.Wait()
 
 	docList.Done()
 
@@ -87,6 +89,7 @@ func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge
 type DocumentList struct {
 	docs   []*search.DocumentMatch
 	bucket *search.Bucket
+	size   int
 	next   int
 }
 
@@ -97,10 +100,11 @@ func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
 func (d *DocumentList) Done() {
 	// sort
 	// merge aggs
+	d.bucket.Finish()
 }
 
 func (d *DocumentList) Next() (*search.DocumentMatch, error) {
-	if d.next >= len(d.docs) {
+	if d.next >= d.size || d.next >= len(d.docs) {
 		return nil, nil
 	}
 	doc := d.docs[d.next]
