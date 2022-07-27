@@ -52,6 +52,14 @@ func (index *Index) GetShardNum() int64 {
 	return index.shardNum
 }
 
+func (index *Index) GetAllShardNum() int64 {
+	var n int64
+	for _, shard := range index.shards {
+		n += shard.GetShardNum()
+	}
+	return n
+}
+
 func (index *Index) GetName() string {
 	return index.ref.Name
 }

@@ -71,7 +71,7 @@ func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) 
 		return nil, err
 	}
 
-	return searchV2(index.GetShardNum(), int64(len(readers)), dmi, query, mappings)
+	return searchV2(index.GetAllShardNum(), int64(len(readers)), dmi, query, mappings)
 }
 
 func searchV2(shardNum, readerNum int64, dmi search.DocumentMatchIterator, query *meta.ZincQuery, mappings *meta.Mappings) (*meta.SearchResponse, error) {
