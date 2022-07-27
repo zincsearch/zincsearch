@@ -148,7 +148,6 @@ func (s *IndexShard) buildField(mappings *meta.Mappings, bdoc *bluge.Document, k
 func (s *IndexShard) CheckDocument(docID string, doc map[string]interface{}, update bool, shard int64) ([]byte, error) {
 	// Pick the index mapping from the cache if it already exists
 	mappings := s.root.GetMappings()
-
 	mappingsNeedsUpdate := false
 
 	flatDoc, _ := flatten.Flatten(doc, "")
@@ -158,63 +157,7 @@ func (s *IndexShard) CheckDocument(docID string, doc map[string]interface{}, upd
 			continue
 		}
 
-		if prop, ok := mappings.GetProperty(key); ok {
-			if config.Global.EnableTextKeywordMapping && prop.Type == "text" {
-				if _, ok := mappings.GetProperty(key + ".keyword"); ok {
-					continue
-				}
-			} else {
-				continue
-			}
-		}
-
-		// try to find the type of the value and use it to define default mapping
-		switch v := value.(type) {
-		case string:
-			if layout, ok := isDateProperty(v); ok {
-				prop := meta.NewProperty("date")
-				prop.Format = layout
-				mappings.SetProperty(key, prop)
-			} else {
-				newProp := meta.NewProperty("text")
-				if config.Global.EnableTextKeywordMapping {
-					p := meta.NewProperty("keyword")
-					newProp.AddField("keyword", p)
-					mappings.SetProperty(key+".keyword", p)
-				}
-				mappings.SetProperty(key, newProp)
-			}
-		case int, int64, float64:
-			mappings.SetProperty(key, meta.NewProperty("numeric"))
-		case bool:
-			mappings.SetProperty(key, meta.NewProperty("bool"))
-		case []interface{}:
-			if v, ok := value.([]interface{}); ok {
-				for _, vv := range v {
-					switch val := vv.(type) {
-					case string:
-						if layout, ok := isDateProperty(val); ok {
-							prop := meta.NewProperty("date")
-							prop.Format = layout
-							mappings.SetProperty(key, prop)
-						} else {
-							newProp := meta.NewProperty("text")
-							if config.Global.EnableTextKeywordMapping {
-								p := meta.NewProperty("keyword")
-								newProp.AddField("keyword", p)
-								mappings.SetProperty(key+".keyword", p)
-							}
-							mappings.SetProperty(key, newProp)
-						}
-					case float64:
-						mappings.SetProperty(key, meta.NewProperty("numeric"))
-					case bool:
-						mappings.SetProperty(key, meta.NewProperty("bool"))
-					}
-					break
-				}
-			}
-
+		if update := s.checkProperty(mappings, key, value); update {
 			mappingsNeedsUpdate = true
 		}
 
@@ -270,6 +213,70 @@ func (s *IndexShard) CheckDocument(docID string, doc map[string]interface{}, upd
 	flatDoc[meta.TimeFieldName] = timestamp.UnixNano()
 
 	return json.Marshal(flatDoc)
+}
+
+// checkProperty returns if need update mappings
+func (s *IndexShard) checkProperty(mappings *meta.Mappings, key string, value interface{}) bool {
+	prop, ok := mappings.GetProperty(key)
+	if ok {
+		if config.Global.EnableTextKeywordMapping && prop.Type == "text" {
+			if _, ok := mappings.GetProperty(key + ".keyword"); ok {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+
+	// try to find the type of the value and use it to define default mapping
+	switch v := value.(type) {
+	case string:
+		if layout, ok := isDateProperty(v); ok {
+			prop = meta.NewProperty("date")
+			prop.Format = layout
+			mappings.SetProperty(key, prop)
+		} else {
+			newProp := meta.NewProperty("text")
+			if config.Global.EnableTextKeywordMapping {
+				p := meta.NewProperty("keyword")
+				newProp.AddField("keyword", p)
+				mappings.SetProperty(key+".keyword", p)
+			}
+			mappings.SetProperty(key, newProp)
+		}
+	case int, int64, float64:
+		mappings.SetProperty(key, meta.NewProperty("numeric"))
+	case bool:
+		mappings.SetProperty(key, meta.NewProperty("bool"))
+	case []interface{}:
+		if v, ok := value.([]interface{}); ok {
+			for _, vv := range v {
+				switch val := vv.(type) {
+				case string:
+					if layout, ok := isDateProperty(val); ok {
+						prop = meta.NewProperty("date")
+						prop.Format = layout
+						mappings.SetProperty(key, prop)
+					} else {
+						newProp := meta.NewProperty("text")
+						if config.Global.EnableTextKeywordMapping {
+							p := meta.NewProperty("keyword")
+							newProp.AddField("keyword", p)
+							mappings.SetProperty(key+".keyword", p)
+						}
+						mappings.SetProperty(key, newProp)
+					}
+				case float64:
+					mappings.SetProperty(key, meta.NewProperty("numeric"))
+				case bool:
+					mappings.SetProperty(key, meta.NewProperty("bool"))
+				}
+				break
+			}
+		}
+	}
+
+	return true
 }
 
 func (s *IndexShard) checkField(mappings *meta.Mappings, data map[string]interface{}, key string, value interface{}, id int, array bool) error {
