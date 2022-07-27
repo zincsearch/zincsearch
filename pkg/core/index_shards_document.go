@@ -163,6 +163,8 @@ func (s *IndexShard) CheckDocument(docID string, doc map[string]interface{}, upd
 				if _, ok := mappings.GetProperty(key + ".keyword"); ok {
 					continue
 				}
+			} else {
+				continue
 			}
 		}
 
