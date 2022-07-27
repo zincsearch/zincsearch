@@ -35,7 +35,7 @@ import (
 )
 
 // MaxBatchSize used to limit memory
-const MaxBatchSize = 102400
+const MaxBatchSize = 10240
 
 // OpenWAL open WAL for index
 func (s *IndexShard) OpenWAL() error {
