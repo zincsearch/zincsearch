@@ -34,12 +34,12 @@ require (
 	go.etcd.io/bbolt v1.3.6
 	go.etcd.io/etcd/client/v3 v3.5.4
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
-	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f
+	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
 	golang.org/x/text v0.3.7
 
 )
 
-replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v1.1.5
+replace github.com/blugelabs/bluge => github.com/zinclabs/bluge v1.1.6-hf-2
 
 replace github.com/blugelabs/ice => github.com/zinclabs/ice v1.1.3
 
