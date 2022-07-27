@@ -94,7 +94,11 @@ func (s *IndexShard) buildField(mappings *meta.Mappings, bdoc *bluge.Document, k
 	prop, _ := mappings.GetProperty(key)
 	switch prop.Type {
 	case "text":
-		field = bluge.NewTextField(key, value.(string)).SearchTermPositions()
+		v := value.(string)
+		if v == "" {
+			return nil
+		}
+		field = bluge.NewTextField(key, v).SearchTermPositions()
 		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(s.root.GetAnalyzers(), mappings, key)
 		if fieldAnalyzer != nil {
 			field.WithAnalyzer(fieldAnalyzer)
@@ -102,7 +106,11 @@ func (s *IndexShard) buildField(mappings *meta.Mappings, bdoc *bluge.Document, k
 	case "numeric":
 		field = bluge.NewNumericField(key, value.(float64))
 	case "keyword":
-		field = bluge.NewKeywordField(key, value.(string))
+		v := value.(string)
+		if v == "" {
+			return nil
+		}
+		field = bluge.NewKeywordField(key, v)
 	case "bool":
 		field = bluge.NewKeywordField(key, strconv.FormatBool(value.(bool)))
 	case "date", "time":
@@ -126,12 +134,10 @@ func (s *IndexShard) buildField(mappings *meta.Mappings, bdoc *bluge.Document, k
 	}
 	bdoc.AddField(field)
 
-	if prop.Fields != nil {
-		for propField := range prop.Fields {
-			err := s.buildField(mappings, bdoc, key+"."+propField, value)
-			if err != nil {
-				return err
-			}
+	for propField := range prop.Fields {
+		err := s.buildField(mappings, bdoc, key+"."+propField, value)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -152,52 +158,58 @@ func (s *IndexShard) CheckDocument(docID string, doc map[string]interface{}, upd
 			continue
 		}
 
-		if _, ok := mappings.GetProperty(key); !ok {
-			// try to find the type of the value and use it to define default mapping
-			switch v := value.(type) {
-			case string:
-				if layout, ok := isDateProperty(v); ok {
-					prop := meta.NewProperty("date")
-					prop.Format = layout
-					mappings.SetProperty(key, prop)
-				} else {
-					newProp := meta.NewProperty("text")
-					if config.Global.EnableTextKeywordMapping {
-						p := meta.NewProperty("keyword")
-						newProp.AddField("keyword", p)
-						mappings.SetProperty(key+".keyword", p)
-					}
-					mappings.SetProperty(key, newProp)
+		if prop, ok := mappings.GetProperty(key); ok {
+			if config.Global.EnableTextKeywordMapping && prop.Type == "text" {
+				if _, ok := mappings.GetProperty(key + ".keyword"); ok {
+					continue
 				}
-			case int, int64, float64:
-				mappings.SetProperty(key, meta.NewProperty("numeric"))
-			case bool:
-				mappings.SetProperty(key, meta.NewProperty("bool"))
-			case []interface{}:
-				if v, ok := value.([]interface{}); ok {
-					for _, vv := range v {
-						switch val := vv.(type) {
-						case string:
-							if layout, ok := isDateProperty(val); ok {
-								prop := meta.NewProperty("date")
-								prop.Format = layout
-								mappings.SetProperty(key, prop)
-							} else {
-								newProp := meta.NewProperty("text")
-								if config.Global.EnableTextKeywordMapping {
-									p := meta.NewProperty("keyword")
-									newProp.AddField("keyword", p)
-									mappings.SetProperty(key+".keyword", p)
-								}
-								mappings.SetProperty(key, newProp)
+			}
+		}
+
+		// try to find the type of the value and use it to define default mapping
+		switch v := value.(type) {
+		case string:
+			if layout, ok := isDateProperty(v); ok {
+				prop := meta.NewProperty("date")
+				prop.Format = layout
+				mappings.SetProperty(key, prop)
+			} else {
+				newProp := meta.NewProperty("text")
+				if config.Global.EnableTextKeywordMapping {
+					p := meta.NewProperty("keyword")
+					newProp.AddField("keyword", p)
+					mappings.SetProperty(key+".keyword", p)
+				}
+				mappings.SetProperty(key, newProp)
+			}
+		case int, int64, float64:
+			mappings.SetProperty(key, meta.NewProperty("numeric"))
+		case bool:
+			mappings.SetProperty(key, meta.NewProperty("bool"))
+		case []interface{}:
+			if v, ok := value.([]interface{}); ok {
+				for _, vv := range v {
+					switch val := vv.(type) {
+					case string:
+						if layout, ok := isDateProperty(val); ok {
+							prop := meta.NewProperty("date")
+							prop.Format = layout
+							mappings.SetProperty(key, prop)
+						} else {
+							newProp := meta.NewProperty("text")
+							if config.Global.EnableTextKeywordMapping {
+								p := meta.NewProperty("keyword")
+								newProp.AddField("keyword", p)
+								mappings.SetProperty(key+".keyword", p)
 							}
-						case float64:
-							mappings.SetProperty(key, meta.NewProperty("numeric"))
-						case bool:
-							mappings.SetProperty(key, meta.NewProperty("bool"))
+							mappings.SetProperty(key, newProp)
 						}
-						break
+					case float64:
+						mappings.SetProperty(key, meta.NewProperty("numeric"))
+					case bool:
+						mappings.SetProperty(key, meta.NewProperty("bool"))
 					}
+					break
 				}
 			}
 
