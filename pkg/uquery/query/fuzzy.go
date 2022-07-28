@@ -20,13 +20,16 @@ import (
 	"strings"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
+	"github.com/blugelabs/bluge/analysis/analyzer"
 
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
+	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
-func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
+func FuzzyQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[fuzzy] query doesn't support multiple fields")
 	}
@@ -60,9 +63,18 @@ func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
 		}
 	}
 
+	var zer *analysis.Analyzer
+	indexZer, searchZer := zincanalysis.QueryAnalyzerForField(analyzers, mappings, field)
+	if zer == nil && searchZer != nil {
+		zer = searchZer
+	}
+	if zer == nil && indexZer != nil {
+		zer = indexZer
+	}
+
 	subq := bluge.NewFuzzyQuery(value.Value).SetField(field)
 	if value.Fuzziness != nil {
-		v := ParseFuzziness(value.Fuzziness, len(value.Value))
+		v := ParseFuzziness(value.Fuzziness, value.Value, zer)
 		if v > 0 {
 			subq.SetFuzziness(v)
 		}
@@ -77,12 +89,23 @@ func FuzzyQuery(query map[string]interface{}) (bluge.Query, error) {
 	return subq, nil
 }
 
-func ParseFuzziness(fuzziness interface{}, n int) int {
+func ParseFuzziness(fuzziness interface{}, query string, zer *analysis.Analyzer) int {
 	val, _ := zutils.ToString(fuzziness)
 	val = strings.ToUpper(val)
 	if !strings.HasPrefix(val, "AUTO") {
 		v, _ := zutils.ToInt(val)
 		return v
+	}
+
+	if zer == nil {
+		zer = analyzer.NewStandardAnalyzer()
+	}
+	tokens := zer.Analyze([]byte(query))
+	n := 0
+	for _, token := range tokens {
+		if n < len(token.Term) {
+			n = len(token.Term)
+		}
 	}
 
 	n1 := 3

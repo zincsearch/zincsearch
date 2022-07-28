@@ -131,7 +131,7 @@ func Query(query interface{}, mappings *meta.Mappings, analyzers map[string]*ana
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[prefix] failed to parse field").Cause(err)
 			}
 		case "fuzzy":
-			if subq, err = FuzzyQuery(v); err != nil {
+			if subq, err = FuzzyQuery(v, mappings, analyzers); err != nil {
 				return nil, errors.New(errors.ErrorTypeXContentParseException, "[fuzzy] failed to parse field").Cause(err)
 			}
 		case "wildcard":
