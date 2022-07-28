@@ -183,6 +183,11 @@ func (s *IndexShard) GetWriter(shardID ...int64) (*bluge.Writer, error) {
 		return nil, err
 	}
 
+	// check WAL
+	if err := s.OpenWAL(); err != nil {
+		return nil, err
+	}
+
 	secondShard.lock.RLock()
 	w = secondShard.writer
 	secondShard.lock.RUnlock()
