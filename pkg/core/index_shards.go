@@ -37,6 +37,11 @@ import (
 // HASH default hash function for docID
 var HASH = zutils.NewDefaultHasher()
 
+const (
+	ShardNoNeedLatest int64 = -1 // get lastest shardID
+	ShardNoNeedUpdate int64 = -2 // get all shardIDs
+)
+
 // IndexShard first layer shard by fixed number shards for index.
 // Use hash algorithm distribute documents to different shards.
 // This shards let we can concurrency write to many shards in same index.

@@ -34,9 +34,9 @@ func (index *Index) CreateDocument(docID string, doc map[string]interface{}, upd
 		return err
 	}
 
-	secondShardID := shard.GetLatestShardID()
+	secondShardID := ShardNoNeedLatest
 	if update {
-		secondShardID = -1
+		secondShardID = ShardNoNeedUpdate
 	}
 	data, err := shard.CheckDocument(docID, doc, update, secondShardID)
 	if err != nil {
