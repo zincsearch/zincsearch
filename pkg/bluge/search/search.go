@@ -21,16 +21,23 @@ import (
 	"sync/atomic"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/search"
 	"github.com/blugelabs/bluge/search/aggregations"
+	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/uquery"
 	"golang.org/x/sync/errgroup"
 )
 
-func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge.Reader) (search.DocumentMatchIterator, error) {
+func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer, readers ...*bluge.Reader) (search.DocumentMatchIterator, error) {
 	if len(readers) == 0 {
 		return nil, nil
 	}
 	if len(readers) == 1 {
+		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
+		if err != nil {
+			return nil, err
+		}
 		return readers[0].Search(ctx, req)
 	}
 
@@ -61,6 +68,10 @@ func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge
 
 	for _, r := range readers {
 		r := r
+		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
+		if err != nil {
+			return nil, err
+		}
 		eg.Go(func() error {
 			var n int64
 			dmi, err := r.Search(ctx, req)

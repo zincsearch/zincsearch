@@ -35,7 +35,7 @@ import (
 func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) {
 	mappings := index.GetMappings()
 	analyzers := index.GetAnalyzers()
-	searchRequest, err := uquery.ParseQueryDSL(query, mappings, analyzers)
+	_, err := uquery.ParseQueryDSL(query, mappings, analyzers)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) 
 	}
 
 	// dmi, err := bluge.MultiSearch(ctx, searchRequest, readers...)
-	dmi, err := zsearch.MultiSearch(ctx, searchRequest, readers...)
+	dmi, err := zsearch.MultiSearch(ctx, query, mappings, analyzers, readers...)
 	if err != nil {
 		log.Printf("index.SearchV2: error executing search: %s", err.Error())
 		if err == context.DeadlineExceeded {
