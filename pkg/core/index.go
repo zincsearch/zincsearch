@@ -240,7 +240,7 @@ func (index *Index) UpdateMetadataByShard(n int64) {
 	}
 
 	// update latest shard docTime
-	secondShard := index.shards[shard.GetLatestShardID()]
+	secondShard := shard.shards[shard.GetLatestShardID()]
 	index.lock.Lock()
 	atomic.StoreInt64(&secondShard.ref.Stats.DocTimeMin, atomic.LoadInt64(&shard.ref.Stats.DocTimeMin))
 	atomic.StoreInt64(&secondShard.ref.Stats.DocTimeMax, atomic.LoadInt64(&shard.ref.Stats.DocTimeMax))
