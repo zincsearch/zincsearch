@@ -45,7 +45,7 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	bucketAggs["duration"] = aggregations.Duration()
 
 	eg := &errgroup.Group{}
-	eg.SetLimit(10)
+	eg.SetLimit(1000)
 	docs := make(chan *search.DocumentMatch, len(readers)*2)
 	aggs := make(chan *search.Bucket, len(readers))
 
