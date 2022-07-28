@@ -63,7 +63,7 @@ func GetTemplate(c *gin.Context) {
 		return
 	}
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template " + name + " does not exists"})
+		c.JSON(http.StatusNotFound, meta.HTTPResponseError{Error: "template " + name + " does not exists"})
 		return
 	}
 	c.JSON(http.StatusOK, template)

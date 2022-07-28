@@ -13,7 +13,7 @@
 * limitations under the License.
  */
 
-package meta
+package elastic
 
 import (
 	"regexp"
@@ -22,10 +22,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func NewESInfo(c *gin.Context) *ESInfo {
-	version := strings.TrimLeft(Version, "v")
+	version := strings.TrimLeft(meta.Version, "v")
 	userAgent := c.Request.UserAgent()
 	if strings.Contains(userAgent, "Elastic") {
 		reg := regexp.MustCompile(`([0-9]+\.[0-9]+\.[0-9]+)`)
@@ -44,8 +45,8 @@ func NewESInfo(c *gin.Context) *ESInfo {
 		Version: ESInfoVersion{
 			Number:                    version,
 			BuildFlavor:               "default",
-			BuildHash:                 CommitHash,
-			BuildDate:                 BuildDate,
+			BuildHash:                 meta.CommitHash,
+			BuildDate:                 meta.BuildDate,
 			BuildSnapshot:             false,
 			LuceneVersion:             "N/A",
 			MinimumWireVersion:        "N/A",

@@ -13,5 +13,32 @@
 * limitations under the License.
  */
 
-// Package elastic holds the ElasticSearch specific meta declarations and util functions.
 package elastic
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+func GetDataStream(c *gin.Context) {
+	target := c.Param("target")
+	c.JSON(http.StatusOK, gin.H{
+		"data_streams": []gin.H{
+			gin.H{
+				"name": target,
+				"timestamp_field": gin.H{
+					"name": "@timestamp",
+				},
+			},
+		},
+	})
+}
+
+func PutDataStream(c *gin.Context) {
+	target := c.Param("target")
+	c.JSON(http.StatusOK, gin.H{
+		"name":    target,
+		"message": "ok",
+	})
+}
