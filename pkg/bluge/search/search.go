@@ -18,6 +18,7 @@ package search
 import (
 	"context"
 	"fmt"
+	"github.com/blugelabs/bluge/search/collector"
 	"sync/atomic"
 
 	"github.com/blugelabs/bluge"
@@ -66,12 +67,20 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 		return nil
 	})
 
+	var sort search.SortOrder
+	var size int
+	var skip int
+	var reversed bool
 	for _, r := range readers {
-		r := r
 		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
 		if err != nil {
 			return nil, err
 		}
+		if sort == nil { // init vars
+			sort = req.SortOrder()
+			size, skip, reversed = req.SizeSkipAndReversed()
+		}
+		r := r
 		eg.Go(func() error {
 			var n int64
 			dmi, err := r.Search(ctx, req)
@@ -103,7 +112,10 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	close(aggs)
 	_ = egm.Wait()
 
-	docList.Done()
+	err := docList.Done(size, skip, reversed, sort)
+	if err != nil {
+		return nil, err
+	}
 
 	return docList, nil
 }
@@ -119,9 +131,32 @@ func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
 	d.docs = append(d.docs, doc)
 }
 
-func (d *DocumentList) Done() {
+func (d *DocumentList) Done(size, skip int, reversed bool, sort search.SortOrder) error {
 	// TODO: sort
+	store := collector.NewCollectorStore(size, skip, reversed, sort)
+
 	d.bucket.Finish()
+	backingSize := size + skip + 1
+
+	for i := range d.docs {
+		store.AddNotExceedingSize(d.docs[i], backingSize)
+	}
+
+	results, err := store.Final(skip, func(doc *search.DocumentMatch) error {
+		doc.Complete(nil)
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	if reversed {
+		for i, j := 0, len(results)-1; i < j; i, j = i+1, j-1 {
+			results[i], results[j] = results[j], results[i]
+		}
+	}
+
+	return nil
 }
 
 func (d *DocumentList) Next() (*search.DocumentMatch, error) {
