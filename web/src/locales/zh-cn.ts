@@ -21,6 +21,7 @@ export default {
     feedback: "反馈问题",
     zincSearch: "Zinc Search",
     documentation: "文档",
+    openapi: "开放API",
   },
   about: {
     name: "Zinc",
