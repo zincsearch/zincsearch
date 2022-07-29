@@ -32,7 +32,7 @@ import (
 
 func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer, readers ...*bluge.Reader) (search.DocumentMatchIterator, error) {
 	if len(readers) == 0 {
-		return nil, nil
+		return &DocumentList{}, nil
 	}
 	if len(readers) == 1 {
 		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
@@ -132,7 +132,6 @@ func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
 }
 
 func (d *DocumentList) Done(size, skip int, reversed bool, sort search.SortOrder) error {
-	// TODO: sort
 	store := collector.NewCollectorStore(size, skip, reversed, sort)
 
 	d.bucket.Finish()
