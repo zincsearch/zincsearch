@@ -27,7 +27,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
-	"github.com/zinclabs/zinc/pkg/zutils/rendezvous"
+	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
 )
 
 var indexNameRe = regexp.MustCompile(`^[a-zA-Z0-9_.-]+$`)

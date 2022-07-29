@@ -24,7 +24,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
-	"github.com/zinclabs/zinc/pkg/zutils/rendezvous"
+	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
 )
 
 func LoadZincIndexesFromMetadata() error {

@@ -26,7 +26,7 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
-	"github.com/zinclabs/zinc/pkg/zutils/rendezvous"
+	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
 )
 
 type Index struct {
