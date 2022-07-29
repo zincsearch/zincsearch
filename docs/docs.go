@@ -114,14 +114,43 @@ const docTemplate = `{
                 ],
                 "summary": "List indexes",
                 "operationId": "ListIndexes",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page num",
+                        "name": "page_num",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort by",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "desc",
+                        "name": "desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/core.Index"
-                            }
+                            "$ref": "#/definitions/index.IndexListResponse"
                         }
                     }
                 }
@@ -742,6 +771,59 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/{index}/_multi": {
+            "post": {
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Document"
+                ],
+                "summary": "Multi documents",
+                "operationId": "Multi",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseRecordCount"
                         }
                     },
                     "400": {
@@ -1455,51 +1537,7 @@ const docTemplate = `{
             }
         },
         "core.Index": {
-            "type": "object",
-            "properties": {
-                "create_at": {
-                    "type": "string"
-                },
-                "doc_num": {
-                    "type": "integer"
-                },
-                "doc_time_max": {
-                    "type": "integer"
-                },
-                "doc_time_min": {
-                    "type": "integer"
-                },
-                "mappings": {
-                    "$ref": "#/definitions/meta.Mappings"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "settings": {
-                    "$ref": "#/definitions/meta.IndexSettings"
-                },
-                "shard_num": {
-                    "type": "integer"
-                },
-                "shards": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/meta.IndexShard"
-                    }
-                },
-                "storage_size": {
-                    "type": "integer"
-                },
-                "storage_type": {
-                    "type": "string"
-                },
-                "update_at": {
-                    "type": "string"
-                },
-                "wal_size": {
-                    "type": "integer"
-                }
-            }
+            "type": "object"
         },
         "index.AnalyzeResponse": {
             "type": "object",
@@ -1532,6 +1570,20 @@ const docTemplate = `{
                 },
                 "type": {
                     "type": "string"
+                }
+            }
+        },
+        "index.IndexListResponse": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/core.Index"
+                    }
+                },
+                "page": {
+                    "$ref": "#/definitions/meta.Page"
                 }
             }
         },
@@ -2134,26 +2186,6 @@ const docTemplate = `{
                 }
             }
         },
-        "meta.IndexShard": {
-            "type": "object",
-            "properties": {
-                "doc_num": {
-                    "type": "integer"
-                },
-                "doc_time_max": {
-                    "type": "integer"
-                },
-                "doc_time_min": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "storage_size": {
-                    "type": "integer"
-                }
-            }
-        },
         "meta.IndexSimple": {
             "type": "object",
             "properties": {
@@ -2166,6 +2198,9 @@ const docTemplate = `{
                 },
                 "settings": {
                     "$ref": "#/definitions/meta.IndexSettings"
+                },
+                "shard_num": {
+                    "type": "integer"
                 },
                 "storage_type": {
                     "type": "string"
@@ -2307,6 +2342,20 @@ const docTemplate = `{
                 "type": {
                     "description": "best_fields(default), most_fields, cross_fields, phrase, phrase_prefix, bool_prefix",
                     "type": "string"
+                }
+            }
+        },
+        "meta.Page": {
+            "type": "object",
+            "properties": {
+                "page_num": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },

@@ -29,6 +29,9 @@ func Request(v interface{}) (*meta.Source, error) {
 	if v == nil {
 		return source, nil
 	}
+	if v, ok := v.(*meta.Source); ok {
+		return v, nil
+	}
 
 	switch v := v.(type) {
 	case bool:

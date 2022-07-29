@@ -13,5 +13,8 @@
 * limitations under the License.
  */
 
-// Package elastic holds the ElasticSearch specific meta declarations and util functions.
-package elastic
+package hash
+
+type Hasher interface {
+	Sum64(string) uint64
+}

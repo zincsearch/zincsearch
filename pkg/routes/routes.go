@@ -34,6 +34,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/handlers/index"
 	"github.com/zinclabs/zinc/pkg/handlers/search"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/meta/elastic"
 )
 
 // SetRoutes sets up all gin HTTP API endpoints that can be called by front end
@@ -112,6 +113,7 @@ func SetRoutes(r *gin.Engine) {
 	// Document Bulk update/insert
 	r.POST("/api/_bulk", AuthMiddleware, document.Bulk)
 	r.POST("/api/:target/_bulk", AuthMiddleware, document.Bulk)
+	r.POST("/api/:target/_multi", AuthMiddleware, document.Multi)
 	// Document CRUD APIs. Update is same as create.
 	r.POST("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)    // create
 	r.PUT("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)     // create
@@ -124,13 +126,16 @@ func SetRoutes(r *gin.Engine) {
 	 */
 
 	r.GET("/es/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, meta.NewESInfo(c))
+		c.JSON(http.StatusOK, elastic.NewESInfo(c))
+	})
+	r.HEAD("/es/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, elastic.NewESInfo(c))
 	})
 	r.GET("/es/_license", func(c *gin.Context) {
-		c.JSON(http.StatusOK, meta.NewESLicense(c))
+		c.JSON(http.StatusOK, elastic.NewESLicense(c))
 	})
 	r.GET("/es/_xpack", func(c *gin.Context) {
-		c.JSON(http.StatusOK, meta.NewESXPack(c))
+		c.JSON(http.StatusOK, elastic.NewESXPack(c))
 	})
 
 	r.POST("/es/_search", AuthMiddleware, search.SearchDSL)
@@ -144,6 +149,10 @@ func SetRoutes(r *gin.Engine) {
 	r.GET("/es/_index_template/:target", AuthMiddleware, index.GetTemplate)
 	r.HEAD("/es/_index_template/:target", AuthMiddleware, index.GetTemplate)
 	r.DELETE("/es/_index_template/:target", AuthMiddleware, index.DeleteTemplate)
+	// ES Compatible data stream
+	r.PUT("/es/_data_stream/:target", AuthMiddleware, elastic.PutDataStream)
+	r.GET("/es/_data_stream/:target", AuthMiddleware, elastic.GetDataStream)
+	r.HEAD("/es/_data_stream/:target", AuthMiddleware, elastic.GetDataStream)
 
 	r.PUT("/es/:target", AuthMiddleware, index.CreateES)
 	r.HEAD("/es/:target", AuthMiddleware, index.Exist)

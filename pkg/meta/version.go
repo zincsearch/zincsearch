@@ -40,7 +40,7 @@ var (
 )
 
 // GetVersion returns the version of the program
-
+//
 // @Id Version
 // @Summary Get version
 // @Produce json

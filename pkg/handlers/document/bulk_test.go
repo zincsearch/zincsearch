@@ -66,6 +66,7 @@ func TestBulk(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c, w := utils.NewGinContext()
 			utils.SetGinRequestData(c, tt.args.data)
+			utils.SetGinRequestParams(c, tt.args.params)
 			Bulk(c)
 			assert.Equal(t, tt.args.code, w.Code)
 			assert.Contains(t, w.Body.String(), tt.args.result)
@@ -115,6 +116,7 @@ func TestESBulk(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c, w := utils.NewGinContext()
 			utils.SetGinRequestData(c, tt.args.data)
+			utils.SetGinRequestParams(c, tt.args.params)
 			ESBulk(c)
 			assert.Equal(t, tt.args.code, w.Code)
 			assert.Contains(t, w.Body.String(), tt.args.result)

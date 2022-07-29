@@ -26,8 +26,9 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-// Delete deletes a zinc index and its associated data. Be careful using thus as you ca't undo this action.
-
+// Delete deletes a zinc index and its associated data.
+// Be careful using thus as you ca't undo this action.
+//
 // @Id DeleteIndex
 // @Summary Delete index
 // @Tags    Index
@@ -82,8 +83,8 @@ func deleteIndexWithWildcard(indexName string, indexList []*core.Index) error {
 	}
 
 	for _, i := range indexList {
-		if p.MatchString(i.Name) {
-			if err := core.DeleteIndex(i.Name); err != nil {
+		if p.MatchString(i.GetName()) {
+			if err := core.DeleteIndex(i.GetName()); err != nil {
 				return err
 			}
 		}

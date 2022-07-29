@@ -32,6 +32,8 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
+// Bulk accept multiple documents, first line index metadata, second line document
+//
 // @Id Bulk
 // @Summary Bulk documents
 // @Tags    Document
@@ -55,6 +57,8 @@ func Bulk(c *gin.Context) {
 	c.JSON(http.StatusOK, meta.HTTPResponseRecordCount{Message: "bulk data inserted", RecordCount: ret.Count})
 }
 
+// ESBulk accept multiple documents, first line index metadata, second line document
+//
 // @Id ESBulk
 // @Summary ES bulk documents
 // @Tags    Document
@@ -143,7 +147,7 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 			default:
 			}
 
-			newIndex, _, err := core.GetOrCreateIndex(indexName, "")
+			newIndex, _, err := core.GetOrCreateIndex(indexName, "", 0)
 			if err != nil {
 				return bulkRes, err
 			}
@@ -187,7 +191,7 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 						return nil, errors.New("bulk index data format error")
 					}
 
-					newIndex, _, err := core.GetOrCreateIndex(indexName, "")
+					newIndex, _, err := core.GetOrCreateIndex(indexName, "", 0)
 					if err != nil {
 						return bulkRes, err
 					}
