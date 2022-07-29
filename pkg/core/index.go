@@ -26,15 +26,18 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
+	"github.com/zinclabs/zinc/pkg/zutils/rendezvous"
 )
 
 type Index struct {
-	ref          *meta.Index
-	analyzers    map[string]*analysis.Analyzer
-	shards       []*IndexShard
-	shardNum     int64
-	shardNumUint uint64 // just for do HASH
-	lock         sync.RWMutex
+	ref           *meta.Index
+	analyzers     map[string]*analysis.Analyzer
+	shards        []*IndexShard
+	shardNum      int64
+	shardNumUint  uint64 // just for do HASH
+	shardHashRing *rendezvous.Rendezvous
+	shardHashData map[string]*IndexShard
+	lock          sync.RWMutex
 }
 
 func (index *Index) MarshalJSON() ([]byte, error) {

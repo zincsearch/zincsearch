@@ -1,13 +1,26 @@
-package zutils
+/* Copyright 2022 Zinc Labs Inc. and Contributors
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+ */
 
-type Hasher interface {
-	Sum64(string) uint64
-}
+package fnv64
+
+import "github.com/zinclabs/zinc/pkg/zutils/hash"
 
 // newDefaultHasher returns a new 64-bit FNV-1a Hasher which makes no memory allocations.
 // Its Sum64 method will lay the value out in big-endian byte order.
 // See https://en.wikipedia.org/wiki/Fowler–Noll–Vo_hash_function
-func NewDefaultHasher() Hasher {
+func NewDefaultHasher() hash.Hasher {
 	return fnv64a{}
 }
 

@@ -16,12 +16,15 @@
 package core
 
 import (
+	"fmt"
+
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
+	"github.com/zinclabs/zinc/pkg/zutils/rendezvous"
 )
 
 func LoadZincIndexesFromMetadata() error {
@@ -72,6 +75,15 @@ func LoadZincIndexesFromMetadata() error {
 				}
 				totalShardNum++
 			}
+		}
+
+		// init shards hashing
+		index.shardHashData = make(map[string]*IndexShard)
+		index.shardHashRing = rendezvous.New()
+		for i := range index.shards {
+			key := fmt.Sprintf("%06x", i)
+			index.shardHashData[key] = index.shards[i]
+			index.shardHashRing.Add(key)
 		}
 
 		log.Info().Msgf("Loading  index... [%s:%s] shards[%d:%d]", index.ref.Name, index.ref.StorageType, index.ref.ShardNum, totalShardNum)

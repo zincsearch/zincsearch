@@ -27,6 +27,9 @@ func Request(v interface{}) (search.SortOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
+	if v, ok := v.(search.SortOrder); ok {
+		return v, nil
+	}
 
 	sorts := make(search.SortOrder, 0, 1)
 	switch v := v.(type) {

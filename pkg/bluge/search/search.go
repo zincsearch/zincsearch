@@ -19,44 +19,59 @@ import (
 	"context"
 
 	"github.com/blugelabs/bluge"
+	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/search"
+	"github.com/blugelabs/bluge/search/aggregations"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/uquery"
 )
 
-func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge.Reader) (search.DocumentMatchIterator, error) {
+func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer, readers ...*bluge.Reader) (search.DocumentMatchIterator, error) {
 	if len(readers) == 0 {
 		return nil, nil
 	}
 	if len(readers) == 1 {
+		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
+		if err != nil {
+			return nil, err
+		}
 		return readers[0].Search(ctx, req)
 	}
 
+	bucketAggs := make(map[string]search.Aggregation)
+	bucketAggs["duration"] = aggregations.Duration()
+
 	eg := &errgroup.Group{}
 	eg.SetLimit(10)
-	docs := make(chan *search.DocumentMatch, req.Collector().Size()*len(readers))
+	docs := make(chan *search.DocumentMatch, len(readers)*2)
 	aggs := make(chan *search.Bucket, len(readers))
 
-	docList := &DocumentList{}
-	eg2 := &errgroup.Group{}
-	eg2.Go(func() error {
+	docList := &DocumentList{
+		bucket: search.NewBucket("", bucketAggs),
+		size:   int64(query.Size),
+	}
+	egm := &errgroup.Group{}
+	egm.Go(func() error {
 		for doc := range docs {
 			docList.addDocument(doc)
 		}
 		return nil
 	})
-	eg2.Go(func() error {
+	egm.Go(func() error {
 		for agg := range aggs {
-			if docList.bucket == nil {
-				docList.bucket = agg
-			} else {
-				docList.bucket.Merge(agg)
-			}
+			docList.bucket.Merge(agg)
 		}
 		return nil
 	})
 
 	for _, r := range readers {
 		r := r
+		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
+		if err != nil {
+			return nil, err
+		}
 		eg.Go(func() error {
 			dmi, err := r.Search(ctx, req)
 			if err != nil {
@@ -77,7 +92,7 @@ func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge
 
 	close(docs)
 	close(aggs)
-	_ = eg2.Wait()
+	_ = egm.Wait()
 
 	docList.Done()
 
@@ -87,7 +102,8 @@ func MultiSearch(ctx context.Context, req bluge.SearchRequest, readers ...*bluge
 type DocumentList struct {
 	docs   []*search.DocumentMatch
 	bucket *search.Bucket
-	next   int
+	size   int64
+	next   int64
 }
 
 func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
@@ -95,12 +111,12 @@ func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
 }
 
 func (d *DocumentList) Done() {
-	// sort
-	// merge aggs
+	// TODO: sort
+	d.bucket.Finish()
 }
 
 func (d *DocumentList) Next() (*search.DocumentMatch, error) {
-	if d.next >= len(d.docs) {
+	if d.next >= d.size || d.next >= int64(len(d.docs)) {
 		return nil, nil
 	}
 	doc := d.docs[d.next]

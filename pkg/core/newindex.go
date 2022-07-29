@@ -27,6 +27,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
+	"github.com/zinclabs/zinc/pkg/zutils/rendezvous"
 )
 
 var indexNameRe = regexp.MustCompile(`^[a-zA-Z0-9_.-]+$`)
@@ -95,6 +96,15 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 				ref:  index.ref.Shards[i].Shards[j],
 			}
 		}
+	}
+
+	// init shards hashing
+	index.shardHashData = make(map[string]*IndexShard)
+	index.shardHashRing = rendezvous.New()
+	for i := range index.shards {
+		key := fmt.Sprintf("%06x", i)
+		index.shardHashData[key] = index.shards[i]
+		index.shardHashRing.Add(key)
 	}
 
 	return index, nil

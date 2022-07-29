@@ -31,11 +31,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/wal"
-	"github.com/zinclabs/zinc/pkg/zutils"
 )
-
-// HASH default hash function for docID
-var HASH = zutils.NewDefaultHasher()
 
 const (
 	ShardNoNeedLatest int64 = -1 // get lastest shardID
@@ -77,9 +73,8 @@ type IndexSecondShard struct {
 
 // GetShardByDocID return the shard by hash docID
 func (index *Index) GetShardByDocID(docID string) *IndexShard {
-	keyHash := HASH.Sum64(docID)
-	shardKey := keyHash % index.shardNumUint
-	return index.shards[shardKey]
+	shardKey := index.shardHashRing.Lookup(docID)
+	return index.shardHashData[shardKey]
 }
 
 // CheckShards check all shards status if need create new second layer shard
