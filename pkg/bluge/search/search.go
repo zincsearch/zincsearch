@@ -32,7 +32,13 @@ import (
 
 func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer, readers ...*bluge.Reader) (search.DocumentMatchIterator, error) {
 	if len(readers) == 0 {
-		return &DocumentList{}, nil
+		return &DocumentList{
+			bucket: search.NewBucket("",
+				map[string]search.Aggregation{
+					"duration": aggregations.Duration(),
+				},
+			),
+		}, nil
 	}
 	if len(readers) == 1 {
 		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
