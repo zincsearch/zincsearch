@@ -55,23 +55,25 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	eg := &errgroup.Group{}
 	eg.SetLimit(config.Global.ReadGorutineNum)
 	docs := make(chan *search.DocumentMatch, len(readers)*10)
-	//aggsChan := make(chan *search.Bucket, len(readers))
+	aggsChan := make(chan *search.Bucket, len(readers))
 
 	docList := &DocumentList{}
 	egm := &errgroup.Group{}
 	egm.Go(func() error {
+		hitNum := 0
 		for doc := range docs {
-			docList.bucket.Consume(doc)
+			hitNum++
+			doc.HitNumber = hitNum
 			docList.addDocument(doc)
 		}
 		return nil
 	})
-	//egm.Go(func() error {
-	//	for agg := range aggsChan {
-	//		docList.bucket.Merge(agg)
-	//	}
-	//	return nil
-	//})
+	egm.Go(func() error {
+		for agg := range aggsChan {
+			docList.bucket.Merge(agg)
+		}
+		return nil
+	})
 
 	var sort search.SortOrder
 	var size int
@@ -102,7 +104,7 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 				docs <- next
 				next, err = dmi.Next()
 			}
-			//aggsChan <- dmi.Aggregations()
+			aggsChan <- dmi.Aggregations()
 
 			if n > atomic.LoadInt64(&docList.size) {
 				atomic.StoreInt64(&docList.size, n)
@@ -118,7 +120,7 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	}
 
 	close(docs)
-	//close(aggsChan)
+	close(aggsChan)
 	_ = egm.Wait()
 
 	err := docList.Done(size, skip, len(readers), reversed, sort)
