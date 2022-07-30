@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/blugelabs/bluge/search/collector"
+	"github.com/zinclabs/zinc/pkg/config"
 	"sync/atomic"
 
 	"github.com/blugelabs/bluge"
@@ -52,37 +53,39 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	bucketAggs["duration"] = aggregations.Duration()
 
 	eg := &errgroup.Group{}
-	eg.SetLimit(1000)
-	docs := make(chan *search.DocumentMatch, len(readers)*2)
-	aggs := make(chan *search.Bucket, len(readers))
+	eg.SetLimit(config.Global.ReadGorutineNum)
+	docs := make(chan *search.DocumentMatch, len(readers)*10)
+	//aggsChan := make(chan *search.Bucket, len(readers))
 
-	docList := &DocumentList{
-		bucket: search.NewBucket("", bucketAggs),
-	}
+	docList := &DocumentList{}
 	egm := &errgroup.Group{}
 	egm.Go(func() error {
 		for doc := range docs {
+			docList.bucket.Consume(doc)
 			docList.addDocument(doc)
 		}
 		return nil
 	})
-	egm.Go(func() error {
-		for agg := range aggs {
-			docList.bucket.Merge(agg)
-		}
-		return nil
-	})
+	//egm.Go(func() error {
+	//	for agg := range aggsChan {
+	//		docList.bucket.Merge(agg)
+	//	}
+	//	return nil
+	//})
 
 	var sort search.SortOrder
 	var size int
 	var skip int
 	var reversed bool
+	var aggs search.Aggregations
 	for _, r := range readers {
 		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
 		if err != nil {
 			return nil, err
 		}
 		if sort == nil { // init vars
+			aggs = req.Aggregations()
+			docList.bucket = search.NewBucket("", aggs)
 			sort = req.SortOrder()
 			size, skip, reversed = req.SizeSkipAndReversed()
 		}
@@ -99,7 +102,7 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 				docs <- next
 				next, err = dmi.Next()
 			}
-			aggs <- dmi.Aggregations()
+			//aggsChan <- dmi.Aggregations()
 
 			if n > atomic.LoadInt64(&docList.size) {
 				atomic.StoreInt64(&docList.size, n)
@@ -115,10 +118,10 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	}
 
 	close(docs)
-	close(aggs)
+	//close(aggsChan)
 	_ = egm.Wait()
 
-	err := docList.Done(size, skip, reversed, sort)
+	err := docList.Done(size, skip, len(readers), reversed, sort)
 	if err != nil {
 		return nil, err
 	}
@@ -137,14 +140,38 @@ func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
 	d.docs = append(d.docs, doc)
 }
 
-func (d *DocumentList) Done(size, skip int, reversed bool, sort search.SortOrder) error {
+func (d *DocumentList) Done(size, skip, numSearchers int, reversed bool, sort search.SortOrder) error {
 	store := collector.NewCollectorStore(size, skip, reversed, sort)
 
 	d.bucket.Finish()
 	backingSize := size + skip + 1
+	backingSize *= numSearchers
 
-	for i := range d.docs {
-		store.AddNotExceedingSize(d.docs[i], backingSize)
+	var lowestMatchOutsideResults *search.DocumentMatch
+	var removed *search.DocumentMatch
+	for _, d := range d.docs {
+
+		// optimization, we track lowest sorting hit already removed from heap
+		// with this one comparison, we can avoid all heap operations if
+		// this hit would have been added and then immediately removed
+		if lowestMatchOutsideResults != nil {
+			cmp := sort.Compare(d, lowestMatchOutsideResults)
+			if cmp >= 0 {
+				continue
+			}
+		}
+
+		removed = store.AddNotExceedingSize(d, backingSize)
+		if removed != nil {
+			if lowestMatchOutsideResults == nil {
+				lowestMatchOutsideResults = removed
+			} else {
+				cmp := sort.Compare(removed, lowestMatchOutsideResults)
+				if cmp < 0 {
+					lowestMatchOutsideResults = removed
+				}
+			}
+		}
 	}
 
 	results, err := store.Final(skip, func(doc *search.DocumentMatch) error {
@@ -161,6 +188,7 @@ func (d *DocumentList) Done(size, skip int, reversed bool, sort search.SortOrder
 		}
 	}
 
+	d.docs = results
 	return nil
 }
 
