@@ -99,7 +99,7 @@ func (s *IndexShard) Rollback() error {
 	// Rollback
 	log.Info().
 		Str("index", s.GetIndexName()).
-		Int64("shard", s.GetID()).
+		Str("shard", s.GetID()).
 		Uint64("minID", readMinID).
 		Uint64("maxID", readMaxID).
 		Msg("rollback start")
@@ -110,14 +110,14 @@ func (s *IndexShard) Rollback() error {
 	for minID := readMinID; minID <= readMaxID; minID++ {
 		entry, err = s.wal.Read(minID)
 		if err != nil {
-			log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Msg("rollback wal.Read()")
+			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("rollback wal.Read()")
 			return err
 		}
 
 		doc := make(map[string]interface{})
 		err = json.Unmarshal(entry, &doc)
 		if err != nil {
-			log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Msg("rollback wal.entry.Unmarshal()")
+			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("rollback wal.entry.Unmarshal()")
 			return err
 		}
 		docs.AddDocument(doc)
@@ -131,16 +131,16 @@ func (s *IndexShard) Rollback() error {
 	// Truncate log
 	minID := readMinID - 1 // minID should be last successfully committed ID
 	if err = s.wal.TruncateFront(minID); err != nil {
-		log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Uint64("id", minID).Msg("rollback wal.Truncate()")
+		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Uint64("id", minID).Msg("rollback wal.Truncate()")
 	}
 
-	log.Info().Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Uint64("minID", readMinID).Uint64("maxID", readMaxID).Msg("rollback success")
+	log.Info().Str("index", s.GetIndexName()).Str("shard", s.GetID()).Uint64("minID", readMinID).Uint64("maxID", readMaxID).Msg("rollback success")
 	return nil
 }
 
 func (s *IndexShard) ConsumeWAL() {
 	if err := s.wal.Sync(); err != nil {
-		log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Msg("consume wal.Sync()")
+		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.Sync()")
 	}
 
 	var err error
@@ -148,13 +148,13 @@ func (s *IndexShard) ConsumeWAL() {
 	var minID, maxID, startID uint64
 	maxID, err = s.wal.LastIndex()
 	if err != nil {
-		log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Msg("consume wal.LastIndex()")
+		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.LastIndex()")
 		return
 	}
 	// read last committed ID
 	_, minID, err = s.readRedoLog(RedoActionWrite)
 	if err != nil && err.Error() != errors.ErrNotFound.Error() {
-		log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Msg("consume wal.readRedoLog()")
+		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.readRedoLog()")
 		return
 	}
 	if minID == maxID {
@@ -173,28 +173,28 @@ func (s *IndexShard) ConsumeWAL() {
 	for startID = minID; minID <= maxID; minID++ {
 		entry, err = s.wal.Read(minID)
 		if err != nil {
-			log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Msg("consume wal.Read()")
+			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.Read()")
 			return
 		}
 
 		doc := make(map[string]interface{})
 		err = json.Unmarshal(entry, &doc)
 		if err != nil {
-			log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Msg("consume wal.entry.Unmarshal()")
+			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.entry.Unmarshal()")
 			return
 		}
 		docs.AddDocument(doc)
 		if docs.MaxShardLen() >= config.Global.BatchSize {
 			if err = s.writeRedoLog(RedoActionRead, startID, minID); err != nil {
-				log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Str("stage", "read").Msg("consume wal.redolog.Write()")
+				log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Str("stage", "read").Msg("consume wal.redolog.Write()")
 				return
 			}
 			if err = docs.WriteTo(s, batch, false); err != nil {
-				log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Msg("consume wal.docs.WriteTo()")
+				log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.docs.WriteTo()")
 				return
 			}
 			if err = s.writeRedoLog(RedoActionWrite, startID, minID); err != nil {
-				log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Str("stage", "write").Msg("consume wal.redolog.Write()")
+				log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Str("stage", "write").Msg("consume wal.redolog.Write()")
 				return
 			}
 			// Reset startID to nextID
@@ -207,15 +207,15 @@ func (s *IndexShard) ConsumeWAL() {
 	// check if there is any docs to write
 	if docs.MaxShardLen() > 0 {
 		if err = s.writeRedoLog(RedoActionRead, startID, minID); err != nil {
-			log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Str("stage", "read").Msg("consume wal.redolog.Write()")
+			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Str("stage", "read").Msg("consume wal.redolog.Write()")
 			return
 		}
 		if err := docs.WriteTo(s, batch, false); err != nil {
-			log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Msg("consume wal.docs.WriteTo()")
+			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.docs.WriteTo()")
 			return
 		}
 		if err = s.writeRedoLog(RedoActionWrite, startID, minID); err != nil {
-			log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Str("stage", "write").Msg("consume wal.redolog.Write()")
+			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Str("stage", "write").Msg("consume wal.redolog.Write()")
 			return
 		}
 	}
@@ -223,13 +223,13 @@ func (s *IndexShard) ConsumeWAL() {
 
 	// Truncate log
 	if err = s.wal.TruncateFront(minID); err != nil {
-		log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Uint64("id", minID).Msg("consume wal.Truncate()")
+		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Uint64("id", minID).Msg("consume wal.Truncate()")
 		return
 	}
 
 	// check shards
 	if err = s.CheckShards(); err != nil {
-		log.Error().Err(err).Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Msg("consume index.CheckShards()")
+		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume index.CheckShards()")
 		return
 	}
 

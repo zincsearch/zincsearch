@@ -16,7 +16,6 @@
 package core
 
 import (
-	"fmt"
 	"sort"
 	"sync"
 	"sync/atomic"
@@ -40,16 +39,25 @@ func init() {
 	// check version
 	version, _ := metadata.KV.Get("version")
 	if version == nil {
-		err := metadata.KV.Set("version", []byte(meta.Version))
+		version = []byte(meta.Version)
+		err := metadata.KV.Set("version", version)
 		if err != nil {
-			fmt.Println("error:", err)
+			log.Error().Err(err).Msg("Error set version")
 		}
 	}
 
 	// start loading index
 	ZINC_INDEX_LIST.Indexes = make(map[string]*Index)
-	if err := LoadZincIndexesFromMetadata(); err != nil {
-		log.Error().Err(err).Msg("Error loading index")
+	if err := LoadZincIndexesFromMetadata(string(version)); err != nil {
+		log.Fatal().Err(err).Msg("Error loading index")
+	}
+
+	// update version
+	if string(version) != meta.Version {
+		err := metadata.KV.Set("version", []byte(meta.Version))
+		if err != nil {
+			log.Error().Err(err).Msg("Error set version")
+		}
 	}
 }
 
