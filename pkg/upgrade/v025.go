@@ -13,23 +13,8 @@
 * limitations under the License.
  */
 
-package ider
+package upgrade
 
-import (
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-)
-
-func TestGenerate(t *testing.T) {
-	got := Generate()
-	assert.NotEmpty(t, got)
-}
-
-func TestNewNode(t *testing.T) {
-	node, err := NewNode(1)
-	assert.NoError(t, err)
-	assert.NotNil(t, node)
-	id := node.Generate()
-	assert.NotEmpty(t, id)
+func UpgradeFromV025() error {
+	return nil
 }

@@ -26,6 +26,10 @@ func Do(oldVersion string) error {
 	switch oldVersion {
 	case "v0.2.4":
 		return UpgradeFromV024()
+	case "v0.2.5":
+		return UpgradeFromV025()
+	case "v0.2.6":
+		return UpgradeFromV026()
 	default:
 		return fmt.Errorf("unsupported upgrade from version: %s", oldVersion)
 	}

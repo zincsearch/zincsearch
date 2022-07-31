@@ -16,18 +16,17 @@
 package core
 
 import (
-	"fmt"
-
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
+	"github.com/zinclabs/zinc/pkg/upgrade"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
 )
 
-func LoadZincIndexesFromMetadata() error {
+func LoadZincIndexesFromMetadata(version string) error {
 	indexes, err := metadata.Index.List(0, 0)
 	if err != nil {
 		return err
@@ -44,18 +43,18 @@ func LoadZincIndexesFromMetadata() error {
 		index.ref.Stats = readIndex.Stats
 
 		index.ref.ShardNum = readIndex.ShardNum
-		index.ref.Shards = make([]*meta.IndexShard, index.ref.ShardNum)
-		for i := range readIndex.Shards {
-			index.ref.Shards[i] = &meta.IndexShard{
-				ID:       readIndex.Shards[i].ID,
-				ShardNum: readIndex.Shards[i].ShardNum,
-				Stats:    readIndex.Shards[i].Stats,
+		index.ref.Shards = make(map[string]*meta.IndexShard, index.shardNum)
+		for id := range readIndex.Shards {
+			index.ref.Shards[id] = &meta.IndexShard{
+				ID:       readIndex.Shards[id].ID,
+				ShardNum: readIndex.Shards[id].ShardNum,
+				Stats:    readIndex.Shards[id].Stats,
 			}
-			index.ref.Shards[i].Shards = make([]*meta.IndexSecondShard, index.ref.Shards[i].ShardNum)
-			for j := range readIndex.Shards[i].Shards {
-				index.ref.Shards[i].Shards[j] = &meta.IndexSecondShard{
-					ID:    readIndex.Shards[i].Shards[j].ID,
-					Stats: readIndex.Shards[i].Shards[j].Stats,
+			index.ref.Shards[id].Shards = make([]*meta.IndexSecondShard, index.ref.Shards[id].ShardNum)
+			for j := range readIndex.Shards[id].Shards {
+				index.ref.Shards[id].Shards[j] = &meta.IndexSecondShard{
+					ID:    readIndex.Shards[id].Shards[j].ID,
+					Stats: readIndex.Shards[id].Shards[j].Stats,
 				}
 			}
 		}
@@ -63,35 +62,37 @@ func LoadZincIndexesFromMetadata() error {
 		// init shards wrapper
 		totalShardNum := 0
 		index.shardNum = index.ref.ShardNum
-		index.shardNumUint = uint64(index.shardNum)
-		index.shards = make([]*IndexShard, index.shardNum)
-		for i := range index.ref.Shards {
-			index.shards[i] = &IndexShard{root: index, ref: index.ref.Shards[i]}
-			index.shards[i].shards = make([]*IndexSecondShard, index.ref.Shards[i].ShardNum)
-			for j := range index.ref.Shards[i].Shards {
-				index.shards[i].shards[j] = &IndexSecondShard{
+		index.shards = make(map[string]*IndexShard, index.shardNum)
+		for id := range index.ref.Shards {
+			index.shards[id] = &IndexShard{root: index, ref: index.ref.Shards[id]}
+			index.shards[id].shards = make([]*IndexSecondShard, index.ref.Shards[id].ShardNum)
+			for j := range index.ref.Shards[id].Shards {
+				index.shards[id].shards[j] = &IndexSecondShard{
 					root: index,
-					ref:  index.ref.Shards[i].Shards[j],
+					ref:  index.ref.Shards[id].Shards[j],
 				}
 				totalShardNum++
 			}
 		}
 
 		// init shards hashing
-		index.shardHashData = make(map[string]*IndexShard)
-		index.shardHashRing = rendezvous.New()
-		for i := range index.shards {
-			key := fmt.Sprintf("%06x", i)
-			index.shardHashData[key] = index.shards[i]
-			index.shardHashRing.Add(key)
+		index.shardHashing = rendezvous.New()
+		for id := range index.shards {
+			index.shardHashing.Add(id)
 		}
-
-		log.Info().Msgf("Loading  index... [%s:%s] shards[%d:%d]", index.ref.Name, index.ref.StorageType, index.ref.ShardNum, totalShardNum)
 
 		// upgrade from version <= 0.2.4
 		// TODO v0.2.4 -> v0.2.7
 		// TODO v0.2.5 -> v0.2.7
 		// TODO v0.2.6 -> v0.2.7
+		if version != meta.Version {
+			log.Info().Msgf("Upgrading index[%s] from version[%s] to version[%s]", index.ref.Name, version, meta.Version)
+			if err := upgrade.Do(version); err != nil {
+				return err
+			}
+		}
+
+		log.Info().Msgf("Loading  index... [%s:%s] shards[%d:%d]", index.ref.Name, index.ref.StorageType, index.ref.ShardNum, totalShardNum)
 
 		// load index analysis
 		if index.ref.Settings != nil && index.ref.Settings.Analysis != nil {
