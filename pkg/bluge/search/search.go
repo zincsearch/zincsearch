@@ -146,8 +146,7 @@ func (d *DocumentList) Done(size, skip, numSearchers int, reversed bool, sort se
 	store := collector.NewCollectorStore(size, skip, reversed, sort)
 
 	d.bucket.Finish()
-	backingSize := size + skip + 1
-	backingSize *= numSearchers
+	backingSize := len(d.docs)
 
 	var lowestMatchOutsideResults *search.DocumentMatch
 	var removed *search.DocumentMatch
