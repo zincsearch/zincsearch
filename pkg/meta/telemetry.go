@@ -24,7 +24,6 @@ import (
 )
 
 var (
-	// SEGMENT_CLIENT := analytics.New("hQYncuWEjDJC23MnU6jHXiye5k7qP2PL")
 	SEGMENT_CLIENT analytics.Client
 )
 
@@ -33,10 +32,10 @@ func init() {
 	cf := analytics.Config{
 		Interval:  15 * time.Second,
 		BatchSize: 10,
-		// Endpoint:  "http://localhost:3090",
-		Verbose: false,
-		Logger:  analytics.StdLogger(log.New(ioutil.Discard, "marker ", log.LstdFlags)), // discard any logs
+		Endpoint:  "https://e1.zinclabs.dev",
+		Verbose:   false,
+		Logger:    analytics.StdLogger(log.New(ioutil.Discard, "marker ", log.LstdFlags)), // discard any logs
 	}
 
-	SEGMENT_CLIENT, _ = analytics.NewWithConfig("CGi3aENuM7L0v1jGtSC9QEhnIVmDAEFm", cf)
+	SEGMENT_CLIENT, _ = analytics.NewWithConfig("", cf)
 }
