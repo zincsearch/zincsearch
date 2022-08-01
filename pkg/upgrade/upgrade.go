@@ -19,17 +19,29 @@ import (
 	"fmt"
 
 	"github.com/rs/zerolog/log"
+
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-func Do(oldVersion string) error {
-	log.Info().Msgf("Begin upgrade from version %s", oldVersion)
+func Do(oldVersion string, index *meta.Index) error {
+	var err error
+	log.Info().Msgf("Begin upgrade[%s] from version[%s]", index.Name, oldVersion)
 	switch oldVersion {
 	case "v0.2.4":
-		return UpgradeFromV024()
+		if err = UpgradeFromV024T025(index); err != nil {
+			return err
+		}
+		return Do("v0.2.5", index)
 	case "v0.2.5":
-		return UpgradeFromV025()
+		if err = UpgradeFromV025T026(index); err != nil {
+			return err
+		}
+		return Do("v0.2.6", index)
 	case "v0.2.6":
-		return UpgradeFromV026()
+		if err = UpgradeFromV026T027(index); err != nil {
+			return err
+		}
+		return nil
 	default:
 		return fmt.Errorf("unsupported upgrade from version: %s", oldVersion)
 	}

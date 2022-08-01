@@ -39,11 +39,9 @@ func init() {
 	// check version
 	version, _ := metadata.KV.Get("version")
 	if version == nil {
-		version = []byte(meta.Version)
-		err := metadata.KV.Set("version", version)
-		if err != nil {
-			log.Error().Err(err).Msg("Error set version")
-		}
+		// version have version from v0.2.5
+		// so if no version, it should be <= v0.2.4
+		version = []byte("v0.2.4")
 	}
 
 	// start loading index

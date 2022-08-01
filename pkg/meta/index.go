@@ -23,6 +23,7 @@ type Index struct {
 	ShardNum    int64                  `json:"shard_num"`
 	Shards      map[string]*IndexShard `json:"shards"`
 	Stats       IndexStat              `json:"stats"`
+	Version     string                 `json:"version"`
 }
 
 type IndexShard struct {

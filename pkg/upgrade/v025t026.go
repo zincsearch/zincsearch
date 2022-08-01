@@ -15,6 +15,8 @@
 
 package upgrade
 
-func UpgradeFromV026() error {
+import "github.com/zinclabs/zinc/pkg/meta"
+
+func UpgradeFromV025T026(index *meta.Index) error {
 	return nil
 }

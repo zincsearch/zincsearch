@@ -19,6 +19,7 @@ import (
 	"github.com/goccy/go-json"
 
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/upgrade"
 )
 
 type index struct{}
@@ -35,7 +36,16 @@ func (t *index) List(offset, limit int) ([]*meta.Index, error) {
 		idx := new(meta.Index)
 		err = json.Unmarshal(d, idx)
 		if err != nil {
-			return nil, err
+			if err.Error() == "expected { character for map value" {
+				// compatible for v026 --> begin
+				err = upgrade.UpgradeMetadataFromV026T027(idx, d)
+				if err != nil {
+					return nil, err
+				}
+				// compatible for v026 --> end
+			} else {
+				return nil, err
+			}
 		}
 		indexes = append(indexes, idx)
 	}

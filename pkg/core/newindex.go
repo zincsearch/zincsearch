@@ -64,6 +64,7 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 	index.ref = new(meta.Index)
 	index.ref.Name = name
 	index.ref.StorageType = storageType
+	index.ref.Version = meta.Version
 
 	// use template
 	if err := index.UseTemplate(); err != nil {
