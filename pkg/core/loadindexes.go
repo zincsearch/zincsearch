@@ -42,6 +42,19 @@ func LoadZincIndexesFromMetadata(version string) error {
 		index.ref.Mappings = readIndex.Mappings
 		index.ref.Stats = readIndex.Stats
 
+		// upgrade from old version
+		if readIndex.Version != "" {
+			version = readIndex.Version
+		}
+		if version != meta.Version {
+			log.Info().Msgf("Upgrade index[%s] from version[%s] to version[%s]", readIndex.Name, version, meta.Version)
+			if err := upgrade.Do(version, readIndex); err != nil {
+				return err
+			}
+			index.ref.Version = meta.Version
+		}
+
+		// init shards
 		index.ref.ShardNum = readIndex.ShardNum
 		index.ref.Shards = make(map[string]*meta.IndexShard, index.shardNum)
 		for id := range readIndex.Shards {
@@ -79,17 +92,6 @@ func LoadZincIndexesFromMetadata(version string) error {
 		index.shardHashing = rendezvous.New()
 		for id := range index.shards {
 			index.shardHashing.Add(id)
-		}
-
-		// upgrade from version <= 0.2.4
-		// TODO v0.2.4 -> v0.2.7
-		// TODO v0.2.5 -> v0.2.7
-		// TODO v0.2.6 -> v0.2.7
-		if version != meta.Version {
-			log.Info().Msgf("Upgrading index[%s] from version[%s] to version[%s]", index.ref.Name, version, meta.Version)
-			if err := upgrade.Do(version); err != nil {
-				return err
-			}
 		}
 
 		log.Info().Msgf("Loading  index... [%s:%s] shards[%d:%d]", index.ref.Name, index.ref.StorageType, index.ref.ShardNum, totalShardNum)
