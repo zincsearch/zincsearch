@@ -56,11 +56,14 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	docs := make(chan *search.DocumentMatch, len(readers)*10)
 	aggsChan := make(chan *search.Bucket, len(readers))
 
-	var sortOrder search.SortOrder
-	var size int
-	var skip int
-	var reversed bool
-	var aggs search.Aggregations
+	var (
+		sortOrder    search.SortOrder
+		size         int
+		skip         int
+		reversed     bool
+		aggs         search.Aggregations
+		neededFields []string
+	)
 
 	docList := &DocumentList{}
 	egm := &errgroup.Group{}
@@ -84,29 +87,28 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 		if sortOrder == nil { // init vars
 			aggs = req.Aggregations()
 			docList.bucket = search.NewBucket("", aggs)
-			sortOrder = req.SortOrder()
+			sortOrder = req.SortOrder().Copy()
 			size, skip, reversed = req.SizeSkipAndReversed()
+
+			neededFields = sortOrder.Fields()
+			neededFields = append(neededFields, aggs.Fields()...)
+			neededFields = filterRepeatedFields(neededFields)
 		}
 
 		r := r
 		eg.Go(func() error {
 			var n int64
-			dmi, err := r.Searcher(req)
+			searcher, err := r.Searcher(req)
 			if err != nil {
 				return err
 			}
 
-			// these lookups traverse an interface, so do once up-front
-			neededFields := sortOrder.Fields()
-			neededFields = append(neededFields, aggs.Fields()...)
+			sctx := search.NewSearchContext(size+searcher.DocumentMatchPoolSize(), len(sortOrder))
 
-			sctx := search.NewSearchContext(size+dmi.DocumentMatchPoolSize(), len(sortOrder))
-
-			next, err := dmi.Next(sctx)
+			next, err := searcher.Next(sctx)
 			for err == nil && next != nil {
 				n++
 
-				neededFields = filterRepeatedFields(neededFields)
 				if len(neededFields) > 0 {
 					err = next.LoadDocumentValues(sctx, neededFields)
 					if err != nil {
@@ -116,7 +118,7 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 
 				req.SortOrder().Compute(next)
 				docs <- next
-				next, err = dmi.Next(sctx)
+				next, err = searcher.Next(sctx)
 			}
 
 			if n > atomic.LoadInt64(&docList.size) {
