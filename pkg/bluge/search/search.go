@@ -97,27 +97,19 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 		r := r
 		eg.Go(func() error {
 			var n int64
-			searcher, err := r.Searcher(req)
+			dmi, err := r.Search(ctx, req)
 			if err != nil {
 				return err
 			}
-
-			sctx := search.NewSearchContext(size+searcher.DocumentMatchPoolSize(), len(sortOrder))
-
-			next, err := searcher.Next(sctx)
+			next, err := dmi.Next()
 			for err == nil && next != nil {
 				n++
-
-				if len(neededFields) > 0 {
-					err = next.LoadDocumentValues(sctx, neededFields)
-					if err != nil {
-						return err
-					}
-				}
-
-				req.SortOrder().Compute(next)
 				docs <- next
-				next, err = searcher.Next(sctx)
+				next, err = dmi.Next()
+			}
+
+			if n > atomic.LoadInt64(&docList.size) {
+				atomic.StoreInt64(&docList.size, n)
 			}
 
 			if n > atomic.LoadInt64(&docList.size) {
