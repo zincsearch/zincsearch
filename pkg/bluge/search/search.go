@@ -54,7 +54,6 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	eg := &errgroup.Group{}
 	eg.SetLimit(config.Global.ReadGorutineNum)
 	docs := make(chan *search.DocumentMatch, len(readers)*10)
-	aggsChan := make(chan *search.Bucket, len(readers))
 
 	docList := &DocumentList{}
 	egm := &errgroup.Group{}
@@ -133,7 +132,6 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	}
 
 	close(docs)
-	close(aggsChan)
 	_ = egm.Wait()
 
 	err := docList.Done(size, skip, reversed, sortOrder)
@@ -173,7 +171,7 @@ func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
 }
 
 func (d *DocumentList) Done(size, skip int, reversed bool, sortOrder search.SortOrder) error {
-	sort.SliceStable(d.docs, func(i, j int) bool {
+	sort.Slice(d.docs, func(i, j int) bool {
 		cmp := sortOrder.Compare(d.docs[i], d.docs[j])
 		return cmp > 0
 	})
