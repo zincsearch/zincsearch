@@ -56,15 +56,6 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	docs := make(chan *search.DocumentMatch, len(readers)*10)
 	aggsChan := make(chan *search.Bucket, len(readers))
 
-	var (
-		sortOrder    search.SortOrder
-		size         int
-		skip         int
-		reversed     bool
-		aggs         search.Aggregations
-		neededFields []string
-	)
-
 	docList := &DocumentList{}
 	egm := &errgroup.Group{}
 	egm.Go(func() error {
@@ -78,6 +69,15 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 		docList.bucket.Finish()
 		return nil
 	})
+
+	var (
+		sortOrder    search.SortOrder
+		size         int
+		skip         int
+		reversed     bool
+		aggs         search.Aggregations
+		neededFields []string
+	)
 
 	for _, r := range readers {
 		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
