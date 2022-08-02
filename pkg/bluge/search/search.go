@@ -56,6 +56,12 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	docs := make(chan *search.DocumentMatch, len(readers)*10)
 	aggsChan := make(chan *search.Bucket, len(readers))
 
+	var sortOrder search.SortOrder
+	var size int
+	var skip int
+	var reversed bool
+	var aggs search.Aggregations
+
 	docList := &DocumentList{}
 	egm := &errgroup.Group{}
 	egm.Go(func() error {
@@ -63,6 +69,7 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 		for doc := range docs {
 			hitNum++
 			doc.HitNumber = hitNum
+			sortOrder.Compute(doc)
 			docList.bucket.Consume(doc)
 			docList.addDocument(doc)
 		}
@@ -70,11 +77,6 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 		return nil
 	})
 
-	var sortOrder search.SortOrder
-	var size int
-	var skip int
-	var reversed bool
-	var aggs search.Aggregations
 	for _, r := range readers {
 		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
 		if err != nil {
@@ -139,7 +141,7 @@ func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
 func (d *DocumentList) Done(size, skip int, reversed bool, sortOrder search.SortOrder) error {
 	sort.SliceStable(d.docs, func(i, j int) bool {
 		cmp := sortOrder.Compare(d.docs[i], d.docs[j])
-		return cmp == 0
+		return cmp > 0
 	})
 
 	if len(d.docs) > skip {
