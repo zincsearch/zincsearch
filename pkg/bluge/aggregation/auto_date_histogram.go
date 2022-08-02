@@ -148,7 +148,7 @@ func (a *AutoDateHistogramCalculator) Consume(d *search.DocumentMatch) {
 	a.total++
 	src := a.src.(search.DateValuesSource)
 	for _, term := range src.Dates(d) {
-		key := term.In(a.timeZone).UnixNano()
+		key := term.UnixNano()
 		if key < a.minValue {
 			a.minValue = key
 		}
@@ -309,15 +309,15 @@ func (a *AutoDateHistogramCalculator) Swap(i, j int) {
 func (a *AutoDateHistogramCalculator) bucketKey(value int64) (int64, string) {
 	var nsec int64
 	if a.intervals[a.currentInterval] >= time.Hour*24*30*12 {
-		t := time.Unix(0, value).In(a.timeZone)
+		t := time.Unix(0, value)
 		t = time.Date(t.Year(), 1, 1, 0, 0, 0, 0, t.Location())
 		nsec = t.UnixNano()
 	} else if a.intervals[a.currentInterval] >= time.Hour*24*30 {
-		t := time.Unix(0, value).In(a.timeZone)
+		t := time.Unix(0, value)
 		t = time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, t.Location())
 		nsec = t.UnixNano()
 	} else {
 		nsec = (value / int64(a.intervals[a.currentInterval])) * int64(a.intervals[a.currentInterval])
 	}
-	return nsec, time.Unix(0, nsec).In(a.timeZone).Format(a.format)
+	return nsec, time.Unix(0, nsec).Format(a.format)
 }
