@@ -69,7 +69,6 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 		for doc := range docs {
 			hitNum++
 			doc.HitNumber = hitNum
-			sortOrder.Compute(doc)
 			docList.bucket.Consume(doc)
 			docList.addDocument(doc)
 		}
@@ -88,6 +87,7 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 			sortOrder = req.SortOrder()
 			size, skip, reversed = req.SizeSkipAndReversed()
 		}
+
 		r := r
 		eg.Go(func() error {
 			var n int64
@@ -95,11 +95,26 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 			if err != nil {
 				return err
 			}
+
+			// these lookups traverse an interface, so do once up-front
+			neededFields := sortOrder.Fields()
+			neededFields = append(neededFields, aggs.Fields()...)
+
 			sctx := search.NewSearchContext(size+dmi.DocumentMatchPoolSize(), len(sortOrder))
 
 			next, err := dmi.Next(sctx)
 			for err == nil && next != nil {
 				n++
+
+				neededFields = filterRepeatedFields(neededFields)
+				if len(neededFields) > 0 {
+					err = next.LoadDocumentValues(sctx, neededFields)
+					if err != nil {
+						return err
+					}
+				}
+
+				req.SortOrder().Compute(next)
 				docs <- next
 				next, err = dmi.Next(sctx)
 			}
@@ -125,6 +140,23 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	}
 
 	return docList, nil
+}
+
+func filterRepeatedFields(s []string) []string {
+	if len(s) > 1 {
+		filtered := s[:0] // reuse backing array
+		store := make(map[string]struct{}, len(s))
+		for _, field := range s {
+			store[field] = struct{}{}
+		}
+
+		for field := range store {
+			filtered = append(filtered, field)
+		}
+
+		return filtered
+	}
+	return s
 }
 
 type DocumentList struct {
