@@ -17,9 +17,8 @@ package search
 
 import (
 	"context"
-	"fmt"
-	"github.com/blugelabs/bluge/search/collector"
 	"github.com/zinclabs/zinc/pkg/config"
+	"sort"
 	"sync/atomic"
 
 	"github.com/blugelabs/bluge"
@@ -64,18 +63,14 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 		for doc := range docs {
 			hitNum++
 			doc.HitNumber = hitNum
+			docList.bucket.Consume(doc)
 			docList.addDocument(doc)
 		}
-		return nil
-	})
-	egm.Go(func() error {
-		for agg := range aggsChan {
-			docList.bucket.Merge(agg)
-		}
+		docList.bucket.Finish()
 		return nil
 	})
 
-	var sort search.SortOrder
+	var sortOrder search.SortOrder
 	var size int
 	var skip int
 	var reversed bool
@@ -85,32 +80,31 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 		if err != nil {
 			return nil, err
 		}
-		if sort == nil { // init vars
+		if sortOrder == nil { // init vars
 			aggs = req.Aggregations()
 			docList.bucket = search.NewBucket("", aggs)
-			sort = req.SortOrder()
+			sortOrder = req.SortOrder()
 			size, skip, reversed = req.SizeSkipAndReversed()
 		}
 		r := r
 		eg.Go(func() error {
 			var n int64
-			dmi, err := r.Search(ctx, req)
+			dmi, err := r.Searcher(req)
 			if err != nil {
 				return err
 			}
-			next, err := dmi.Next()
+			sctx := search.NewSearchContext(size+dmi.DocumentMatchPoolSize(), len(sortOrder))
+
+			next, err := dmi.Next(sctx)
 			for err == nil && next != nil {
 				n++
 				docs <- next
-				next, err = dmi.Next()
+				next, err = dmi.Next(sctx)
 			}
-			aggsChan <- dmi.Aggregations()
 
 			if n > atomic.LoadInt64(&docList.size) {
 				atomic.StoreInt64(&docList.size, n)
 			}
-
-			fmt.Println("r", dmi.Aggregations().Duration().Milliseconds())
 
 			return err
 		})
@@ -123,7 +117,7 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 	close(aggsChan)
 	_ = egm.Wait()
 
-	err := docList.Done(size, skip, len(readers), reversed, sort)
+	err := docList.Done(size, skip, reversed, sortOrder)
 	if err != nil {
 		return nil, err
 	}
@@ -142,54 +136,34 @@ func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
 	d.docs = append(d.docs, doc)
 }
 
-func (d *DocumentList) Done(size, skip, numSearchers int, reversed bool, sort search.SortOrder) error {
-	store := collector.NewCollectorStore(size, skip, reversed, sort)
+func (d *DocumentList) Done(size, skip int, reversed bool, sortOrder search.SortOrder) error {
+	sort.SliceStable(d.docs, func(i, j int) bool {
+		cmp := sortOrder.Compare(d.docs[i], d.docs[j])
+		return cmp == 0
+	})
 
-	d.bucket.Finish()
-	backingSize := len(d.docs)
-
-	var lowestMatchOutsideResults *search.DocumentMatch
-	var removed *search.DocumentMatch
-	for _, d := range d.docs {
-
-		// optimization, we track lowest sorting hit already removed from heap
-		// with this one comparison, we can avoid all heap operations if
-		// this hit would have been added and then immediately removed
-		if lowestMatchOutsideResults != nil {
-			cmp := sort.Compare(d, lowestMatchOutsideResults)
-			if cmp >= 0 {
-				continue
-			}
-		}
-
-		removed = store.AddNotExceedingSize(d, backingSize)
-		if removed != nil {
-			if lowestMatchOutsideResults == nil {
-				lowestMatchOutsideResults = removed
-			} else {
-				cmp := sort.Compare(removed, lowestMatchOutsideResults)
-				if cmp < 0 {
-					lowestMatchOutsideResults = removed
-				}
-			}
-		}
+	if len(d.docs) > skip {
+		d.docs = d.docs[skip:]
+	} else {
+		d.docs = d.docs[:0]
 	}
 
-	results, err := store.Final(skip, func(doc *search.DocumentMatch) error {
-		doc.Complete(nil)
-		return nil
-	})
-	if err != nil {
-		return err
+	// cut down to desired size
+	if len(d.docs) > size {
+		d.docs = d.docs[:size]
+	}
+
+	// complete only selected docs
+	for i := range d.docs {
+		d.docs[i].Complete(nil)
 	}
 
 	if reversed {
-		for i, j := 0, len(results)-1; i < j; i, j = i+1, j-1 {
-			results[i], results[j] = results[j], results[i]
+		for i, j := 0, len(d.docs)-1; i < j; i, j = i+1, j-1 {
+			d.docs[i], d.docs[j] = d.docs[j], d.docs[i]
 		}
 	}
 
-	d.docs = results
 	return nil
 }
 
