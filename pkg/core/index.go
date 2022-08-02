@@ -207,6 +207,8 @@ func (index *Index) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error) 
 	return readers, nil
 }
 
+// UpdateMetadata update index metadata, mainly docNum and storageSize
+// need merge from all first layer shards
 func (index *Index) UpdateMetadata() error {
 	var totalDocNum, totalSize uint64
 	for id := range index.shards {
@@ -224,6 +226,8 @@ func (index *Index) UpdateMetadata() error {
 	return storeIndex(index)
 }
 
+// UpdateMetadataByShard update first layer shard metadata, mainly docNum, storageSize and timeRange
+// need merge from all second layer shards
 func (index *Index) UpdateMetadataByShard(id string) {
 	var totalDocNum, totalSize uint64
 	// update docNum and storageSize
@@ -248,6 +252,7 @@ func (index *Index) UpdateMetadataByShard(id string) {
 	index.lock.Unlock()
 }
 
+// UpdateStatsBySecondShard update second layer shard stats, mainly docNum and storageSize
 func (index *Index) UpdateStatsBySecondShard(id string, secondIndex int64) {
 	shard := index.shards[id]
 	shard.lock.RLock()
