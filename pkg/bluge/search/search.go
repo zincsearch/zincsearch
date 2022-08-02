@@ -17,8 +17,8 @@ package search
 
 import (
 	"context"
+	"github.com/blugelabs/bluge/search/collector"
 	"github.com/zinclabs/zinc/pkg/config"
-	"sort"
 	"sync/atomic"
 
 	"github.com/blugelabs/bluge"
@@ -170,34 +170,28 @@ func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
 	d.docs = append(d.docs, doc)
 }
 
-func (d *DocumentList) Done(size, skip int, reversed bool, sortOrder search.SortOrder) error {
-	sort.Slice(d.docs, func(i, j int) bool {
-		cmp := sortOrder.Compare(d.docs[i], d.docs[j])
-		return cmp > 0
+func (d *DocumentList) Done(size, skip int, reversed bool, sort search.SortOrder) error {
+	store := collector.NewCollectorStore(size, skip, reversed, sort)
+
+	for _, doc := range d.docs {
+		store.AddNotExceedingSize(doc, len(d.docs)) // no need to track removed since we're setting to len(d.docs)
+	}
+
+	results, err := store.Final(skip, func(doc *search.DocumentMatch) error {
+		doc.Complete(nil)
+		return nil
 	})
-
-	if len(d.docs) > skip {
-		d.docs = d.docs[skip:]
-	} else {
-		d.docs = d.docs[:0]
-	}
-
-	// cut down to desired size
-	if len(d.docs) > size {
-		d.docs = d.docs[:size]
-	}
-
-	// complete only selected docs
-	for i := range d.docs {
-		d.docs[i].Complete(nil)
+	if err != nil {
+		return err
 	}
 
 	if reversed {
-		for i, j := 0, len(d.docs)-1; i < j; i, j = i+1, j-1 {
-			d.docs[i], d.docs[j] = d.docs[j], d.docs[i]
+		for i, j := 0, len(results)-1; i < j; i, j = i+1, j-1 {
+			results[i], results[j] = results[j], results[i]
 		}
 	}
 
+	d.docs = results
 	return nil
 }
 
