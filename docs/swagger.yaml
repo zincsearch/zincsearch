@@ -1174,6 +1174,41 @@ paths:
       summary: Analyze
       tags:
       - Index
+  /api/{index}/_bulkv2:
+    post:
+      consumes:
+      - text/plain
+      operationId: Bulkv2
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      - description: Query
+        in: body
+        name: query
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseRecordCount'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Bulkv2 documents
+      tags:
+      - Document
   /api/{index}/_doc:
     post:
       consumes:
