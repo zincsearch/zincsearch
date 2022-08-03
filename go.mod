@@ -20,7 +20,7 @@ require (
 	github.com/goccy/go-json v0.9.10
 	github.com/joho/godotenv v1.4.0
 	github.com/klauspost/cpuid v1.3.1 // indirect
-	github.com/minio/minio-go/v7 v7.0.33
+	github.com/minio/minio-go/v7 v7.0.34
 	github.com/pyroscope-io/client v0.3.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.27.0
