@@ -23,6 +23,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // Bulkv2 accept JSONIngest json documents. Its a simpler and standard format to ingest data.
@@ -31,10 +32,10 @@ import (
 // @Id Bulkv2
 // @Summary Bulkv2 documents
 // @Tags    Document
-// @Accept  plain
+// @Accept  json
 // @Produce json
 // @Param   index  path  string  true  "Index"
-// @Param   query  body  string  true  "Query"
+// @Param   query  body  meta.JSONIngest  true  "Query"
 // @Success 200 {object} meta.HTTPResponseRecordCount
 // @Failure 400 {object} meta.HTTPResponseError
 // @Failure 500 {object} meta.HTTPResponseError
@@ -44,7 +45,7 @@ func Bulkv2(c *gin.Context) {
 
 	var body meta.JSONIngest
 
-	if err := c.BindJSON(&body); err != nil {
+	if err := zutils.GinBindJSON(c, &body); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}

@@ -498,6 +498,16 @@ definitions:
       updated_at:
         type: string
     type: object
+  meta.JSONIngest:
+    properties:
+      index:
+        type: string
+      records:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
+    type: object
   meta.Mappings:
     properties:
       properties:
@@ -1177,7 +1187,7 @@ paths:
   /api/{index}/_bulkv2:
     post:
       consumes:
-      - text/plain
+      - application/json
       operationId: Bulkv2
       parameters:
       - description: Index
@@ -1190,7 +1200,7 @@ paths:
         name: query
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/meta.JSONIngest'
       produces:
       - application/json
       responses:

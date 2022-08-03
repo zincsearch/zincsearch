@@ -543,7 +543,7 @@ const docTemplate = `{
         "/api/{index}/_bulkv2": {
             "post": {
                 "consumes": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -567,7 +567,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/meta.JSONIngest"
                         }
                     }
                 ],
@@ -2281,6 +2281,21 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "meta.JSONIngest": {
+            "type": "object",
+            "properties": {
+                "index": {
+                    "type": "string"
+                },
+                "records": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 }
             }
         },
