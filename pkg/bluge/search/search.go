@@ -16,7 +16,9 @@
 package search
 
 import (
+	"container/heap"
 	"context"
+	"sync/atomic"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
@@ -28,9 +30,20 @@ import (
 	"github.com/zinclabs/zinc/pkg/uquery"
 )
 
-func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer, readers ...*bluge.Reader) (search.DocumentMatchIterator, error) {
+func MultiSearch(
+	ctx context.Context,
+	query *meta.ZincQuery,
+	mappings *meta.Mappings,
+	analyzers map[string]*analysis.Analyzer,
+	readers ...*bluge.Reader) (search.DocumentMatchIterator, error) {
 	if len(readers) == 0 {
-		return nil, nil
+		return &DocumentList{
+			bucket: search.NewBucket("",
+				map[string]search.Aggregation{
+					"duration": aggregations.Duration(),
+				},
+			),
+		}, nil
 	}
 	if len(readers) == 1 {
 		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
@@ -50,16 +63,22 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 
 	docList := &DocumentList{
 		bucket: search.NewBucket("", bucketAggs),
+		from:   int64(query.From),
 		size:   int64(query.Size),
 	}
-	egm := &errgroup.Group{}
-	egm.Go(func() error {
+	heap.Init(docList)
+	// handle skip and limit
+	query.Size += query.From
+	query.From = 0
+
+	egDoc := &errgroup.Group{}
+	egDoc.Go(func() error {
 		for doc := range docs {
-			docList.addDocument(doc)
+			heap.Push(docList, &Document{doc})
 		}
 		return nil
 	})
-	egm.Go(func() error {
+	egDoc.Go(func() error {
 		for agg := range aggs {
 			docList.bucket.Merge(agg)
 		}
@@ -72,17 +91,29 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 		if err != nil {
 			return nil, err
 		}
+		if docList.sort == nil {
+			if req, ok := req.(*bluge.TopNSearch); ok {
+				docList.sort = req.SortOrder().Copy()
+			}
+		}
 		eg.Go(func() error {
+			var n int64
 			dmi, err := r.Search(ctx, req)
 			if err != nil {
 				return err
 			}
 			next, err := dmi.Next()
 			for err == nil && next != nil {
+				n++
 				docs <- next
 				next, err = dmi.Next()
 			}
 			aggs <- dmi.Aggregations()
+
+			if n > atomic.LoadInt64(&docList.size) {
+				atomic.StoreInt64(&docList.size, n)
+			}
+
 			return err
 		})
 	}
@@ -92,38 +123,57 @@ func MultiSearch(ctx context.Context, query *meta.ZincQuery, mappings *meta.Mapp
 
 	close(docs)
 	close(aggs)
-	_ = egm.Wait()
+	_ = egDoc.Wait()
 
 	docList.Done()
+	docList.bucket.Aggregation("duration").Finish()
 
 	return docList, nil
 }
 
-type DocumentList struct {
-	docs   []*search.DocumentMatch
-	bucket *search.Bucket
-	size   int64
-	next   int64
+type Document struct {
+	doc *search.DocumentMatch
 }
 
-func (d *DocumentList) addDocument(doc *search.DocumentMatch) {
-	d.docs = append(d.docs, doc)
+type DocumentList struct {
+	docs   []*Document
+	bucket *search.Bucket
+	from   int64
+	size   int64
+	next   int64
+	sort   search.SortOrder
 }
 
 func (d *DocumentList) Done() {
-	// TODO: sort
-	d.bucket.Finish()
+	// do skip
+	for i := int64(0); i < d.from; i++ {
+		heap.Pop(d)
+	}
 }
 
 func (d *DocumentList) Next() (*search.DocumentMatch, error) {
 	if d.next >= d.size || d.next >= int64(len(d.docs)) {
 		return nil, nil
 	}
-	doc := d.docs[d.next]
+	doc := heap.Pop(d)
 	d.next++
-	return doc, nil
+	return doc.(*Document).doc, nil
 }
 
 func (d *DocumentList) Aggregations() *search.Bucket {
 	return d.bucket
 }
+
+func (d *DocumentList) Push(doc interface{}) {
+	d.docs = append(d.docs, doc.(*Document))
+}
+func (d *DocumentList) Pop() interface{} {
+	n := len(d.docs)
+	doc := d.docs[n-1]
+	d.docs = d.docs[:n-1]
+	return doc
+}
+
+func (d *DocumentList) Len() int           { return len(d.docs) }
+func (d *DocumentList) Less(i, j int) bool { return d.sort.Compare(d.docs[i].doc, d.docs[j].doc) < 0 }
+func (d *DocumentList) Swap(i, j int)      { d.docs[i], d.docs[j] = d.docs[j], d.docs[i] }

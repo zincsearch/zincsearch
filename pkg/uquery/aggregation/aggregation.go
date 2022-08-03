@@ -192,20 +192,21 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 
 			// format interval
 			var interval int64
+			var calendarInterval = agg.DateHistogram.CalendarInterval
 			if agg.DateHistogram.CalendarInterval != "" {
 				switch agg.DateHistogram.CalendarInterval {
 				case "second", "1s":
 					interval = int64(time.Second)
-					agg.DateHistogram.CalendarInterval = ""
+					calendarInterval = ""
 				case "minute", "1m":
 					interval = int64(time.Minute)
-					agg.DateHistogram.CalendarInterval = ""
+					calendarInterval = ""
 				case "hour", "1h":
 					interval = int64(time.Hour)
-					agg.DateHistogram.CalendarInterval = ""
+					calendarInterval = ""
 				case "day", "1d":
 					interval = int64(time.Hour * 24)
-					agg.DateHistogram.CalendarInterval = ""
+					calendarInterval = ""
 				case "week", "1w", "month", "1M", "quarter", "1q", "year", "1y":
 					// calendar
 				default:
@@ -238,7 +239,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 			case "date", "time":
 				subreq = zincaggregation.NewDateHistogramAggregation(
 					search.Field(agg.DateHistogram.Field),
-					agg.DateHistogram.CalendarInterval,
+					calendarInterval,
 					interval,
 					agg.DateHistogram.Format,
 					timeZone,

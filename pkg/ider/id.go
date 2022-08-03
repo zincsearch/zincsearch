@@ -16,8 +16,6 @@
 package ider
 
 import (
-	"strconv"
-
 	"github.com/bwmarrin/snowflake"
 	"github.com/rs/zerolog/log"
 
@@ -25,18 +23,29 @@ import (
 	"github.com/zinclabs/zinc/pkg/zutils/base62"
 )
 
-var node *snowflake.Node
+type Node struct {
+	node *snowflake.Node
+}
+
+var local *Node
 
 func init() {
 	var err error
-	nodeID := config.Global.NodeID
-	id, _ := strconv.ParseInt(nodeID, 10, 64)
-	node, err = snowflake.NewNode(id)
+	local, err = NewNode(config.Global.NodeID)
 	if err != nil {
-		log.Fatal().Msgf("id generater init err %s", err.Error())
+		log.Fatal().Msgf("id generater init[local] err %s", err.Error())
 	}
 }
 
 func Generate() string {
-	return base62.Encode(node.Generate().Int64())
+	return local.Generate()
+}
+
+func NewNode(id int) (*Node, error) {
+	node, err := snowflake.NewNode(int64(id % 1023))
+	return &Node{node: node}, err
+}
+
+func (n *Node) Generate() string {
+	return base62.Encode(n.node.Generate().Int64())
 }

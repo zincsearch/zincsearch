@@ -25,6 +25,7 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/rs/zerolog/log"
 
+	zincsearch "github.com/zinclabs/zinc/pkg/bluge/search"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/uquery"
 	"github.com/zinclabs/zinc/pkg/uquery/timerange"
@@ -79,7 +80,7 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 		}
 	}()
 
-	searchRequest, err := uquery.ParseQueryDSL(query, mappings, analyzers)
+	_, err := uquery.ParseQueryDSL(query, mappings, analyzers)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +92,8 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 		defer cancel()
 	}
 
-	dmi, err := bluge.MultiSearch(ctx, searchRequest, readers...)
+	// dmi, err := bluge.MultiSearch(ctx, searchRequest, readers...)
+	dmi, err := zincsearch.MultiSearch(ctx, query, mappings, analyzers, readers...)
 	if err != nil {
 		log.Printf("core.MultiSearchV2: error executing search: %s", err.Error())
 		if err == context.DeadlineExceeded {

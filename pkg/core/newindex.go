@@ -25,6 +25,7 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/bluge/directory"
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
 	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
@@ -63,6 +64,7 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 	index.ref = new(meta.Index)
 	index.ref.Name = name
 	index.ref.StorageType = storageType
+	index.ref.Version = meta.Version
 
 	// use template
 	if err := index.UseTemplate(); err != nil {
@@ -74,19 +76,24 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 		}
 	}
 
-	index.ref.ShardNum = shardNum
 	index.shardNum = shardNum
+	index.ref.ShardNum = shardNum
+	index.ref.Shards = make(map[string]*meta.IndexShard, index.shardNum)
 	for i := int64(0); i < index.shardNum; i++ {
-		shard := &meta.IndexShard{ID: i, ShardNum: 1}
+		node, err := ider.NewNode(int(i))
+		if err != nil {
+			return nil, err
+		}
+		id := node.Generate()
+		shard := &meta.IndexShard{ID: id, ShardNum: 1}
 		for j := int64(0); j < shard.ShardNum; j++ {
 			shard.Shards = append(shard.Shards, &meta.IndexSecondShard{ID: j})
 		}
-		index.ref.Shards = append(index.ref.Shards, shard)
+		index.ref.Shards[id] = shard
 	}
 
 	// init shards wrapper
-	index.shardNumUint = uint64(index.shardNum)
-	index.shards = make([]*IndexShard, index.shardNum)
+	index.shards = make(map[string]*IndexShard, index.shardNum)
 	for i := range index.ref.Shards {
 		index.shards[i] = &IndexShard{root: index, ref: index.ref.Shards[i]}
 		index.shards[i].shards = make([]*IndexSecondShard, index.ref.Shards[i].ShardNum)
@@ -99,12 +106,9 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 	}
 
 	// init shards hashing
-	index.shardHashData = make(map[string]*IndexShard)
-	index.shardHashRing = rendezvous.New()
-	for i := range index.shards {
-		key := fmt.Sprintf("%06x", i)
-		index.shardHashData[key] = index.shards[i]
-		index.shardHashRing.Add(key)
+	index.shardHashing = rendezvous.New()
+	for id := range index.shards {
+		index.shardHashing.Add(id)
 	}
 
 	return index, nil

@@ -73,8 +73,8 @@ type IndexSecondShard struct {
 
 // GetShardByDocID return the shard by hash docID
 func (index *Index) GetShardByDocID(docID string) *IndexShard {
-	shardKey := index.shardHashRing.Lookup(docID)
-	return index.shardHashData[shardKey]
+	shardKey := index.shardHashing.Lookup(docID)
+	return index.shards[shardKey]
 }
 
 // CheckShards check all shards status if need create new second layer shard
@@ -111,12 +111,12 @@ func (s *IndexShard) GetShardName() string {
 	str := strings.Builder{}
 	str.WriteString(s.root.GetName())
 	str.WriteString("/")
-	str.WriteString(fmt.Sprintf("%06x", s.GetID()))
+	str.WriteString(s.GetID())
 	s.name = str.String()
 	return s.name
 }
 
-func (s *IndexShard) GetID() int64 {
+func (s *IndexShard) GetID() string {
 	return s.ref.ID
 }
 
@@ -131,7 +131,7 @@ func (s *IndexShard) GetLatestShardID() int64 {
 func (s *IndexShard) NewShard() error {
 	log.Info().
 		Str("index", s.root.GetName()).
-		Int64("shard", s.GetID()).
+		Str("shard", s.GetID()).
 		Int64("second shard", s.GetShardNum()).
 		Msg("init new second layer shard")
 
@@ -265,7 +265,7 @@ func (s *IndexShard) openWriter(shardID int64) error {
 		return nil
 	}
 	var err error
-	indexName := fmt.Sprintf("%s/%06x/%06x", s.GetIndexName(), s.GetID(), shardID)
+	indexName := fmt.Sprintf("%s/%s/%06x", s.GetIndexName(), s.GetID(), shardID)
 	secondShard.writer, err = OpenIndexWriter(indexName, s.root.GetStorageType(), defaultSearchAnalyzer, 0, 0)
 	return err
 }
@@ -337,7 +337,7 @@ func (s *IndexShard) FindShardByDocID(docID string) (int64, error) {
 			if err != nil {
 				log.Error().Err(err).
 					Str("index", s.GetIndexName()).
-					Int64("shard", s.GetID()).
+					Str("shard", s.GetID()).
 					Int64("second shard", id).
 					Msg("failed to get reader")
 				return nil // not check err, if returns err with cancel all gorutines.
@@ -347,7 +347,7 @@ func (s *IndexShard) FindShardByDocID(docID string) (int64, error) {
 			if err != nil {
 				log.Error().Err(err).
 					Str("index", s.GetIndexName()).
-					Int64("shard", s.GetID()).
+					Str("shard", s.GetID()).
 					Int64("second shard", id).
 					Msg("failed to do search")
 				return nil // not check err, if returns err with cancel all gorutines.
