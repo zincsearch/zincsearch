@@ -19,45 +19,23 @@ import (
 	"os"
 	"path"
 
-	"github.com/rs/zerolog/log"
-
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
-// UpgradeFromV024 upgrades from version <= 0.2.4
+// UpgradeFromV024T025 upgrades from version <= 0.2.4
 // upgrade steps:
-// range ZINC_DATA_PATH/
 // -- mv    index index_old
-// -- mkdir index/000000
-// -- mv    index_old index/000000/000000
-func UpgradeFromV024() error {
-	rootPath := config.Global.DataPath
-	fs, err := os.ReadDir(rootPath)
-	if err != nil {
-		return err
-	}
-	for _, f := range fs {
-		if !f.IsDir() {
-			continue
-		}
-		if f.Name() == "_metadata.db" {
-			continue
-		}
-		log.Info().Msgf("Upgrading index: %s", f.Name())
-		if err := UpgradeFromV024Index(f.Name()); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func UpgradeFromV024Index(indexName string) error {
+// -- mkdir index
+// -- mv    index_old index/000000
+func UpgradeFromV024T025(index *meta.Index) error {
+	indexName := index.Name
 	rootPath := config.Global.DataPath
 	if ok, _ := zutils.IsExist(path.Join(rootPath, indexName)); !ok {
 		return nil // if index does not exist, skip
 	}
-	if ok, _ := zutils.IsExist(path.Join(rootPath, indexName, "000000", "000000")); ok {
+	if ok, _ := zutils.IsExist(path.Join(rootPath, indexName, "000000")); ok {
 		return nil // if index already upgraded, skip
 	}
 	if err := os.Rename(path.Join(rootPath, indexName), path.Join(rootPath, indexName+"_old")); err != nil {
@@ -66,10 +44,7 @@ func UpgradeFromV024Index(indexName string) error {
 	if err := os.Mkdir(path.Join(rootPath, indexName), 0755); err != nil {
 		return err
 	}
-	if err := os.Mkdir(path.Join(rootPath, indexName, "000000"), 0755); err != nil {
-		return err
-	}
-	if err := os.Rename(path.Join(rootPath, indexName+"_old"), path.Join(rootPath, indexName, "000000", "000000")); err != nil {
+	if err := os.Rename(path.Join(rootPath, indexName+"_old"), path.Join(rootPath, indexName, "000000")); err != nil {
 		return err
 	}
 	return nil

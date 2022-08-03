@@ -16,17 +16,18 @@
 package meta
 
 type Index struct {
-	Name        string         `json:"name"`
-	StorageType string         `json:"storage_type"`
-	Settings    *IndexSettings `json:"settings,omitempty"`
-	Mappings    *Mappings      `json:"mappings,omitempty"`
-	ShardNum    int64          `json:"shard_num"`
-	Shards      []*IndexShard  `json:"shards"`
-	Stats       IndexStat      `json:"stats"`
+	Name        string                 `json:"name"`
+	StorageType string                 `json:"storage_type"`
+	Settings    *IndexSettings         `json:"settings,omitempty"`
+	Mappings    *Mappings              `json:"mappings,omitempty"`
+	ShardNum    int64                  `json:"shard_num"`
+	Shards      map[string]*IndexShard `json:"shards"`
+	Stats       IndexStat              `json:"stats"`
+	Version     string                 `json:"version"`
 }
 
 type IndexShard struct {
-	ID       int64               `json:"id"`
+	ID       string              `json:"id"`
 	NodeID   string              `json:"node_id"` // remote instance ID
 	ShardNum int64               `json:"shard_num"`
 	Shards   []*IndexSecondShard `json:"shards"`

@@ -30,14 +30,12 @@ import (
 )
 
 type Index struct {
-	ref           *meta.Index
-	analyzers     map[string]*analysis.Analyzer
-	shards        []*IndexShard
-	shardNum      int64
-	shardNumUint  uint64 // just for do HASH
-	shardHashRing *rendezvous.Rendezvous
-	shardHashData map[string]*IndexShard
-	lock          sync.RWMutex
+	ref          *meta.Index
+	analyzers    map[string]*analysis.Analyzer
+	shards       map[string]*IndexShard
+	shardNum     int64
+	shardHashing *rendezvous.Rendezvous
+	lock         sync.RWMutex
 }
 
 func (index *Index) MarshalJSON() ([]byte, error) {
@@ -209,11 +207,13 @@ func (index *Index) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error) 
 	return readers, nil
 }
 
+// UpdateMetadata update index metadata, mainly docNum and storageSize
+// need merge from all first layer shards
 func (index *Index) UpdateMetadata() error {
 	var totalDocNum, totalSize uint64
-	for i := int64(0); i < index.shardNum; i++ {
-		totalDocNum += atomic.LoadUint64(&index.shards[i].ref.Stats.DocNum)
-		totalSize += atomic.LoadUint64(&index.shards[i].ref.Stats.StorageSize)
+	for id := range index.shards {
+		totalDocNum += atomic.LoadUint64(&index.shards[id].ref.Stats.DocNum)
+		totalSize += atomic.LoadUint64(&index.shards[id].ref.Stats.StorageSize)
 	}
 
 	if totalDocNum > 0 && totalSize > 0 {
@@ -226,12 +226,14 @@ func (index *Index) UpdateMetadata() error {
 	return storeIndex(index)
 }
 
-func (index *Index) UpdateMetadataByShard(n int64) {
+// UpdateMetadataByShard update first layer shard metadata, mainly docNum, storageSize and timeRange
+// need merge from all second layer shards
+func (index *Index) UpdateMetadataByShard(id string) {
 	var totalDocNum, totalSize uint64
 	// update docNum and storageSize
-	shard := index.shards[n]
+	shard := index.shards[id]
 	for i := int64(0); i < shard.GetShardNum(); i++ {
-		index.UpdateStatsBySecondShard(n, i)
+		index.UpdateStatsBySecondShard(id, i)
 		totalDocNum += atomic.LoadUint64(&shard.ref.Shards[i].Stats.DocNum)
 		totalSize += atomic.LoadUint64(&shard.ref.Shards[i].Stats.StorageSize)
 	}
@@ -250,8 +252,9 @@ func (index *Index) UpdateMetadataByShard(n int64) {
 	index.lock.Unlock()
 }
 
-func (index *Index) UpdateStatsBySecondShard(n, secondIndex int64) {
-	shard := index.shards[n]
+// UpdateStatsBySecondShard update second layer shard stats, mainly docNum and storageSize
+func (index *Index) UpdateStatsBySecondShard(id string, secondIndex int64) {
+	shard := index.shards[id]
 	shard.lock.RLock()
 	secondShard := shard.shards[secondIndex]
 	shard.lock.RUnlock()
