@@ -347,7 +347,7 @@ func (w *walMergeDocs) WriteToShard(shard *IndexShard, shardID int64, batch *blu
 	var writer *bluge.Writer
 	otherWriters := make([]*bluge.Writer, 0)
 	otherBatch := blugeindex.NewBatch()
-	if shardID == ShardNoNeedLatest {
+	if shardID == ShardIDNeedLatest {
 		shardID = shard.GetLatestShardID()
 	}
 	if shardID >= 0 {
