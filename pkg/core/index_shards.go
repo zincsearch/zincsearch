@@ -34,8 +34,8 @@ import (
 )
 
 const (
-	ShardNoNeedLatest int64 = -1 // get lastest shardID
-	ShardNoNeedUpdate int64 = -2 // get all shardIDs
+	ShardIDNeedLatest int64 = -1 // get lastest shardID
+	ShardIDNeedUpdate int64 = -2 // get all shardIDs
 )
 
 // IndexShard first layer shard by fixed number shards for index.
