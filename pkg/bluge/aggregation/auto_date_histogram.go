@@ -22,6 +22,7 @@ import (
 
 	"github.com/blugelabs/bluge/search"
 	"github.com/blugelabs/bluge/search/aggregations"
+	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/zutils"
@@ -147,13 +148,14 @@ func (a *AutoDateHistogramCalculator) Consume(d *search.DocumentMatch) {
 	a.total++
 	src := a.src.(search.DateValuesSource)
 	for _, term := range src.Dates(d) {
-		if term.UnixNano() < a.minValue {
-			a.minValue = term.UnixNano()
+		key := term.UnixNano()
+		if key < a.minValue {
+			a.minValue = key
 		}
-		if term.UnixNano() > a.maxValue {
-			a.maxValue = term.UnixNano()
+		if key > a.maxValue {
+			a.maxValue = key
 		}
-		termKey, termStr := a.bucketKey(term.UnixNano())
+		termKey, termStr := a.bucketKey(key)
 		bucket, ok := a.bucketsMap[termKey]
 		if ok {
 			bucket.Consume(d)
@@ -161,7 +163,6 @@ func (a *AutoDateHistogramCalculator) Consume(d *search.DocumentMatch) {
 			newBucket := search.NewBucket(termStr, a.aggregations)
 			newBucket.Consume(d)
 			a.bucketsMap[termKey] = newBucket
-			// a.bucketsList = append(a.bucketsList, newBucket)
 		}
 	}
 }
@@ -181,12 +182,44 @@ func (a *AutoDateHistogramCalculator) Merge(other search.Calculator) {
 				}
 			}
 			if !foundLocal {
-				a.bucketsList = append(a.bucketsList, other.bucketsList[i])
+				// a.bucketsList = append(a.bucketsList, other.bucketsList[i])
+				keyTime, err := time.ParseInLocation(a.format, other.bucketsList[i].Name(), a.timeZone)
+				if err != nil {
+					log.Error().Msgf("auto_date_histogram: Failed to parse time: %v", err)
+					continue
+				}
+				key := keyTime.UnixNano()
+				a.bucketsMap[key] = other.bucketsList[i]
+				if a.minValue > key {
+					a.minValue = key
+				}
+				if a.maxValue < key {
+					a.maxValue = key
+				}
+				if a.currentInterval < other.currentInterval {
+					a.currentInterval = other.currentInterval
+				}
 			}
 		}
 		// now re-invoke finish, this should trim to correct size again
 		// and recalculate other
+		a.afterMerge()
 		a.Finish()
+	}
+}
+
+func (a *AutoDateHistogramCalculator) afterMerge() {
+	for key, bucket := range a.bucketsMap {
+		delete(a.bucketsMap, key)
+		termKey, termStr := a.bucketKey(key)
+		newBucket, ok := a.bucketsMap[termKey]
+		if ok {
+			newBucket.Merge(bucket)
+		} else {
+			newBucket = search.NewBucket(termStr, a.aggregations)
+			newBucket.Merge(bucket)
+			a.bucketsMap[termKey] = newBucket
+		}
 	}
 }
 
@@ -198,7 +231,7 @@ func (a *AutoDateHistogramCalculator) Finish() {
 
 	for {
 		// Replenish bucket
-		if len(a.bucketsList) <= a.size {
+		if len(a.bucketsMap) <= a.size {
 			for value := a.minValue; value < a.maxValue; value += int64(a.intervals[a.currentInterval]) {
 				termKey, termStr := a.bucketKey(value)
 				if a.bucketsMap == nil {
@@ -229,10 +262,11 @@ func (a *AutoDateHistogramCalculator) Finish() {
 		}
 	}
 
+	a.bucketsList = a.bucketsList[:0]
 	for _, bucket := range a.bucketsMap {
 		a.bucketsList = append(a.bucketsList, bucket)
 	}
-	a.bucketsMap = nil
+	// a.bucketsMap = nil
 
 	// sort the buckets
 	if a.desc {
@@ -275,15 +309,15 @@ func (a *AutoDateHistogramCalculator) Swap(i, j int) {
 func (a *AutoDateHistogramCalculator) bucketKey(value int64) (int64, string) {
 	var nsec int64
 	if a.intervals[a.currentInterval] >= time.Hour*24*30*12 {
-		t := time.Unix(0, value).In(a.timeZone)
+		t := time.Unix(0, value)
 		t = time.Date(t.Year(), 1, 1, 0, 0, 0, 0, t.Location())
 		nsec = t.UnixNano()
 	} else if a.intervals[a.currentInterval] >= time.Hour*24*30 {
-		t := time.Unix(0, value).In(a.timeZone)
+		t := time.Unix(0, value)
 		t = time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, t.Location())
 		nsec = t.UnixNano()
 	} else {
 		nsec = (value / int64(a.intervals[a.currentInterval])) * int64(a.intervals[a.currentInterval])
 	}
-	return nsec, time.Unix(0, nsec).In(a.timeZone).Format(a.format)
+	return nsec, time.Unix(0, nsec).Format(a.format)
 }

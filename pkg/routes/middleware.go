@@ -38,3 +38,9 @@ func AuthMiddleware(c *gin.Context) {
 		return
 	}
 }
+
+func ESMiddleware(c *gin.Context) {
+	// Some es clients will check header("X-elastic-product") == "Elasticsearch".
+	// If not, it will not work, and show "The client noticed that the server is not Elasticsearch and we do not support this unknown product."
+	c.Header("X-elastic-product", "Elasticsearch")
+}
