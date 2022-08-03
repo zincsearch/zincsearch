@@ -16,6 +16,7 @@
 package core
 
 import (
+	"runtime"
 	"sync"
 	"time"
 
@@ -98,5 +99,8 @@ func (t *IndexShardWALList) ConsumeWAL() {
 		for name := range indexClosed {
 			t.Remove(name)
 		}
+
+		// force gc
+		runtime.GC()
 	}
 }
