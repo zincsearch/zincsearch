@@ -28,7 +28,8 @@ import (
 func NewESInfo(c *gin.Context) *ESInfo {
 	version := strings.TrimLeft(meta.Version, "v")
 	userAgent := c.Request.UserAgent()
-	if strings.Contains(userAgent, "Elastic") {
+	// eg.1: User-Agent:[elastic-transport-ruby/8.0.1 (RUBY_VERSION: 3.1.2; linux x86_64; Faraday v1.10.0)]
+	if strings.Contains(strings.ToLower(userAgent), "elastic") {
 		reg := regexp.MustCompile(`([0-9]+\.[0-9]+\.[0-9]+)`)
 		matches := reg.FindAllString(userAgent, 1)
 		if len(matches) > 0 {
