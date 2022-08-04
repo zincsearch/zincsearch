@@ -3,7 +3,7 @@ export default {
     selectIndex: "İndeks Seçin",
     typeSearch: "Sorgu",
     searchField: "Sütun Ara",
-    maxRecords: "Gosterilecek maksimum kayıt",
+    maxRecords: "Gösterilecek maksimum kayıt",
     searchResult: "Arama Sonuçları",
     timestamp: "Zaman Damgası",
     source: "_kaynak",
