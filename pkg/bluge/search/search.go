@@ -58,7 +58,7 @@ func MultiSearch(
 	bucketAggs["duration"] = aggregations.Duration()
 
 	eg := &errgroup.Group{}
-	eg.SetLimit(config.Global.ReadGorutineNum)
+	eg.SetLimit(config.Global.Shard.GorutineNum)
 	docs := make(chan *search.DocumentMatch, len(readers)*10)
 	aggs := make(chan *search.Bucket, len(readers))
 

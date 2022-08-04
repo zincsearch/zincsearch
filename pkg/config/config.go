@@ -51,7 +51,7 @@ type config struct {
 	AggregationTermsSize      int    `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
 	WalSyncInterval           string `env:"ZINC_WAL_SYNC_INTERVAL,default=1s"`      // sync wal to disk, 1s, 10ms
 	WalRedoLogNoSync          bool   `env:"ZINC_WAL_REDOLOG_NO_SYNC,default=false"` // control sync after every write
-	ReadGorutineNum           int    `env:"ZINC_READ_GORUTINE_NUM,default=10"`      // control gorutine number for read
+	Cluster                   cluster
 	Shard                     shard
 	Etcd                      etcd
 	S3                        s3
@@ -59,19 +59,17 @@ type config struct {
 	Plugin                    plugin
 }
 
-// 1073741824 1g
-// 536870912  512m
-// 268435456  256m
-// 134217728  128m
-// 67108864   64m
-// 33554432   32m
-// 16777216   16m
+type cluster struct {
+	Name string `env:"ZINC_CLUSTER_NAME,default=ZincCluster"`
+}
 
 type shard struct {
 	// DefaultNum is the default number of shards.
 	Num int64 `env:"ZINC_SHARD_NUM,default=3"`
 	// MaxSize is the maximum size limit for one shard, or will create a new shard.
 	MaxSize uint64 `env:"ZINC_SHARD_MAX_SIZE,default=1073741824"`
+	// control gorutine number for read
+	GorutineNum int `env:"ZINC_SHARD_GORUTINE_NUM,default=10"`
 }
 
 type etcd struct {

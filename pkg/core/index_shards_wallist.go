@@ -74,7 +74,7 @@ func (t *IndexShardWALList) ConsumeWAL() {
 		log.Fatal().Err(err).Msg("consume ParseInterval")
 	}
 	eg := &errgroup.Group{}
-	eg.SetLimit(config.Global.ReadGorutineNum)
+	eg.SetLimit(config.Global.Shard.GorutineNum)
 	tick := time.NewTicker(interval)
 	for range tick.C {
 		indexClosed := make(chan string, t.Len())

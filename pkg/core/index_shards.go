@@ -212,7 +212,7 @@ func (s *IndexShard) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error)
 	rs := make([]*bluge.Reader, 0, 1)
 	chs := make(chan *bluge.Reader, s.GetShardNum())
 	eg := errgroup.Group{}
-	eg.SetLimit(config.Global.ReadGorutineNum)
+	eg.SetLimit(config.Global.Shard.GorutineNum)
 	for i := s.GetLatestShardID(); i >= 0; i-- {
 		var i = i
 		s.lock.RLock()
@@ -328,7 +328,7 @@ func (s *IndexShard) FindShardByDocID(docID string) (int64, error) {
 	}
 
 	eg, ctx := errgroup.WithContext(ctx)
-	eg.SetLimit(config.Global.ReadGorutineNum)
+	eg.SetLimit(config.Global.Shard.GorutineNum)
 	for id := int64(len(writers)) - 1; id >= 0; id-- {
 		id := id
 		w := writers[id]

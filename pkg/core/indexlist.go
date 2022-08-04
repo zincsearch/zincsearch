@@ -160,7 +160,7 @@ func (t *IndexList) Close() error {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 	eg := errgroup.Group{}
-	eg.SetLimit(config.Global.ReadGorutineNum)
+	eg.SetLimit(config.Global.Shard.GorutineNum)
 	for _, index := range t.Indexes {
 		index := index
 		eg.Go(func() error {
