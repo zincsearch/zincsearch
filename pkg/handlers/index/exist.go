@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 // @Summary Checks if the index exists for compatible ES
@@ -24,5 +25,5 @@ func Exist(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok"})
 }
