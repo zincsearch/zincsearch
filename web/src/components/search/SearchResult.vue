@@ -326,7 +326,7 @@ export default defineComponent({
         text: "",
       },
       noData: {
-        text: "Loading...",
+        text: "No data available",
       },
     };
 
