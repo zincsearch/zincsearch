@@ -1609,6 +1609,28 @@ paths:
       summary: Create index
       tags:
       - Index
+  /api/index/:index:
+    head:
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+      summary: Checks if the index exists
+      tags:
+      - Index
   /api/index/{index}:
     delete:
       operationId: DeleteIndex
@@ -1805,30 +1827,29 @@ paths:
       summary: Delete user
       tags:
       - User
-  /es/:target:
+  /es/:index:
     head:
       parameters:
-      - description: Index data
-        in: body
+      - description: Index
+        in: path
         name: index
         required: true
-        schema:
-          $ref: '#/definitions/meta.IndexSimple'
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
+            $ref: '#/definitions/meta.HTTPResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/meta.HTTPResponse'
       summary: Checks if the index exists for compatible ES
       tags:
       - Index
+  /es/:target:
     put:
       parameters:
       - description: Index data
