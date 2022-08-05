@@ -3,11 +3,15 @@ import { getLanguage } from "../utils/cookies";
 
 // User defined lang
 import enLocale from "./en";
+import trLocale from "./tr";
 import zhLocale from "./zh-cn";
 
 const messages = {
   en: {
     ...enLocale,
+  },
+  tr: {
+    ...trLocale,
   },
   "zh-cn": {
     ...zhLocale,

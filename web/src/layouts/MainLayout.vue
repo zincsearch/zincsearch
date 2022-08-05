@@ -175,6 +175,10 @@ export default {
         value: "en",
       },
       {
+        label: "Türkçe",
+        value: "tr",
+      },
+      {
         label: "简体中文",
         value: "zh-cn",
       },
