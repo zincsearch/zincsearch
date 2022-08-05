@@ -9,13 +9,13 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-// @Summary Checks if the index exists for compatible ES
+// @Summary Checks if the index exists
 // @Tags    Index
 // @Produce json
-// @Param   index body meta.IndexSimple true "Index data"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} meta.HTTPResponse
-// @Router /es/:target [head]
+// @Param   index  path  string  true  "Index"
+// @Success 200 {object} meta.HTTPResponse
+// @Failure 404 {object} meta.HTTPResponse
+// @Router /api/index/:index [head]
 func Exist(c *gin.Context) {
 	indexName := c.Param("target")
 
@@ -27,3 +27,12 @@ func Exist(c *gin.Context) {
 
 	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok"})
 }
+
+// @Summary Checks if the index exists for compatible ES
+// @Tags    Index
+// @Produce json
+// @Param   index  path  string  true  "Index"
+// @Success 200 {object} meta.HTTPResponse
+// @Failure 404 {object} meta.HTTPResponse
+// @Router /es/:index [head]
+func ESExist() {}
