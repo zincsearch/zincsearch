@@ -194,6 +194,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/index/:index": {
+            "head": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Checks if the index exists",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/index/{index}": {
             "delete": {
                 "produces": [
@@ -1089,6 +1123,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/es/:index": {
+            "head": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Checks if the index exists for compatible ES",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/es/:target": {
             "put": {
                 "produces": [
@@ -1098,41 +1166,6 @@ const docTemplate = `{
                     "Index"
                 ],
                 "summary": "Create index for compatible ES",
-                "parameters": [
-                    {
-                        "description": "Index data",
-                        "name": "index",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/meta.IndexSimple"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            },
-            "head": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Index"
-                ],
-                "summary": "Checks if the index exists for compatible ES",
                 "parameters": [
                     {
                         "description": "Index data",
