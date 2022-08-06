@@ -34,7 +34,7 @@ import (
 // @Tags    Index
 // @Accept  json
 // @Produce json
-// @Param   index body meta.IndexSimple true "Index data"
+// @Param   data body meta.IndexSimple true "Index data"
 // @Success 200 {object} meta.HTTPResponseIndex
 // @Failure 400 {object} meta.HTTPResponseError
 // @Router /api/index [post]
@@ -59,13 +59,15 @@ func Create(c *gin.Context) {
 	})
 }
 
+// @Id ESCreateIndex
 // @Summary Create index for compatible ES
 // @Tags    Index
 // @Produce json
-// @Param   index body meta.IndexSimple true "Index data"
+// @Param   index path  string  true  "Index"
+// @Param   data  body  meta.IndexSimple true "Index data"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} meta.HTTPResponse
-// @Router /es/:target [put]
+// @Router /es/{index} [put]
 func CreateES(c *gin.Context) {
 	indexName := c.Param("target")
 

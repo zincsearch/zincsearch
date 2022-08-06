@@ -96,7 +96,7 @@ func SetRoutes(r *gin.Engine) {
 	r.PUT("/api/index", AuthMiddleware, index.Create)
 	r.PUT("/api/index/:target", AuthMiddleware, index.Create)
 	r.DELETE("/api/index/:target", AuthMiddleware, index.Delete)
-	r.HEAD("/api/index/:target", AuthMiddleware, index.Exist)
+	r.HEAD("/api/index/:target", AuthMiddleware, index.Exists)
 	r.POST("/api/index/:target/refresh", AuthMiddleware, index.Refresh)
 	// index settings
 	r.GET("/api/:target/_mapping", AuthMiddleware, index.GetMapping)
@@ -158,7 +158,7 @@ func SetRoutes(r *gin.Engine) {
 	r.HEAD("/es/_data_stream/:target", AuthMiddleware, ESMiddleware, elastic.GetDataStream)
 
 	r.PUT("/es/:target", AuthMiddleware, ESMiddleware, index.CreateES)
-	r.HEAD("/es/:target", AuthMiddleware, ESMiddleware, index.Exist)
+	r.HEAD("/es/:target", AuthMiddleware, ESMiddleware, index.Exists)
 
 	r.GET("/es/:target/_mapping", AuthMiddleware, ESMiddleware, index.GetESMapping)
 	r.PUT("/es/:target/_mapping", AuthMiddleware, ESMiddleware, index.SetMapping)
