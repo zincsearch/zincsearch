@@ -34,12 +34,11 @@ import (
 // @Tags    Document
 // @Accept  json
 // @Produce json
-// @Param   index  path  string  true  "Index"
 // @Param   query  body  meta.JSONIngest  true  "Query"
 // @Success 200 {object} meta.HTTPResponseRecordCount
 // @Failure 400 {object} meta.HTTPResponseError
 // @Failure 500 {object} meta.HTTPResponseError
-// @Router /api/{index}/_bulkv2 [post]
+// @Router /api/_bulkv2 [post]
 func Bulkv2(c *gin.Context) {
 	target := c.Param("target")
 
