@@ -11,6 +11,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta/elastic"
 )
 
+// @Id ESGetMapping
 // @Summary Get index mappings for compatible ES
 // @Tags    Index
 // @Produce json

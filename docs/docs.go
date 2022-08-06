@@ -256,6 +256,7 @@ const docTemplate = `{
                     "Index"
                 ],
                 "summary": "Checks if the index exists",
+                "operationId": "Exists",
                 "parameters": [
                     {
                         "type": "string",
@@ -1132,6 +1133,7 @@ const docTemplate = `{
                     "Index"
                 ],
                 "summary": "Checks if the index exists for compatible ES",
+                "operationId": "EsExists",
                 "parameters": [
                     {
                         "type": "string",
@@ -1166,6 +1168,7 @@ const docTemplate = `{
                     "Index"
                 ],
                 "summary": "Create index for compatible ES",
+                "operationId": "ESCreateIndex",
                 "parameters": [
                     {
                         "description": "Index data",
@@ -1203,6 +1206,7 @@ const docTemplate = `{
                     "Index"
                 ],
                 "summary": "Get index mappings for compatible ES",
+                "operationId": "ESGetMapping",
                 "parameters": [
                     {
                         "type": "string",

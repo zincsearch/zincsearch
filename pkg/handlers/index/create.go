@@ -59,6 +59,7 @@ func Create(c *gin.Context) {
 	})
 }
 
+// @Id ESCreateIndex
 // @Summary Create index for compatible ES
 // @Tags    Index
 // @Produce json

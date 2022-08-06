@@ -1611,6 +1611,7 @@ paths:
       - Index
   /api/index/:index:
     head:
+      operationId: Exists
       parameters:
       - description: Index
         in: path
@@ -1829,6 +1830,7 @@ paths:
       - User
   /es/:index:
     head:
+      operationId: EsExists
       parameters:
       - description: Index
         in: path
@@ -1851,6 +1853,7 @@ paths:
       - Index
   /es/:target:
     put:
+      operationId: ESCreateIndex
       parameters:
       - description: Index data
         in: body
@@ -1875,6 +1878,7 @@ paths:
       - Index
   /es/:target/_mapping:
     get:
+      operationId: ESGetMapping
       parameters:
       - description: Index
         in: path
