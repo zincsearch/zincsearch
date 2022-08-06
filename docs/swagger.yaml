@@ -1153,38 +1153,7 @@ paths:
       summary: Bulk documents
       tags:
       - Document
-  /api/{index}/_analyze:
-    post:
-      consumes:
-      - application/json
-      operationId: AnalyzeIndex
-      parameters:
-      - description: Index
-        in: path
-        name: index
-        required: true
-        type: string
-      - description: Query
-        in: body
-        name: query
-        required: true
-        schema:
-          type: object
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/index.AnalyzeResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/meta.HTTPResponseError'
-      summary: Analyze
-      tags:
-      - Index
-  /api/{index}/_bulkv2:
+  /api/_bulkv2:
     post:
       consumes:
       - application/json
@@ -1219,6 +1188,37 @@ paths:
       summary: Bulkv2 documents
       tags:
       - Document
+  /api/{index}/_analyze:
+    post:
+      consumes:
+      - application/json
+      operationId: AnalyzeIndex
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      - description: Query
+        in: body
+        name: query
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/index.AnalyzeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Analyze
+      tags:
+      - Index
   /api/{index}/_doc:
     post:
       consumes:
