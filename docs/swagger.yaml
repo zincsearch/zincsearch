@@ -1159,11 +1159,6 @@ paths:
       - application/json
       operationId: Bulkv2
       parameters:
-      - description: Index
-        in: path
-        name: index
-        required: true
-        type: string
       - description: Query
         in: body
         name: query
@@ -1591,7 +1586,7 @@ paths:
       parameters:
       - description: Index data
         in: body
-        name: index
+        name: data
         required: true
         schema:
           $ref: '#/definitions/meta.IndexSimple'
@@ -1607,29 +1602,6 @@ paths:
           schema:
             $ref: '#/definitions/meta.HTTPResponseError'
       summary: Create index
-      tags:
-      - Index
-  /api/index/:index:
-    head:
-      operationId: Exists
-      parameters:
-      - description: Index
-        in: path
-        name: index
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-      summary: Checks if the index exists
       tags:
       - Index
   /api/index/{index}:
@@ -1657,6 +1629,28 @@ paths:
           schema:
             $ref: '#/definitions/meta.HTTPResponseError'
       summary: Delete index
+      tags:
+      - Index
+    head:
+      operationId: Exists
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+      summary: Checks if the index exists
       tags:
       - Index
   /api/index/{index}/refresh:
@@ -1828,78 +1822,6 @@ paths:
       summary: Delete user
       tags:
       - User
-  /es/:index:
-    head:
-      operationId: EsExists
-      parameters:
-      - description: Index
-        in: path
-        name: index
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-      summary: Checks if the index exists for compatible ES
-      tags:
-      - Index
-  /es/:target:
-    put:
-      operationId: ESCreateIndex
-      parameters:
-      - description: Index data
-        in: body
-        name: index
-        required: true
-        schema:
-          $ref: '#/definitions/meta.IndexSimple'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-      summary: Create index for compatible ES
-      tags:
-      - Index
-  /es/:target/_mapping:
-    get:
-      operationId: ESGetMapping
-      parameters:
-      - description: Index
-        in: path
-        name: target
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/meta.HTTPResponse'
-      summary: Get index mappings for compatible ES
-      tags:
-      - Index
   /es/_bulk:
     post:
       consumes:
@@ -2072,6 +1994,82 @@ paths:
       summary: Search V2 MultipleSearch for compatible ES
       tags:
       - Search
+  /es/{index}:
+    head:
+      operationId: EsExists
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+      summary: Checks if the index exists for compatible ES
+      tags:
+      - Index
+    put:
+      operationId: ESCreateIndex
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      - description: Index data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/meta.IndexSimple'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+      summary: Create index for compatible ES
+      tags:
+      - Index
+  /es/{index}/_mapping:
+    get:
+      operationId: ESGetMapping
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponse'
+      summary: Get index mappings for compatible ES
+      tags:
+      - Index
   /es/{index}/_search:
     post:
       consumes:

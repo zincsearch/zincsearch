@@ -119,13 +119,6 @@ const docTemplate = `{
                 "operationId": "Bulkv2",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "index",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Query",
                         "name": "query",
                         "in": "body",
@@ -223,7 +216,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Index data",
-                        "name": "index",
+                        "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -242,41 +235,6 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/meta.HTTPResponseError"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/index/:index": {
-            "head": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Index"
-                ],
-                "summary": "Checks if the index exists",
-                "operationId": "Exists",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "index",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -318,6 +276,39 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            },
+            "head": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Checks if the index exists",
+                "operationId": "Exists",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
@@ -1124,115 +1115,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/es/:index": {
-            "head": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Index"
-                ],
-                "summary": "Checks if the index exists for compatible ES",
-                "operationId": "EsExists",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "index",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/es/:target": {
-            "put": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Index"
-                ],
-                "summary": "Create index for compatible ES",
-                "operationId": "ESCreateIndex",
-                "parameters": [
-                    {
-                        "description": "Index data",
-                        "name": "index",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/meta.IndexSimple"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/es/:target/_mapping": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Index"
-                ],
-                "summary": "Get index mappings for compatible ES",
-                "operationId": "ESGetMapping",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Index",
-                        "name": "target",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/es/_bulk": {
             "post": {
                 "consumes": [
@@ -1489,6 +1371,120 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/es/{index}": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Create index for compatible ES",
+                "operationId": "ESCreateIndex",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Index data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.IndexSimple"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            },
+            "head": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Checks if the index exists for compatible ES",
+                "operationId": "EsExists",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/es/{index}/_mapping": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Get index mappings for compatible ES",
+                "operationId": "ESGetMapping",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponse"
                         }
                     }
                 }
