@@ -141,6 +141,7 @@ type DocumentList struct {
 	bucket *search.Bucket
 	from   int64
 	size   int64
+	len    int64
 	next   int64
 	sort   search.SortOrder
 }
@@ -150,10 +151,12 @@ func (d *DocumentList) Done() {
 	for i := int64(0); i < d.from; i++ {
 		heap.Pop(d)
 	}
+	// log size
+	d.len = int64(len(d.docs))
 }
 
 func (d *DocumentList) Next() (*search.DocumentMatch, error) {
-	if d.next >= d.size || d.next >= int64(len(d.docs)) {
+	if d.next >= d.size || d.next >= d.len {
 		return nil, nil
 	}
 	doc := heap.Pop(d)
@@ -168,6 +171,7 @@ func (d *DocumentList) Aggregations() *search.Bucket {
 func (d *DocumentList) Push(doc interface{}) {
 	d.docs = append(d.docs, doc.(*Document))
 }
+
 func (d *DocumentList) Pop() interface{} {
 	n := len(d.docs)
 	doc := d.docs[n-1]
