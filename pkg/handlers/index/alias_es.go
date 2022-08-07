@@ -97,8 +97,12 @@ func GetESAliases(c *gin.Context) {
 
 	targetAlias := c.Param("target_alias")
 
-	aliases := M{}
+	var targetAliases []string
+	if targetAlias != "" {
+		targetAliases = strings.Split(targetAlias, ",")
+	}
 
+	aliases := M{}
 	for _, index := range indexList {
 		als := M{}
 		aliases[index.GetName()] = M{
@@ -106,7 +110,7 @@ func GetESAliases(c *gin.Context) {
 		}
 
 		for _, alias := range index.GetAliases() {
-			if targetAlias != "" && alias != targetAlias { // check if this is the alias we're looking for
+			if targetAlias != "" && !zutils.SliceExists(targetAliases, alias) { // check if this is the alias we're looking for
 				continue
 			}
 
@@ -119,11 +123,16 @@ func GetESAliases(c *gin.Context) {
 
 func getIndexList(target string) ([]*core.Index, bool) {
 	if target != "" {
-		index, ok := core.ZINC_INDEX_LIST.Get(target)
-		if !ok {
-			return nil, false
+		targets := strings.Split(target, ",")
+		indexList := make([]*core.Index, 0, len(targets))
+		for _, t := range targets {
+			index, ok := core.ZINC_INDEX_LIST.Get(t)
+			if !ok {
+				return nil, false
+			}
+			indexList = append(indexList, index)
 		}
-		return []*core.Index{index}, true
+		return indexList, true
 	}
 	return core.ZINC_INDEX_LIST.List(), true
 }
