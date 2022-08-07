@@ -73,6 +73,8 @@ func (t *IndexShardWALList) ConsumeWAL() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("consume ParseInterval")
 	}
+
+	indexes := make(map[string]*Index)
 	eg := &errgroup.Group{}
 	eg.SetLimit(config.Global.Shard.GorutineNum)
 	tick := time.NewTicker(interval)
@@ -80,6 +82,7 @@ func (t *IndexShardWALList) ConsumeWAL() {
 		indexClosed := make(chan string, t.Len())
 		for _, shard := range t.List() {
 			shard := shard
+			indexes[shard.GetIndexName()] = shard.root
 			eg.Go(func() error {
 				select {
 				case <-shard.close:
@@ -98,6 +101,15 @@ func (t *IndexShardWALList) ConsumeWAL() {
 		// check index closed
 		for name := range indexClosed {
 			t.Remove(name)
+		}
+
+		// check index stats
+		for name, index := range indexes {
+			index.UpdateMetadata()
+			stats := index.GetStats()
+			SetMetricStatsByIndex(name, "doc_num", float64(stats.DocNum))
+			SetMetricStatsByIndex(name, "storage_size", float64(stats.StorageSize))
+			delete(indexes, name)
 		}
 
 		// force gc

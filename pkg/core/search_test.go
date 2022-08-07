@@ -34,6 +34,7 @@ func TestIndex_Search(t *testing.T) {
 		name    string
 		args    args
 		want    *meta.SearchResponse
+		wantNum int
 		wantErr bool
 	}{
 		{
@@ -76,6 +77,7 @@ func TestIndex_Search(t *testing.T) {
 					Size: 10,
 				},
 			},
+			wantNum: 3,
 		},
 		{
 			name: "Search Query - wildcard",
@@ -229,6 +231,14 @@ func TestIndex_Search(t *testing.T) {
 			},
 			"hobby": "chess",
 		},
+		{
+			"name": "Baris DiCaprio",
+			"address": map[string]interface{}{
+				"city":  "Los angeles",
+				"state": "California",
+			},
+			"hobby": "chess",
+		},
 	}
 
 	var err error
@@ -264,6 +274,10 @@ func TestIndex_Search(t *testing.T) {
 			got, err := index.Search(tt.args.iQuery)
 			assert.NoError(t, err)
 			assert.GreaterOrEqual(t, got.Hits.Total.Value, 1)
+			if tt.wantNum > 0 {
+				assert.Equal(t, got.Hits.Total.Value, tt.wantNum)
+				assert.Equal(t, len(got.Hits.Hits), tt.wantNum)
+			}
 		})
 	}
 

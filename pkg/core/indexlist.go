@@ -136,7 +136,8 @@ func (t *IndexList) ListStat() []*Index {
 		if size == uint64(index.GetShardNum()) {
 			size = 0
 		}
-		atomic.StoreUint64(&index.ref.Stats.WALSize, size)
+		stats := index.GetStats()
+		atomic.StoreUint64(&stats.WALSize, size)
 		_ = index.UpdateMetadata()
 	}
 	return items

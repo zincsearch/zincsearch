@@ -20,6 +20,7 @@ import (
 	ginprometheus "github.com/zsais/go-gin-prometheus"
 
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/core"
 )
 
 // SetPrometheus sets up prometheus metrics for gin
@@ -28,6 +29,6 @@ func SetPrometheus(app *gin.Engine) {
 		return
 	}
 
-	p := ginprometheus.NewPrometheus("gin")
+	p := ginprometheus.NewPrometheus("zinc", []*ginprometheus.Metric{core.ZINC_PROMETHEUS})
 	p.Use(app)
 }
