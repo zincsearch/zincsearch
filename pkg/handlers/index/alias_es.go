@@ -1,15 +1,15 @@
 package index
 
 import (
+	"net/http"
+	"regexp"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/zutils"
-	"regexp"
-	"strings"
-
-	"net/http"
 )
 
 type Alias struct {
@@ -26,7 +26,7 @@ type base struct {
 	Alias string `json:"alias"`
 }
 
-func CreateESAlias(c *gin.Context) {
+func AddOrRemoveESAlias(c *gin.Context) {
 	var alias Alias
 	err := zutils.GinBindJSON(c, &alias)
 	if err != nil {
@@ -37,8 +37,21 @@ func CreateESAlias(c *gin.Context) {
 	addMap := map[string][]string{}
 	removeMap := map[string][]string{}
 
-	indexList := core.ZINC_INDEX_LIST.List()
+	var indexList []*core.Index
 
+	target := c.Param("target")
+	if target != "" {
+		index, ok := core.ZINC_INDEX_LIST.Get(target)
+		if !ok {
+			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index not found"})
+			return
+		}
+		indexList = []*core.Index{index}
+	} else {
+		indexList = core.ZINC_INDEX_LIST.List()
+	}
+
+	c.Params[0].Value = ""
 	for _, action := range alias.Actions {
 		if action.Add != nil {
 			for _, index := range indexList {

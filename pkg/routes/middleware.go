@@ -19,8 +19,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
 	"github.com/zinclabs/zinc/pkg/auth"
+	"github.com/zinclabs/zinc/pkg/core"
 )
 
 func AuthMiddleware(c *gin.Context) {
@@ -43,4 +43,37 @@ func ESMiddleware(c *gin.Context) {
 	// Some es clients will check header("X-elastic-product") == "Elasticsearch".
 	// If not, it will not work, and show "The client noticed that the server is not Elasticsearch and we do not support this unknown product."
 	c.Header("X-elastic-product", "Elasticsearch")
+}
+
+func IndexAliasMiddleware(c *gin.Context) {
+	target := ""
+	ix := 0
+
+	for i, entry := range c.Params {
+		if entry.Key == "target" {
+			target = entry.Value
+			ix = i
+			break
+		}
+	}
+
+	if target == "" {
+		c.Next()
+		return
+	}
+
+	indexList := core.ZINC_INDEX_LIST.List()
+	newTarget := ""
+
+	// find all index that match this alias and add them to the newTarget
+	for _, index := range indexList {
+		if index.HasAlias(target) {
+			newTarget += "," + index.GetName()
+		}
+	}
+
+	if newTarget != "" {
+		c.Params[ix].Value = newTarget // set target new value in the request context
+	}
+	c.Next()
 }

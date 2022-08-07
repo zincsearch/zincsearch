@@ -152,6 +152,17 @@ func (index *Index) AddAliases(aliases []string) {
 	index.lock.Unlock()
 }
 
+func (index *Index) HasAlias(as string) bool {
+	index.lock.RLock()
+	for _, alias := range index.ref.Aliases {
+		if alias == as {
+			return true
+		}
+	}
+	index.lock.RUnlock()
+	return false
+}
+
 func (index *Index) RemoveAliases(aliases []string) {
 	index.lock.Lock()
 
