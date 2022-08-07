@@ -22,8 +22,10 @@ type Action struct {
 }
 
 type base struct {
-	Index string `json:"index"`
-	Alias string `json:"alias"`
+	Index   string   `json:"index"`
+	Alias   string   `json:"alias"`
+	Indices []string `json:"indices"`
+	Aliases []string `json:"aliases"`
 }
 
 func AddOrRemoveESAlias(c *gin.Context) {
@@ -37,8 +39,6 @@ func AddOrRemoveESAlias(c *gin.Context) {
 	addMap := map[string][]string{}
 	removeMap := map[string][]string{}
 
-	var indexList []*core.Index
-
 	target := c.Param("target")
 	indexList, ok := getIndexList(target)
 	if !ok {
@@ -46,24 +46,60 @@ func AddOrRemoveESAlias(c *gin.Context) {
 		return
 	}
 
-	c.Params[0].Value = ""
+outerLoop:
 	for _, action := range alias.Actions {
 		if action.Add != nil {
+			if action.Add.Indices != nil {
+			innerLoop1:
+				for _, indexName := range action.Add.Indices {
+					_, ok = core.ZINC_INDEX_LIST.Get(indexName)
+					if !ok {
+						continue innerLoop1
+					}
+
+					if action.Add.Alias != "" {
+						addMap[indexName] = append(addMap[indexName], action.Add.Alias)
+					} else {
+						addMap[indexName] = append(addMap[indexName], action.Add.Aliases...)
+					}
+				}
+
+				continue outerLoop
+			}
+
 			for _, index := range indexList {
 				indexName := index.GetName()
 				if indexNameMatches(action.Add.Index, indexName) {
-					addMap[indexName] = append(addMap[indexName], action.Add.Alias) // append the alias to add list for this index
+					addMap[indexName] = append(addMap[indexName], action.Add.Alias)
 				}
 			}
 
-			continue
+			continue outerLoop
 		}
 
 		if action.Remove != nil {
+			if action.Remove.Indices != nil {
+			innerLoop2:
+				for _, indexName := range action.Remove.Indices {
+					_, ok = core.ZINC_INDEX_LIST.Get(indexName)
+					if !ok {
+						continue innerLoop2
+					}
+
+					if action.Remove.Alias != "" {
+						removeMap[indexName] = append(removeMap[indexName], action.Remove.Alias)
+					} else {
+						removeMap[indexName] = append(removeMap[indexName], action.Remove.Aliases...)
+					}
+				}
+
+				continue outerLoop
+			}
+
 			for _, index := range indexList {
 				indexName := index.GetName()
-				if indexNameMatches(action.Add.Index, indexName) {
-					removeMap[indexName] = append(addMap[indexName], action.Add.Alias) // append the alias to remove list for this index
+				if indexNameMatches(action.Remove.Index, indexName) {
+					removeMap[indexName] = append(addMap[indexName], action.Remove.Alias) // append the alias to remove list for this index
 				}
 			}
 		}

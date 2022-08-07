@@ -129,6 +129,16 @@ func (t *IndexList) List() []*Index {
 	return indexes
 }
 
+func (t *IndexList) ListMap() map[string]*Index {
+	t.lock.RLock()
+	indexes := make(map[string]*Index, len(t.Indexes))
+	for _, index := range t.Indexes {
+		indexes[index.ref.Name] = index
+	}
+	t.lock.RUnlock()
+	return indexes
+}
+
 func (t *IndexList) ListStat() []*Index {
 	items := t.List()
 	for _, index := range items {
