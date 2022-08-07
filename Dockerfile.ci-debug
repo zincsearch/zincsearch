@@ -1,0 +1,37 @@
+# syntax=docker/dockerfile:experimental
+
+# build using a full blown image that is easier to debug instead scratch image
+FROM --platform=$BUILDPLATFORM public.ecr.aws/docker/library/golang:latest
+ARG VERSION
+ARG COMMIT_HASH
+ARG BUILD_DATE
+ARG TARGETOS
+ARG TARGETARCH
+
+WORKDIR $GOPATH/src/github.com/zinclabs/zinc/
+
+# Copy the whole repo to the current directory. This includes prebuilt front end assets. in web/dist folder
+COPY . .    
+
+# Fetch dependencies.
+RUN go mod tidy
+# Using go mod.
+# RUN go mod download
+# RUN go mod verify
+# Build the binary.
+# to tackle error standard_init_linux.go:207: exec user process caused "no such file or directory" set CGO_ENABLED=0.
+# CGO_ENABLED=0 builds a statically linked binary.
+# docs for -ldflags at https://pkg.go.dev/cmd/link
+#       -w : Omit the DWARF symbol table.
+#       -s : Omit the symbol table and debug information.
+#       Omit the symbol table and debug information will reduce the binary size.
+# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o zinc cmd/zinc/main.go
+ENV VERSION=$VERSION
+ENV COMMIT_HASH=$COMMIT_HASH
+ENV BUILD_DATE=$BUILD_DATE
+
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
+
+EXPOSE 4080
+# Run the zinc binary.
+ENTRYPOINT ["/go/src/github.com/zinclabs/zinc/zinc"]
