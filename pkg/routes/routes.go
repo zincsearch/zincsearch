@@ -168,7 +168,11 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/es/_analyze", AuthMiddleware, ESMiddleware, index.Analyze)
 	r.POST("/es/:target/_analyze", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, index.Analyze)
 
-	r.POST("/es/_alias", AuthMiddleware, ESMiddleware, index.AddOrRemoveESAlias)
+	r.POST("/es/_aliases", AuthMiddleware, ESMiddleware, index.AddOrRemoveESAlias)
+
+	r.GET("/es/_alias", AuthMiddleware, ESMiddleware, index.GetESAliases)
+	r.GET("/es/:target/_alias", AuthMiddleware, ESMiddleware, index.GetESAliases)
+	r.GET("/es/_alias/:target_alias", AuthMiddleware, ESMiddleware, index.GetESAliases)
 
 	// ES Bulk update/insert
 	r.POST("/es/_bulk", AuthMiddleware, ESMiddleware, document.ESBulk)

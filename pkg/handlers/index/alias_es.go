@@ -40,15 +40,10 @@ func AddOrRemoveESAlias(c *gin.Context) {
 	var indexList []*core.Index
 
 	target := c.Param("target")
-	if target != "" {
-		index, ok := core.ZINC_INDEX_LIST.Get(target)
-		if !ok {
-			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index not found"})
-			return
-		}
-		indexList = []*core.Index{index}
-	} else {
-		indexList = core.ZINC_INDEX_LIST.List()
+	indexList, ok := getIndexList(target)
+	if !ok {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index not found"})
+		return
 	}
 
 	c.Params[0].Value = ""
@@ -86,6 +81,51 @@ func AddOrRemoveESAlias(c *gin.Context) {
 			index.RemoveAliases(aliases)
 		}
 	}
+
+	c.JSON(http.StatusOK, gin.H{"acknowledged": true})
+}
+
+type M map[string]interface{}
+
+func GetESAliases(c *gin.Context) {
+	targetIndex := c.Param("target")
+	indexList, ok := getIndexList(targetIndex)
+	if !ok {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index not found"})
+		return
+	}
+
+	targetAlias := c.Param("target_alias")
+
+	aliases := M{}
+
+	for _, index := range indexList {
+		als := M{}
+		aliases[index.GetName()] = M{
+			"aliases": als,
+		}
+
+		for _, alias := range index.GetAliases() {
+			if targetAlias != "" && alias != targetAlias { // check if this is the alias we're looking for
+				continue
+			}
+
+			als[alias] = M{}
+		}
+	}
+
+	c.JSON(http.StatusOK, aliases)
+}
+
+func getIndexList(target string) ([]*core.Index, bool) {
+	if target != "" {
+		index, ok := core.ZINC_INDEX_LIST.Get(target)
+		if !ok {
+			return nil, false
+		}
+		return []*core.Index{index}, true
+	}
+	return core.ZINC_INDEX_LIST.List(), true
 }
 
 func indexNameMatches(name, indexName string) bool {
