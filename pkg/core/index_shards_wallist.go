@@ -18,6 +18,7 @@ package core
 import (
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -79,36 +80,52 @@ func (t *IndexShardWALList) ConsumeWAL() {
 	eg.SetLimit(config.Global.Shard.GorutineNum)
 	tick := time.NewTicker(interval)
 	for range tick.C {
-		indexClosed := make(chan string, t.Len())
+		shardClosed := make(chan string, t.Len())
+		indexUpdated := make(chan string, t.Len())
 		for _, shard := range t.List() {
 			shard := shard
 			indexes[shard.GetIndexName()] = shard.root
 			eg.Go(func() error {
 				select {
 				case <-shard.close:
-					indexClosed <- shard.GetShardName()
+					shardClosed <- shard.GetShardName()
 					return nil
 				default:
 					// continue
 				}
-				shard.ConsumeWAL()
+				updated := shard.ConsumeWAL()
+				if updated {
+					indexUpdated <- shard.GetIndexName()
+				}
 				return nil
 			})
 		}
 		_ = eg.Wait()
-		close(indexClosed)
+		close(shardClosed)
+		close(indexUpdated)
 
-		// check index closed
-		for name := range indexClosed {
+		// check shard closed
+		for name := range shardClosed {
 			t.Remove(name)
 		}
 
-		// check index stats
-		for name, index := range indexes {
-			index.UpdateMetadata()
+		// update index stats
+		for name := range indexUpdated {
+			index, ok := indexes[name]
+			if !ok {
+				continue
+			}
+
+			_ = index.UpdateMetadata()
+			size := index.GetWALSize()
+			if size == uint64(index.GetShardNum()) {
+				size = 0
+			}
 			stats := index.GetStats()
-			SetMetricStatsByIndex(name, "doc_num", float64(stats.DocNum))
-			SetMetricStatsByIndex(name, "storage_size", float64(stats.StorageSize))
+			atomic.StoreUint64(&stats.WALSize, size)
+			SetMetricStatsByIndex(name, "doc_num", float64(atomic.LoadUint64(&stats.DocNum)))
+			SetMetricStatsByIndex(name, "storage_size", float64(atomic.LoadUint64(&stats.StorageSize)/1024/1024)) // convert to MB
+
 			delete(indexes, name)
 		}
 

@@ -77,7 +77,11 @@ func LoadZincIndexesFromMetadata(version string) error {
 		index.shardNum = index.ref.ShardNum
 		index.shards = make(map[string]*IndexShard, index.shardNum)
 		for id := range index.ref.Shards {
-			index.shards[id] = &IndexShard{root: index, ref: index.ref.Shards[id]}
+			index.shards[id] = &IndexShard{
+				root: index,
+				ref:  index.ref.Shards[id],
+				name: index.ref.Name + "/" + index.ref.Shards[id].ID,
+			}
 			index.shards[id].shards = make([]*IndexSecondShard, index.ref.Shards[id].ShardNum)
 			for j := range index.ref.Shards[id].Shards {
 				index.shards[id].shards[j] = &IndexSecondShard{

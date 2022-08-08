@@ -40,9 +40,9 @@ type IndexSecondShard struct {
 }
 
 type IndexStat struct {
-	DocNum      uint64 `json:"doc_num"`
 	DocTimeMin  int64  `json:"doc_time_min"`
 	DocTimeMax  int64  `json:"doc_time_max"`
+	DocNum      uint64 `json:"doc_num"`
 	StorageSize uint64 `json:"storage_size"`
 	WALSize     uint64 `json:"wal_size"`
 }

@@ -17,16 +17,16 @@ package core
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
-	ginprometheus "github.com/zsais/go-gin-prometheus"
+	ginprometheus "github.com/zinclabs/go-gin-prometheus"
 )
 
 var (
-	ZINC_PROMETHEUS *ginprometheus.Metric
+	ZINC_METRICS *ginprometheus.Metric
 )
 
 func init() {
-	ZINC_PROMETHEUS = &ginprometheus.Metric{
-		ID:          "index",                      // Identifier
+	ZINC_METRICS = &ginprometheus.Metric{
+		ID:          "indexStats",                 // Identifier
 		Name:        "index_stats",                // Metric Name
 		Description: "Summary index stats metric", // Help Description
 		Type:        "gauge_vec",                  // type associated with prometheus collector
@@ -38,15 +38,15 @@ func init() {
 }
 
 func SetMetricStatsByIndex(index, field string, val float64) {
-	if ZINC_PROMETHEUS.MetricCollector == nil {
+	if ZINC_METRICS.MetricCollector == nil {
 		return
 	}
-	ZINC_PROMETHEUS.MetricCollector.(*prometheus.GaugeVec).WithLabelValues(index, field).Set(val)
+	ZINC_METRICS.MetricCollector.(*prometheus.GaugeVec).WithLabelValues(index, field).Set(val)
 }
 
 func IncrMetricStatsByIndex(index, field string) {
-	if ZINC_PROMETHEUS.MetricCollector == nil {
+	if ZINC_METRICS.MetricCollector == nil {
 		return
 	}
-	ZINC_PROMETHEUS.MetricCollector.(*prometheus.GaugeVec).WithLabelValues(index, field).Inc()
+	ZINC_METRICS.MetricCollector.(*prometheus.GaugeVec).WithLabelValues(index, field).Inc()
 }

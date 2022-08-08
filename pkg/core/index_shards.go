@@ -18,7 +18,6 @@ package core
 import (
 	"context"
 	"fmt"
-	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -105,14 +104,6 @@ func (s *IndexShard) GetIndexName() string {
 }
 
 func (s *IndexShard) GetShardName() string {
-	if s.name != "" {
-		return s.name
-	}
-	str := strings.Builder{}
-	str.WriteString(s.root.GetName())
-	str.WriteString("/")
-	str.WriteString(s.GetID())
-	s.name = str.String()
 	return s.name
 }
 
