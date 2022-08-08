@@ -135,7 +135,6 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 func TestGetESAliases(t *testing.T) {
 	indexName := "TestAddOrRemoveESAlias.index_1"
 	type args struct {
-		data   string
 		result string
 	}
 	tests := []struct {
@@ -149,7 +148,6 @@ func TestGetESAliases(t *testing.T) {
 		{
 			name: "should_get_es_alias",
 			args: args{
-				data:   `{"actions": [{"add": {"index": "TestAddOrRemoveESAlias.index_1","alias": "test_alias_1"}}]}`,
 				result: `{"TestAddOrRemoveESAlias.index_1":{"aliases":{"existing_alias_1":{},"existing_alias_2":{},"existing_alias_3":{}}}}`,
 			},
 			nFn: func(index *core.Index) {
@@ -161,7 +159,6 @@ func TestGetESAliases(t *testing.T) {
 		{
 			name: "should_get_es_alias_of_target_index",
 			args: args{
-				data:   `{"actions": [{"add": {"index": "TestAddOrRemoveESAlias.index_1","alias": "test_alias_1"}}]}`,
 				result: `{"TestAddOrRemoveESAlias.index_1":{"aliases":{"existing_alias_1":{},"existing_alias_2":{},"existing_alias_3":{}}}}`,
 			},
 			params: map[string]string{
@@ -176,7 +173,6 @@ func TestGetESAliases(t *testing.T) {
 		{
 			name: "should_get_es_alias_of_target_alias",
 			args: args{
-				data:   `{"actions": [{"add": {"index": "TestAddOrRemoveESAlias.index_1","alias": "test_alias_1"}}]}`,
 				result: `{"TestAddOrRemoveESAlias.index_1":{"aliases":{"existing_alias_1":{}}}}`,
 			},
 			params: map[string]string{
@@ -200,7 +196,6 @@ func TestGetESAliases(t *testing.T) {
 			}
 
 			c, w := utils.NewGinContext()
-			utils.SetGinRequestData(c, tt.args.data)
 			utils.SetGinRequestParams(c, tt.params)
 			GetESAliases(c)
 
