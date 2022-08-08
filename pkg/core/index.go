@@ -175,8 +175,8 @@ func (index *Index) RemoveAliases(aliases []string) {
 	index.lock.Lock()
 
 outer:
-	for i, alias := range aliases {
-		for _, s := range index.ref.Aliases {
+	for _, alias := range aliases {
+		for i, s := range index.ref.Aliases {
 			if s == alias {
 				index.ref.Aliases = append(index.ref.Aliases[:i], index.ref.Aliases[i+1:]...)
 				continue outer
@@ -184,7 +184,6 @@ outer:
 		}
 	}
 
-	index.ref.Aliases = append(index.ref.Aliases, aliases...)
 	index.lock.Unlock()
 }
 

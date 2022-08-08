@@ -70,7 +70,11 @@ outerLoop:
 			for _, index := range indexList {
 				indexName := index.GetName()
 				if indexNameMatches(action.Add.Index, indexName) {
-					addMap[indexName] = append(addMap[indexName], action.Add.Alias)
+					if action.Add.Alias != "" {
+						addMap[indexName] = append(addMap[indexName], action.Add.Alias)
+					} else {
+						addMap[indexName] = append(addMap[indexName], action.Add.Aliases...)
+					}
 				}
 			}
 
@@ -99,7 +103,11 @@ outerLoop:
 			for _, index := range indexList {
 				indexName := index.GetName()
 				if indexNameMatches(action.Remove.Index, indexName) {
-					removeMap[indexName] = append(addMap[indexName], action.Remove.Alias) // append the alias to remove list for this index
+					if action.Remove.Alias != "" {
+						removeMap[indexName] = append(removeMap[indexName], action.Remove.Alias)
+					} else {
+						removeMap[indexName] = append(removeMap[indexName], action.Remove.Aliases...)
+					}
 				}
 			}
 		}
