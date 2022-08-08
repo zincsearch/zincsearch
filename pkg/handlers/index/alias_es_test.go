@@ -1,6 +1,7 @@
 package index
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -70,7 +71,6 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 			wantErr:     false,
 			wantAliases: []string{"existing_alias", "test_alias_3", "test_alias_4"},
 		},
-
 		{
 			name: "should_remove_es_alias",
 			args: args{
@@ -129,6 +129,86 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 			require.Equal(t, tt.wantCode, w.Code)
 			require.Equal(t, tt.args.result, w.Body.String())
 			require.Equal(t, tt.wantAliases, index.GetAliases())
+		})
+	}
+}
+
+func TestGetESAliases(t *testing.T) {
+	indexName := "TestAddOrRemoveESAlias.index_1"
+	type args struct {
+		data   string
+		result string
+	}
+	tests := []struct {
+		name     string
+		nFn      func(*core.Index)
+		params   map[string]string
+		args     args
+		wantErr  bool
+		wantCode int
+	}{
+		{
+			name: "should_get_es_alias",
+			args: args{
+				data:   `{"actions": [{"add": {"index": "TestAddOrRemoveESAlias.index_1","alias": "test_alias_1"}}]}`,
+				result: `{"TestAddOrRemoveESAlias.index_1":{"aliases":{"existing_alias_1":{},"existing_alias_2":{},"existing_alias_3":{}}},"TestRefresh.index_1":{"aliases":{}}}`,
+			},
+			nFn: func(index *core.Index) {
+				index.AddAliases([]string{"existing_alias_1", "existing_alias_2", "existing_alias_3"})
+			},
+			wantCode: http.StatusOK,
+			wantErr:  false,
+		},
+		{
+			name: "should_get_es_alias_of_target_index",
+			args: args{
+				data:   `{"actions": [{"add": {"index": "TestAddOrRemoveESAlias.index_1","alias": "test_alias_1"}}]}`,
+				result: `{"TestAddOrRemoveESAlias.index_1":{"aliases":{"existing_alias_1":{},"existing_alias_2":{},"existing_alias_3":{}}}}`,
+			},
+			params: map[string]string{
+				"target": "TestAddOrRemoveESAlias.index_1",
+			},
+			nFn: func(index *core.Index) {
+				index.AddAliases([]string{"existing_alias_1", "existing_alias_2", "existing_alias_3"})
+			},
+			wantCode: http.StatusOK,
+			wantErr:  false,
+		},
+		{
+			name: "should_get_es_alias_of_target_alias",
+			args: args{
+				data:   `{"actions": [{"add": {"index": "TestAddOrRemoveESAlias.index_1","alias": "test_alias_1"}}]}`,
+				result: `{"TestAddOrRemoveESAlias.index_1":{"aliases":{"existing_alias_1":{}}}}`,
+			},
+			params: map[string]string{
+				//"target":       "TestAddOrRemoveESAlias.index_1",
+				"target_alias": "existing_alias_1",
+			},
+			nFn: func(index *core.Index) {
+				index.AddAliases([]string{"existing_alias_1", "existing_alias_2", "existing_alias_3"})
+			},
+			wantCode: http.StatusOK,
+			wantErr:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			index, closeFn := newIndex(t, indexName)
+			defer closeFn()
+
+			if tt.nFn != nil {
+				tt.nFn(index)
+			}
+
+			c, w := utils.NewGinContext()
+			utils.SetGinRequestData(c, tt.args.data)
+			utils.SetGinRequestParams(c, tt.params)
+			GetESAliases(c)
+
+			fmt.Println("vv", w.Body.String())
+			require.Equal(t, tt.wantCode, w.Code)
+			require.Equal(t, tt.args.result, w.Body.String())
 		})
 	}
 }

@@ -149,16 +149,19 @@ func GetESAliases(c *gin.Context) {
 	aliases := M{}
 	for _, index := range indexList {
 		als := M{}
-		aliases[index.GetName()] = M{
-			"aliases": als,
-		}
 
 		for _, alias := range index.GetAliases() {
 			if targetAlias != "" && !zutils.SliceExists(targetAliases, alias) { // check if this is the alias we're looking for
 				continue
 			}
 
-			als[alias] = M{}
+			als[alias] = struct{}{}
+		}
+
+		if len(als) > 0 {
+			aliases[index.GetName()] = M{
+				"aliases": als,
+			}
 		}
 	}
 
