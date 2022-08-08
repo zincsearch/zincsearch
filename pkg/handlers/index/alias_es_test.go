@@ -1,7 +1,6 @@
 package index
 
 import (
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -151,7 +150,7 @@ func TestGetESAliases(t *testing.T) {
 			name: "should_get_es_alias",
 			args: args{
 				data:   `{"actions": [{"add": {"index": "TestAddOrRemoveESAlias.index_1","alias": "test_alias_1"}}]}`,
-				result: `{"TestAddOrRemoveESAlias.index_1":{"aliases":{"existing_alias_1":{},"existing_alias_2":{},"existing_alias_3":{}}},"TestRefresh.index_1":{"aliases":{}}}`,
+				result: `{"TestAddOrRemoveESAlias.index_1":{"aliases":{"existing_alias_1":{},"existing_alias_2":{},"existing_alias_3":{}}}}`,
 			},
 			nFn: func(index *core.Index) {
 				index.AddAliases([]string{"existing_alias_1", "existing_alias_2", "existing_alias_3"})
@@ -181,7 +180,6 @@ func TestGetESAliases(t *testing.T) {
 				result: `{"TestAddOrRemoveESAlias.index_1":{"aliases":{"existing_alias_1":{}}}}`,
 			},
 			params: map[string]string{
-				//"target":       "TestAddOrRemoveESAlias.index_1",
 				"target_alias": "existing_alias_1",
 			},
 			nFn: func(index *core.Index) {
@@ -206,7 +204,6 @@ func TestGetESAliases(t *testing.T) {
 			utils.SetGinRequestParams(c, tt.params)
 			GetESAliases(c)
 
-			fmt.Println("vv", w.Body.String())
 			require.Equal(t, tt.wantCode, w.Code)
 			require.Equal(t, tt.args.result, w.Body.String())
 		})
