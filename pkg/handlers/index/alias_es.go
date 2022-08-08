@@ -39,76 +39,33 @@ func AddOrRemoveESAlias(c *gin.Context) {
 	addMap := map[string][]string{}
 	removeMap := map[string][]string{}
 
-	target := c.Param("target")
-	indexList, ok := getIndexList(target)
-	if !ok {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index not found"})
-		return
-	}
+	indexList := core.ZINC_INDEX_LIST.List()
 
 outerLoop:
 	for _, action := range alias.Actions {
 		if action.Add != nil {
-			if action.Add.Indices != nil {
-			innerLoop1:
-				for _, indexName := range action.Add.Indices {
-					_, ok = core.ZINC_INDEX_LIST.Get(indexName)
-					if !ok {
-						continue innerLoop1
-					}
-
-					if action.Add.Alias != "" {
-						addMap[indexName] = append(addMap[indexName], action.Add.Alias)
-					} else {
-						addMap[indexName] = append(addMap[indexName], action.Add.Aliases...)
-					}
-				}
-
+			if action.Add.Index != "" {
+				matchAndAddToMap(indexList, action.Add.Index, addMap, action.Add)
 				continue outerLoop
 			}
 
-			for _, index := range indexList {
-				indexName := index.GetName()
-				if indexNameMatches(action.Add.Index, indexName) {
-					if action.Add.Alias != "" {
-						addMap[indexName] = append(addMap[indexName], action.Add.Alias)
-					} else {
-						addMap[indexName] = append(addMap[indexName], action.Add.Aliases...)
-					}
-				}
+			// index is empty, try the indices field
+			for _, indexName := range action.Add.Indices {
+				matchAndAddToMap(indexList, indexName, addMap, action.Add)
 			}
 
-			continue outerLoop
+			continue outerLoop // this was an add action, don't bother checking action.Remove
 		}
 
 		if action.Remove != nil {
-			if action.Remove.Indices != nil {
-			innerLoop2:
-				for _, indexName := range action.Remove.Indices {
-					_, ok = core.ZINC_INDEX_LIST.Get(indexName)
-					if !ok {
-						continue innerLoop2
-					}
-
-					if action.Remove.Alias != "" {
-						removeMap[indexName] = append(removeMap[indexName], action.Remove.Alias)
-					} else {
-						removeMap[indexName] = append(removeMap[indexName], action.Remove.Aliases...)
-					}
-				}
-
+			if action.Remove.Index != "" {
+				matchAndAddToMap(indexList, action.Remove.Index, removeMap, action.Remove)
 				continue outerLoop
 			}
 
-			for _, index := range indexList {
-				indexName := index.GetName()
-				if indexNameMatches(action.Remove.Index, indexName) {
-					if action.Remove.Alias != "" {
-						removeMap[indexName] = append(removeMap[indexName], action.Remove.Alias)
-					} else {
-						removeMap[indexName] = append(removeMap[indexName], action.Remove.Aliases...)
-					}
-				}
+			// index is empty, try the indices field
+			for _, indexName := range action.Remove.Indices {
+				matchAndAddToMap(indexList, indexName, removeMap, action.Remove)
 			}
 		}
 	}
@@ -218,4 +175,17 @@ func getRegex(s string) (*regexp.Regexp, error) {
 	}
 
 	return p, nil
+}
+
+func matchAndAddToMap(indexList []*core.Index, indexName string, m map[string][]string, b *base) {
+	for _, index := range indexList {
+		n := index.GetName()
+		if indexNameMatches(indexName, n) {
+			if b.Alias != "" { // alias takes precedence over aliases
+				m[n] = append(m[n], b.Alias)
+			} else {
+				m[n] = append(m[n], b.Aliases...)
+			}
+		}
+	}
 }
