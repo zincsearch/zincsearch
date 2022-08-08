@@ -164,6 +164,7 @@ func (index *Index) HasAlias(as string) bool {
 	index.lock.RLock()
 	for _, alias := range index.ref.Aliases {
 		if alias == as {
+			index.lock.RUnlock()
 			return true
 		}
 	}
