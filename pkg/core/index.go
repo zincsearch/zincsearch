@@ -292,10 +292,6 @@ func (index *Index) Reopen() error {
 }
 
 func (index *Index) Close() error {
-	if err := index.UpdateMetadata(); err != nil {
-		return err
-	}
-
 	eg := errgroup.Group{}
 	for _, shard := range index.shards {
 		shard := shard

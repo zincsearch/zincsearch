@@ -17,9 +17,10 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	ginprometheus "github.com/zsais/go-gin-prometheus"
+	ginprometheus "github.com/zinclabs/go-gin-prometheus"
 
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/core"
 )
 
 // SetPrometheus sets up prometheus metrics for gin
@@ -28,6 +29,6 @@ func SetPrometheus(app *gin.Engine) {
 		return
 	}
 
-	p := ginprometheus.NewPrometheus("gin")
+	p := ginprometheus.NewPrometheus("zinc", []*ginprometheus.Metric{core.ZINC_METRICS})
 	p.Use(app)
 }
