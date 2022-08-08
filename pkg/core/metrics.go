@@ -20,9 +20,7 @@ import (
 	ginprometheus "github.com/zinclabs/go-gin-prometheus"
 )
 
-var (
-	ZINC_METRICS *ginprometheus.Metric
-)
+var ZINC_METRICS *ginprometheus.Metric
 
 func init() {
 	ZINC_METRICS = &ginprometheus.Metric{
