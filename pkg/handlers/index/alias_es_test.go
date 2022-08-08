@@ -71,6 +71,19 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 			wantAliases: []string{"existing_alias", "test_alias_3", "test_alias_4"},
 		},
 		{
+			name: "should_add_es_alias_with_indices_field_using_*",
+			args: args{
+				data:   `{"actions": [{"add": {"indices": ["*index_1"],"aliases": ["test_alias_3","test_alias_4"]}}]}`,
+				result: `{"acknowledged":true}`,
+			},
+			nFn: func(index *core.Index) {
+				index.AddAliases([]string{"existing_alias"})
+			},
+			wantCode:    http.StatusOK,
+			wantErr:     false,
+			wantAliases: []string{"existing_alias", "test_alias_3", "test_alias_4"},
+		},
+		{
 			name: "should_remove_es_alias",
 			args: args{
 				data:   `{"actions": [{"remove": {"index": "TestAddOrRemoveESAlias.index_1","alias": "existing_alias_2"}}]}`,
@@ -100,6 +113,19 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 			name: "should_remove_es_alias_with_indices_field",
 			args: args{
 				data:   `{"actions": [{"remove": {"indices": ["TestAddOrRemoveESAlias.index_1"],"aliases": ["existing_alias_1","existing_alias_2"]}}]}`,
+				result: `{"acknowledged":true}`,
+			},
+			nFn: func(index *core.Index) {
+				index.AddAliases([]string{"existing_alias_1", "existing_alias_2", "existing_alias_3"})
+			},
+			wantCode:    http.StatusOK,
+			wantErr:     false,
+			wantAliases: []string{"existing_alias_3"},
+		},
+		{
+			name: "should_remove_es_alias_with_indices_field",
+			args: args{
+				data:   `{"actions": [{"remove": {"indices": ["*index_1"],"aliases": ["existing_alias_1","existing_alias_2"]}}]}`,
 				result: `{"acknowledged":true}`,
 			},
 			nFn: func(index *core.Index) {
