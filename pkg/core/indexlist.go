@@ -18,7 +18,6 @@ package core
 import (
 	"sort"
 	"sync"
-	"sync/atomic"
 
 	"github.com/rs/zerolog/log"
 	"golang.org/x/sync/errgroup"
@@ -141,14 +140,6 @@ func (t *IndexList) ListMap() map[string]*Index {
 
 func (t *IndexList) ListStat() []*Index {
 	items := t.List()
-	for _, index := range items {
-		size := index.GetWALSize()
-		if size == uint64(index.GetShardNum()) {
-			size = 0
-		}
-		atomic.StoreUint64(&index.ref.Stats.WALSize, size)
-		_ = index.UpdateMetadata()
-	}
 	return items
 }
 

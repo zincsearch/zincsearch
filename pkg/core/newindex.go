@@ -94,13 +94,17 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 
 	// init shards wrapper
 	index.shards = make(map[string]*IndexShard, index.shardNum)
-	for i := range index.ref.Shards {
-		index.shards[i] = &IndexShard{root: index, ref: index.ref.Shards[i]}
-		index.shards[i].shards = make([]*IndexSecondShard, index.ref.Shards[i].ShardNum)
-		for j := range index.ref.Shards[i].Shards {
-			index.shards[i].shards[j] = &IndexSecondShard{
+	for id := range index.ref.Shards {
+		index.shards[id] = &IndexShard{
+			root: index,
+			ref:  index.ref.Shards[id],
+			name: index.ref.Name + "/" + index.ref.Shards[id].ID,
+		}
+		index.shards[id].shards = make([]*IndexSecondShard, index.ref.Shards[id].ShardNum)
+		for j := range index.ref.Shards[id].Shards {
+			index.shards[id].shards[j] = &IndexSecondShard{
 				root: index,
-				ref:  index.ref.Shards[i].Shards[j],
+				ref:  index.ref.Shards[id].Shards[j],
 			}
 		}
 	}

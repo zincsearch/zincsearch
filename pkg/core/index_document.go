@@ -27,9 +27,11 @@ import (
 
 // CreateDocument inserts or updates a document in the zinc index
 func (index *Index) CreateDocument(docID string, doc map[string]interface{}, update bool) error {
-	shard := index.GetShardByDocID(docID)
+	// metrics
+	IncrMetricStatsByIndex(index.GetName(), "wal_request")
 
 	// check WAL
+	shard := index.GetShardByDocID(docID)
 	if err := shard.OpenWAL(); err != nil {
 		return err
 	}
@@ -48,9 +50,11 @@ func (index *Index) CreateDocument(docID string, doc map[string]interface{}, upd
 
 // UpdateDocument updates a document in the zinc index
 func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, insert bool) error {
-	shard := index.GetShardByDocID(docID)
+	// metrics
+	IncrMetricStatsByIndex(index.GetName(), "wal_request")
 
 	// check WAL
+	shard := index.GetShardByDocID(docID)
 	if err := shard.OpenWAL(); err != nil {
 		return err
 	}
@@ -75,9 +79,11 @@ func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, ins
 
 // DeleteDocument deletes a document in the zinc index
 func (index *Index) DeleteDocument(docID string) error {
-	shard := index.GetShardByDocID(docID)
+	// metrics
+	IncrMetricStatsByIndex(index.GetName(), "wal_request")
 
 	// check WAL
+	shard := index.GetShardByDocID(docID)
 	if err := shard.OpenWAL(); err != nil {
 		return err
 	}

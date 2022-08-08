@@ -138,7 +138,8 @@ func (s *IndexShard) Rollback() error {
 	return nil
 }
 
-func (s *IndexShard) ConsumeWAL() {
+// ConsumeWAL consume WAL for index returns if there is any data updated
+func (s *IndexShard) ConsumeWAL() bool {
 	if err := s.wal.Sync(); err != nil {
 		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.Sync()")
 	}
@@ -149,16 +150,16 @@ func (s *IndexShard) ConsumeWAL() {
 	maxID, err = s.wal.LastIndex()
 	if err != nil {
 		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.LastIndex()")
-		return
+		return false
 	}
 	// read last committed ID
 	_, minID, err = s.readRedoLog(RedoActionWrite)
 	if err != nil && err.Error() != errors.ErrNotFound.Error() {
 		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.readRedoLog()")
-		return
+		return false
 	}
 	if minID == maxID {
-		return // no new entries
+		return false // no new entries
 	}
 	// log.Debug().Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Uint64("minID", minID).Uint64("maxID", maxID).Msg("consume wal begin")
 
@@ -174,28 +175,28 @@ func (s *IndexShard) ConsumeWAL() {
 		entry, err = s.wal.Read(minID)
 		if err != nil {
 			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.Read()")
-			return
+			return false
 		}
 
 		doc := make(map[string]interface{})
 		err = json.Unmarshal(entry, &doc)
 		if err != nil {
 			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.entry.Unmarshal()")
-			return
+			return false
 		}
 		docs.AddDocument(doc)
 		if docs.MaxShardLen() >= config.Global.BatchSize {
 			if err = s.writeRedoLog(RedoActionRead, startID, minID); err != nil {
 				log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Str("stage", "read").Msg("consume wal.redolog.Write()")
-				return
+				return false
 			}
 			if err = docs.WriteTo(s, batch, false); err != nil {
 				log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.docs.WriteTo()")
-				return
+				return false
 			}
 			if err = s.writeRedoLog(RedoActionWrite, startID, minID); err != nil {
 				log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Str("stage", "write").Msg("consume wal.redolog.Write()")
-				return
+				return false
 			}
 			// Reset startID to nextID
 			startID = minID + 1
@@ -208,15 +209,15 @@ func (s *IndexShard) ConsumeWAL() {
 	if docs.MaxShardLen() > 0 {
 		if err = s.writeRedoLog(RedoActionRead, startID, minID); err != nil {
 			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Str("stage", "read").Msg("consume wal.redolog.Write()")
-			return
+			return false
 		}
 		if err := docs.WriteTo(s, batch, false); err != nil {
 			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume wal.docs.WriteTo()")
-			return
+			return false
 		}
 		if err = s.writeRedoLog(RedoActionWrite, startID, minID); err != nil {
 			log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Str("stage", "write").Msg("consume wal.redolog.Write()")
-			return
+			return false
 		}
 	}
 	// log.Debug().Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Uint64("minID", minID).Uint64("maxID", maxID).Msg("consume wal end")
@@ -224,17 +225,18 @@ func (s *IndexShard) ConsumeWAL() {
 	// Truncate log
 	if err = s.wal.TruncateFront(minID); err != nil {
 		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Uint64("id", minID).Msg("consume wal.Truncate()")
-		return
+		return true
 	}
 
 	// check shards
 	if err = s.CheckShards(); err != nil {
 		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg("consume index.CheckShards()")
-		return
+		return true
 	}
 
 	//  update metadata
 	s.root.UpdateMetadataByShard(s.GetID())
+	return true
 }
 
 const (
@@ -269,10 +271,13 @@ func (s *IndexShard) readRedoLog(option uint64) (uint64, uint64, error) {
 }
 
 func (s *IndexShard) GetWALSize() (uint64, error) {
-	if s.wal == nil {
+	s.lock.RLock()
+	w := s.wal
+	s.lock.RUnlock()
+	if w == nil {
 		return 0, nil
 	}
-	return s.wal.Len()
+	return w.Len()
 }
 
 type walDocument struct {
