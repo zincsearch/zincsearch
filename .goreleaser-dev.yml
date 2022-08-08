@@ -78,7 +78,7 @@ dockers:
   - image_templates:
       - public.ecr.aws/zinclabs/zinc-dev:{{ .Version }}-arm64
     use: buildx
-    dockerfile: Dockerfile.ci
+    dockerfile: Dockerfile.ci-debug
     skip_push: "false"
     build_flag_templates:
     - "--build-arg=VERSION={{.Version}}"
@@ -97,7 +97,7 @@ dockers:
   - image_templates:
       - public.ecr.aws/zinclabs/zinc-dev:{{ .Version }}-armv7 
     use: buildx
-    dockerfile: Dockerfile.ci
+    dockerfile: Dockerfile.ci-debug
     skip_push: "false"
     build_flag_templates:
     - "--build-arg=VERSION={{.Version}}"
