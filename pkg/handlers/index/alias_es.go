@@ -28,6 +28,13 @@ type base struct {
 	Aliases []string `json:"aliases"`
 }
 
+// @Id AddOrRemoveESAlias
+// @Summary Add or remove index alias for compatible ES
+// @Tags    Index
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} meta.HTTPResponseError
+// @Router /es/_aliases [post]
 func AddOrRemoveESAlias(c *gin.Context) {
 	var alias Alias
 	err := zutils.GinBindJSON(c, &alias)
@@ -88,6 +95,15 @@ outerLoop:
 
 type M map[string]interface{}
 
+// @Id GetESAliases
+// @Summary Get index alias for compatible ES
+// @Tags    Index
+// @Produce json
+// @Param   index path  string  false  "Index"
+// @Param   alias path  string  false  "Alias"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} meta.HTTPResponseError
+// @Router /es/{target}/_alias/{target_alias} [get]
 func GetESAliases(c *gin.Context) {
 	targetIndex := c.Param("target")
 	indexList, ok := getIndexList(targetIndex)

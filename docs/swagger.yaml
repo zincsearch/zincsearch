@@ -1112,7 +1112,7 @@ paths:
         name: query
         required: true
         schema:
-          type: object
+          type: primitive
       produces:
       - application/json
       responses:
@@ -1138,7 +1138,7 @@ paths:
         name: query
         required: true
         schema:
-          type: string
+          type: primitive
       produces:
       - application/json
       responses:
@@ -1199,7 +1199,7 @@ paths:
         name: query
         required: true
         schema:
-          type: object
+          type: primitive
       produces:
       - application/json
       responses:
@@ -1396,7 +1396,7 @@ paths:
         name: query
         required: true
         schema:
-          type: string
+          type: primitive
       produces:
       - application/json
       responses:
@@ -1822,6 +1822,24 @@ paths:
       summary: Delete user
       tags:
       - User
+  /es/_aliases:
+    post:
+      operationId: AddOrRemoveESAlias
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Add or remove index alias for compatible ES
+      tags:
+      - Index
   /es/_bulk:
     post:
       consumes:
@@ -1833,7 +1851,7 @@ paths:
         name: query
         required: true
         schema:
-          type: string
+          type: primitive
       produces:
       - application/json
       responses:
@@ -1979,7 +1997,7 @@ paths:
         name: query
         required: true
         schema:
-          type: string
+          type: primitive
       produces:
       - application/json
       responses:
@@ -2101,6 +2119,33 @@ paths:
       summary: Search V2 DSL for compatible ES
       tags:
       - Search
+  /es/{target}/_alias/{target_alias}:
+    get:
+      operationId: GetESAliases
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        type: string
+      - description: Alias
+        in: path
+        name: alias
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Get index alias for compatible ES
+      tags:
+      - Index
   /healthz:
     get:
       operationId: Healthz
