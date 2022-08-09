@@ -45,7 +45,8 @@ func init() {
 
 	// start loading index
 	ZINC_INDEX_LIST.Indexes = make(map[string]*Index)
-	if err := LoadZincIndexesFromMetadata(string(version)); err != nil {
+	err := LoadZincIndexesFromMetadata(string(version))
+	if err != nil {
 		log.Fatal().Err(err).Msg("Error loading index")
 	}
 
@@ -55,6 +56,11 @@ func init() {
 		if err != nil {
 			log.Error().Err(err).Msg("Error set version")
 		}
+	}
+
+	ZINC_INDEX_ALIAS_LIST.Aliases, err = metadata.Alias.Get()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Error loading alias")
 	}
 }
 

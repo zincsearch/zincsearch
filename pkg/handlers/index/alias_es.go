@@ -78,11 +78,21 @@ outerLoop:
 	}
 
 	for alias, indexes := range addMap {
-		core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias(alias, indexes)
+		err = core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias(alias, indexes)
+		if err != nil {
+			log.Err(err).Msg("failed to add indexes to alias")
+			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "failed to add indexes to alias"})
+			return
+		}
 	}
 
 	for alias, indexes := range removeMap {
-		core.ZINC_INDEX_ALIAS_LIST.RemoveIndexesFromAlias(alias, indexes)
+		err = core.ZINC_INDEX_ALIAS_LIST.RemoveIndexesFromAlias(alias, indexes)
+		if err != nil {
+			log.Err(err).Msg("failed to remove indexes to alias")
+			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "failed to remove indexes to alias"})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"acknowledged": true})
@@ -117,22 +127,6 @@ func GetESAliases(c *gin.Context) {
 	m := core.ZINC_INDEX_ALIAS_LIST.GetAliasMap(targetIndexes, targetAliases)
 
 	c.JSON(http.StatusOK, m)
-}
-
-func getIndexList(target string) ([]*core.Index, bool) {
-	if target != "" {
-		targets := strings.Split(target, ",")
-		indexList := make([]*core.Index, 0, len(targets))
-		for _, t := range targets {
-			index, ok := core.ZINC_INDEX_LIST.Get(t)
-			if !ok {
-				return nil, false
-			}
-			indexList = append(indexList, index)
-		}
-		return indexList, true
-	}
-	return core.ZINC_INDEX_LIST.List(), true
 }
 
 func indexNameMatches(name, indexName string) bool {

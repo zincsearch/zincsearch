@@ -3,6 +3,7 @@ package core
 import (
 	"sync"
 
+	"github.com/zinclabs/zinc/pkg/metadata"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
@@ -19,23 +20,31 @@ func NewAliasList() *AliasList {
 	return &AliasList{Aliases: map[string][]string{}}
 }
 
-func (al *AliasList) AddIndexesToAlias(alias string, indexes []string) {
+func (al *AliasList) AddIndexesToAlias(alias string, indexes []string) error {
 	al.lock.Lock()
 	if al.Aliases == nil {
 		al.Aliases = map[string][]string{}
 	}
 
 	al.Aliases[alias] = append(al.Aliases[alias], indexes...)
+
+	err := metadata.Alias.Set(al.Aliases)
+	if err != nil {
+		al.lock.Unlock()
+		return err
+	}
+
 	al.lock.Unlock()
+	return nil
 }
 
-func (al *AliasList) RemoveIndexesFromAlias(alias string, removeIndexes []string) {
+func (al *AliasList) RemoveIndexesFromAlias(alias string, removeIndexes []string) error {
 	al.lock.Lock()
 
 	indexes, ok := al.Aliases[alias]
 	if !ok {
 		al.lock.Unlock()
-		return
+		return nil
 	}
 
 outer:
@@ -49,7 +58,15 @@ outer:
 	}
 
 	al.Aliases[alias] = indexes
+
+	err := metadata.Alias.Set(al.Aliases)
+	if err != nil {
+		al.lock.Unlock()
+		return err
+	}
+
 	al.lock.Unlock()
+	return nil
 }
 
 func (al *AliasList) GetIndexesForAlias(aliasName string) ([]string, bool) {
