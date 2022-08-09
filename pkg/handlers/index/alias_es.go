@@ -77,17 +77,12 @@ outerLoop:
 		}
 	}
 
-	var aliases []string
-	for _, index := range indexList {
-		aliases = addMap[index.GetName()]
-		if aliases != nil {
-			index.AddAliases(aliases)
-		}
+	for alias, indexes := range addMap {
+		core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias(alias, indexes)
+	}
 
-		aliases = removeMap[index.GetName()]
-		if aliases != nil {
-			index.RemoveAliases(aliases)
-		}
+	for alias, indexes := range removeMap {
+		core.ZINC_INDEX_ALIAS_LIST.RemoveIndexesFromAlias(alias, indexes)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"acknowledged": true})
@@ -106,10 +101,10 @@ type M map[string]interface{}
 // @Router /es/{target}/_alias/{target_alias} [get]
 func GetESAliases(c *gin.Context) {
 	targetIndex := c.Param("target")
-	indexList, ok := getIndexList(targetIndex)
-	if !ok {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index not found"})
-		return
+
+	var targetIndexes []string
+	if targetIndex != "" {
+		targetIndexes = strings.Split(targetIndex, ",")
 	}
 
 	targetAlias := c.Param("target_alias")
@@ -119,26 +114,9 @@ func GetESAliases(c *gin.Context) {
 		targetAliases = strings.Split(targetAlias, ",")
 	}
 
-	aliases := M{}
-	for _, index := range indexList {
-		als := M{}
+	m := core.ZINC_INDEX_ALIAS_LIST.GetAliasMap(targetIndexes, targetAliases)
 
-		for _, alias := range index.GetAliases() {
-			if targetAlias != "" && !zutils.SliceExists(targetAliases, alias) { // check if this is the alias we're looking for
-				continue
-			}
-
-			als[alias] = struct{}{}
-		}
-
-		if len(als) > 0 {
-			aliases[index.GetName()] = M{
-				"aliases": als,
-			}
-		}
-	}
-
-	c.JSON(http.StatusOK, aliases)
+	c.JSON(http.StatusOK, m)
 }
 
 func getIndexList(target string) ([]*core.Index, bool) {
@@ -198,9 +176,11 @@ func matchAndAddToMap(indexList []*core.Index, indexName string, m map[string][]
 		n := index.GetName()
 		if indexNameMatches(indexName, n) {
 			if b.Alias != "" { // alias takes precedence over aliases
-				m[n] = append(m[n], b.Alias)
+				m[b.Alias] = append(m[b.Alias], n)
 			} else {
-				m[n] = append(m[n], b.Aliases...)
+				for _, a := range b.Aliases {
+					m[a] = append(m[a], n)
+				}
 			}
 		}
 	}

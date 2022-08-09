@@ -17,7 +17,6 @@ package meta
 
 type Index struct {
 	Name        string                 `json:"name"`
-	Aliases     []string               `json:"aliases"`
 	StorageType string                 `json:"storage_type"`
 	Settings    *IndexSettings         `json:"settings,omitempty"`
 	Mappings    *Mappings              `json:"mappings,omitempty"`

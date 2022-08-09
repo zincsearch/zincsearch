@@ -18,9 +18,10 @@ package routes
 import (
 	"net/http"
 
+	"github.com/zinclabs/zinc/pkg/core"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zinclabs/zinc/pkg/auth"
-	"github.com/zinclabs/zinc/pkg/core"
 )
 
 func AuthMiddleware(c *gin.Context) {
@@ -62,14 +63,16 @@ func IndexAliasMiddleware(c *gin.Context) {
 		return
 	}
 
-	indexList := core.ZINC_INDEX_LIST.List()
 	newTarget := ""
+	indexes, ok := core.ZINC_INDEX_ALIAS_LIST.GetIndexesForAlias(target)
+	if !ok {
+		c.Next()
+		return
+	}
 
 	// find all index that match this alias and add them to the newTarget
-	for _, index := range indexList {
-		if index.HasAlias(target) {
-			newTarget += "," + index.GetName()
-		}
+	for _, index := range indexes {
+		newTarget += "," + index
 	}
 
 	if newTarget != "" {

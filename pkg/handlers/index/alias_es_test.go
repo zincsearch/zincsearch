@@ -51,7 +51,7 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 				result: `{"acknowledged":true}`,
 			},
 			nFn: func(index *core.Index) {
-				index.AddAliases([]string{"existing_alias"})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias", []string{index.GetName()})
 			},
 			wantCode:    http.StatusOK,
 			wantErr:     false,
@@ -64,7 +64,7 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 				result: `{"acknowledged":true}`,
 			},
 			nFn: func(index *core.Index) {
-				index.AddAliases([]string{"existing_alias"})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias", []string{index.GetName()})
 			},
 			wantCode:    http.StatusOK,
 			wantErr:     false,
@@ -77,7 +77,7 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 				result: `{"acknowledged":true}`,
 			},
 			nFn: func(index *core.Index) {
-				index.AddAliases([]string{"existing_alias"})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias", []string{index.GetName()})
 			},
 			wantCode:    http.StatusOK,
 			wantErr:     false,
@@ -90,7 +90,8 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 				result: `{"acknowledged":true}`,
 			},
 			nFn: func(index *core.Index) {
-				index.AddAliases([]string{"existing_alias_1", "existing_alias_2"})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_2", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_1", []string{index.GetName()})
 			},
 			wantCode:    http.StatusOK,
 			wantErr:     false,
@@ -103,7 +104,9 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 				result: `{"acknowledged":true}`,
 			},
 			nFn: func(index *core.Index) {
-				index.AddAliases([]string{"existing_alias_1", "existing_alias_2", "existing_alias_3"})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_1", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_2", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_3", []string{index.GetName()})
 			},
 			wantCode:    http.StatusOK,
 			wantErr:     false,
@@ -116,7 +119,9 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 				result: `{"acknowledged":true}`,
 			},
 			nFn: func(index *core.Index) {
-				index.AddAliases([]string{"existing_alias_1", "existing_alias_2", "existing_alias_3"})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_1", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_2", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_3", []string{index.GetName()})
 			},
 			wantCode:    http.StatusOK,
 			wantErr:     false,
@@ -129,7 +134,9 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 				result: `{"acknowledged":true}`,
 			},
 			nFn: func(index *core.Index) {
-				index.AddAliases([]string{"existing_alias_1", "existing_alias_2", "existing_alias_3"})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_1", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_2", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_3", []string{index.GetName()})
 			},
 			wantCode:    http.StatusOK,
 			wantErr:     false,
@@ -153,7 +160,9 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 
 			require.Equal(t, tt.wantCode, w.Code)
 			require.Equal(t, tt.args.result, w.Body.String())
-			require.Equal(t, tt.wantAliases, index.GetAliases())
+
+			als := core.ZINC_INDEX_ALIAS_LIST.GetAliasesForIndex(indexName)
+			require.ElementsMatch(t, tt.wantAliases, als)
 		})
 	}
 }
@@ -177,7 +186,9 @@ func TestGetESAliases(t *testing.T) {
 				result: `{"TestAddOrRemoveESAlias.index_1":{"aliases":{"existing_alias_1":{},"existing_alias_2":{},"existing_alias_3":{}}}}`,
 			},
 			nFn: func(index *core.Index) {
-				index.AddAliases([]string{"existing_alias_1", "existing_alias_2", "existing_alias_3"})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_1", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_2", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_3", []string{index.GetName()})
 			},
 			wantCode: http.StatusOK,
 			wantErr:  false,
@@ -191,7 +202,9 @@ func TestGetESAliases(t *testing.T) {
 				"target": "TestAddOrRemoveESAlias.index_1",
 			},
 			nFn: func(index *core.Index) {
-				index.AddAliases([]string{"existing_alias_1", "existing_alias_2", "existing_alias_3"})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_1", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_2", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_3", []string{index.GetName()})
 			},
 			wantCode: http.StatusOK,
 			wantErr:  false,
@@ -205,7 +218,9 @@ func TestGetESAliases(t *testing.T) {
 				"target_alias": "existing_alias_1",
 			},
 			nFn: func(index *core.Index) {
-				index.AddAliases([]string{"existing_alias_1", "existing_alias_2", "existing_alias_3"})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_1", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_2", []string{index.GetName()})
+				core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias("existing_alias_3", []string{index.GetName()})
 			},
 			wantCode: http.StatusOK,
 			wantErr:  false,
@@ -239,6 +254,7 @@ func newIndex(t *testing.T, indexName string) (*core.Index, func()) {
 	require.NoError(t, err)
 
 	return index, func() {
+		core.ZINC_INDEX_ALIAS_LIST = *core.NewAliasList()
 		require.NoError(t, core.DeleteIndex(indexName))
 	}
 }

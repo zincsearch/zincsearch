@@ -146,48 +146,6 @@ func (index *Index) SetAnalyzers(analyzers map[string]*analysis.Analyzer) error 
 	return nil
 }
 
-func (index *Index) AddAliases(aliases []string) {
-	index.lock.Lock()
-	index.ref.Aliases = append(index.ref.Aliases, aliases...)
-	index.lock.Unlock()
-}
-
-func (index *Index) GetAliases() []string {
-	index.lock.RLock()
-	a := make([]string, len(index.ref.Aliases))
-	copy(a, index.ref.Aliases)
-	index.lock.RUnlock()
-	return a
-}
-
-func (index *Index) HasAlias(as string) bool {
-	index.lock.RLock()
-	for _, alias := range index.ref.Aliases {
-		if alias == as {
-			index.lock.RUnlock()
-			return true
-		}
-	}
-	index.lock.RUnlock()
-	return false
-}
-
-func (index *Index) RemoveAliases(aliases []string) {
-	index.lock.Lock()
-
-outer:
-	for _, alias := range aliases {
-		for i, s := range index.ref.Aliases {
-			if s == alias {
-				index.ref.Aliases = append(index.ref.Aliases[:i], index.ref.Aliases[i+1:]...)
-				continue outer
-			}
-		}
-	}
-
-	index.lock.Unlock()
-}
-
 func (index *Index) SetMappings(mappings *meta.Mappings) error {
 	if mappings == nil {
 		mappings = meta.NewMappings()
