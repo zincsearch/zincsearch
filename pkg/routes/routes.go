@@ -30,6 +30,7 @@ import (
 
 	"github.com/zinclabs/zinc"
 	"github.com/zinclabs/zinc/pkg/handlers/auth"
+	"github.com/zinclabs/zinc/pkg/handlers/cluster"
 	"github.com/zinclabs/zinc/pkg/handlers/document"
 	"github.com/zinclabs/zinc/pkg/handlers/index"
 	"github.com/zinclabs/zinc/pkg/handlers/search"
@@ -89,14 +90,20 @@ func SetRoutes(r *gin.Engine) {
 	r.DELETE("/api/user/:id", AuthMiddleware, auth.Delete)
 	r.GET("/api/user", AuthMiddleware, auth.List)
 
+	// cluster
+	r.GET("/api/node/status", cluster.NodeStatus)
+	r.GET("/api/cluster/status", AuthMiddleware, cluster.ClusterStatus)
+	r.GET("/api/shards/distribution", AuthMiddleware, cluster.ShardsDistribution)
+
 	// index
 	r.GET("/api/index", AuthMiddleware, index.List)
 	r.GET("/api/index_name", AuthMiddleware, index.IndexNameList)
 	r.POST("/api/index", AuthMiddleware, index.Create)
 	r.PUT("/api/index", AuthMiddleware, index.Create)
 	r.PUT("/api/index/:target", AuthMiddleware, index.Create)
-	r.DELETE("/api/index/:target", AuthMiddleware, index.Delete)
+	r.GET("/api/index/:target", AuthMiddleware, index.Get)
 	r.HEAD("/api/index/:target", AuthMiddleware, index.Exists)
+	r.DELETE("/api/index/:target", AuthMiddleware, index.Delete)
 	r.POST("/api/index/:target/refresh", AuthMiddleware, index.Refresh)
 	// index settings
 	r.GET("/api/:target/_mapping", AuthMiddleware, index.GetMapping)

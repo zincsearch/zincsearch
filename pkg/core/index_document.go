@@ -21,6 +21,7 @@ import (
 
 	"github.com/goccy/go-json"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 )
@@ -50,6 +51,10 @@ func (index *Index) CreateDocument(docID string, doc map[string]interface{}, upd
 
 // UpdateDocument updates a document in the zinc index
 func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, insert bool) error {
+	if config.Global.ServerMode == meta.ServerModeCluster {
+		return errors.ErrClusterModeNotSupported
+	}
+
 	// metrics
 	IncrMetricStatsByIndex(index.GetName(), "wal_request")
 
@@ -79,6 +84,10 @@ func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, ins
 
 // DeleteDocument deletes a document in the zinc index
 func (index *Index) DeleteDocument(docID string) error {
+	if config.Global.ServerMode == meta.ServerModeCluster {
+		return errors.ErrClusterModeNotSupported
+	}
+
 	// metrics
 	IncrMetricStatsByIndex(index.GetName(), "wal_request")
 

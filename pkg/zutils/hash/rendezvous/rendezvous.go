@@ -114,10 +114,10 @@ func (r *Rendezvous) Remove(node string) {
 
 	// remove from the slices
 	l := len(r.nstr)
-	r.nstr[nidx] = r.nstr[l]
+	r.nstr[nidx] = r.nstr[l-1]
 	r.nstr = r.nstr[:l]
 
-	r.nhash[nidx] = r.nhash[l]
+	r.nhash[nidx] = r.nhash[l-1]
 	r.nhash = r.nhash[:l]
 
 	// update the map

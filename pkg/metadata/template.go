@@ -25,7 +25,7 @@ type template struct{}
 
 var Template = new(template)
 
-func (t *template) List(offset, limit int) ([]*meta.Template, error) {
+func (t *template) List(offset, limit int64) ([]*meta.Template, error) {
 	data, err := db.List(t.key(""), offset, limit)
 	if err != nil {
 		return nil, err

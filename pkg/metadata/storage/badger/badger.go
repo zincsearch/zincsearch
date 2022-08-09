@@ -16,7 +16,9 @@
 package badger
 
 import (
+	"bytes"
 	"path"
+	"sync"
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/dgraph-io/badger/v3/options"
@@ -28,7 +30,8 @@ import (
 )
 
 type badgerStorage struct {
-	db *badger.DB
+	db   *badger.DB
+	lock sync.Map
 }
 
 func New(dbpath string) storage.Storager {
@@ -36,7 +39,7 @@ func New(dbpath string) storage.Storager {
 	if err != nil {
 		log.Fatal().Err(err).Msg("open badger db for metadata failed")
 	}
-	return &badgerStorage{db}
+	return &badgerStorage{db: db}
 }
 
 func openBadgerDB(dbpath string, readOnly bool) (*badger.DB, error) {
@@ -53,7 +56,16 @@ func openBadgerDB(dbpath string, readOnly bool) (*badger.DB, error) {
 	return badger.Open(opt)
 }
 
-func (t *badgerStorage) List(prefix string, _, _ int) ([][]byte, error) {
+func (t *badgerStorage) NewLocker(prefix string) (sync.Locker, error) {
+	if lock, ok := t.lock.Load(prefix); ok {
+		return lock.(*badgerStorageLocker), nil
+	}
+	lock := &badgerStorageLocker{key: prefix, db: t, mutex: &sync.Mutex{}}
+	t.lock.Store(prefix, lock)
+	return lock, nil
+}
+
+func (t *badgerStorage) List(prefix string, offset, limit int64) ([][]byte, error) {
 	data := make([][]byte, 0)
 	pre := []byte(prefix)
 	err := t.db.View(func(txn *badger.Txn) error {
@@ -61,13 +73,53 @@ func (t *badgerStorage) List(prefix string, _, _ int) ([][]byte, error) {
 		opts.PrefetchValues = true
 		it := txn.NewIterator(opts)
 		defer it.Close()
+		i := int64(0)
 		for it.Seek(pre); it.ValidForPrefix(pre); it.Next() {
+			i++
+			if i <= offset {
+				continue
+			}
+			if limit > 0 && i > offset+limit {
+				break
+			}
 			item := it.Item()
 			buf, err := item.ValueCopy(nil)
 			if err != nil {
 				return err
 			}
 			data = append(data, buf)
+		}
+		return nil
+	})
+	return data, err
+}
+
+func (t *badgerStorage) ListEntries(prefix string, offset, limit int64) ([]*storage.StorageEntry, error) {
+	data := make([]*storage.StorageEntry, 0)
+	pre := []byte(prefix)
+	err := t.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = true
+		it := txn.NewIterator(opts)
+		defer it.Close()
+		var err error
+		i := int64(0)
+		for it.Seek(pre); it.ValidForPrefix(pre); it.Next() {
+			i++
+			if i <= offset {
+				continue
+			}
+			if limit > 0 && i > offset+limit {
+				break
+			}
+			item := it.Item()
+			entry := &storage.StorageEntry{}
+			entry.Key = bytes.TrimPrefix(item.Key(), pre)
+			entry.Value, err = item.ValueCopy(nil)
+			if err != nil {
+				return err
+			}
+			data = append(data, entry)
 		}
 		return nil
 	})
@@ -99,6 +151,14 @@ func (t *badgerStorage) Set(key string, value []byte) error {
 	})
 }
 
+func (t *badgerStorage) SetWithKeepAlive(key string, value []byte, _ int64) error {
+	return t.Set(key, value)
+}
+
+func (t *badgerStorage) CancelWithKeepAlive(key string) error {
+	return t.Delete(key)
+}
+
 func (t *badgerStorage) Delete(key string) error {
 	if key == "" {
 		return errors.ErrKeyEmpty
@@ -108,6 +168,25 @@ func (t *badgerStorage) Delete(key string) error {
 	})
 }
 
+func (t *badgerStorage) Watch(key string) <-chan storage.StorageEvent {
+	return make(chan storage.StorageEvent, 1)
+}
+
 func (t *badgerStorage) Close() error {
 	return t.db.Close()
+}
+
+type badgerStorageLocker struct {
+	key   string
+	db    *badgerStorage
+	mutex sync.Locker
+}
+
+func (l *badgerStorageLocker) Lock() {
+	l.mutex.Lock()
+}
+
+func (l *badgerStorageLocker) Unlock() {
+	l.mutex.Unlock()
+	l.db.lock.Delete(l.key)
 }

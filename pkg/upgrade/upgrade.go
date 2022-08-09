@@ -17,6 +17,7 @@ package upgrade
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/rs/zerolog/log"
 
@@ -26,6 +27,8 @@ import (
 func Do(oldVersion string, index *meta.Index) error {
 	var err error
 	log.Info().Msgf("Begin upgrade[%s] from version[%s]", index.Name, oldVersion)
+	columns := strings.Split(oldVersion, "-")
+	oldVersion = columns[0]
 	switch oldVersion {
 	case "v0.2.4":
 		if err = UpgradeFromV024T025(index); err != nil {

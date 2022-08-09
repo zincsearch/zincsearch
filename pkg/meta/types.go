@@ -28,3 +28,34 @@ const (
 	ActionTypeUpdate = "update"
 	ActionTypeDelete = "delete"
 )
+
+const (
+	ServerModeNode    = "node"
+	ServerModeCluster = "cluster"
+)
+
+const (
+	StorageEventTypePut    = int64(1)
+	StorageEventTypeDelete = int64(2)
+)
+
+var StorageEventTypeString = map[int64]string{
+	StorageEventTypePut:    "PUT",
+	StorageEventTypeDelete: "DELETE",
+}
+
+const (
+	ClusterEventTypeNode         = "node"         // node event
+	ClusterEventTypeIndex        = "index"        // index event
+	ClusterEventTypeDistribution = "distribution" // distribute event
+
+	ClusterEventNodeJoin  = "join"  // node join cluster
+	ClusterEventNodeLeave = "leave" // node leave cluster
+
+	ClusterEventIndexCreate = "create" // index create event
+	ClusterEventIndexRemove = "remove" // index remove event
+	ClusterEventIndexUpdate = "update" // index metadata update event
+
+	ClusterEventDistributionHold = "hold" // node hold a shard event
+	ClusterEventDistributionFree = "free" // node free a shard event
+)

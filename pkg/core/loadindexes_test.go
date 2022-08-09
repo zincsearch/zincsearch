@@ -46,7 +46,7 @@ func TestLoadIndexes(t *testing.T) {
 
 	t.Run("load user index from disk", func(t *testing.T) {
 		ZINC_INDEX_LIST.Close()
-		err := LoadZincIndexesFromMetadata(meta.Version)
+		err := LoadIndexFromMetadata("TestLoadIndexes.index_1", meta.Version)
 		assert.NoError(t, err)
 		assert.GreaterOrEqual(t, ZINC_INDEX_LIST.Len(), 0)
 	})

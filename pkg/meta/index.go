@@ -24,11 +24,11 @@ type Index struct {
 	Shards      map[string]*IndexShard `json:"shards"`
 	Stats       IndexStat              `json:"stats"`
 	Version     string                 `json:"version"`
+	MetaVersion int64                  `json:"meta_version"`
 }
 
 type IndexShard struct {
 	ID       string              `json:"id"`
-	NodeID   string              `json:"node_id"` // remote instance ID
 	ShardNum int64               `json:"shard_num"`
 	Shards   []*IndexSecondShard `json:"shards"`
 	Stats    IndexStat           `json:"stats"`
@@ -40,9 +40,9 @@ type IndexSecondShard struct {
 }
 
 type IndexStat struct {
+	DocNum      uint64 `json:"doc_num"`
 	DocTimeMin  int64  `json:"doc_time_min"`
 	DocTimeMax  int64  `json:"doc_time_max"`
-	DocNum      uint64 `json:"doc_num"`
 	StorageSize uint64 `json:"storage_size"`
 	WALSize     uint64 `json:"wal_size"`
 }

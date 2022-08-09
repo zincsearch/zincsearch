@@ -340,7 +340,7 @@ func TestUseTemplate(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "not exits",
+			name: "not exists",
 			args: args{
 				indexName: "TestUseTemplate-No-2022.02.02",
 			},

@@ -15,10 +15,28 @@
 
 package storage
 
+import "sync"
+
 type Storager interface {
-	List(string, int, int) ([][]byte, error)
+	NewLocker(string) (sync.Locker, error)
+	Watch(string) <-chan StorageEvent
+	List(string, int64, int64) ([][]byte, error)
+	ListEntries(string, int64, int64) ([]*StorageEntry, error)
 	Get(string) ([]byte, error)
 	Set(string, []byte) error
+	SetWithKeepAlive(string, []byte, int64) error
+	CancelWithKeepAlive(string) error
 	Delete(string) error
 	Close() error
+}
+
+type StorageEntry struct {
+	Key   []byte
+	Value []byte
+}
+
+type StorageEvent struct {
+	Type  int64
+	Key   []byte
+	Value []byte
 }

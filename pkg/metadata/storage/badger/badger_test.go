@@ -24,8 +24,8 @@ import (
 func Test_badgerStorage_List(t *testing.T) {
 	type args struct {
 		prefix string
-		in1    int
-		in2    int
+		in1    int64
+		in2    int64
 	}
 	tests := []struct {
 		name    string

@@ -13,28 +13,16 @@
 * limitations under the License.
  */
 
-package metadata
+package core
 
-type kv struct{}
+import "github.com/zinclabs/zinc/pkg/meta"
 
-var KV = new(kv)
-
-func (t *kv) List(offset, limit int64) ([][]byte, error) {
-	return db.List(t.key(""), offset, limit)
-}
-
-func (t *kv) Get(key string) ([]byte, error) {
-	return db.Get(t.key(key))
-}
-
-func (t *kv) Set(key string, val []byte) error {
-	return db.Set(t.key(key), val)
-}
-
-func (t *kv) Delete(key string) error {
-	return db.Delete(t.key(key))
-}
-
-func (t *kv) key(key string) string {
-	return "/kv/" + key
+// init initializes the core package.
+func init() {
+	SetupNode()
+	SetupCluster()
+	SetupShardWAL()
+	SetupIndex()
+	// ready to serve requests
+	ZINC_NODE.SetStatus(meta.NodeStatusOK)
 }

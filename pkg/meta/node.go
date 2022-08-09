@@ -13,28 +13,24 @@
 * limitations under the License.
  */
 
-package metadata
+package meta
 
-type kv struct{}
+const (
+	NodeStatusUnknown     int64 = iota
+	NodeStatusPrepare           // prepare some things before to serve
+	NodeStatusOK                // ready to serve
+	NodeStatusUnreachable       // maybe offline
+)
 
-var KV = new(kv)
-
-func (t *kv) List(offset, limit int64) ([][]byte, error) {
-	return db.List(t.key(""), offset, limit)
+var NodeStatusString = map[int64]string{
+	NodeStatusUnknown:     "unknown",
+	NodeStatusPrepare:     "prepare",
+	NodeStatusOK:          "ok",
+	NodeStatusUnreachable: "unreachable",
 }
 
-func (t *kv) Get(key string) ([]byte, error) {
-	return db.Get(t.key(key))
-}
-
-func (t *kv) Set(key string, val []byte) error {
-	return db.Set(t.key(key), val)
-}
-
-func (t *kv) Delete(key string) error {
-	return db.Delete(t.key(key))
-}
-
-func (t *kv) key(key string) string {
-	return "/kv/" + key
+type Node struct {
+	ID     int64  `json:"id"`
+	Name   string `json:"name"`
+	Status int64  `json:"-"`
 }

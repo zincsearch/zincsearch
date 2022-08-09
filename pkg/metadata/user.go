@@ -25,7 +25,7 @@ type user struct{}
 
 var User = new(user)
 
-func (t *user) List(offset, limit int) ([]*meta.User, error) {
+func (t *user) List(offset, limit int64) ([]*meta.User, error) {
 	data, err := db.List(t.key(""), offset, limit)
 	if err != nil {
 		return nil, err

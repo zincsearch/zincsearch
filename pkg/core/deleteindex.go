@@ -61,7 +61,12 @@ func DeleteIndex(name string) error {
 	}
 
 	// 4. Delete form metadata
-	return metadata.Index.Delete(name)
+	if err := metadata.Index.Delete(name); err != nil {
+		return err
+	}
+
+	// 5. Notify cluster
+	return ZINC_CLUSTER.DeleteIndex(name)
 }
 
 func deleteFilesForIndexFromMinIO(indexName string) error {

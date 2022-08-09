@@ -72,13 +72,17 @@ type IndexSecondShard struct {
 
 // GetShardByDocID return the shard by hash docID
 func (index *Index) GetShardByDocID(docID string) *IndexShard {
+	_, err := ZINC_CLUSTER.GetShardsDistribution(index.GetName(), ZINC_NODE.GetID())
+	if err != nil {
+		log.Error().Err(err).Msgf("cluster.GetShardsDistribution")
+	}
 	shardKey := index.shardHashing.Lookup(docID)
 	return index.shards[shardKey]
 }
 
 // CheckShards check all shards status if need create new second layer shard
 func (index *Index) CheckShards() error {
-	for _, shard := range index.shards {
+	for _, shard := range index.localShards {
 		if err := shard.CheckShards(); err != nil {
 			return err
 		}

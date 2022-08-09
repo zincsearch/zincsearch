@@ -34,7 +34,7 @@ type IndexList struct {
 	lock    sync.RWMutex
 }
 
-func init() {
+func SetupIndex() {
 	// check version
 	version, _ := metadata.KV.Get("version")
 	if version == nil {
@@ -45,8 +45,16 @@ func init() {
 
 	// start loading index
 	ZINC_INDEX_LIST.Indexes = make(map[string]*Index)
-	if err := LoadZincIndexesFromMetadata(string(version)); err != nil {
+	indexes, err := metadata.Cluster.ListIndex(0, 0)
+	if err != nil {
 		log.Fatal().Err(err).Msg("Error loading index")
+	}
+	for indexName, metaVersion := range indexes {
+		err = LoadIndexFromMetadata(indexName, string(version))
+		if err != nil {
+			log.Fatal().Err(err).Str("index", indexName).Msg("Error loading index")
+		}
+		ZINC_CLUSTER.StoreIndex(indexName, metaVersion)
 	}
 
 	// update version
@@ -58,10 +66,14 @@ func init() {
 	}
 }
 
-func (t *IndexList) Add(index *Index) {
+func (t *IndexList) Set(index *Index) {
 	t.lock.Lock()
+	defer t.lock.Unlock()
+	if _, ok := t.Indexes[index.GetName()]; ok {
+		log.Error().Str("index", index.GetName()).Int64("meta version", index.ref.MetaVersion).Msg("core.IndexList set an exists index")
+		return // already exists
+	}
 	t.Indexes[index.GetName()] = index
-	t.lock.Unlock()
 }
 
 func (t *IndexList) Get(name string) (*Index, bool) {

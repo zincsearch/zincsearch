@@ -16,7 +16,6 @@
 package metadata
 
 import (
-	"errors"
 	"strings"
 
 	"github.com/zinclabs/zinc/pkg/config"
@@ -26,20 +25,21 @@ import (
 	"github.com/zinclabs/zinc/pkg/metadata/storage/etcd"
 )
 
-var ErrorKeyNotExists = errors.New("key not exists")
+var DefaultTimeout int64 = 30 // 30s
 
 var db storage.Storager
 
 func init() {
-	if strings.ToLower(config.Global.ServerMode) == "cluster" {
-		db = etcd.New(config.Global.Etcd.Prefix + "/metadata")
-	} else {
-		switch strings.ToLower(config.Global.MetadataStorage) {
-		case "badger":
-			db = badger.New("_metadata.db")
-		default:
-			db = bolt.New("_metadata.bolt")
-		}
+	switch strings.ToLower(config.Global.MetadataStorage) {
+	case "badger":
+		db = badger.New("_metadata.db")
+	case "bolt":
+		db = bolt.New("_metadata.bolt")
+	case "etcd":
+		prefix := strings.TrimRight(config.Global.Etcd.Prefix, "/")
+		db = etcd.New(prefix, DefaultTimeout)
+	default:
+		db = bolt.New("_metadata.bolt")
 	}
 }
 

@@ -35,7 +35,7 @@ type IndexShardWALList struct {
 	lock   sync.RWMutex
 }
 
-func init() {
+func SetupShardWAL() {
 	ZINC_INDEX_SHARD_WAL_LIST.Shards = make(map[string]*IndexShard)
 	go ZINC_INDEX_SHARD_WAL_LIST.ConsumeWAL()
 }

@@ -35,8 +35,8 @@ func TestMain(m *testing.M) {
 func Test_etcdStorage_List(t *testing.T) {
 	type args struct {
 		prefix string
-		in1    int
-		in2    int
+		in1    int64
+		in2    int64
 	}
 	tests := []struct {
 		name    string
@@ -62,7 +62,7 @@ func Test_etcdStorage_List(t *testing.T) {
 		},
 	}
 
-	store := New("/zinc/test")
+	store := New("/zinc/test", 5)
 	defer store.Close()
 	t.Run("prepare", func(t *testing.T) {
 		err := store.Set("/test/foo", []byte("bar"))
@@ -109,7 +109,7 @@ func Test_etcdStorage_Get(t *testing.T) {
 		},
 	}
 
-	store := New("/zinc/test")
+	store := New("/zinc/test", 5)
 	defer store.Close()
 	t.Run("prepare", func(t *testing.T) {
 		err := store.Set("/test/foo", []byte("bar"))
@@ -156,7 +156,7 @@ func Test_etcdStorage_Set(t *testing.T) {
 		},
 	}
 
-	store := New("/zinc/test")
+	store := New("/zinc/test", 5)
 	defer store.Close()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -193,7 +193,7 @@ func Test_etcdStorage_Delete(t *testing.T) {
 		},
 	}
 
-	store := New("/zinc/test")
+	store := New("/zinc/test", 5)
 	defer store.Close()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

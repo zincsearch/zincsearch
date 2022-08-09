@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
@@ -48,6 +49,8 @@ func CheckIndexName(name string) error {
 
 // NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
 func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
+	fmt.Println("new index", name)
+
 	if err := CheckIndexName(name); err != nil {
 		return nil, err
 	}
@@ -94,6 +97,7 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 
 	// init shards wrapper
 	index.shards = make(map[string]*IndexShard, index.shardNum)
+	index.localShards = make(map[string]*IndexShard, index.shardNum)
 	for id := range index.ref.Shards {
 		index.shards[id] = &IndexShard{
 			root: index,
@@ -111,9 +115,9 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 
 	// init shards hashing
 	index.shardHashing = rendezvous.New()
-	for id := range index.shards {
-		index.shardHashing.Add(id)
-	}
+	// for id := range index.shards {
+	// 	index.shardHashing.Add(id)
+	// }
 
 	return index, nil
 }
@@ -153,7 +157,8 @@ func StoreIndex(index *Index) error {
 		return err
 	}
 	// cache index
-	ZINC_INDEX_LIST.Add(index)
+	ZINC_INDEX_LIST.Set(index)
+
 	return nil
 }
 
@@ -176,15 +181,17 @@ func checkIndex(index *Index) {
 }
 
 func storeIndex(index *Index) error {
+	index.ref.MetaVersion = time.Now().UnixNano()
 	data, err := index.MarshalJSON()
 	if err != nil {
-		return fmt.Errorf("core.storeIndex: index: %s, error: %s", index.ref.Name, err.Error())
+		return fmt.Errorf("core.storeIndex: index: %s, error: %s", index.GetName(), err.Error())
 	}
 	err = metadata.Index.Set(index.GetName(), data)
 	if err != nil {
-		return fmt.Errorf("core.storeIndex: index: %s, error: %s", index.ref.Name, err.Error())
+		return fmt.Errorf("core.storeIndex: index: %s, error: %s", index.GetName(), err.Error())
 	}
-	return nil
+	// notify cluster
+	return ZINC_CLUSTER.SetIndex(index.GetName(), index.ref.MetaVersion)
 }
 
 func GetIndex(name string) (*Index, bool) {

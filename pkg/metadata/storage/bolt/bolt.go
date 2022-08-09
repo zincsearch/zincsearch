@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"os"
 	"path"
+	"sync"
 
 	"github.com/rs/zerolog/log"
 	"go.etcd.io/bbolt"
@@ -29,7 +30,8 @@ import (
 )
 
 type boltStorage struct {
-	db *bbolt.DB
+	db   *bbolt.DB
+	lock sync.Map
 }
 
 func New(dbpath string) storage.Storager {
@@ -37,7 +39,7 @@ func New(dbpath string) storage.Storager {
 	if err != nil {
 		log.Fatal().Err(err).Msg("open bbolt db for metadata failed")
 	}
-	return &boltStorage{db}
+	return &boltStorage{db: db}
 }
 
 func openbboltDB(dbpath string, readOnly bool) (*bbolt.DB, error) {
@@ -52,7 +54,16 @@ func openbboltDB(dbpath string, readOnly bool) (*bbolt.DB, error) {
 	return bbolt.Open(dbpath, 0666, opt)
 }
 
-func (t *boltStorage) List(prefix string, _, _ int) ([][]byte, error) {
+func (t *boltStorage) NewLocker(prefix string) (sync.Locker, error) {
+	if lock, ok := t.lock.Load(prefix); ok {
+		return lock.(*boltStorageLocker), nil
+	}
+	lock := &boltStorageLocker{key: prefix, db: t, mutex: &sync.Mutex{}}
+	t.lock.Store(prefix, lock)
+	return lock, nil
+}
+
+func (t *boltStorage) List(prefix string, offset, limit int64) ([][]byte, error) {
 	data := make([][]byte, 0)
 	bucket, _ := t.splitBucketAndKey(prefix)
 	err := t.db.View(func(txn *bbolt.Tx) error {
@@ -60,11 +71,49 @@ func (t *boltStorage) List(prefix string, _, _ int) ([][]byte, error) {
 		if b == nil {
 			return nil
 		}
+		i := int64(0)
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
+			i++
+			if i <= offset {
+				continue
+			}
+			if limit > 0 && i > offset+limit {
+				break
+			}
 			valCopy := make([]byte, len(v))
 			copy(valCopy, v)
 			data = append(data, valCopy)
+		}
+		return nil
+	})
+	return data, err
+}
+
+func (t *boltStorage) ListEntries(prefix string, offset, limit int64) ([]*storage.StorageEntry, error) {
+	prefixByte := []byte(prefix)
+	data := make([]*storage.StorageEntry, 0)
+	bucket, _ := t.splitBucketAndKey(prefix)
+	err := t.db.View(func(txn *bbolt.Tx) error {
+		b := txn.Bucket(bucket)
+		if b == nil {
+			return nil
+		}
+		i := int64(0)
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			i++
+			if i <= offset {
+				continue
+			}
+			if limit > 0 && i > offset+limit {
+				break
+			}
+			entry := &storage.StorageEntry{}
+			entry.Key = bytes.TrimPrefix(k, prefixByte)
+			entry.Value = make([]byte, len(v))
+			copy(entry.Value, v)
+			data = append(data, entry)
 		}
 		return nil
 	})
@@ -104,6 +153,14 @@ func (t *boltStorage) Set(key string, value []byte) error {
 	})
 }
 
+func (t *boltStorage) SetWithKeepAlive(key string, value []byte, _ int64) error {
+	return t.Set(key, value)
+}
+
+func (t *boltStorage) CancelWithKeepAlive(key string) error {
+	return t.Delete(key)
+}
+
 func (t *boltStorage) Delete(key string) error {
 	if key == "" {
 		return errors.ErrKeyEmpty
@@ -118,6 +175,10 @@ func (t *boltStorage) Delete(key string) error {
 	})
 }
 
+func (t *boltStorage) Watch(key string) <-chan storage.StorageEvent {
+	return make(chan storage.StorageEvent, 1)
+}
+
 func (t *boltStorage) Close() error {
 	return t.db.Close()
 }
@@ -128,4 +189,19 @@ func (t *boltStorage) splitBucketAndKey(key string) ([]byte, []byte) {
 	}
 	p := bytes.LastIndex([]byte(key), []byte("/"))
 	return []byte(key[:p]), []byte(key[p+1:])
+}
+
+type boltStorageLocker struct {
+	key   string
+	db    *boltStorage
+	mutex sync.Locker
+}
+
+func (l *boltStorageLocker) Lock() {
+	l.mutex.Lock()
+}
+
+func (l *boltStorageLocker) Unlock() {
+	l.mutex.Unlock()
+	l.db.lock.Delete(l.key)
 }

@@ -26,28 +26,14 @@ type index struct{}
 
 var Index = new(index)
 
-func (t *index) List(offset, limit int) ([]*meta.Index, error) {
-	data, err := db.List(t.key(""), offset, limit)
+func (t *index) ListName(offset, limit int64) ([]string, error) {
+	data, err := db.ListEntries(t.key(""), offset, limit)
 	if err != nil {
 		return nil, err
 	}
-	indexes := make([]*meta.Index, 0, len(data))
+	indexes := make([]string, 0, len(data))
 	for _, d := range data {
-		idx := new(meta.Index)
-		err = json.Unmarshal(d, idx)
-		if err != nil {
-			if err.Error() == "expected { character for map value" {
-				// compatible for v026 --> begin
-				err = upgrade.UpgradeMetadataFromV026T027(idx, d)
-				if err != nil {
-					return nil, err
-				}
-				// compatible for v026 --> end
-			} else {
-				return nil, err
-			}
-		}
-		indexes = append(indexes, idx)
+		indexes = append(indexes, string(d.Key))
 	}
 	return indexes, nil
 }
@@ -59,6 +45,18 @@ func (t *index) Get(id string) (*meta.Index, error) {
 	}
 	idx := new(meta.Index)
 	err = json.Unmarshal(data, idx)
+	if err != nil {
+		if err.Error() == "expected { character for map value" {
+			// compatible for v026 --> begin
+			err = upgrade.UpgradeMetadataFromV026T027(idx, data)
+			if err != nil {
+				return nil, err
+			}
+			// compatible for v026 --> end
+		} else {
+			return nil, err
+		}
+	}
 	return idx, err
 }
 

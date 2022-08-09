@@ -13,28 +13,18 @@
 * limitations under the License.
  */
 
-package metadata
+package cluster
 
-type kv struct{}
+import (
+	"net/http"
 
-var KV = new(kv)
+	"github.com/gin-gonic/gin"
 
-func (t *kv) List(offset, limit int64) ([][]byte, error) {
-	return db.List(t.key(""), offset, limit)
-}
+	"github.com/zinclabs/zinc/pkg/core"
+)
 
-func (t *kv) Get(key string) ([]byte, error) {
-	return db.Get(t.key(key))
-}
-
-func (t *kv) Set(key string, val []byte) error {
-	return db.Set(t.key(key), val)
-}
-
-func (t *kv) Delete(key string) error {
-	return db.Delete(t.key(key))
-}
-
-func (t *kv) key(key string) string {
-	return "/kv/" + key
+func NodeStatus(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"status": core.ZINC_NODE.GetStatus(),
+	})
 }

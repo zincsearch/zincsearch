@@ -55,10 +55,10 @@ import (
 func main() {
 	// Version
 	if len(os.Args) > 1 && os.Args[1] == "version" {
-		fmt.Printf("zinc version %s\n", meta.Version)
+		fmt.Printf("Zinc search version %s\n", meta.Version)
 		os.Exit(0)
 	}
-	log.Info().Msgf("Starting Zinc %s", meta.Version)
+	log.Info().Msgf("Starting Zinc search %s", meta.Version)
 
 	// Initialize telemetry
 	telemetry()
@@ -89,10 +89,13 @@ func main() {
 		} else {
 			server.Close()
 		}
-
-		log.Info().Msg("Index closing...")
+		var err error
+		// leave cluster
+		err = core.ZINC_CLUSTER.Leave()
+		log.Info().Err(err).Msgf("Leave cluster")
 		// close indexes
-		err := core.ZINC_INDEX_LIST.Close()
+		log.Info().Msg("Index closing...")
+		err = core.ZINC_INDEX_LIST.Close()
 		log.Info().Err(err).Msgf("Index closed")
 		// close metadata
 		err = metadata.Close()
@@ -180,7 +183,7 @@ func profiling() {
 	}
 }
 
-//shutdown support twice signal must exit
+// shutdown support twice signal must exit
 func shutdown(stop func(grace bool, done chan<- struct{})) <-chan struct{} {
 	done := make(chan struct{})
 	sig := make(chan os.Signal, 2)

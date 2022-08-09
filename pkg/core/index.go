@@ -33,6 +33,7 @@ type Index struct {
 	ref          *meta.Index
 	analyzers    map[string]*analysis.Analyzer
 	shards       map[string]*IndexShard
+	localShards  map[string]*IndexShard
 	shardNum     int64
 	shardHashing *rendezvous.Rendezvous
 	lock         sync.RWMutex
