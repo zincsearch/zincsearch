@@ -62,7 +62,11 @@ outer:
 	for _, removeIndex := range removeIndexes {
 		for i, s := range indexes {
 			if s == removeIndex {
-				indexes = append(indexes[:i], indexes[i+1:]...)
+				if i < len(indexes)-1 {
+					indexes = append(indexes[:i], indexes[i+1:]...)
+				} else {
+					indexes = indexes[:i]
+				}
 				continue outer
 			}
 		}
@@ -111,6 +115,10 @@ func (al *AliasList) GetAliasesForIndex(indexName string) []string {
 
 type M map[string]interface{}
 
+// GetAliasMap returns an ES compatible map of indexes to their aliases
+// In the form:
+//
+//	{"gitea_issues":{"aliases":{}},"gitea_codes.v1":{"aliases":{"gitea_codes":{}}}}
 func (al *AliasList) GetAliasMap(targetIndexes, targetAliases []string) M {
 	al.lock.RLock()
 	top := M{}
