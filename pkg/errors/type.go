@@ -19,7 +19,19 @@ import "errors"
 
 var ErrCancelSignal = errors.New("cancelled") // just for cancel notice
 var ErrNotFound = errors.New("not found")
+
+var ErrIDNotFound = errors.New("id not found")
+var ErrIDIsEmpty = errors.New("id is empty")
+
 var ErrKeyNotFound = errors.New("key not found")
-var ErrKeyEmpty = errors.New("key is be empty")
+var ErrKeyIsEmpty = errors.New("key is empty")
+
+var ErrIndexNotExists = errors.New("index not exists")
+var ErrIndexIsExists = errors.New("index already exists")
+var ErrIndexIsEmpty = errors.New("index is empty")
+
+var ErrShardNotExists = errors.New("shard not exists")
+var ErrShardIsExists = errors.New("shard already exists")
 
 var ErrClusterModeNotSupported = errors.New("cluster mode not supported")
+var ErrClusterTimeout = errors.New("cluster timeout")

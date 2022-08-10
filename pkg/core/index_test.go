@@ -31,12 +31,9 @@ import (
 
 func TestIndex_Index(t *testing.T) {
 	indexName := "TestIndex_Index.index_1"
-	index, err := NewIndex(indexName, "disk", 2)
+	index, _, err := GetOrCreateIndex(indexName, "disk", 2)
 	assert.NoError(t, err)
 	assert.NotNil(t, index)
-
-	err = StoreIndex(index)
-	assert.NoError(t, err)
 
 	got, err := json.Marshal(index)
 	assert.NoError(t, err)
@@ -257,12 +254,9 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex(indexName, "disk", 2)
+		index, _, err = GetOrCreateIndex(indexName, "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-
-		err = StoreIndex(index)
-		assert.NoError(t, err)
 		index.GetMappings().SetProperty("time", meta.NewProperty("date"))
 	})
 
@@ -309,12 +303,9 @@ func TestIndex_Settings(t *testing.T) {
 	indexName := "TestIndex_Settings.index_1"
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex(indexName, "disk", 2)
+		index, _, err = GetOrCreateIndex(indexName, "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-
-		err = StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	t.Run("setting", func(t *testing.T) {
@@ -328,7 +319,7 @@ func TestIndex_Settings(t *testing.T) {
 					},
 				},
 			},
-		})
+		}, true)
 		assert.NoError(t, err)
 	})
 
@@ -337,15 +328,14 @@ func TestIndex_Settings(t *testing.T) {
 			Properties: map[string]meta.Property{
 				"id": meta.NewProperty("keyword"),
 			},
-		})
+		}, true)
 		assert.NoError(t, err)
 	})
 
 	t.Run("analyzer", func(t *testing.T) {
-		err := index.SetAnalyzers(map[string]*analysis.Analyzer{
+		index.SetAnalyzers(map[string]*analysis.Analyzer{
 			"standard": analyzer.NewStandardAnalyzer(),
 		})
-		assert.NoError(t, err)
 	})
 
 	t.Run("cleanup", func(t *testing.T) {

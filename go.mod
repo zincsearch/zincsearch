@@ -18,8 +18,8 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-ego/gse v0.70.2
 	github.com/goccy/go-json v0.9.10
+	github.com/jinzhu/copier v0.3.5
 	github.com/joho/godotenv v1.4.0
-	github.com/klauspost/cpuid v1.3.1 // indirect
 	github.com/minio/minio-go/v7 v7.0.34
 	github.com/prometheus/client_golang v1.11.1
 	github.com/pyroscope-io/client v0.3.0

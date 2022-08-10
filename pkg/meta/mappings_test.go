@@ -19,6 +19,6 @@ func TestProperty_DeepClone(t *testing.T) {
 	prop.SearchAnalyzer = "search_analyzer"
 	prop.Format = "2009-11-10T23:00:00Z"
 
-	clone := prop.DeepClone()
+	clone := prop.Copy()
 	assert.Equal(t, prop, clone)
 }

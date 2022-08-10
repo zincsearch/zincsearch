@@ -23,8 +23,12 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
+	"github.com/zinclabs/zinc/pkg/upgrade"
+	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
+	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
 )
 
 var ZINC_INDEX_LIST IndexList
@@ -50,11 +54,11 @@ func SetupIndex() {
 		log.Fatal().Err(err).Msg("Error loading index")
 	}
 	for indexName, metaVersion := range indexes {
-		err = LoadIndexFromMetadata(indexName, string(version))
+		err = LoadIndex(indexName, string(version))
 		if err != nil {
 			log.Fatal().Err(err).Str("index", indexName).Msg("Error loading index")
 		}
-		ZINC_CLUSTER.StoreIndex(indexName, metaVersion)
+		ZINC_CLUSTER.SetIndex(indexName, metaVersion)
 	}
 
 	// update version
@@ -66,11 +70,153 @@ func SetupIndex() {
 	}
 }
 
+func LoadIndex(indexName string, version string) error {
+	log.Info().Str("index", indexName).Str("version", version).Msg("Load index")
+
+	lock, err := metadata.Cluster.NewLocker("index/" + indexName)
+	if err != nil {
+		return err
+	}
+	lock.Lock()
+	defer lock.Unlock()
+
+	metaIndex, err := metadata.Index.Get(indexName)
+	if err != nil {
+		return err
+	}
+
+	index := new(Index)
+	index.ref = metaIndex
+
+	// upgrade from old version
+	if version == "" {
+		version = meta.Version
+	}
+	if metaIndex.Meta.GetVersion() != "" {
+		version = metaIndex.Meta.GetVersion()
+	}
+	if version != meta.Version {
+		log.Info().Msgf("Upgrade index[%s] from version[%s] to version[%s]", metaIndex.Meta.GetName(), version, meta.Version)
+		if err := upgrade.Do(version, metaIndex); err != nil {
+			return err
+		}
+		metaIndex.Meta.SetVersion(meta.Version)
+		err := metadata.Index.SetMeta(indexName, metaIndex.Meta.Copy())
+		if err != nil {
+			return err
+		}
+	}
+
+	// init shards wrapper
+	totalShardNum := 0
+	index.shards = make(map[string]*IndexShard, metaIndex.GetShardNum())
+	index.localShards = make(map[string]*IndexShard, metaIndex.GetShardNum())
+	for _, shard := range metaIndex.Shards.List() {
+		id := shard.GetID()
+		index.shards[id] = &IndexShard{
+			root: index,
+			ref:  shard,
+			name: index.GetName() + "/" + id,
+		}
+		index.shards[id].shards = make([]*IndexSecondShard, shard.GetShardNum())
+		for i, secondShard := range shard.List() {
+			index.shards[id].shards[i] = &IndexSecondShard{
+				root: index,
+				ref:  secondShard,
+			}
+			totalShardNum++
+		}
+	}
+
+	// init shards hashing
+	index.shardHashing = rendezvous.New()
+
+	log.Info().Msgf("Loading  index... [%s:%s] shards[%d:%d]", index.GetName(), index.GetStorageType(), index.GetShardNum(), totalShardNum)
+
+	// load index analysis
+	if index.ref.Settings != nil && index.ref.Settings.Analysis != nil {
+		index.analyzers, err = zincanalysis.RequestAnalyzer(index.ref.Settings.Analysis)
+		if err != nil {
+			return errors.New(errors.ErrorTypeRuntimeException, "parse stored analysis error").Cause(err)
+		}
+	}
+
+	// load in memory
+	ZINC_INDEX_LIST.Set(index)
+
+	return nil
+}
+
+func ReloadIndex(indexName string) error {
+	log.Info().Str("index", indexName).Msg("Reload index")
+	lock, err := metadata.Cluster.NewLocker("index/" + indexName)
+	if err != nil {
+		return err
+	}
+	lock.Lock()
+	defer lock.Unlock()
+
+	index, ok := GetIndex(indexName)
+	if !ok {
+		return errors.ErrIndexNotExists
+	}
+
+	// update settings
+	newSettings, err := metadata.Index.GetSettings(indexName)
+	if err != nil {
+		return err
+	}
+	index.SetSettings(newSettings, false)
+
+	// update mappings
+	newMappings, err := metadata.Index.GetMappings(indexName)
+	if err != nil {
+		return err
+	}
+	index.SetMappings(newMappings, false)
+
+	// update shards
+	newShards, err := metadata.Index.GetShards(indexName)
+	if err != nil {
+		return err
+	}
+	for _, shard := range newShards.List() {
+		err := index.GetRef().Shards.Set(shard)
+		if err == nil {
+			// new shard
+			id := shard.GetID()
+			index.shards[id] = &IndexShard{
+				root: index,
+				ref:  shard,
+				name: index.GetName() + "/" + id,
+			}
+			index.shards[id].shards = make([]*IndexSecondShard, shard.GetShardNum())
+			for i, secondShard := range shard.List() {
+				index.shards[id].shards[i] = &IndexSecondShard{
+					root: index,
+					ref:  secondShard,
+				}
+			}
+		}
+	}
+
+	// reload index analysis
+	ana := index.GetSettings().GetAnalysis()
+	if ana != nil {
+		index.analyzers, err = zincanalysis.RequestAnalyzer(ana)
+		if err != nil {
+			return errors.New(errors.ErrorTypeRuntimeException, "parse stored analysis error").Cause(err)
+		}
+	}
+
+	return nil
+}
+
 func (t *IndexList) Set(index *Index) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 	if _, ok := t.Indexes[index.GetName()]; ok {
-		log.Error().Str("index", index.GetName()).Int64("meta version", index.ref.MetaVersion).Msg("core.IndexList set an exists index")
+		log.Error().Str("index", index.GetName()).Int64("meta version", index.GetMetaVersion()).Msg("core.IndexList set an exists index")
 		return // already exists
 	}
 	t.Indexes[index.GetName()] = index
@@ -90,6 +236,8 @@ func (t *IndexList) GetOrCreate(name, storageType string, shardNum int64) (*Inde
 	if ok {
 		return idx, true, nil
 	}
+
+	// local lock
 	t.lock.Lock()
 	defer t.lock.Unlock()
 	// maybe someone else created it while we were waiting for the lock
@@ -100,11 +248,6 @@ func (t *IndexList) GetOrCreate(name, storageType string, shardNum int64) (*Inde
 	// okay, let's create new index
 	idx, err := NewIndex(name, storageType, shardNum)
 	if err != nil {
-		return nil, false, err
-	}
-	// check index
-	checkIndex(idx)
-	if err = storeIndex(idx); err != nil {
 		return nil, false, err
 	}
 	// cache it
@@ -147,15 +290,13 @@ func (t *IndexList) ListStat() []*Index {
 
 func (t *IndexList) ListName() []string {
 	items := t.List()
-	sort.Slice(items, func(i, j int) bool {
-		return items[i].GetName() < items[j].GetName()
-	})
-
 	names := make([]string, 0, len(items))
 	for _, index := range items {
 		names = append(names, index.GetName())
 	}
-
+	sort.Slice(names, func(i, j int) bool {
+		return names[i] < names[j]
+	})
 	return names
 }
 

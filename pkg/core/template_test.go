@@ -423,12 +423,9 @@ func TestUseTemplate(t *testing.T) {
 
 			t.Run("new index use template", func(t *testing.T) {
 				indexName := "TestUseTemplate-log-error-2022.02.02"
-				index, err := NewIndex(indexName, "", 1)
+				index, _, err := GetOrCreateIndex(indexName, "", 1)
 				assert.NoError(t, err)
 				assert.NotNil(t, index)
-
-				err = StoreIndex(index)
-				assert.NoError(t, err)
 
 				err = DeleteIndex(indexName)
 				assert.NoError(t, err)

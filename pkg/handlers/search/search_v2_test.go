@@ -75,11 +75,9 @@ func TestSearchDSL(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err := core.NewIndex(indexName, "disk", 2)
+		index, _, err := core.GetOrCreateIndex(indexName, "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-		err = core.StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	for _, tt := range tests {
@@ -142,11 +140,9 @@ func TestMultipleSearch(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err := core.NewIndex(indexName, "disk", 2)
+		index, _, err := core.GetOrCreateIndex(indexName, "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-		err = core.StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	for _, tt := range tests {

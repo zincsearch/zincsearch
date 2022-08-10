@@ -16,7 +16,6 @@
 package errors
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -28,10 +27,6 @@ const (
 	ErrorTypeRuntimeException         = "runtime_exception"
 	ErrorTypeNotImplemented           = "not_implemented"
 	ErrorTypeInvalidArgument          = "invalid_argument"
-)
-
-var (
-	ErrorIDNotFound = errors.New("id not found")
 )
 
 type Error struct {

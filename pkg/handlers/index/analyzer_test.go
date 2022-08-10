@@ -233,7 +233,7 @@ func TestAnalyze(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err := core.NewIndex(indexName, "disk", 2)
+		index, _, err := core.GetOrCreateIndex(indexName, "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 
@@ -245,10 +245,7 @@ func TestAnalyze(t *testing.T) {
 		prop2.Analyzer = "standard"
 		prop2.SearchAnalyzer = "standard"
 		mapping.Properties["name2"] = prop2
-		err = index.SetMappings(mapping)
-		assert.NoError(t, err)
-
-		err = core.StoreIndex(index)
+		err = index.SetMappings(mapping, true)
 		assert.NoError(t, err)
 	})
 

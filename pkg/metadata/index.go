@@ -16,58 +16,202 @@
 package metadata
 
 import (
+	"strings"
+
 	"github.com/goccy/go-json"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/upgrade"
 )
 
 type index struct{}
 
 var Index = new(index)
 
-func (t *index) ListName(offset, limit int64) ([]string, error) {
-	data, err := db.ListEntries(t.key(""), offset, limit)
-	if err != nil {
-		return nil, err
-	}
-	indexes := make([]string, 0, len(data))
-	for _, d := range data {
-		indexes = append(indexes, string(d.Key))
-	}
-	return indexes, nil
-}
-
 func (t *index) Get(id string) (*meta.Index, error) {
-	data, err := db.Get(t.key(id))
-	if err != nil {
-		return nil, err
-	}
-	idx := new(meta.Index)
-	err = json.Unmarshal(data, idx)
-	if err != nil {
-		if err.Error() == "expected { character for map value" {
-			// compatible for v026 --> begin
-			err = upgrade.UpgradeMetadataFromV026T027(idx, data)
-			if err != nil {
-				return nil, err
-			}
-			// compatible for v026 --> end
-		} else {
-			return nil, err
+	idx := meta.NewIndex("", "", "")
+	eg := errgroup.Group{}
+	eg.Go(func() error {
+		data, err := db.Get(t.key(id, "meta"))
+		if err != nil {
+			return err
 		}
-	}
+		return json.Unmarshal(data, idx.Meta)
+	})
+	eg.Go(func() error {
+		data, err := db.Get(t.key(id, "stats"))
+		if err != nil {
+			return err
+		}
+		return json.Unmarshal(data, idx.Stats)
+	})
+	eg.Go(func() error {
+		data, err := db.Get(t.key(id, "settings"))
+		if err != nil {
+			return err
+		}
+		idx.Settings = new(meta.IndexSettings)
+		return json.Unmarshal(data, idx.Settings)
+	})
+	eg.Go(func() error {
+		data, err := db.Get(t.key(id, "mappings"))
+		if err != nil {
+			return err
+		}
+		idx.Mappings = meta.NewMappings()
+		return json.Unmarshal(data, idx.Mappings)
+	})
+	eg.Go(func() error {
+		shards, err := t.GetShards(id)
+		if err != nil {
+			return err
+		}
+		for _, shard := range shards.Shards {
+			if err := idx.Shards.Set(shard); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	err := eg.Wait()
+
 	return idx, err
 }
 
-func (t *index) Set(id string, data []byte) error {
-	return db.Set(t.key(id), data)
+func (t *index) GetMeta(id string) (*meta.IndexMeta, error) {
+	data, err := db.Get(t.key(id, "meta"))
+	if err != nil {
+		return nil, err
+	}
+	val := meta.NewIndexMeta()
+	err = json.Unmarshal(data, val)
+	return val, err
+}
+
+func (t *index) GetStats(id string) (*meta.IndexStat, error) {
+	data, err := db.Get(t.key(id, "stats"))
+	if err != nil {
+		return nil, err
+	}
+	val := meta.NewIndexStat()
+	err = json.Unmarshal(data, val)
+	return val, err
+}
+
+func (t *index) GetSettings(id string) (*meta.IndexSettings, error) {
+	data, err := db.Get(t.key(id, "settings"))
+	if err != nil {
+		return nil, err
+	}
+	val := meta.NewIndexSettings()
+	err = json.Unmarshal(data, val)
+	return val, err
+}
+
+func (t *index) GetMappings(id string) (*meta.Mappings, error) {
+	data, err := db.Get(t.key(id, "mappings"))
+	if err != nil {
+		return nil, err
+	}
+	val := meta.NewMappings()
+	err = json.Unmarshal(data, val)
+	return val, err
+}
+
+func (t *index) GetShards(id string) (*meta.IndexShards, error) {
+	data, err := db.List(t.key(id, "shards/"), 0, 0)
+	if err != nil {
+		return nil, err
+	}
+	val := meta.NewIndexShards()
+	for _, d := range data {
+		shard := new(meta.IndexFirstShard)
+		err = json.Unmarshal(d, shard)
+		if err != nil {
+			return nil, err
+		}
+		val.Shards[shard.ID] = shard
+	}
+	return val, err
+}
+
+func (t *index) GetShard(id, shard string) (*meta.IndexFirstShard, error) {
+	data, err := db.Get(t.key(id, "shards", shard))
+	if err != nil {
+		return nil, err
+	}
+	val := new(meta.IndexFirstShard)
+	err = json.Unmarshal(data, val)
+	return val, err
+}
+
+func (t *index) SetMeta(id string, data *meta.IndexMeta) error {
+	val, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return db.Set(t.key(id, "meta"), val)
+}
+
+func (t *index) SetStats(id string, data *meta.IndexStat) error {
+	val, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return db.Set(t.key(id, "stats"), val)
+}
+
+func (t *index) SetSettings(id string, data *meta.IndexSettings) error {
+	val, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return db.Set(t.key(id, "settings"), val)
+}
+
+func (t *index) SetMappings(id string, data *meta.Mappings) error {
+	val, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return db.Set(t.key(id, "mappings"), val)
+}
+
+func (t *index) SetShards(id string, data []*meta.IndexFirstShard) error {
+	for _, shard := range data {
+		if err := t.SetShard(id, shard); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t *index) SetShard(id string, data *meta.IndexFirstShard) error {
+	val, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return db.Set(t.key(id, "shards", data.ID), val)
 }
 
 func (t *index) Delete(id string) error {
-	return db.Delete(t.key(id))
+	for _, key := range []string{"meta", "stats", "settings", "mappings", "shards"} {
+		err := db.Delete(t.key(id, key))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (t *index) key(id string) string {
-	return "/index/" + id
+func (t *index) key(keys ...string) string {
+	s := new(strings.Builder)
+	s.WriteString("/index")
+	for _, k := range keys {
+		if k != "/" {
+			s.WriteString("/")
+		}
+		s.WriteString(k)
+	}
+	return s.String()
 }

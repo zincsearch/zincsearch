@@ -74,8 +74,7 @@ func TestNewIndex(t *testing.T) {
 			assert.NoError(t, err)
 			assert.NotNil(t, got)
 
-			err = StoreIndex(got)
-			assert.NoError(t, err)
+			ZINC_INDEX_LIST.Set(got)
 
 			t.Run("cleanup", func(t *testing.T) {
 				err := DeleteIndex(tt.args.name)
@@ -116,8 +115,7 @@ func TestGetIndex(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 
-		err = StoreIndex(index)
-		assert.NoError(t, err)
+		ZINC_INDEX_LIST.Set(index)
 	})
 
 	for _, tt := range tests {
@@ -170,7 +168,7 @@ func TestCheckIndexName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := CheckIndexName(tt.args.name); (err != nil) != tt.wantErr {
+			if err := checkIndexName(tt.args.name); (err != nil) != tt.wantErr {
 				t.Errorf("CheckIndexName() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

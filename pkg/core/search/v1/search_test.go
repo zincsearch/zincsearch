@@ -224,11 +224,9 @@ func TestSearch(t *testing.T) {
 	var index *core.Index
 	indexName := "Search.v1.index_1"
 	t.Run("Prepare", func(t *testing.T) {
-		index, err = core.NewIndex(indexName, "disk", 2)
+		index, _, err = core.GetOrCreateIndex(indexName, "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-		err = core.StoreIndex(index)
-		assert.NoError(t, err)
 
 		index.GetMappings().SetProperty("address.city", meta.Property{
 			Type:          "text",

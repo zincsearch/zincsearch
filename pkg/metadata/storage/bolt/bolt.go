@@ -65,7 +65,7 @@ func (t *boltStorage) NewLocker(prefix string) (sync.Locker, error) {
 
 func (t *boltStorage) List(prefix string, offset, limit int64) ([][]byte, error) {
 	data := make([][]byte, 0)
-	bucket, _ := t.splitBucketAndKey(prefix)
+	bucket, pre := t.splitBucketAndKey(prefix)
 	err := t.db.View(func(txn *bbolt.Tx) error {
 		b := txn.Bucket(bucket)
 		if b == nil {
@@ -74,6 +74,9 @@ func (t *boltStorage) List(prefix string, offset, limit int64) ([][]byte, error)
 		i := int64(0)
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
+			if !bytes.HasPrefix(k, pre) {
+				continue
+			}
 			i++
 			if i <= offset {
 				continue
@@ -91,9 +94,8 @@ func (t *boltStorage) List(prefix string, offset, limit int64) ([][]byte, error)
 }
 
 func (t *boltStorage) ListEntries(prefix string, offset, limit int64) ([]*storage.StorageEntry, error) {
-	prefixByte := []byte(prefix)
 	data := make([]*storage.StorageEntry, 0)
-	bucket, _ := t.splitBucketAndKey(prefix)
+	bucket, pre := t.splitBucketAndKey(prefix)
 	err := t.db.View(func(txn *bbolt.Tx) error {
 		b := txn.Bucket(bucket)
 		if b == nil {
@@ -102,6 +104,9 @@ func (t *boltStorage) ListEntries(prefix string, offset, limit int64) ([]*storag
 		i := int64(0)
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
+			if !bytes.HasPrefix(k, pre) {
+				continue
+			}
 			i++
 			if i <= offset {
 				continue
@@ -110,7 +115,7 @@ func (t *boltStorage) ListEntries(prefix string, offset, limit int64) ([]*storag
 				break
 			}
 			entry := &storage.StorageEntry{}
-			entry.Key = bytes.TrimPrefix(k, prefixByte)
+			entry.Key = bytes.TrimPrefix(k, pre)
 			entry.Value = make([]byte, len(v))
 			copy(entry.Value, v)
 			data = append(data, entry)
@@ -141,7 +146,7 @@ func (t *boltStorage) Get(key string) ([]byte, error) {
 
 func (t *boltStorage) Set(key string, value []byte) error {
 	if key == "" {
-		return errors.ErrKeyEmpty
+		return errors.ErrKeyIsEmpty
 	}
 	bucket, name := t.splitBucketAndKey(key)
 	return t.db.Update(func(txn *bbolt.Tx) error {
@@ -163,7 +168,24 @@ func (t *boltStorage) CancelWithKeepAlive(key string) error {
 
 func (t *boltStorage) Delete(key string) error {
 	if key == "" {
-		return errors.ErrKeyEmpty
+		return errors.ErrKeyIsEmpty
+	}
+	data, err := t.ListEntries(key, 0, 0)
+	if err != nil {
+		return err
+	}
+	for _, d := range data {
+		err := t.delete(key + string(d.Key))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t *boltStorage) delete(key string) error {
+	if key == "" {
+		return errors.ErrKeyIsEmpty
 	}
 	bucket, name := t.splitBucketAndKey(key)
 	return t.db.Update(func(Tx *bbolt.Tx) error {
@@ -187,7 +209,8 @@ func (t *boltStorage) splitBucketAndKey(key string) ([]byte, []byte) {
 	if key == "" {
 		return nil, nil
 	}
-	p := bytes.LastIndex([]byte(key), []byte("/"))
+	p := bytes.Index([]byte(key[1:]), []byte("/"))
+	p = p + 1 // first '/' is not part of the bucket name
 	return []byte(key[:p]), []byte(key[p+1:])
 }
 

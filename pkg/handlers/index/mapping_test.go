@@ -28,12 +28,9 @@ import (
 
 func TestMapping(t *testing.T) {
 	t.Run("create index", func(t *testing.T) {
-		index, err := core.NewIndex("TestMapping.index_1", "disk", 2)
+		index, _, err := core.GetOrCreateIndex("TestMapping.index_1", "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-
-		err = core.StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	t.Run("set mapping", func(t *testing.T) {

@@ -144,7 +144,7 @@ func (t *badgerStorage) Get(key string) ([]byte, error) {
 
 func (t *badgerStorage) Set(key string, value []byte) error {
 	if key == "" {
-		return errors.ErrKeyEmpty
+		return errors.ErrKeyIsEmpty
 	}
 	return t.db.Update(func(txn *badger.Txn) error {
 		return txn.Set([]byte(key), value)
@@ -161,7 +161,24 @@ func (t *badgerStorage) CancelWithKeepAlive(key string) error {
 
 func (t *badgerStorage) Delete(key string) error {
 	if key == "" {
-		return errors.ErrKeyEmpty
+		return errors.ErrKeyIsEmpty
+	}
+	data, err := t.ListEntries(key, 0, 0)
+	if err != nil {
+		return err
+	}
+	for _, d := range data {
+		err := t.delete(key + string(d.Key))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t *badgerStorage) delete(key string) error {
+	if key == "" {
+		return errors.ErrKeyIsEmpty
 	}
 	return t.db.Update(func(txn *badger.Txn) error {
 		return txn.Delete([]byte(key))

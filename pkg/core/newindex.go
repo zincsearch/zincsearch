@@ -26,17 +26,133 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/bluge/directory"
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
 	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
 )
 
+func GetIndex(name string) (*Index, bool) {
+	return ZINC_INDEX_LIST.Get(name)
+}
+
+func GetOrCreateIndex(name, storageType string, shardNum int64) (*Index, bool, error) {
+	return ZINC_INDEX_LIST.GetOrCreate(name, storageType, shardNum)
+}
+
+// NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
+func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
+	// cluster lock
+	clusterLock, err := metadata.Cluster.NewLocker("index/" + name)
+	if err != nil {
+		return nil, err
+	}
+	clusterLock.Lock()
+	defer clusterLock.Unlock()
+
+	// check index name
+	if err := checkIndexName(name); err != nil {
+		return nil, err
+	}
+
+	// check repeat create
+	if idx, _ := metadata.Index.GetMeta(name); idx != nil {
+		return nil, errors.ErrIndexIsExists
+	}
+
+	// create index meta
+	if storageType == "" {
+		storageType = "disk"
+	}
+	metaIndex := meta.NewIndex(name, storageType, meta.Version)
+	metaIndex.Meta.SetMetaVersion(time.Now().Unix())
+	index := new(Index)
+	index.ref = metaIndex
+
+	// use template
+	if err := index.UseTemplate(); err != nil {
+		return nil, err
+	}
+
+	// check shard num
+	if shardNum <= 0 {
+		shardNum = config.Global.Shard.Num
+	}
+	if metaIndex.Settings.GetShards() != 0 {
+		shardNum = metaIndex.Settings.GetShards()
+	}
+
+	// init shards
+	for i := int64(0); i < shardNum; i++ {
+		node, err := ider.NewNode(int(i))
+		if err != nil {
+			return nil, err
+		}
+		_, err = metaIndex.Shards.Create(node.Generate())
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// init shards wrapper
+	index.shards = make(map[string]*IndexShard, shardNum)
+	index.localShards = make(map[string]*IndexShard, shardNum)
+	for _, shard := range metaIndex.Shards.List() {
+		id := shard.GetID()
+		index.shards[id] = &IndexShard{
+			root: index,
+			ref:  shard,
+			name: metaIndex.GetName() + "/" + id,
+		}
+		index.shards[id].shards = make([]*IndexSecondShard, shard.GetShardNum())
+		for i, secondShard := range shard.List() {
+			index.shards[id].shards[i] = &IndexSecondShard{
+				root: index,
+				ref:  secondShard,
+			}
+		}
+	}
+
+	// init shards hashing
+	index.shardHashing = rendezvous.New()
+
+	// store in local
+	err = metadata.Index.SetMeta(name, metaIndex.Meta.Copy())
+	if err != nil {
+		return nil, err
+	}
+	err = metadata.Index.SetStats(name, metaIndex.Stats.Copy())
+	if err != nil {
+		return nil, err
+	}
+	err = metadata.Index.SetSettings(name, metaIndex.Settings.Copy())
+	if err != nil {
+		return nil, err
+	}
+	err = metadata.Index.SetMappings(name, metaIndex.Mappings.Copy())
+	if err != nil {
+		return nil, err
+	}
+	err = metadata.Index.SetShards(name, metaIndex.Shards.Copy())
+	if err != nil {
+		return nil, err
+	}
+
+	// notify cluster
+	err = ZINC_CLUSTER.SetIndex(name, metaIndex.GetMetaVersion())
+	if err != nil {
+		return nil, err
+	}
+
+	return index, nil
+}
+
 var indexNameRe = regexp.MustCompile(`^[a-zA-Z0-9_.-]+$`)
 
-func CheckIndexName(name string) error {
+func checkIndexName(name string) error {
 	if name == "" {
-		return fmt.Errorf("index name cannot be empty")
+		return errors.ErrIndexIsEmpty
 	}
 	if strings.HasPrefix(name, "_") {
 		return fmt.Errorf("index name cannot start with _")
@@ -47,83 +163,8 @@ func CheckIndexName(name string) error {
 	return nil
 }
 
-// NewIndex creates an instance of a physical zinc index that can be used to store and retrieve data.
-func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
-	fmt.Println("new index", name)
-
-	if err := CheckIndexName(name); err != nil {
-		return nil, err
-	}
-
-	if storageType == "" {
-		storageType = "disk"
-	}
-
-	if shardNum <= 0 {
-		shardNum = config.Global.Shard.Num
-	}
-
-	index := new(Index)
-	index.ref = new(meta.Index)
-	index.ref.Name = name
-	index.ref.StorageType = storageType
-	index.ref.Version = meta.Version
-
-	// use template
-	if err := index.UseTemplate(); err != nil {
-		return nil, err
-	}
-	if index.ref.Settings != nil {
-		if index.ref.Settings.NumberOfShards != 0 {
-			shardNum = index.ref.Settings.NumberOfShards
-		}
-	}
-
-	index.shardNum = shardNum
-	index.ref.ShardNum = shardNum
-	index.ref.Shards = make(map[string]*meta.IndexShard, index.shardNum)
-	for i := int64(0); i < index.shardNum; i++ {
-		node, err := ider.NewNode(int(i))
-		if err != nil {
-			return nil, err
-		}
-		id := node.Generate()
-		shard := &meta.IndexShard{ID: id, ShardNum: 1}
-		for j := int64(0); j < shard.ShardNum; j++ {
-			shard.Shards = append(shard.Shards, &meta.IndexSecondShard{ID: j})
-		}
-		index.ref.Shards[id] = shard
-	}
-
-	// init shards wrapper
-	index.shards = make(map[string]*IndexShard, index.shardNum)
-	index.localShards = make(map[string]*IndexShard, index.shardNum)
-	for id := range index.ref.Shards {
-		index.shards[id] = &IndexShard{
-			root: index,
-			ref:  index.ref.Shards[id],
-			name: index.ref.Name + "/" + index.ref.Shards[id].ID,
-		}
-		index.shards[id].shards = make([]*IndexSecondShard, index.ref.Shards[id].ShardNum)
-		for j := range index.ref.Shards[id].Shards {
-			index.shards[id].shards[j] = &IndexSecondShard{
-				root: index,
-				ref:  index.ref.Shards[id].Shards[j],
-			}
-		}
-	}
-
-	// init shards hashing
-	index.shardHashing = rendezvous.New()
-	// for id := range index.shards {
-	// 	index.shardHashing.Add(id)
-	// }
-
-	return index, nil
-}
-
 // LoadIndexWriter load the index writer from the storage
-func OpenIndexWriter(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) (*bluge.Writer, error) {
+func openIndexWriter(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) (*bluge.Writer, error) {
 	cfg := getOpenConfig(name, storageType, defaultSearchAnalyzer, timeRange...)
 	return bluge.OpenWriter(cfg)
 }
@@ -146,58 +187,4 @@ func getOpenConfig(name string, storageType string, defaultSearchAnalyzer *analy
 		cfg.DefaultSearchAnalyzer = defaultSearchAnalyzer
 	}
 	return cfg
-}
-
-// storeIndex stores the index to metadata
-func StoreIndex(index *Index) error {
-	// check index
-	checkIndex(index)
-	// store index
-	if err := storeIndex(index); err != nil {
-		return err
-	}
-	// cache index
-	ZINC_INDEX_LIST.Set(index)
-
-	return nil
-}
-
-func checkIndex(index *Index) {
-	index.lock.Lock()
-
-	if index.ref.Settings == nil {
-		index.ref.Settings = new(meta.IndexSettings)
-	}
-	if index.ref.Mappings == nil {
-		// set default mappings
-		index.ref.Mappings = meta.NewMappings()
-		index.ref.Mappings.SetProperty(meta.TimeFieldName, meta.NewProperty("date"))
-	}
-	if index.analyzers == nil {
-		index.analyzers = make(map[string]*analysis.Analyzer)
-	}
-
-	index.lock.Unlock()
-}
-
-func storeIndex(index *Index) error {
-	index.ref.MetaVersion = time.Now().UnixNano()
-	data, err := index.MarshalJSON()
-	if err != nil {
-		return fmt.Errorf("core.storeIndex: index: %s, error: %s", index.GetName(), err.Error())
-	}
-	err = metadata.Index.Set(index.GetName(), data)
-	if err != nil {
-		return fmt.Errorf("core.storeIndex: index: %s, error: %s", index.GetName(), err.Error())
-	}
-	// notify cluster
-	return ZINC_CLUSTER.SetIndex(index.GetName(), index.ref.MetaVersion)
-}
-
-func GetIndex(name string) (*Index, bool) {
-	return ZINC_INDEX_LIST.Get(name)
-}
-
-func GetOrCreateIndex(name, storageType string, shardNum int64) (*Index, bool, error) {
-	return ZINC_INDEX_LIST.GetOrCreate(name, storageType, shardNum)
 }

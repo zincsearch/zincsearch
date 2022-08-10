@@ -17,12 +17,12 @@ package index
 
 import (
 	"net/http"
-	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/zutils"
@@ -40,7 +40,7 @@ func GetSettings(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIndexNotExists.Error()})
 		return
 	}
 
@@ -66,7 +66,7 @@ func GetSettings(c *gin.Context) {
 func SetSettings(c *gin.Context) {
 	indexName := c.Param("target")
 	if indexName == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index.name should be not empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIndexIsEmpty.Error()})
 		return
 	}
 
@@ -99,34 +99,24 @@ func SetSettings(c *gin.Context) {
 	if exists {
 		// it can only change settings.NumberOfReplicas when index exists
 		if settings.NumberOfReplicas > 0 {
-			indexSettings := index.GetSettings()
-			atomic.StoreInt64(&indexSettings.NumberOfReplicas, settings.NumberOfReplicas)
+			index.GetSettings().SetReplicas(settings.NumberOfReplicas)
 		}
 		if settings.Analysis != nil && len(settings.Analysis.Analyzer) > 0 {
 			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "can't update analyzer for existing index"})
 			return
 		}
-		// store index
-		if err := core.StoreIndex(index); err != nil {
-			c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
-			return
-		}
-
 		c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok"})
 		return
 	}
 
 	// update settings
-	_ = index.SetSettings(settings)
-
-	// update analyzers
-	_ = index.SetAnalyzers(analyzers)
-
-	// store index
-	if err := core.StoreIndex(index); err != nil {
+	if err := index.SetSettings(settings, true); err != nil {
 		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
+
+	// update analyzers
+	index.SetAnalyzers(analyzers)
 
 	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok"})
 }

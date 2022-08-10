@@ -25,6 +25,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
 )
@@ -34,24 +35,42 @@ type Index struct {
 	analyzers    map[string]*analysis.Analyzer
 	shards       map[string]*IndexShard
 	localShards  map[string]*IndexShard
-	shardNum     int64
 	shardHashing *rendezvous.Rendezvous
 	lock         sync.RWMutex
 }
 
 func (index *Index) MarshalJSON() ([]byte, error) {
-	index.lock.RLock()
-	b, err := json.Marshal(index.ref)
-	index.lock.RUnlock()
+	data := make(map[string]interface{})
+	data["name"] = index.GetName()
+	data["storage_type"] = index.GetStorageType()
+	data["settings"] = index.GetSettings().Copy()
+	data["mappings"] = index.GetMappings().Copy()
+	data["stats"] = index.GetStats().Copy()
+	data["shard_num"] = index.GetShardNum()
+	data["all_shard_num"] = index.GetAllShardNum()
+	data["wal_size"] = index.GetWALSize()
+	b, err := json.Marshal(data)
 	return b, err
 }
 
-func (index *Index) GetIndex() meta.Index {
-	return *index.ref
+func (index *Index) GetName() string {
+	return index.ref.GetName()
+}
+
+func (index *Index) GetStorageType() string {
+	return index.ref.GetStorageType()
+}
+
+func (index *Index) GetVersion() string {
+	return index.ref.GetStorageType()
+}
+
+func (index *Index) GetMetaVersion() int64 {
+	return index.ref.GetMetaVersion()
 }
 
 func (index *Index) GetShardNum() int64 {
-	return index.shardNum
+	return index.ref.GetShardNum()
 }
 
 func (index *Index) GetAllShardNum() int64 {
@@ -62,33 +81,28 @@ func (index *Index) GetAllShardNum() int64 {
 	return n
 }
 
-func (index *Index) GetName() string {
-	return index.ref.Name
+func (index *Index) GetRef() *meta.Index {
+	return index.ref
 }
 
-func (index *Index) GetStorageType() string {
-	return index.ref.StorageType
-}
-
-func (index *Index) GetMappings() *meta.Mappings {
-	index.lock.RLock()
-	m := index.ref.Mappings
-	index.lock.RUnlock()
-	return m
+func (index *Index) GetMeta() *meta.IndexMeta {
+	return index.ref.Meta
 }
 
 func (index *Index) GetSettings() *meta.IndexSettings {
-	index.lock.RLock()
-	s := index.ref.Settings
-	index.lock.RUnlock()
-	return s
+	return index.ref.Settings
 }
 
-func (index *Index) GetStats() meta.IndexStat {
-	index.lock.RLock()
-	s := index.ref.Stats
-	index.lock.RUnlock()
-	return s
+func (index *Index) GetMappings() *meta.Mappings {
+	return index.ref.Mappings
+}
+
+func (index *Index) GetShards() *meta.IndexShards {
+	return index.ref.Shards
+}
+
+func (index *Index) GetStats() *meta.IndexStat {
+	return index.ref.Stats
 }
 
 func (index *Index) GetAnalyzers() map[string]*analysis.Analyzer {
@@ -96,6 +110,18 @@ func (index *Index) GetAnalyzers() map[string]*analysis.Analyzer {
 	a := index.analyzers
 	index.lock.RUnlock()
 	return a
+}
+
+func (index *Index) GetWALSize() uint64 {
+	size := uint64(0)
+	for _, shard := range index.shards {
+		s, err := shard.GetWALSize()
+		if err != nil {
+			return size
+		}
+		size += s
+	}
+	return size
 }
 
 func (index *Index) UseTemplate() error {
@@ -110,46 +136,53 @@ func (index *Index) UseTemplate() error {
 
 	if template.Template.Settings != nil {
 		// update settings
-		_ = index.SetSettings(template.Template.Settings)
+		_ = index.SetSettings(template.Template.Settings, true)
 		// update analyzers
 		analyzers, _ := zincanalysis.RequestAnalyzer(template.Template.Settings.Analysis)
-		_ = index.SetAnalyzers(analyzers)
+		index.SetAnalyzers(analyzers)
 	}
 
 	if template.Template.Mappings != nil {
-		_ = index.SetMappings(template.Template.Mappings)
+		_ = index.SetMappings(template.Template.Mappings, true)
 	}
 
 	return nil
 }
 
-func (index *Index) SetSettings(settings *meta.IndexSettings) error {
-	if settings == nil {
-		return nil
-	}
-
-	index.lock.Lock()
-	index.ref.Settings = settings
-	index.lock.Unlock()
-
-	return nil
-}
-
-func (index *Index) SetAnalyzers(analyzers map[string]*analysis.Analyzer) error {
+func (index *Index) SetAnalyzers(analyzers map[string]*analysis.Analyzer) {
 	if len(analyzers) == 0 {
-		return nil
+		return
 	}
 
 	index.lock.Lock()
 	index.analyzers = analyzers
 	index.lock.Unlock()
+}
 
+func (index *Index) SetSettings(settings *meta.IndexSettings, save bool) error {
+	if settings == nil {
+		return nil
+	}
+
+	if settings.NumberOfShards > 0 {
+		index.GetSettings().SetShards(settings.NumberOfShards)
+	}
+	if settings.NumberOfReplicas > 0 {
+		index.GetSettings().SetReplicas(settings.NumberOfReplicas)
+	}
+	if settings.Analysis != nil {
+		index.GetSettings().SetAnalysis(settings.Analysis)
+	}
+
+	if save {
+		return metadata.Index.SetSettings(index.GetName(), index.GetSettings().Copy())
+	}
 	return nil
 }
 
-func (index *Index) SetMappings(mappings *meta.Mappings) error {
+func (index *Index) SetMappings(mappings *meta.Mappings, save bool) error {
 	if mappings == nil {
-		mappings = meta.NewMappings()
+		return nil
 	}
 
 	// custom analyzer just for text field
@@ -161,9 +194,10 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 		}
 	}
 
+	// set _id field
 	mappings.SetProperty("_id", meta.NewProperty("keyword"))
 
-	// @timestamp need date_range/date_histogram aggregation, and mappings used for type check in aggregation
+	// set @timestamp field
 	fieldTimestamp, exists := mappings.GetProperty(meta.TimeFieldName)
 	if !exists {
 		fieldTimestamp = meta.NewProperty("date")
@@ -174,23 +208,14 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 	mappings.SetProperty(meta.TimeFieldName, fieldTimestamp)
 
 	// update in the cache
-	index.lock.Lock()
-	index.ref.Mappings = mappings
-	index.lock.Unlock()
-
-	return nil
-}
-
-func (index *Index) GetWALSize() uint64 {
-	size := uint64(0)
-	for _, shard := range index.shards {
-		s, err := shard.GetWALSize()
-		if err != nil {
-			return size
-		}
-		size += s
+	for name, prop := range mappings.ListProperty() {
+		index.GetMappings().SetProperty(name, prop)
 	}
-	return size
+
+	if save {
+		return metadata.Index.SetMappings(index.GetName(), index.GetMappings().Copy())
+	}
+	return nil
 }
 
 // GetReaders return all shard readers
@@ -224,7 +249,7 @@ func (index *Index) UpdateMetadata() error {
 		index.lock.Unlock()
 	}
 
-	return storeIndex(index)
+	return metadata.Index.SetStats(index.GetName(), index.GetStats().Copy())
 }
 
 // UpdateMetadataByShard update first layer shard metadata, mainly docNum, storageSize and timeRange
@@ -251,6 +276,9 @@ func (index *Index) UpdateMetadataByShard(id string) {
 	atomic.StoreInt64(&secondShard.ref.Stats.DocTimeMin, atomic.LoadInt64(&shard.ref.Stats.DocTimeMin))
 	atomic.StoreInt64(&secondShard.ref.Stats.DocTimeMax, atomic.LoadInt64(&shard.ref.Stats.DocTimeMax))
 	index.lock.Unlock()
+
+	// update local storage
+	_ = metadata.Index.SetShard(index.GetName(), shard.ref.Copy())
 }
 
 // UpdateStatsBySecondShard update second layer shard stats, mainly docNum and storageSize

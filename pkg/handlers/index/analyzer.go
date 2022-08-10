@@ -52,7 +52,7 @@ func Analyze(c *gin.Context) {
 		// use index analyzer
 		index, exists := core.GetIndex(indexName)
 		if !exists {
-			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
+			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIndexNotExists.Error()})
 			return
 		}
 		if query.Filed != "" && query.Analyzer == "" {

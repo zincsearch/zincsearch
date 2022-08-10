@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/meta/elastic"
 )
@@ -23,7 +24,7 @@ func GetESMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIndexNotExists.Error()})
 		return
 	}
 
@@ -56,7 +57,7 @@ func GetESMapping(c *gin.Context) {
 // convertToESMapping converts the given Zinc mappings to the ElasticSearch representation.
 // TODO: In the future, the result can be stored, if a performance gain can be achieved (with a TTL).
 func convertToESMapping(mappings *meta.Mappings) *elastic.Mappings {
-	orig := mappings.DeepClone()
+	orig := mappings.Copy()
 	m := elastic.NewMappings()
 
 	// we first have to remove the automatically added property field mappings
@@ -131,7 +132,7 @@ func convertToESMapping(mappings *meta.Mappings) *elastic.Mappings {
 
 // convertToESProperty converst the given property to the ES representation.
 func convertToESProperty(p meta.Property) elastic.Property {
-	p = p.DeepClone()
+	p = p.Copy()
 
 	prop := elastic.NewProperty(p.Type)
 	prop.Analyzer = p.Analyzer

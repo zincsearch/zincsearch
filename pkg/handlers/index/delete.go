@@ -23,6 +23,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
@@ -41,7 +42,7 @@ import (
 func Delete(c *gin.Context) {
 	indexNames := c.Param("target")
 	if indexNames == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index name cannot be empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIndexIsEmpty.Error()})
 		return
 	}
 

@@ -32,6 +32,7 @@ func SetupNode() {
 	name, _ := os.Hostname()
 	ZINC_NODE = &Node{
 		data: &meta.Node{
+			ID:     1,
 			Name:   name,
 			Status: meta.NodeStatusPrepare,
 		},

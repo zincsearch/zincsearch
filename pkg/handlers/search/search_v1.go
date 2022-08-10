@@ -22,6 +22,7 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/core"
 	v1 "github.com/zinclabs/zinc/pkg/core/search/v1"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
@@ -42,7 +43,7 @@ func SearchV1(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIndexNotExists.Error()})
 		return
 	}
 

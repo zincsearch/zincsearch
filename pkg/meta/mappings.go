@@ -48,9 +48,10 @@ type Property struct {
 }
 
 func NewMappings() *Mappings {
-	return &Mappings{
-		Properties: make(map[string]Property),
-	}
+	m := &Mappings{Properties: make(map[string]Property)}
+	m.SetProperty("_id", NewProperty("keyword"))
+	m.SetProperty("@timestamp", NewProperty("date"))
+	return m
 }
 
 func NewProperty(typ string) Property {
@@ -87,7 +88,7 @@ func (p *Property) AddField(field string, value Property) {
 }
 
 // DeepClone returns a copy of the Property.
-func (p *Property) DeepClone() Property {
+func (p *Property) Copy() Property {
 	prop := NewProperty(p.Type)
 	prop.Analyzer = p.Analyzer
 	prop.SearchAnalyzer = p.SearchAnalyzer
@@ -100,7 +101,7 @@ func (p *Property) DeepClone() Property {
 
 	if p.Fields != nil {
 		for k, v := range p.Fields {
-			prop.Fields[k] = v.DeepClone()
+			prop.Fields[k] = v.Copy()
 		}
 	} else {
 		prop.Fields = nil
@@ -140,14 +141,14 @@ func (t *Mappings) ListProperty() map[string]Property {
 }
 
 // DeepClone returns a full copy of the mapping.
-func (t *Mappings) DeepClone() *Mappings {
+func (t *Mappings) Copy() *Mappings {
 	m := NewMappings()
 
 	t.lock.RLock()
 	defer t.lock.RUnlock()
 
 	for k, v := range t.Properties {
-		m.Properties[k] = v.DeepClone()
+		m.Properties[k] = v.Copy()
 	}
 
 	return m

@@ -21,6 +21,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/uquery/mappings"
 	"github.com/zinclabs/zinc/pkg/zutils"
@@ -38,7 +39,7 @@ func GetMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIndexNotExists.Error()})
 		return
 	}
 
@@ -62,7 +63,7 @@ func GetMapping(c *gin.Context) {
 func SetMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	if indexName == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index.name should be not empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIndexIsEmpty.Error()})
 		return
 	}
 
@@ -89,6 +90,9 @@ func SetMapping(c *gin.Context) {
 		indexMappings := index.GetMappings()
 		if indexMappings != nil && indexMappings.Len() > 0 {
 			for field := range mappings.ListProperty() {
+				if field == "_id" || field == meta.TimeFieldName {
+					continue
+				}
 				if _, ok := indexMappings.GetProperty(field); ok {
 					c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index [" + indexName + "] already exists mapping of field [" + field + "]"})
 					return
@@ -122,11 +126,9 @@ func SetMapping(c *gin.Context) {
 				mappings.Properties[k] = v
 			}
 		}
-		_ = index.SetMappings(mappings)
 	}
 
-	// store index
-	if err := core.StoreIndex(index); err != nil {
+	if err := index.SetMappings(mappings, true); err != nil {
 		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}

@@ -98,10 +98,7 @@ func TestDelete(t *testing.T) {
 }
 
 func prepareIndex(t *testing.T, name, storageType string) {
-	index, err := core.NewIndex(name, storageType, 2)
+	index, _, err := core.GetOrCreateIndex(name, storageType, 2)
 	assert.NoError(t, err)
 	assert.NotNil(t, index)
-
-	err = core.StoreIndex(index)
-	assert.NoError(t, err)
 }

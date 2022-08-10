@@ -24,12 +24,9 @@ import (
 func TestTelemetry(t *testing.T) {
 	indexName := "TestTelemetry.index_1"
 	t.Run("prepare", func(t *testing.T) {
-		index, err := NewIndex(indexName, "disk", 1)
+		index, _, err := GetOrCreateIndex(indexName, "", 1)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-
-		err = StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	t.Run("telemetry", func(t *testing.T) {

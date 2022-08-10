@@ -21,6 +21,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
@@ -37,14 +38,14 @@ import (
 func Delete(c *gin.Context) {
 	docID := c.Param("id")
 	if docID == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "id is empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIDIsEmpty.Error()})
 		return
 	}
 
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index does not exists"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIndexNotExists.Error()})
 		return
 	}
 

@@ -16,13 +16,13 @@
 package index
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/uquery/mappings"
@@ -102,24 +102,24 @@ func CreateIndexWorker(newIndex *meta.IndexSimple, indexName string) error {
 	}
 
 	if newIndex.Name == "" {
-		return errors.New("index.name should be not empty")
+		return errors.ErrIndexIsEmpty
 	}
 
 	if _, ok := core.GetIndex(newIndex.Name); ok {
-		return errors.New("index [" + newIndex.Name + "] already exists")
+		return errors.ErrIndexIsExists
 	}
 
 	if newIndex.Settings == nil {
-		newIndex.Settings = new(meta.IndexSettings)
+		newIndex.Settings = meta.NewIndexSettings()
 	}
 	analyzers, err := zincanalysis.RequestAnalyzer(newIndex.Settings.Analysis)
 	if err != nil {
-		return errors.New(err.Error())
+		return err
 	}
 
 	mappings, err := mappings.Request(analyzers, newIndex.Mappings)
 	if err != nil {
-		return errors.New(err.Error())
+		return err
 	}
 
 	if newIndex.Settings != nil && newIndex.Settings.NumberOfShards != 0 {
@@ -130,24 +130,26 @@ func CreateIndexWorker(newIndex *meta.IndexSimple, indexName string) error {
 	if newIndex.ShardNum == 0 {
 		newIndex.ShardNum = config.Global.Shard.Num
 	}
-	index, err := core.NewIndex(newIndex.Name, newIndex.StorageType, newIndex.ShardNum)
+	index, exists, err := core.GetOrCreateIndex(newIndex.Name, newIndex.StorageType, newIndex.ShardNum)
 	if err != nil {
-		return errors.New(err.Error())
+		return err
+	}
+	if exists {
+		return errors.ErrIndexIsExists
 	}
 
 	// update settings
-	_ = index.SetSettings(newIndex.Settings)
-
-	// update analyzers
-	_ = index.SetAnalyzers(analyzers)
+	if err := index.SetSettings(newIndex.Settings, true); err != nil {
+		return err
+	}
 
 	// update mappings
-	_ = index.SetMappings(mappings)
-
-	// store index
-	if err = core.StoreIndex(index); err != nil {
-		return errors.New(err.Error())
+	if err := index.SetMappings(mappings, true); err != nil {
+		return err
 	}
+
+	// update analyzers
+	index.SetAnalyzers(analyzers)
 
 	return nil
 }

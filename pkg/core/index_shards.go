@@ -28,7 +28,9 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
+	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 	"github.com/zinclabs/zinc/pkg/wal"
 )
 
@@ -47,7 +49,7 @@ const (
 type IndexShard struct {
 	name   string // shard name: index/shardID
 	root   *Index
-	ref    *meta.IndexShard
+	ref    *meta.IndexFirstShard
 	shards []*IndexSecondShard
 	wal    *wal.Log
 	lock   sync.RWMutex
@@ -72,7 +74,7 @@ type IndexSecondShard struct {
 
 // GetShardByDocID return the shard by hash docID
 func (index *Index) GetShardByDocID(docID string) *IndexShard {
-	_, err := ZINC_CLUSTER.GetShardsDistribution(index.GetName(), ZINC_NODE.GetID())
+	err := ZINC_CLUSTER.DistributeIndexShards(index.GetName(), ZINC_NODE.GetID())
 	if err != nil {
 		log.Error().Err(err).Msgf("cluster.GetShardsDistribution")
 	}
@@ -87,6 +89,76 @@ func (index *Index) CheckShards() error {
 			return err
 		}
 	}
+	return nil
+}
+
+// NewShard create first layer shards for index
+func (index *Index) NewShard() (string, error) {
+	id := ider.Generate()
+	log.Info().Str("index", index.GetName()).Str("shard", id).Msg("Create first layer shard")
+
+	newShard, err := index.ref.Shards.Create(id)
+	if err != nil {
+		return id, err
+	}
+
+	index.lock.Lock()
+	index.shards[id] = &IndexShard{
+		root: index,
+		ref:  newShard,
+		name: fmt.Sprintf("%s/%s", index.GetName(), id),
+	}
+	localShard := index.shards[id]
+	index.lock.Unlock()
+
+	localShard.lock.Lock()
+	localShard.shards = make([]*IndexSecondShard, newShard.GetShardNum())
+	for i, secondShard := range newShard.List() {
+		localShard.shards[i] = &IndexSecondShard{
+			root: index,
+			ref:  secondShard,
+		}
+	}
+	localShard.lock.Unlock()
+
+	return id, nil
+}
+
+// ReloadShard reload shard from meta data
+// because shards metadata may changed, we need reload it
+func (index *Index) ReloadShard(id string) error {
+	newShard, err := metadata.Index.GetShard(index.GetName(), id)
+	if err != nil {
+		return err
+	}
+	if err := index.GetShards().Reset(newShard); err != nil {
+		return err
+	}
+
+	// reset local cache
+	index.lock.Lock()
+	localShard := index.shards[id]
+	index.lock.Unlock()
+	localShard.lock.Lock()
+	localShard.ref = newShard
+	if len(localShard.shards) < int(newShard.GetShardNum()) {
+		shards := make([]*IndexSecondShard, newShard.GetShardNum())
+		copy(shards, localShard.shards)
+		localShard.shards = shards
+	}
+	for i, secondShard := range newShard.List() {
+		v := localShard.shards[i]
+		if v == nil {
+			v = &IndexSecondShard{
+				root: index,
+				ref:  secondShard,
+			}
+			localShard.shards[i] = v
+		} else {
+			v.ref = secondShard
+		}
+	}
+	localShard.lock.Unlock()
 	return nil
 }
 
@@ -139,15 +211,16 @@ func (s *IndexShard) NewShard() error {
 	s.ref.Stats.DocTimeMin = 0
 	s.ref.Stats.DocTimeMax = 0
 	// create new shard
-	atomic.AddInt64(&s.ref.ShardNum, 1)
-	s.ref.Shards = append(s.ref.Shards, &meta.IndexSecondShard{ID: s.GetLatestShardID()})
-	s.shards = append(s.shards, &IndexSecondShard{root: s.root, ref: s.ref.Shards[s.GetLatestShardID()]})
+	newShard := s.ref.Create()
+	s.shards = append(s.shards, &IndexSecondShard{root: s.root, ref: newShard})
 	s.root.lock.Unlock()
 
 	// store update
-	if err := storeIndex(s.root); err != nil {
+	err := metadata.Index.SetShard(s.root.GetName(), s.ref.Copy())
+	if err != nil {
 		return err
 	}
+
 	return s.openWriter(s.GetLatestShardID())
 }
 
@@ -261,7 +334,7 @@ func (s *IndexShard) openWriter(shardID int64) error {
 	}
 	var err error
 	indexName := fmt.Sprintf("%s/%s/%06x", s.GetIndexName(), s.GetID(), shardID)
-	secondShard.writer, err = OpenIndexWriter(indexName, s.root.GetStorageType(), defaultSearchAnalyzer, 0, 0)
+	secondShard.writer, err = openIndexWriter(indexName, s.root.GetStorageType(), defaultSearchAnalyzer, 0, 0)
 	return err
 }
 
@@ -356,7 +429,7 @@ func (s *IndexShard) FindShardByDocID(docID string) (int64, error) {
 	}
 	_ = eg.Wait()
 	if shardID == -1 {
-		return shardID, errors.ErrorIDNotFound
+		return shardID, errors.ErrIDNotFound
 	}
 	return shardID, nil
 }

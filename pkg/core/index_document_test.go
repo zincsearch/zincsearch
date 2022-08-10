@@ -95,11 +95,9 @@ func TestIndex_CreateUpdateDocument(t *testing.T) {
 	var index *Index
 	var err error
 	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex(indexName, "disk", 2)
+		index, _, err = GetOrCreateIndex(indexName, "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-		err = StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	for _, tt := range tests {
@@ -175,15 +173,14 @@ func TestIndex_UpdateDocument(t *testing.T) {
 	var index *Index
 	var err error
 	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex("TestIndex_UpdateDocument.index_1", "disk", 2)
+		index, _, err = GetOrCreateIndex("TestIndex_UpdateDocument.index_1", "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-		err = StoreIndex(index)
-		assert.NoError(t, err)
+
 		prop := meta.NewProperty("date")
 		mappings := index.GetMappings()
 		mappings.SetProperty("time", prop)
-		err = index.SetMappings(mappings)
+		err = index.SetMappings(mappings, true)
 		assert.NoError(t, err)
 
 		err = index.CreateDocument("1", map[string]interface{}{
@@ -237,11 +234,9 @@ func TestIndex_DeleteDocument(t *testing.T) {
 	var index *Index
 	var err error
 	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex(indexName, "disk", 2)
+		index, _, err = GetOrCreateIndex(indexName, "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-		err = StoreIndex(index)
-		assert.NoError(t, err)
 
 		err = index.CreateDocument("1", map[string]interface{}{
 			"name": "Hello",
@@ -414,11 +409,9 @@ func TestIndex_CreateUpdateDocumentWithDateField(t *testing.T) {
 	var index *Index
 	var err error
 	t.Run("prepare", func(t *testing.T) {
-		index, err = NewIndex(indexName, "disk", 2)
+		index, _, err = GetOrCreateIndex(indexName, "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-		err = StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	for _, tt := range tests {

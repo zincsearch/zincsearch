@@ -58,12 +58,9 @@ func TestRefresh(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, err := core.NewIndex("TestRefresh.index_1", "disk", 2)
+		index, _, err := core.GetOrCreateIndex("TestRefresh.index_1", "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-
-		err = core.StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	for _, tt := range tests {

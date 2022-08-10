@@ -39,14 +39,14 @@ import (
 // -- mv     index_old/000002 index/shard1/000002
 // -- mv     index_old/000003 index/shard1/000003
 func UpgradeFromV026T027(index *meta.Index) error {
-	indexName := index.Name
+	indexName := index.Meta.Name
 	rootPath := config.Global.DataPath
 	if ok, _ := zutils.IsExist(path.Join(rootPath, indexName)); !ok {
 		return nil // if index does not exist, skip
 	}
 
 	// update metadata
-	if len(index.Shards) == 0 {
+	if len(index.Shards.Shards) == 0 {
 		err := UpgradeMetadataFromV026T027(index, nil)
 		if err != nil {
 			return err
@@ -54,7 +54,7 @@ func UpgradeFromV026T027(index *meta.Index) error {
 	}
 
 	// check if index has been upgraded
-	for id := range index.Shards {
+	for id := range index.Shards.Shards {
 		if ok, _ := zutils.IsExist(path.Join(rootPath, indexName, id, "000000")); ok {
 			return nil // if index already upgraded, skip
 		}
@@ -73,8 +73,8 @@ func UpgradeFromV026T027(index *meta.Index) error {
 	}
 
 	// make new shards
-	shardNames := make([]string, 0, index.ShardNum)
-	for id := range index.Shards {
+	shardNames := make([]string, 0, index.GetShardNum())
+	for id := range index.Shards.Shards {
 		if err := os.Mkdir(path.Join(rootPath, indexName, id), 0755); err != nil {
 			return err
 		}
@@ -115,14 +115,14 @@ func UpgradeMetadataFromV026T027(idx *meta.Index, data []byte) error {
 	}
 
 	shardNames := make([]string, config.Global.Shard.Num)
-	shards := make(map[string]*meta.IndexShard, config.Global.Shard.Num)
+	shards := make(map[string]*meta.IndexFirstShard, config.Global.Shard.Num)
 	for i := int64(0); i < config.Global.Shard.Num; i++ {
 		node, err := ider.NewNode(int(i))
 		if err != nil {
 			return err
 		}
 		id := node.Generate()
-		shard := &meta.IndexShard{ID: id, ShardNum: 1}
+		shard := &meta.IndexFirstShard{ID: id, ShardNum: 1}
 		for j := int64(0); j < shard.ShardNum; j++ {
 			shard.Shards = append(shard.Shards, &meta.IndexSecondShard{ID: j})
 		}
@@ -140,7 +140,7 @@ func UpgradeMetadataFromV026T027(idx *meta.Index, data []byte) error {
 	for i := int64(0); i < idx026.ShardNum; i++ {
 		shards[firstShardName].Shards[i] = &meta.IndexSecondShard{
 			ID: i,
-			Stats: meta.IndexStat{
+			Stats: &meta.IndexStat{
 				DocNum:      idx026.Shards[i].DocNum,
 				StorageSize: idx026.Shards[i].StorageSize,
 				DocTimeMin:  idx026.Shards[i].DocTimeMin,
@@ -160,8 +160,7 @@ func UpgradeMetadataFromV026T027(idx *meta.Index, data []byte) error {
 	if err != nil {
 		return err
 	}
-	idx.Shards = shards
-	idx.ShardNum = config.Global.Shard.Num
+	idx.Shards = &meta.IndexShards{ShardNum: int64(len(shards)), Shards: shards}
 	idx.Stats.DocNum = shards[firstShardName].Stats.DocNum
 	idx.Stats.StorageSize = shards[firstShardName].Stats.StorageSize
 	return nil

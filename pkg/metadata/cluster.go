@@ -16,9 +16,9 @@
 package metadata
 
 import (
-	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/goccy/go-json"
@@ -32,7 +32,7 @@ type cluster struct{}
 var Cluster = new(cluster)
 
 func (t *cluster) NewLocker(key string) (sync.Locker, error) {
-	return db.NewLocker(t.key("lock/" + key))
+	return db.NewLocker(t.key("lock", key))
 }
 
 func (t *cluster) ListNode(offset, limit int64) ([]*meta.Node, error) {
@@ -74,7 +74,7 @@ func (t *cluster) ListIndex(offset, limit int64) (map[string]int64, error) {
 // ListDistribution returns the distribution of shards for an index.
 // returns data is map[shardName]nodeID
 func (t *cluster) ListDistribution(index string) (map[string]int64, error) {
-	data, err := db.ListEntries(t.key("distribution/"+index+"/"), 0, 0)
+	data, err := db.ListEntries(t.key("distribution", index, "/"), 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -92,24 +92,24 @@ func (t *cluster) Join(id int64, node *meta.Node) error {
 	if err != nil {
 		return err
 	}
-	return db.SetWithKeepAlive(t.key(fmt.Sprintf("node/%d", id)), data, 5)
+	return db.SetWithKeepAlive(t.key("node", strconv.FormatInt(id, 10)), data, 5)
 }
 
 func (t *cluster) Leave(id int64) error {
-	return db.Delete(t.key(fmt.Sprintf("node/%d", id)))
+	return db.Delete(t.key("node", strconv.FormatInt(id, 10)))
 }
 
 func (t *cluster) ShardDistribute(index, shard string, nodeID int64) error {
 	data := strconv.FormatInt(nodeID, 10)
-	return db.SetWithKeepAlive(t.key(fmt.Sprintf("distribution/%s/%s", index, shard)), []byte(data), 5)
+	return db.SetWithKeepAlive(t.key("distribution", index, shard), []byte(data), 5)
 }
 
 func (t *cluster) ReleaseDistribute(index, shard string) error {
-	return db.CancelWithKeepAlive(t.key(fmt.Sprintf("distribution/%s/%s", index, shard)))
+	return db.CancelWithKeepAlive(t.key("distribution", index, shard))
 }
 
 func (t *cluster) GetShardDistribute(index, shard string) (int64, error) {
-	data, err := db.Get(t.key(fmt.Sprintf("distribution/%s/%s", index, shard)))
+	data, err := db.Get(t.key("distribution", index, shard))
 	if err != nil {
 		return 0, err
 	}
@@ -118,11 +118,11 @@ func (t *cluster) GetShardDistribute(index, shard string) (int64, error) {
 
 func (t *cluster) SetIndex(index string, metaVersion int64) error {
 	data := strconv.FormatInt(metaVersion, 10)
-	return db.Set(t.key("index/"+index), []byte(data))
+	return db.Set(t.key("index", index), []byte(data))
 }
 
 func (t *cluster) GetIndex(index string) (int64, error) {
-	data, err := db.Get(t.key("index/" + index))
+	data, err := db.Get(t.key("index", index))
 	if err != nil {
 		return 0, err
 	}
@@ -130,7 +130,7 @@ func (t *cluster) GetIndex(index string) (int64, error) {
 }
 
 func (t *cluster) DeleteIndex(index string) error {
-	return db.Delete(t.key("index/" + index))
+	return db.Delete(t.key("index", index))
 }
 
 func (t *cluster) Watch(eventType string) <-chan storage.StorageEvent {
@@ -146,6 +146,14 @@ func (t *cluster) Watch(eventType string) <-chan storage.StorageEvent {
 	return db.Watch(t.key(key))
 }
 
-func (t *cluster) key(key string) string {
-	return "/cluster/" + key
+func (t *cluster) key(keys ...string) string {
+	s := new(strings.Builder)
+	s.WriteString("/cluster")
+	for _, k := range keys {
+		if k != "/" {
+			s.WriteString("/")
+		}
+		s.WriteString(k)
+	}
+	return s.String()
 }

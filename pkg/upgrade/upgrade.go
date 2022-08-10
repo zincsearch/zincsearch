@@ -26,7 +26,7 @@ import (
 
 func Do(oldVersion string, index *meta.Index) error {
 	var err error
-	log.Info().Msgf("Begin upgrade[%s] from version[%s]", index.Name, oldVersion)
+	log.Info().Msgf("Begin upgrade[%s] from version[%s]", index.Meta.Name, oldVersion)
 	columns := strings.Split(oldVersion, "-")
 	oldVersion = columns[0]
 	switch oldVersion {

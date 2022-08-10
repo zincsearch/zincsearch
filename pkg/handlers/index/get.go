@@ -21,6 +21,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
@@ -41,7 +42,7 @@ func Get(c *gin.Context) {
 
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusNotFound, meta.HTTPResponseError{Error: "index does not exists"})
+		c.JSON(http.StatusNotFound, meta.HTTPResponseError{Error: errors.ErrIndexNotExists.Error()})
 		return
 	}
 

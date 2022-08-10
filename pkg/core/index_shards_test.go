@@ -60,12 +60,9 @@ func TestIndex_Shards(t *testing.T) {
 	var err error
 	var indexName = "TestIndex_Shards.index_1"
 	t.Run("perpare", func(t *testing.T) {
-		index, err = NewIndex(indexName, "disk", 2)
+		index, _, err = GetOrCreateIndex(indexName, "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-
-		err = StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	for _, tt := range tests {

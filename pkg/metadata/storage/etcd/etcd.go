@@ -126,7 +126,7 @@ func (t *etcdStorage) Get(key string) ([]byte, error) {
 
 func (t *etcdStorage) Set(key string, value []byte) error {
 	if key == "" {
-		return errors.ErrKeyEmpty
+		return errors.ErrKeyIsEmpty
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), t.timeout)
 	defer cancel()
@@ -136,7 +136,7 @@ func (t *etcdStorage) Set(key string, value []byte) error {
 
 func (t *etcdStorage) SetWithKeepAlive(key string, value []byte, ttl int64) error {
 	if key == "" {
-		return errors.ErrKeyEmpty
+		return errors.ErrKeyIsEmpty
 	}
 
 	lease, _ := t.cli.Lease.Grant(context.Background(), ttl)
@@ -173,11 +173,11 @@ func (t *etcdStorage) CancelWithKeepAlive(key string) error {
 
 func (t *etcdStorage) Delete(key string) error {
 	if key == "" {
-		return errors.ErrKeyEmpty
+		return errors.ErrKeyIsEmpty
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), t.timeout)
 	defer cancel()
-	_, err := t.cli.Delete(ctx, t.prefix+key)
+	_, err := t.cli.Delete(ctx, t.prefix+key, client.WithPrefix())
 	return err
 }
 

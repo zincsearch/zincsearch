@@ -67,7 +67,7 @@ func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, ins
 	update := true
 	secondShardID, err := shard.FindShardByDocID(docID)
 	if err != nil {
-		if insert && err == errors.ErrorIDNotFound {
+		if insert && err == errors.ErrIDNotFound {
 			update = false
 		} else {
 			return err

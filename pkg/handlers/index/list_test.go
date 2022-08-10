@@ -29,12 +29,9 @@ import (
 
 func TestList(t *testing.T) {
 	t.Run("prepare", func(t *testing.T) {
-		index, err := core.NewIndex("TestIndexList.index_1", "disk", 2)
+		index, _, err := core.GetOrCreateIndex("TestIndexList.index_1", "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-
-		err = core.StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	t.Run("list", func(t *testing.T) {
@@ -65,7 +62,7 @@ func TestList(t *testing.T) {
 				assert.NotNil(t, resp.List)
 				assert.NotNil(t, resp.Page)
 				assert.Equal(t, len(resp.List), 1)
-				assert.Equal(t, resp.List[0].Name, "TestIndexList.index_1")
+				assert.Equal(t, resp.List[0].GetName(), "TestIndexList.index_1")
 				assert.Equal(t, resp.Page.PageSize, int64(20))
 				assert.Equal(t, resp.Page.PageNum, int64(1))
 				assert.Equal(t, resp.Page.Total, int64(1))
@@ -82,12 +79,9 @@ func TestList(t *testing.T) {
 
 func TestIndexNameList(t *testing.T) {
 	t.Run("prepare", func(t *testing.T) {
-		index, err := core.NewIndex("TestIndexNameList.index_1", "disk", 2)
+		index, _, err := core.GetOrCreateIndex("TestIndexNameList.index_1", "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-
-		err = core.StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	t.Run("indexNameList", func(t *testing.T) {

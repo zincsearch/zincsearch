@@ -30,7 +30,7 @@ import (
 // -- mkdir index
 // -- mv    index_old index/000000
 func UpgradeFromV024T025(index *meta.Index) error {
-	indexName := index.Name
+	indexName := index.Meta.Name
 	rootPath := config.Global.DataPath
 	if ok, _ := zutils.IsExist(path.Join(rootPath, indexName)); !ok {
 		return nil // if index does not exist, skip

@@ -16,12 +16,9 @@ func TestESMapping_GetConverted(t *testing.T) {
 	config.Global.EnableTextKeywordMapping = true
 
 	t.Run("create index", func(t *testing.T) {
-		index, err := core.NewIndex("TestEsMapping.index_1", "disk", 2)
+		index, _, err := core.GetOrCreateIndex("TestEsMapping.index_1", "disk", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
-
-		err = core.StoreIndex(index)
-		assert.NoError(t, err)
 	})
 
 	t.Run("set mapping", func(t *testing.T) {

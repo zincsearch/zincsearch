@@ -17,8 +17,8 @@ package core
 
 import (
 	"context"
-	"errors"
 	"os"
+	"time"
 
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -28,45 +28,84 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
 func DeleteIndex(name string) error {
+	log.Info().Int("No", 1).Msg("delete index")
+	// cluster lock
+	clusterLock, err := metadata.Cluster.NewLocker("index/" + name)
+	if err != nil {
+		return err
+	}
+	clusterLock.Lock()
+	defer clusterLock.Unlock()
+	log.Info().Int("No", 2).Msg("delete index")
+
 	// 1. Check if index exists
 	index, exists := GetIndex(name)
 	if !exists {
-		return errors.New("index " + name + " does not exists")
+		return errors.ErrIndexNotExists
 	}
+	log.Info().Int("No", 3).Msg("delete index")
 
-	// 2. Close and Delete from cache
+	// 2. Notify cluster
+	if err := ZINC_CLUSTER.DeleteIndex(name); err != nil {
+		return err
+	}
+	log.Info().Int("No", 4).Msg("delete index")
+
+	// 3. Waiting for cluster to be ready
+	waitOK := false
+	for i := 0; i < 300; i++ {
+		time.Sleep(time.Millisecond * 100)
+		dis, _ := metadata.Cluster.ListDistribution(name)
+		log.Info().Float64("No", 4.1).Msg("delete index, wait cluster other nodes deleted")
+		if len(dis) == 0 {
+			waitOK = true
+			break
+		}
+	}
+	if !waitOK {
+		return errors.ErrClusterTimeout
+	}
+	log.Info().Int("No", 5).Msg("delete index")
+
+	// 4. Close and Delete from local
 	ZINC_INDEX_LIST.Delete(name)
+	log.Info().Int("No", 6).Msg("delete index")
 
-	// 3. Physically delete the index
-	if index.GetStorageType() == "disk" {
-		dataPath := config.Global.DataPath
-		err := os.RemoveAll(dataPath + "/" + index.GetName())
-		if err != nil {
-			log.Error().Err(err).Msg("failed to delete index")
-		}
-	} else if index.GetStorageType() == "s3" {
-		err := deleteFilesForIndexFromS3(index.GetName())
-		if err != nil {
-			log.Error().Err(err).Msg("failed to delete index from S3")
-		}
-	} else if index.GetStorageType() == "minio" {
-		err := deleteFilesForIndexFromMinIO(index.GetName())
-		if err != nil {
-			log.Error().Err(err).Msg("failed to delete index from minIO")
-		}
-	}
-
-	// 4. Delete form metadata
+	// 5. Delete form metadata
 	if err := metadata.Index.Delete(name); err != nil {
 		return err
 	}
+	log.Info().Int("No", 7).Msg("delete index")
 
-	// 5. Notify cluster
-	return ZINC_CLUSTER.DeleteIndex(name)
+	// Physically delete the index
+	go func(name string) {
+		if index.GetStorageType() == "disk" {
+			dataPath := config.Global.DataPath
+			err := os.RemoveAll(dataPath + "/" + index.GetName())
+			if err != nil {
+				log.Error().Err(err).Msg("failed to delete index")
+			}
+		} else if index.GetStorageType() == "s3" {
+			err := deleteFilesForIndexFromS3(index.GetName())
+			if err != nil {
+				log.Error().Err(err).Msg("failed to delete index from S3")
+			}
+		} else if index.GetStorageType() == "minio" {
+			err := deleteFilesForIndexFromMinIO(index.GetName())
+			if err != nil {
+				log.Error().Err(err).Msg("failed to delete index from minIO")
+			}
+		}
+		log.Info().Str("index", name).Msg("deleted index success")
+	}(name)
+	log.Info().Int("No", 8).Msg("delete index")
+
+	return nil
 }
 
 func deleteFilesForIndexFromMinIO(indexName string) error {

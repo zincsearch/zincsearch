@@ -99,7 +99,7 @@ func Test_walMergeDocs_WriteTo(t *testing.T) {
 			docs.AddDocument(d)
 		}
 
-		index, err = NewIndex("Test_walMergeDocs_WriteTo.index_1", "", 2)
+		index, _, err = GetOrCreateIndex("Test_walMergeDocs_WriteTo.index_1", "", 2)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 
@@ -109,10 +109,7 @@ func Test_walMergeDocs_WriteTo(t *testing.T) {
 		mappings := meta.NewMappings()
 		mappings.SetProperty("name", meta.NewProperty("text"))
 		mappings.SetProperty("age", meta.NewProperty("numeric"))
-		err = index.SetMappings(mappings)
-		assert.NoError(t, err)
-
-		err = StoreIndex(index)
+		err = index.SetMappings(mappings, true)
 		assert.NoError(t, err)
 	})
 

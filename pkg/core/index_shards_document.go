@@ -182,10 +182,7 @@ func (s *IndexShard) CheckDocument(docID string, doc map[string]interface{}, upd
 
 	var err error
 	if mappingsNeedsUpdate {
-		if err = s.root.SetMappings(mappings); err != nil {
-			return nil, err
-		}
-		if err = StoreIndex(s.root); err != nil {
+		if err = s.root.SetMappings(mappings, true); err != nil {
 			return nil, err
 		}
 	}

@@ -21,6 +21,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
@@ -55,7 +56,7 @@ func Update(c *gin.Context) {
 		docID = id.(string)
 	}
 	if docID == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "id is empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIDIsEmpty.Error()})
 		return
 	}
 

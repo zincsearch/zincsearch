@@ -88,12 +88,9 @@ func TestMultiSearch(t *testing.T) {
 	indexNames := []string{"TestMultiSearch.index_1", "TestMultiSearch.index_2"}
 	t.Run("prepare", func(t *testing.T) {
 		for _, indexName := range indexNames {
-			index, err := NewIndex(indexName, "disk", 2)
+			index, _, err := GetOrCreateIndex(indexName, "disk", 2)
 			assert.NoError(t, err)
 			assert.NotNil(t, index)
-
-			err = StoreIndex(index)
-			assert.NoError(t, err)
 		}
 	})
 

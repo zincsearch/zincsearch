@@ -17,7 +17,6 @@ package search
 
 import (
 	"bufio"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -161,7 +160,7 @@ func searchIndex(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 	} else {
 		index, exists := core.GetIndex(indexName)
 		if !exists {
-			return nil, fmt.Errorf("index %s does not exists", indexName)
+			return nil, errors.ErrIndexNotExists
 		}
 		resp, err = index.Search(query)
 	}

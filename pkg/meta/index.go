@@ -16,35 +16,11 @@
 package meta
 
 type Index struct {
-	Name        string                 `json:"name"`
-	StorageType string                 `json:"storage_type"`
-	Settings    *IndexSettings         `json:"settings,omitempty"`
-	Mappings    *Mappings              `json:"mappings,omitempty"`
-	ShardNum    int64                  `json:"shard_num"`
-	Shards      map[string]*IndexShard `json:"shards"`
-	Stats       IndexStat              `json:"stats"`
-	Version     string                 `json:"version"`
-	MetaVersion int64                  `json:"meta_version"`
-}
-
-type IndexShard struct {
-	ID       string              `json:"id"`
-	ShardNum int64               `json:"shard_num"`
-	Shards   []*IndexSecondShard `json:"shards"`
-	Stats    IndexStat           `json:"stats"`
-}
-
-type IndexSecondShard struct {
-	ID    int64     `json:"id"`
-	Stats IndexStat `json:"stats"`
-}
-
-type IndexStat struct {
-	DocNum      uint64 `json:"doc_num"`
-	DocTimeMin  int64  `json:"doc_time_min"`
-	DocTimeMax  int64  `json:"doc_time_max"`
-	StorageSize uint64 `json:"storage_size"`
-	WALSize     uint64 `json:"wal_size"`
+	Meta     *IndexMeta     `json:"-"`
+	Stats    *IndexStat     `json:"-"`
+	Shards   *IndexShards   `json:"-"`
+	Settings *IndexSettings `json:"-"`
+	Mappings *Mappings      `json:"-"`
 }
 
 type IndexSimple struct {
@@ -55,16 +31,36 @@ type IndexSimple struct {
 	Mappings    map[string]interface{} `json:"mappings,omitempty"`
 }
 
-type IndexSettings struct {
-	NumberOfShards   int64          `json:"number_of_shards,omitempty"`
-	NumberOfReplicas int64          `json:"number_of_replicas,omitempty"`
-	Analysis         *IndexAnalysis `json:"analysis,omitempty"`
+func NewIndex(name, storageType, version string) *Index {
+	return &Index{
+		Meta: &IndexMeta{
+			Name:        name,
+			StorageType: storageType,
+			Version:     version,
+		},
+		Stats:    NewIndexStat(),
+		Shards:   NewIndexShards(),
+		Settings: NewIndexSettings(),
+		Mappings: NewMappings(),
+	}
 }
 
-type IndexAnalysis struct {
-	Analyzer    map[string]*Analyzer   `json:"analyzer,omitempty"`
-	CharFilter  map[string]interface{} `json:"char_filter,omitempty"`
-	Tokenizer   map[string]interface{} `json:"tokenizer,omitempty"`
-	TokenFilter map[string]interface{} `json:"token_filter,omitempty"`
-	Filter      map[string]interface{} `json:"filter,omitempty"` // compatibility with es, alias for TokenFilter
+func (t *Index) GetName() string {
+	return t.Meta.GetName()
+}
+
+func (t *Index) GetStorageType() string {
+	return t.Meta.GetStorageType()
+}
+
+func (t *Index) GetVersion() string {
+	return t.Meta.GetVersion()
+}
+
+func (t *Index) GetMetaVersion() int64 {
+	return t.Meta.GetMetaVersion()
+}
+
+func (t *Index) GetShardNum() int64 {
+	return t.Shards.GetShardNum()
 }
