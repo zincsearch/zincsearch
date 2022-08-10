@@ -17,6 +17,7 @@ package routes
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/zinclabs/zinc/pkg/core"
 
@@ -69,13 +70,7 @@ func IndexAliasMiddleware(c *gin.Context) {
 		return
 	}
 
-	newTarget := ""
-	for i, index := range indexes {
-		newTarget += index
-		if i < len(indexes)-1 {
-			newTarget += ","
-		}
-	}
+	newTarget := strings.Join(indexes, ",")
 
 	if newTarget != "" {
 		c.Params[ix].Value = newTarget // set target new value in the request context
