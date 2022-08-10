@@ -104,7 +104,7 @@ type SearchResponse struct {
 	TimedOut     bool                           `json:"timed_out"`
 	Hits         Hits                           `json:"hits"`
 	Aggregations map[string]AggregationResponse `json:"aggregations,omitempty"`
-	Error        string                         `json:"error"`
+	Error        string                         `json:"error,omitempty"`
 }
 
 type Hits struct {

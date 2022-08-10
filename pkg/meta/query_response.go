@@ -24,7 +24,7 @@ type SearchResponse struct {
 	Shards       Shards                         `json:"_shards"`
 	Hits         Hits                           `json:"hits"`
 	Aggregations map[string]AggregationResponse `json:"aggregations,omitempty"`
-	Error        string                         `json:"error"`
+	Error        string                         `json:"error,omitempty"`
 }
 
 type Shards struct {
