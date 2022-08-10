@@ -63,16 +63,18 @@ func IndexAliasMiddleware(c *gin.Context) {
 		return
 	}
 
-	newTarget := ""
 	indexes, ok := core.ZINC_INDEX_ALIAS_LIST.GetIndexesForAlias(target)
 	if !ok {
 		c.Next()
 		return
 	}
 
-	// find all index that match this alias and add them to the newTarget
-	for _, index := range indexes {
-		newTarget += "," + index
+	newTarget := ""
+	for i, index := range indexes {
+		newTarget += index
+		if i < len(indexes)-1 {
+			newTarget += ","
+		}
 	}
 
 	if newTarget != "" {

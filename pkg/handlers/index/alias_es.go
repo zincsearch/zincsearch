@@ -78,17 +78,15 @@ outerLoop:
 	}
 
 	for alias, indexes := range addMap {
-		core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias(alias, indexes)
+		_ = core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias(alias, indexes)
 	}
 
 	for alias, indexes := range removeMap {
-		core.ZINC_INDEX_ALIAS_LIST.RemoveIndexesFromAlias(alias, indexes)
+		_ = core.ZINC_INDEX_ALIAS_LIST.RemoveIndexesFromAlias(alias, indexes)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"acknowledged": true})
 }
-
-type M map[string]interface{}
 
 // @Id GetESAliases
 // @Summary Get index alias for compatible ES

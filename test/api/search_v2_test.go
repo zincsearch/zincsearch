@@ -24,7 +24,7 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
-
+	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
@@ -33,6 +33,7 @@ func TestSearchV2(t *testing.T) {
 		body := bytes.NewBuffer(nil)
 		body.WriteString(indexData)
 		resp := request("PUT", "/api/"+indexName+"/_doc", body)
+		assert.NoError(t, core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias(indexAlias, []string{indexName}))
 		assert.Equal(t, http.StatusOK, resp.Code)
 	})
 
@@ -47,6 +48,12 @@ func TestSearchV2(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(`{"query": {"match_all":{}}, "size":10}`)
 			resp := request("POST", "/es/"+indexName+"/_search", body)
+			assert.Equal(t, http.StatusOK, resp.Code)
+		})
+		t.Run("search document with index alias", func(t *testing.T) {
+			body := bytes.NewBuffer(nil)
+			body.WriteString(`{"query": {"match_all":{}}, "size":10}`)
+			resp := request("POST", "/es/"+indexAlias+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 		})
 		t.Run("search document with not exist term", func(t *testing.T) {

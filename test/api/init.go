@@ -27,10 +27,11 @@ import (
 )
 
 var (
-	username  = "admin"
-	password  = "Complexpass#123"
-	indexName = "games3"
-	indexData = `{
+	username   = "admin"
+	password   = "Complexpass#123"
+	indexName  = "games3"
+	indexAlias = indexName + "-alias"
+	indexData  = `{
 	"Athlete": "DEMTSCHENKO, Albert",
 	"City": "Turin",
 	"Country": "RUS",
@@ -74,8 +75,10 @@ var (
 {"delete": {"_index": "games3", "_type": "doc", "_id": "1"}}`
 )
 
-var r *gin.Engine
-var once sync.Once
+var (
+	r    *gin.Engine
+	once sync.Once
+)
 
 func server() *gin.Engine {
 	if r == nil {
