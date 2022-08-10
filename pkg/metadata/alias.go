@@ -23,23 +23,25 @@ type alias struct{}
 
 var Alias = new(alias)
 
-const aliasKey = "/aliases/alias"
-
 func (t *alias) Set(data map[string][]string) error {
 	buf, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
-	return db.Set(aliasKey, buf)
+	return db.Set("/aliases/alias", buf)
 }
 
 func (t *alias) Get() (map[string][]string, error) {
-	data, err := db.Get(aliasKey)
+	data, err := db.List("/aliases/", 0, 0)
 	if err != nil {
 		return nil, err
 	}
 
+	if len(data) == 0 {
+		return map[string][]string{}, nil
+	}
+
 	als := map[string][]string{}
-	err = json.Unmarshal(data, als)
+	err = json.Unmarshal(data[0], als)
 	return als, err
 }
