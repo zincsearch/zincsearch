@@ -11,8 +11,6 @@ import (
 var ZINC_INDEX_ALIAS_LIST AliasList
 
 type AliasList struct {
-	// Name    string
-	// Indices []string
 	lock    sync.RWMutex
 	Aliases map[string][]string
 }
@@ -23,10 +21,6 @@ func NewAliasList() *AliasList {
 
 func (al *AliasList) AddIndexesToAlias(alias string, indexes []string) error {
 	al.lock.Lock()
-	if al.Aliases == nil {
-		al.Aliases = map[string][]string{}
-	}
-
 	al.Aliases[alias] = append(al.Aliases[alias], indexes...)
 
 	err := metadata.Alias.Set(al.Aliases)
