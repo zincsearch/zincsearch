@@ -3,6 +3,7 @@ package core
 import (
 	"sync"
 
+	"github.com/rs/zerolog/log"
 	"github.com/zinclabs/zinc/pkg/metadata"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
@@ -30,6 +31,7 @@ func (al *AliasList) AddIndexesToAlias(alias string, indexes []string) error {
 
 	err := metadata.Alias.Set(al.Aliases)
 	if err != nil {
+		log.Err(err).Msg("failed to save alias in metadata after add operation")
 		al.lock.Unlock()
 		return err
 	}
@@ -61,6 +63,7 @@ outer:
 
 	err := metadata.Alias.Set(al.Aliases)
 	if err != nil {
+		log.Err(err).Msg("failed to save alias in metadata after remove operation")
 		al.lock.Unlock()
 		return err
 	}

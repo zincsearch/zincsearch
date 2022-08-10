@@ -78,21 +78,11 @@ outerLoop:
 	}
 
 	for alias, indexes := range addMap {
-		err = core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias(alias, indexes)
-		if err != nil {
-			log.Err(err).Msg("failed to add indexes to alias")
-			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "failed to add indexes to alias"})
-			return
-		}
+		core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias(alias, indexes)
 	}
 
 	for alias, indexes := range removeMap {
-		err = core.ZINC_INDEX_ALIAS_LIST.RemoveIndexesFromAlias(alias, indexes)
-		if err != nil {
-			log.Err(err).Msg("failed to remove indexes to alias")
-			c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "failed to remove indexes to alias"})
-			return
-		}
+		core.ZINC_INDEX_ALIAS_LIST.RemoveIndexesFromAlias(alias, indexes)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"acknowledged": true})

@@ -27,6 +27,16 @@ func TestAddOrRemoveESAlias(t *testing.T) {
 		wantAliases []string
 	}{
 		{
+			name: "should_fail_for_empty_request_body",
+			args: args{
+				data:   "",
+				result: `{"error":"invalid character '\u0000' looking for beginning of value"}`,
+			},
+			wantCode:    http.StatusBadRequest,
+			wantErr:     false,
+			wantAliases: []string{},
+		},
+		{
 			name: "should_add_es_alias",
 			args: args{
 				data:   `{"actions": [{"add": {"index": "TestAddOrRemoveESAlias.index_1","alias": "test_alias_1"}}]}`,
