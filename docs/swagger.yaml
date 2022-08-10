@@ -1112,7 +1112,7 @@ paths:
         name: query
         required: true
         schema:
-          type: primitive
+          type: object
       produces:
       - application/json
       responses:
@@ -1138,7 +1138,7 @@ paths:
         name: query
         required: true
         schema:
-          type: primitive
+          type: string
       produces:
       - application/json
       responses:
@@ -1199,7 +1199,7 @@ paths:
         name: query
         required: true
         schema:
-          type: primitive
+          type: object
       produces:
       - application/json
       responses:
@@ -1396,7 +1396,7 @@ paths:
         name: query
         required: true
         schema:
-          type: primitive
+          type: string
       produces:
       - application/json
       responses:
@@ -1851,7 +1851,7 @@ paths:
         name: query
         required: true
         schema:
-          type: primitive
+          type: string
       produces:
       - application/json
       responses:
@@ -1997,7 +1997,7 @@ paths:
         name: query
         required: true
         schema:
-          type: primitive
+          type: string
       produces:
       - application/json
       responses:

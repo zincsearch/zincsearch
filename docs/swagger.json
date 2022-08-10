@@ -41,7 +41,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "primitive"
+                            "type": "object"
                         }
                     }
                 ],
@@ -81,7 +81,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "primitive"
+                            "type": "string"
                         }
                     }
                 ],
@@ -596,7 +596,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "primitive"
+                            "type": "object"
                         }
                     }
                 ],
@@ -891,7 +891,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "primitive"
+                            "type": "string"
                         }
                     }
                 ],
@@ -1159,7 +1159,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "primitive"
+                            "type": "string"
                         }
                     }
                 ],
@@ -1380,7 +1380,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "primitive"
+                            "type": "string"
                         }
                     }
                 ],
