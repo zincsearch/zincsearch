@@ -42,6 +42,6 @@ func (t *alias) Get() (map[string][]string, error) {
 	}
 
 	als := map[string][]string{}
-	err = json.Unmarshal(data[0], als)
+	err = json.Unmarshal(data[0], &als)
 	return als, err
 }
