@@ -20,7 +20,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
 )
 
@@ -28,7 +27,7 @@ func ClusterStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 		"cluster": gin.H{
-			"name": config.Global.Cluster.Name,
+			"name": core.ZINC_CLUSTER.Name(),
 		},
 		"nodes": core.ZINC_CLUSTER.GetNodes(),
 	})

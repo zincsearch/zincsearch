@@ -33,6 +33,7 @@ import (
 var ZINC_CLUSTER *Cluster
 
 type Cluster struct {
+	name         string
 	nodes        sync.Map
 	indexes      sync.Map
 	distribution sync.Map
@@ -45,7 +46,9 @@ func SetupCluster() {
 }
 
 func NewCluster() *Cluster {
-	cluster := &Cluster{}
+	cluster := &Cluster{
+		name: config.Global.Cluster.Name,
+	}
 	cluster.HandleClusterEvent()
 	return cluster
 }
@@ -54,6 +57,10 @@ func (c *Cluster) HandleClusterEvent() {
 	go c.handleNodeEvent()
 	go c.handleIndexEvent()
 	go c.handleDistributionEvent()
+}
+
+func (c *Cluster) Name() string {
+	return c.name
 }
 
 func (c *Cluster) Local() *meta.Node {
