@@ -71,7 +71,7 @@ func (c *Cluster) GetNodes() []*meta.Node {
 
 func (c *Cluster) GetNodesNum() int {
 	n := 0
-	c.nodes.Range(func(_, value interface{}) bool {
+	c.nodes.Range(func(_, _ interface{}) bool {
 		n++
 		return true
 	})
@@ -98,10 +98,10 @@ func (c *Cluster) GetNodeName(nodeID int64) string {
 // returns data is map[indexName][shardName]nodeName
 func (c *Cluster) GetDistribution() map[string]map[string]string {
 	dis := make(map[string]map[string]string)
-	c.distribution.Range(func(indexName, value interface{}) bool {
+	c.distribution.Range(func(indexName, disIndex interface{}) bool {
 		dis[indexName.(string)] = make(map[string]string)
-		value.(*sync.Map).Range(func(shardName, value interface{}) bool {
-			dis[indexName.(string)][shardName.(string)] = c.GetNodeName(value.(int64))
+		disIndex.(*sync.Map).Range(func(shardName, nodeID interface{}) bool {
+			dis[indexName.(string)][shardName.(string)] = c.GetNodeName(nodeID.(int64))
 			return true
 		})
 		return true
@@ -187,7 +187,7 @@ func (c *Cluster) handleDistributionEvent() {
 		case meta.StorageEventTypeDelete:
 			disIndex, ok := c.distribution.Load(indexName)
 			if ok {
-				disIndex.(*sync.Map).Delete(shardName)
+				disIndex.(*sync.Map).Store(shardName, int64(0))
 			}
 		}
 	}
@@ -257,8 +257,8 @@ func (c *Cluster) DeleteIndex(indexName string) error {
 	// release distribution of this node
 	disIndex, ok := c.distribution.Load(indexName)
 	if ok {
-		disIndex.(*sync.Map).Range(func(shard, value interface{}) bool {
-			_ = metadata.Cluster.ReleaseDistribute(indexName, shard.(string))
+		disIndex.(*sync.Map).Range(func(shardName, _ interface{}) bool {
+			_ = metadata.Cluster.ReleaseDistribute(indexName, shardName.(string))
 			return true
 		})
 	}
@@ -269,7 +269,7 @@ func (c *Cluster) DeleteIndex(indexName string) error {
 
 // LoadDistribution load distribution from cluster
 func (c *Cluster) LoadDistribution() {
-	c.indexes.Range(func(key, value interface{}) bool {
+	c.indexes.Range(func(key, _ interface{}) bool {
 		indexName := key.(string)
 		data, err := metadata.Cluster.ListDistribution(indexName)
 		if err != nil {
@@ -296,7 +296,7 @@ func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
 	}
 	needShards := int(math.Ceil(float64(index.GetShardNum()) / float64(c.GetNodesNum())))
 
-	shards := make([]string, 0)
+	shards := make(map[string]bool, needShards)
 	disIndex, ok := c.distribution.Load(indexName)
 	if !ok {
 		disIndex = new(sync.Map)
@@ -304,7 +304,7 @@ func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
 	}
 	disIndex.(*sync.Map).Range(func(shardName, value interface{}) bool {
 		if nodeID == value.(int64) {
-			shards = append(shards, shardName.(string))
+			shards[shardName.(string)] = true
 		}
 		return true
 	})
@@ -323,7 +323,7 @@ func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
 	// check local again
 	disIndex.(*sync.Map).Range(func(shardName, value interface{}) bool {
 		if nodeID == value.(int64) {
-			shards = append(shards, shardName.(string))
+			shards[shardName.(string)] = true
 		}
 		return true
 	})
@@ -350,18 +350,23 @@ func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
 		}
 		if len(shards) < needShards {
 			// distribute to this node
-			err := metadata.Cluster.ShardDistribute(indexName, shard, nodeID)
-			if err != nil {
-				return err
+			if nid != nodeID {
+				// if already distributed, skip
+				err := metadata.Cluster.ShardDistribute(indexName, shard, nodeID)
+				if err != nil {
+					return err
+				}
+				// reload shard from storage
+				if err := index.ReloadShard(shard); err != nil {
+					return err
+				}
 			}
 			// cache distribution
 			disIndex.(*sync.Map).Store(shard, nodeID)
 			// add to shards
 			index.localShards[shard] = index.shards[shard]
 			index.shardHashing.Add(shard)
-			// reload the shard from storage
-			index.ReloadShard(shard)
-			shards = append(shards, shard)
+			shards[shard] = true
 		}
 	}
 
@@ -415,7 +420,7 @@ func (c *Cluster) ReleaseIndexShards(indexName string, nodeID int64) error {
 				delete(index.localShards, shardName.(string))
 				index.shardHashing.Remove(shardName.(string))
 				// clear cache
-				disIndex.(*sync.Map).Delete(shardName)
+				disIndex.(*sync.Map).Store(shardName, int64(0))
 			}
 		}
 		return true

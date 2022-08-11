@@ -267,7 +267,7 @@ func (index *Index) SetMappings(mappings *meta.Mappings, save bool) error {
 // GetReaders return all shard readers
 func (index *Index) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error) {
 	readers := make([]*bluge.Reader, 0)
-	for _, shard := range index.shards {
+	for _, shard := range index.localShards {
 		rs, err := shard.GetReaders(timeMin, timeMax)
 		if err != nil {
 			return nil, err
