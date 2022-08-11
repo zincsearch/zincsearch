@@ -162,13 +162,19 @@ func checkIndexName(name string) error {
 	return nil
 }
 
+// openIndexReader load the index reader from the storage
+func openIndexReader(name string, storageType string, ans *analysis.Analyzer, timeRange ...int64) (*bluge.Reader, error) {
+	cfg := getOpenConfig(name, storageType, ans, timeRange...)
+	return bluge.OpenReader(cfg)
+}
+
 // LoadIndexWriter load the index writer from the storage
-func openIndexWriter(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) (*bluge.Writer, error) {
-	cfg := getOpenConfig(name, storageType, defaultSearchAnalyzer, timeRange...)
+func openIndexWriter(name string, storageType string, ans *analysis.Analyzer, timeRange ...int64) (*bluge.Writer, error) {
+	cfg := getOpenConfig(name, storageType, ans, timeRange...)
 	return bluge.OpenWriter(cfg)
 }
 
-func getOpenConfig(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) bluge.Config {
+func getOpenConfig(name string, storageType string, ans *analysis.Analyzer, timeRange ...int64) bluge.Config {
 	var dataPath string
 	var cfg bluge.Config
 	switch storageType {
@@ -182,8 +188,8 @@ func getOpenConfig(name string, storageType string, defaultSearchAnalyzer *analy
 		dataPath = config.Global.DataPath
 		cfg = directory.GetDiskConfig(dataPath, name, timeRange...)
 	}
-	if defaultSearchAnalyzer != nil {
-		cfg.DefaultSearchAnalyzer = defaultSearchAnalyzer
+	if ans != nil {
+		cfg.DefaultSearchAnalyzer = ans
 	}
 	return cfg
 }

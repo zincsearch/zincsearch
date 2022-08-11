@@ -239,6 +239,22 @@ func (s *IndexShard) NewShard() error {
 	return s.openWriter(s.GetLatestShardID())
 }
 
+// GetReader return the newest shard reader or special shard reader
+func (s *IndexShard) GetReader(shardID ...int64) (*bluge.Reader, error) {
+	var id int64
+	if len(shardID) == 1 {
+		id = shardID[0]
+	} else {
+		id = s.GetLatestShardID()
+	}
+	if id >= s.GetShardNum() || id < 0 {
+		return nil, errors.New(errors.ErrorTypeRuntimeException, "second shard not found")
+	}
+
+	// open reader
+	return s.openReader(id)
+}
+
 // GetWriter return the newest shard writer or special shard writer
 func (s *IndexShard) GetWriter(shardID ...int64) (*bluge.Writer, error) {
 	var id int64
@@ -308,11 +324,7 @@ func (s *IndexShard) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error)
 			continue
 		}
 		eg.Go(func() error {
-			w, err := s.GetWriter(i)
-			if err != nil {
-				return err
-			}
-			r, err := w.Reader()
+			r, err := s.GetReader(i)
 			if err != nil {
 				return err
 			}
@@ -333,11 +345,26 @@ func (s *IndexShard) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error)
 	return rs, nil
 }
 
-func (s *IndexShard) openWriter(shardID int64) error {
-	var defaultSearchAnalyzer *analysis.Analyzer
+func (s *IndexShard) openReader(shardID int64) (*bluge.Reader, error) {
+	var ans *analysis.Analyzer
 	analyzers := s.root.GetAnalyzers()
 	if analyzers != nil {
-		defaultSearchAnalyzer = analyzers["default"]
+		ans = analyzers["default"]
+	}
+	s.lock.RLock()
+	secondShard := s.shards[shardID]
+	s.lock.RUnlock()
+	secondShard.lock.Lock()
+	defer secondShard.lock.Unlock()
+	indexName := fmt.Sprintf("%s/%s/%06x", s.GetIndexName(), s.GetID(), shardID)
+	return openIndexReader(indexName, s.root.GetStorageType(), ans, 0, 0)
+}
+
+func (s *IndexShard) openWriter(shardID int64) error {
+	var ans *analysis.Analyzer
+	analyzers := s.root.GetAnalyzers()
+	if analyzers != nil {
+		ans = analyzers["default"]
 	}
 	s.lock.RLock()
 	secondShard := s.shards[shardID]
@@ -349,7 +376,7 @@ func (s *IndexShard) openWriter(shardID int64) error {
 	}
 	var err error
 	indexName := fmt.Sprintf("%s/%s/%06x", s.GetIndexName(), s.GetID(), shardID)
-	secondShard.writer, err = openIndexWriter(indexName, s.root.GetStorageType(), defaultSearchAnalyzer, 0, 0)
+	secondShard.writer, err = openIndexWriter(indexName, s.root.GetStorageType(), ans, 0, 0)
 	return err
 }
 
