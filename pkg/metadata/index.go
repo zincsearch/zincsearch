@@ -123,16 +123,17 @@ func (t *index) GetShards(id string) (*meta.IndexShards, error) {
 	if err != nil {
 		return nil, err
 	}
-	val := meta.NewIndexShards()
+	shards := meta.NewIndexShards()
 	for _, d := range data {
 		shard := new(meta.IndexFirstShard)
-		err = json.Unmarshal(d, shard)
-		if err != nil {
+		if err = json.Unmarshal(d, shard); err != nil {
 			return nil, err
 		}
-		val.Shards[shard.ID] = shard
+		if err = shards.Set(shard); err != nil {
+			return nil, err
+		}
 	}
-	return val, err
+	return shards, err
 }
 
 func (t *index) GetShard(id, shard string) (*meta.IndexFirstShard, error) {

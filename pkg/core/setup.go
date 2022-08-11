@@ -23,6 +23,8 @@ func init() {
 	SetupCluster()
 	SetupShardWAL()
 	SetupIndex()
+	// load distribution of cluster
+	ZINC_CLUSTER.LoadDistribution()
 	// ready to serve requests
 	ZINC_NODE.SetStatus(meta.NodeStatusOK)
 }

@@ -37,11 +37,15 @@ const (
 const (
 	StorageEventTypePut    = int64(1)
 	StorageEventTypeDelete = int64(2)
+	StorageEventTypeCreate = int64(3)
+	StorageEventTypeUpdate = int64(4)
 )
 
 var StorageEventTypeString = map[int64]string{
 	StorageEventTypePut:    "PUT",
 	StorageEventTypeDelete: "DELETE",
+	StorageEventTypeCreate: "CREATE",
+	StorageEventTypeUpdate: "UPDATE",
 }
 
 const (

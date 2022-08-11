@@ -57,10 +57,6 @@ func (t *Index) GetVersion() string {
 	return t.Meta.GetVersion()
 }
 
-func (t *Index) GetMetaVersion() int64 {
-	return t.Meta.GetMetaVersion()
-}
-
 func (t *Index) GetShardNum() int64 {
 	return t.Shards.GetShardNum()
 }

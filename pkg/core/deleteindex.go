@@ -33,7 +33,6 @@ import (
 )
 
 func DeleteIndex(name string) error {
-	log.Info().Int("No", 1).Msg("delete index")
 	// cluster lock
 	clusterLock, err := metadata.Cluster.NewLocker("index/" + name)
 	if err != nil {
@@ -41,27 +40,23 @@ func DeleteIndex(name string) error {
 	}
 	clusterLock.Lock()
 	defer clusterLock.Unlock()
-	log.Info().Int("No", 2).Msg("delete index")
 
 	// 1. Check if index exists
 	index, exists := GetIndex(name)
 	if !exists {
 		return errors.ErrIndexNotExists
 	}
-	log.Info().Int("No", 3).Msg("delete index")
 
 	// 2. Notify cluster
 	if err := ZINC_CLUSTER.DeleteIndex(name); err != nil {
 		return err
 	}
-	log.Info().Int("No", 4).Msg("delete index")
 
 	// 3. Waiting for cluster to be ready
 	waitOK := false
 	for i := 0; i < 300; i++ {
 		time.Sleep(time.Millisecond * 100)
 		dis, _ := metadata.Cluster.ListDistribution(name)
-		log.Info().Float64("No", 4.1).Msg("delete index, wait cluster other nodes deleted")
 		if len(dis) == 0 {
 			waitOK = true
 			break
@@ -70,17 +65,14 @@ func DeleteIndex(name string) error {
 	if !waitOK {
 		return errors.ErrClusterTimeout
 	}
-	log.Info().Int("No", 5).Msg("delete index")
 
 	// 4. Close and Delete from local
 	ZINC_INDEX_LIST.Delete(name)
-	log.Info().Int("No", 6).Msg("delete index")
 
 	// 5. Delete form metadata
 	if err := metadata.Index.Delete(name); err != nil {
 		return err
 	}
-	log.Info().Int("No", 7).Msg("delete index")
 
 	// Physically delete the index
 	go func(name string) {
@@ -101,9 +93,8 @@ func DeleteIndex(name string) error {
 				log.Error().Err(err).Msg("failed to delete index from minIO")
 			}
 		}
-		log.Info().Str("index", name).Msg("deleted index success")
+		log.Debug().Str("index", name).Msg("deleted index success")
 	}(name)
-	log.Info().Int("No", 8).Msg("delete index")
 
 	return nil
 }

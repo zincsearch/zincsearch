@@ -112,9 +112,10 @@ func (c *Cluster) GetDistribution() map[string]map[string]string {
 func (c *Cluster) handleNodeEvent() {
 	events := metadata.Cluster.Watch(meta.ClusterEventTypeNode)
 	for e := range events {
+		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster node event")
 		nodeID, _ := strconv.ParseInt(string(e.Key), 10, 64)
 		switch e.Type {
-		case meta.StorageEventTypePut:
+		case meta.StorageEventTypePut, meta.StorageEventTypeCreate, meta.StorageEventTypeUpdate:
 			node := new(meta.Node)
 			_ = json.Unmarshal(e.Value, node)
 			c.nodes.Store(nodeID, node)
@@ -123,16 +124,16 @@ func (c *Cluster) handleNodeEvent() {
 		case meta.StorageEventTypeDelete:
 			c.nodes.Delete(nodeID)
 		}
-		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster node event")
 	}
 }
 
 func (c *Cluster) handleIndexEvent() {
 	events := metadata.Cluster.Watch(meta.ClusterEventTypeIndex)
 	for e := range events {
+		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster index event")
 		indexName := string(e.Key)
 		switch e.Type {
-		case meta.StorageEventTypePut:
+		case meta.StorageEventTypePut, meta.StorageEventTypeCreate, meta.StorageEventTypeUpdate:
 			metaVersion, _ := strconv.ParseInt(string(e.Value), 10, 64)
 			oldVersion, ok := c.indexes.Load(indexName)
 			if ok && oldVersion.(int64) == metaVersion {
@@ -164,18 +165,18 @@ func (c *Cluster) handleIndexEvent() {
 			// delete from local metadata
 			ZINC_INDEX_LIST.Delete(indexName)
 		}
-		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster index event")
 	}
 }
 
 func (c *Cluster) handleDistributionEvent() {
 	events := metadata.Cluster.Watch(meta.ClusterEventTypeDistribution)
 	for e := range events {
+		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster distribution event")
 		columns := strings.Split(string(e.Key), "/")
 		indexName := columns[0]
 		shardName := columns[1]
 		switch e.Type {
-		case meta.StorageEventTypePut:
+		case meta.StorageEventTypePut, meta.StorageEventTypeCreate, meta.StorageEventTypeUpdate:
 			nodeID, _ := strconv.ParseInt(string(e.Value), 10, 64)
 			disIndex, ok := c.distribution.Load(indexName)
 			if !ok {
@@ -189,7 +190,6 @@ func (c *Cluster) handleDistributionEvent() {
 				disIndex.(*sync.Map).Delete(shardName)
 			}
 		}
-		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster distribution event")
 	}
 }
 
@@ -239,9 +239,14 @@ func (c *Cluster) Leave() error {
 	return metadata.Cluster.Leave(c.Local().ID)
 }
 
-func (c *Cluster) SetIndex(indexName string, metaVersion int64) error {
+func (c *Cluster) SetIndex(indexName string, metaVersion int64, update bool) error {
+	log.Debug().Str("index", indexName).Int64("version", metaVersion).Msg("set index")
+
 	c.indexes.Store(indexName, metaVersion)
-	return metadata.Cluster.SetIndex(indexName, metaVersion)
+	if update {
+		return metadata.Cluster.SetIndex(indexName, metaVersion)
+	}
+	return nil
 }
 
 func (c *Cluster) DeleteIndex(indexName string) error {
@@ -262,20 +267,40 @@ func (c *Cluster) DeleteIndex(indexName string) error {
 	return nil
 }
 
+// LoadDistribution load distribution from cluster
+func (c *Cluster) LoadDistribution() {
+	c.indexes.Range(func(key, value interface{}) bool {
+		indexName := key.(string)
+		data, err := metadata.Cluster.ListDistribution(indexName)
+		if err != nil {
+			log.Error().Err(err).Str("index", indexName).Msg("cluster load distribution")
+			return false
+		}
+		disIndex, ok := c.distribution.Load(indexName)
+		if !ok {
+			disIndex = new(sync.Map)
+			c.distribution.Store(indexName, disIndex)
+		}
+		for shard, nodeID := range data {
+			disIndex.(*sync.Map).Store(shard, nodeID)
+		}
+		return true
+	})
+}
+
 // DistributeIndexShards distribute shards by the index for the node id
 func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
 	index, ok := GetIndex(indexName)
 	if !ok {
 		return errors.ErrIndexNotExists
 	}
-	needShards := int(math.Round(float64(index.GetShardNum()) / float64(c.GetNodesNum())))
+	needShards := int(math.Ceil(float64(index.GetShardNum()) / float64(c.GetNodesNum())))
 
 	shards := make([]string, 0)
 	disIndex, ok := c.distribution.Load(indexName)
 	if !ok {
 		disIndex = new(sync.Map)
 		c.distribution.Store(indexName, disIndex)
-		c.indexes.Store(indexName, index.GetMetaVersion())
 	}
 	disIndex.(*sync.Map).Range(func(shardName, value interface{}) bool {
 		if nodeID == value.(int64) {
@@ -319,27 +344,24 @@ func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
 
 	for shard, nid := range indexDistribution {
 		if nid > 0 && nid != nodeID {
+			// if the shard is not distributed to this node, store and skip
 			disIndex.(*sync.Map).Store(shard, nid)
-		} else {
-			if oid, ok := disIndex.(*sync.Map).Load(shard); ok && oid == nodeID {
-				continue
+			continue
+		}
+		if len(shards) < needShards {
+			// distribute to this node
+			err := metadata.Cluster.ShardDistribute(indexName, shard, nodeID)
+			if err != nil {
+				return err
 			}
-			if len(shards) < needShards {
-				if nid != nodeID {
-					err := metadata.Cluster.ShardDistribute(indexName, shard, nodeID)
-					if err != nil {
-						return err
-					}
-				}
-				// cache to local node
-				disIndex.(*sync.Map).Store(shard, nodeID)
-				// reload the shard from storage
-				index.ReloadShard(shard)
-				// add to shards
-				index.localShards[shard] = index.shards[shard]
-				index.shardHashing.Add(shard)
-				shards = append(shards, shard)
-			}
+			// cache distribution
+			disIndex.(*sync.Map).Store(shard, nodeID)
+			// add to shards
+			index.localShards[shard] = index.shards[shard]
+			index.shardHashing.Add(shard)
+			// reload the shard from storage
+			index.ReloadShard(shard)
+			shards = append(shards, shard)
 		}
 	}
 
@@ -353,8 +375,12 @@ func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
 	if err != nil {
 		return err
 	}
-
-	// cache to local node
+	// distribute to this node
+	err = metadata.Cluster.ShardDistribute(indexName, shard, nodeID)
+	if err != nil {
+		return err
+	}
+	// cache distribution
 	disIndex.(*sync.Map).Store(shard, nodeID)
 	index.localShards[shard] = index.shards[shard]
 	index.shardHashing.Add(shard)
@@ -362,13 +388,13 @@ func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
 	return nil
 }
 
-// ReleaseIndexShards release some shards let node just hold math.Round(shards / nodes)
+// ReleaseIndexShards release some shards let node just hold math.Ceil(shards / nodes)
 func (c *Cluster) ReleaseIndexShards(indexName string, nodeID int64) error {
 	index, ok := GetIndex(indexName)
 	if !ok {
 		return errors.ErrIndexNotExists
 	}
-	needShards := int(math.Round(float64(index.GetShardNum()) / float64(c.GetNodesNum())))
+	needShards := int(math.Ceil(float64(index.GetShardNum()) / float64(c.GetNodesNum())))
 
 	disIndex, ok := c.distribution.Load(indexName)
 	if !ok {
@@ -398,7 +424,7 @@ func (c *Cluster) ReleaseIndexShards(indexName string, nodeID int64) error {
 	return nil
 }
 
-// ReleaseNodeShards release some shards let node just hold math.Round(shards / nodes)
+// ReleaseNodeShards release some shards for each index, let node just hold math.Ceil(shards / nodes)
 func (c *Cluster) ReleaseNodeShards(nodeID int64) {
 	c.indexes.Range(func(indexName, version interface{}) bool {
 		err := c.ReleaseIndexShards(indexName.(string), nodeID)

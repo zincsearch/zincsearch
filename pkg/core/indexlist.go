@@ -58,7 +58,7 @@ func SetupIndex() {
 		if err != nil {
 			log.Fatal().Err(err).Str("index", indexName).Msg("Error loading index")
 		}
-		ZINC_CLUSTER.SetIndex(indexName, metaVersion)
+		ZINC_CLUSTER.SetIndex(indexName, metaVersion, false)
 	}
 
 	// update version
@@ -71,7 +71,7 @@ func SetupIndex() {
 }
 
 func LoadIndex(indexName string, version string) error {
-	log.Info().Str("index", indexName).Str("version", version).Msg("Load index")
+	log.Debug().Str("index", indexName).Str("version", version).Msg("Load index")
 
 	lock, err := metadata.Cluster.NewLocker("index/" + indexName)
 	if err != nil {
@@ -148,7 +148,8 @@ func LoadIndex(indexName string, version string) error {
 }
 
 func ReloadIndex(indexName string) error {
-	log.Info().Str("index", indexName).Msg("Reload index")
+	log.Debug().Str("index", indexName).Msg("Reload index")
+
 	lock, err := metadata.Cluster.NewLocker("index/" + indexName)
 	if err != nil {
 		return err
@@ -216,7 +217,7 @@ func (t *IndexList) Set(index *Index) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 	if _, ok := t.Indexes[index.GetName()]; ok {
-		log.Error().Str("index", index.GetName()).Int64("meta version", index.GetMetaVersion()).Msg("core.IndexList set an exists index")
+		log.Error().Str("index", index.GetName()).Msg("core.IndexList set an exists index")
 		return // already exists
 	}
 	t.Indexes[index.GetName()] = index

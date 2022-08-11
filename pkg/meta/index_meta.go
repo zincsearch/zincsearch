@@ -15,13 +15,10 @@
 
 package meta
 
-import "sync/atomic"
-
 type IndexMeta struct {
 	Name        string `json:"name"`
 	StorageType string `json:"storage_type"`
 	Version     string `json:"version"`
-	MetaVersion int64  `json:"meta_version"`
 }
 
 func NewIndexMeta() *IndexMeta {
@@ -44,19 +41,10 @@ func (t *IndexMeta) SetVersion(ver string) {
 	t.Version = ver
 }
 
-func (t *IndexMeta) SetMetaVersion(ver int64) {
-	atomic.StoreInt64(&t.MetaVersion, ver)
-}
-
-func (t *IndexMeta) GetMetaVersion() int64 {
-	return atomic.LoadInt64(&t.MetaVersion)
-}
-
 func (t *IndexMeta) Copy() *IndexMeta {
 	return &IndexMeta{
 		Name:        t.Name,
 		StorageType: t.StorageType,
 		Version:     t.Version,
-		MetaVersion: t.GetMetaVersion(),
 	}
 }

@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
@@ -97,8 +98,20 @@ func (index *Index) NewShard() (string, error) {
 	id := ider.Generate()
 	log.Info().Str("index", index.GetName()).Str("shard", id).Msg("Create first layer shard")
 
+	// cluster lock
+	clusterLock, err := metadata.Cluster.NewLocker("index/shards/" + index.GetName())
+	if err != nil {
+		return id, err
+	}
+	clusterLock.Lock()
+	defer clusterLock.Unlock()
+
 	newShard, err := index.ref.Shards.Create(id)
 	if err != nil {
+		return id, err
+	}
+	// save to storage
+	if err := metadata.Index.SetShard(index.GetName(), newShard); err != nil {
 		return id, err
 	}
 
@@ -121,7 +134,9 @@ func (index *Index) NewShard() (string, error) {
 	}
 	localShard.lock.Unlock()
 
-	return id, nil
+	// notify cluster
+	err = ZINC_CLUSTER.SetIndex(index.GetName(), time.Now().UnixNano(), true)
+	return id, err
 }
 
 // ReloadShard reload shard from meta data
@@ -200,7 +215,7 @@ func (s *IndexShard) NewShard() error {
 		Str("index", s.root.GetName()).
 		Str("shard", s.GetID()).
 		Int64("second shard", s.GetShardNum()).
-		Msg("init new second layer shard")
+		Msg("Create second layer shard")
 
 	// update current shard
 	s.root.UpdateStatsBySecondShard(s.GetID(), s.GetLatestShardID())

@@ -190,7 +190,13 @@ func (t *etcdStorage) Watch(key string) <-chan storage.StorageEvent {
 			for _, e := range ev.Events {
 				var eType int64
 				if e.Type == client.EventTypePut {
-					eType = meta.StorageEventTypePut
+					if e.IsCreate() {
+						eType = meta.StorageEventTypeCreate
+					} else if e.IsModify() {
+						eType = meta.StorageEventTypeUpdate
+					} else {
+						eType = meta.StorageEventTypePut
+					}
 				} else if e.Type == client.EventTypeDelete {
 					eType = meta.StorageEventTypeDelete
 				}

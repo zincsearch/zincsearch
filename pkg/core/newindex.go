@@ -66,7 +66,6 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 		storageType = "disk"
 	}
 	metaIndex := meta.NewIndex(name, storageType, meta.Version)
-	metaIndex.Meta.SetMetaVersion(time.Now().Unix())
 	index := new(Index)
 	index.ref = metaIndex
 
@@ -140,7 +139,7 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 	}
 
 	// notify cluster
-	err = ZINC_CLUSTER.SetIndex(name, metaIndex.GetMetaVersion())
+	err = ZINC_CLUSTER.SetIndex(name, time.Now().UnixNano(), true)
 	if err != nil {
 		return nil, err
 	}

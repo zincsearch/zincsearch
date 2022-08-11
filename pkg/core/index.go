@@ -18,10 +18,12 @@ package core
 import (
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/goccy/go-json"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/zinclabs/zinc/pkg/meta"
@@ -63,10 +65,6 @@ func (index *Index) GetStorageType() string {
 
 func (index *Index) GetVersion() string {
 	return index.ref.GetStorageType()
-}
-
-func (index *Index) GetMetaVersion() int64 {
-	return index.ref.GetMetaVersion()
 }
 
 func (index *Index) GetShardNum() int64 {
@@ -136,14 +134,14 @@ func (index *Index) UseTemplate() error {
 
 	if template.Template.Settings != nil {
 		// update settings
-		_ = index.SetSettings(template.Template.Settings, true)
+		_ = index.SetSettings(template.Template.Settings, false)
 		// update analyzers
 		analyzers, _ := zincanalysis.RequestAnalyzer(template.Template.Settings.Analysis)
 		index.SetAnalyzers(analyzers)
 	}
 
 	if template.Template.Mappings != nil {
-		_ = index.SetMappings(template.Template.Mappings, true)
+		_ = index.SetMappings(template.Template.Mappings, false)
 	}
 
 	return nil
@@ -160,6 +158,8 @@ func (index *Index) SetAnalyzers(analyzers map[string]*analysis.Analyzer) {
 }
 
 func (index *Index) SetSettings(settings *meta.IndexSettings, save bool) error {
+	log.Debug().Str("index", index.GetName()).Msg("set settings")
+
 	if settings == nil {
 		return nil
 	}
@@ -191,12 +191,19 @@ func (index *Index) SetSettings(settings *meta.IndexSettings, save bool) error {
 	index.GetRef().Settings.Set(metaSettings)
 
 	if save {
-		return metadata.Index.SetSettings(index.GetName(), index.GetSettings().Copy())
+		err := metadata.Index.SetSettings(index.GetName(), index.GetSettings().Copy())
+		if err != nil {
+			return err
+		}
+		// notify cluster
+		return ZINC_CLUSTER.SetIndex(index.GetName(), time.Now().UnixNano(), true)
 	}
 	return nil
 }
 
 func (index *Index) SetMappings(mappings *meta.Mappings, save bool) error {
+	log.Debug().Str("index", index.GetName()).Msg("set mappings")
+
 	if mappings == nil {
 		return nil
 	}
@@ -247,7 +254,12 @@ func (index *Index) SetMappings(mappings *meta.Mappings, save bool) error {
 	}
 
 	if save {
-		return metadata.Index.SetMappings(index.GetName(), index.GetMappings().Copy())
+		err := metadata.Index.SetMappings(index.GetName(), index.GetMappings().Copy())
+		if err != nil {
+			return err
+		}
+		// notify cluster
+		return ZINC_CLUSTER.SetIndex(index.GetName(), time.Now().UnixNano(), true)
 	}
 	return nil
 }
