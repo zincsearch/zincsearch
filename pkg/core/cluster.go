@@ -223,7 +223,7 @@ func (c *Cluster) Join() error {
 	}
 
 	// if not cluster mode, node id always set to 1
-	if config.Global.ServerMode == meta.ServerModeCluster {
+	if config.Global.ServerMode != meta.ServerModeCluster {
 		newNodeID = 1
 	}
 	ZINC_NODE.SetID(newNodeID)

@@ -164,15 +164,31 @@ func (index *Index) SetSettings(settings *meta.IndexSettings, save bool) error {
 		return nil
 	}
 
+	// cluster lock
+	clusterLock, err := metadata.Cluster.NewLocker("index/settings/" + index.GetName())
+	if err != nil {
+		return err
+	}
+	clusterLock.Lock()
+	defer clusterLock.Unlock()
+
+	// get latest settings from metadata
+	metaSettings, err := metadata.Index.GetSettings(index.GetName())
+	if err != nil {
+		return err
+	}
+
+	// update settings
 	if settings.NumberOfShards > 0 {
-		index.GetSettings().SetShards(settings.NumberOfShards)
+		metaSettings.SetShards(settings.NumberOfShards)
 	}
 	if settings.NumberOfReplicas > 0 {
-		index.GetSettings().SetReplicas(settings.NumberOfReplicas)
+		metaSettings.SetReplicas(settings.NumberOfReplicas)
 	}
 	if settings.Analysis != nil {
-		index.GetSettings().SetAnalysis(settings.Analysis)
+		metaSettings.SetAnalysis(settings.Analysis)
 	}
+	index.GetRef().Settings.Set(metaSettings)
 
 	if save {
 		return metadata.Index.SetSettings(index.GetName(), index.GetSettings().Copy())
@@ -207,8 +223,26 @@ func (index *Index) SetMappings(mappings *meta.Mappings, save bool) error {
 	fieldTimestamp.Aggregatable = true
 	mappings.SetProperty(meta.TimeFieldName, fieldTimestamp)
 
-	// update in the cache
+	// cluster lock
+	clusterLock, err := metadata.Cluster.NewLocker("index/mappings/" + index.GetName())
+	if err != nil {
+		return err
+	}
+	clusterLock.Lock()
+	defer clusterLock.Unlock()
+
+	// get latest settings from metadata
+	metaMappings, err := metadata.Index.GetMappings(index.GetName())
+	if err != nil {
+		return err
+	}
+
+	// merge mappings
 	for name, prop := range mappings.ListProperty() {
+		metaMappings.SetProperty(name, prop)
+	}
+	// update mappings
+	for name, prop := range metaMappings.ListProperty() {
 		index.GetMappings().SetProperty(name, prop)
 	}
 
