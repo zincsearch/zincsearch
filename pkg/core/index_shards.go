@@ -411,17 +411,15 @@ func (s *IndexShard) Close() error {
 }
 
 func (s *IndexShard) SetTimestamp(t int64) {
-	s.root.lock.Lock()
-	defer s.root.lock.Unlock()
-	if s.ref.Stats.DocTimeMin == 0 {
-		s.ref.Stats.DocTimeMin = t
-		s.ref.Stats.DocTimeMax = t
+	if s.ref.Stats.GetDocTimeMin() == 0 {
+		s.ref.Stats.SetDocTimeMin(t)
+		s.ref.Stats.SetDocTimeMax(t)
 		return
 	}
-	if t < s.ref.Stats.DocTimeMin {
-		s.ref.Stats.DocTimeMin = t
+	if t < s.ref.Stats.GetDocTimeMin() {
+		s.ref.Stats.SetDocTimeMin(t)
 	} else if t > s.ref.Stats.DocTimeMax {
-		s.ref.Stats.DocTimeMax = t
+		s.ref.Stats.SetDocTimeMax(t)
 	}
 }
 

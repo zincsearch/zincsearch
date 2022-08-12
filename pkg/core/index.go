@@ -300,15 +300,13 @@ func (index *Index) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error) 
 func (index *Index) UpdateMetadata() error {
 	var totalDocNum, totalSize uint64
 	for id := range index.shards {
-		totalDocNum += atomic.LoadUint64(&index.shards[id].ref.Stats.DocNum)
-		totalSize += atomic.LoadUint64(&index.shards[id].ref.Stats.StorageSize)
+		totalDocNum += index.shards[id].ref.Stats.GetDocNum()
+		totalSize += index.shards[id].ref.Stats.GetStorageSize()
 	}
 
 	if totalDocNum > 0 && totalSize > 0 {
-		index.lock.Lock()
-		atomic.StoreUint64(&index.ref.Stats.DocNum, totalDocNum)
-		atomic.StoreUint64(&index.ref.Stats.StorageSize, totalSize)
-		index.lock.Unlock()
+		index.GetStats().SetDocNum(totalDocNum)
+		index.GetStats().SetStorageSize(totalSize)
 	}
 
 	return metadata.Index.SetStats(index.GetName(), index.GetStats().Copy())
@@ -337,18 +335,14 @@ func (index *Index) UpdateMetadataByShard(id string) {
 		}
 	}
 	if totalDocNum > 0 && totalSize > 0 {
-		index.lock.Lock()
-		atomic.StoreUint64(&shard.ref.Stats.DocNum, totalDocNum)
-		atomic.StoreUint64(&shard.ref.Stats.StorageSize, totalSize)
-		index.lock.Unlock()
+		shard.ref.Stats.SetDocNum(totalDocNum)
+		shard.ref.Stats.SetStorageSize(totalSize)
 	}
 
 	// update latest shard docTime
 	secondShard := shard.shards[shard.GetLatestShardID()]
-	index.lock.Lock()
-	atomic.StoreInt64(&secondShard.ref.Stats.DocTimeMin, atomic.LoadInt64(&shard.ref.Stats.DocTimeMin))
-	atomic.StoreInt64(&secondShard.ref.Stats.DocTimeMax, atomic.LoadInt64(&shard.ref.Stats.DocTimeMax))
-	index.lock.Unlock()
+	secondShard.ref.Stats.SetDocTimeMin(shard.ref.Stats.GetDocTimeMin())
+	secondShard.ref.Stats.SetDocTimeMax(shard.ref.Stats.GetDocTimeMax())
 
 	// update local storage
 	_ = metadata.Index.SetShard(index.GetName(), shard.ref.Copy())
@@ -377,14 +371,12 @@ func (index *Index) UpdateStatsBySecondShard(id string, secondIndex int64) {
 		_ = r.Close()
 	}
 
-	index.lock.Lock()
 	if docNum > 0 {
-		atomic.StoreUint64(&secondShard.ref.Stats.DocNum, docNum)
+		secondShard.ref.Stats.SetDocNum(docNum)
 	}
 	if storageSize > 0 {
-		atomic.StoreUint64(&secondShard.ref.Stats.StorageSize, storageSize)
+		secondShard.ref.Stats.SetStorageSize(storageSize)
 	}
-	index.lock.Unlock()
 }
 
 // Reopen just close the index, it will open automatically by trigger
