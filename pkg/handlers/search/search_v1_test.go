@@ -52,7 +52,7 @@ func TestSearchV1(t *testing.T) {
 				code:   http.StatusBadRequest,
 				data:   `{"query_type":"match_all","max_results":10}`,
 				params: map[string]string{"target": "NotExist" + indexName},
-				result: "does not exists",
+				result: "index not exists",
 			},
 		},
 		{

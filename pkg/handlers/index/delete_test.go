@@ -60,16 +60,16 @@ func TestDelete(t *testing.T) {
 			args: args{
 				code:   http.StatusBadRequest,
 				params: map[string]string{"target": ""},
-				result: "index name cannot be empty",
+				result: "index is empty",
 			},
 			wantErr: false,
 		},
 		{
-			name: "index does not exist",
+			name: "index not exists",
 			args: args{
 				code:   http.StatusBadRequest,
 				params: map[string]string{"target": "Index-Not-Exists"},
-				result: "index Index-Not-Exists does not exists",
+				result: "index not exists",
 			},
 			wantErr: false,
 		},

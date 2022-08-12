@@ -51,7 +51,7 @@ func TestRefresh(t *testing.T) {
 			args: args{
 				code:   http.StatusBadRequest,
 				params: map[string]string{"target": ""},
-				result: "does not exists",
+				result: "index not exists",
 			},
 			wantErr: false,
 		},

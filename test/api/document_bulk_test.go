@@ -66,7 +66,7 @@ func TestDocumentBulk(t *testing.T) {
 			respData := make(map[string]string)
 			err := json.Unmarshal(resp.Body.Bytes(), &respData)
 			assert.NoError(t, err)
-			assert.Equal(t, "index ["+indexName+"] already exists", respData["error"])
+			assert.Equal(t, "index already exists", respData["error"])
 
 			// check bulk
 			body.Reset()

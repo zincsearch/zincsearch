@@ -113,7 +113,7 @@ func TestCreateUpdate(t *testing.T) {
 				code:    http.StatusInternalServerError,
 				rawData: `{"name": "user", "role": "create"}`,
 				params:  map[string]string{},
-				result:  "index name cannot be empty",
+				result:  "index is empty",
 			},
 		},
 	}

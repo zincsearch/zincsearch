@@ -60,7 +60,7 @@ func SearchDSL(c *gin.Context) {
 
 	if indexName != "" {
 		idx, _ := core.ZINC_INDEX_LIST.Get(indexName)
-		storageSize := idx.GetStats().StorageSize
+		storageSize := idx.GetStats().GetStorageSize()
 		eventData := make(map[string]interface{})
 		eventData["search_type"] = "query_dsl"
 		eventData["search_index_storage"] = idx.GetStorageType()

@@ -163,26 +163,26 @@ func (t *badgerStorage) Delete(key string) error {
 	if key == "" {
 		return errors.ErrKeyIsEmpty
 	}
+	return t.db.Update(func(txn *badger.Txn) error {
+		return txn.Delete([]byte(key))
+	})
+}
+
+func (t *badgerStorage) DeleteWithPrefix(key string) error {
+	if key == "" {
+		return errors.ErrKeyIsEmpty
+	}
 	data, err := t.ListEntries(key, 0, 0)
 	if err != nil {
 		return err
 	}
 	for _, d := range data {
-		err := t.delete(key + string(d.Key))
+		err := t.Delete(key + string(d.Key))
 		if err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func (t *badgerStorage) delete(key string) error {
-	if key == "" {
-		return errors.ErrKeyIsEmpty
-	}
-	return t.db.Update(func(txn *badger.Txn) error {
-		return txn.Delete([]byte(key))
-	})
 }
 
 func (t *badgerStorage) Watch(key string) <-chan storage.StorageEvent {

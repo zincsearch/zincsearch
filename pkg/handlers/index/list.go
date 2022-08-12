@@ -114,11 +114,16 @@ func List(c *gin.Context) {
 	if endIndex > 0 {
 		items = items[startIndex:endIndex]
 	} else {
-		items = []*core.Index{}
+		items = nil
+	}
+
+	list := make([]*meta.IndexSimple, 0, page.PageSize)
+	for _, item := range items {
+		list = append(list, item.ToSimple())
 	}
 
 	c.JSON(http.StatusOK, IndexListResponse{
-		List: items,
+		List: list,
 		Page: page,
 	})
 }
@@ -153,6 +158,6 @@ func IndexNameList(c *gin.Context) {
 }
 
 type IndexListResponse struct {
-	List []*core.Index `json:"list"`
-	Page *meta.Page    `json:"page"`
+	List []*meta.IndexSimple `json:"list"`
+	Page *meta.Page          `json:"page"`
 }

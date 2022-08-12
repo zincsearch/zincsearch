@@ -28,7 +28,7 @@ import (
 
 func TestMapping(t *testing.T) {
 	t.Run("create index", func(t *testing.T) {
-		index, _, err := core.GetOrCreateIndex("TestMapping.index_1", "disk", 2)
+		index, _, err := core.GetOrCreateIndex("TestMapping.index_1", "disk", 1)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 	})
@@ -128,7 +128,7 @@ func TestMapping(t *testing.T) {
 					code:   http.StatusBadRequest,
 					data:   map[string]interface{}{},
 					target: "",
-					result: `{"error":"index.name should be not empty"}`,
+					result: `{"error":"index is empty"}`,
 				},
 				wantErr: false,
 			},
@@ -185,7 +185,7 @@ func TestMapping(t *testing.T) {
 				args: args{
 					code:   http.StatusBadRequest,
 					target: "",
-					result: `does not exists`,
+					result: `index not exists`,
 				},
 				wantErr: false,
 			},

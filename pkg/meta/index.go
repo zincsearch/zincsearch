@@ -27,8 +27,11 @@ type IndexSimple struct {
 	Name        string                 `json:"name"`
 	StorageType string                 `json:"storage_type"`
 	ShardNum    int64                  `json:"shard_num"`
-	Settings    *IndexSettings         `json:"settings,omitempty"`
+	AllShardNum int64                  `json:"all_shard_num"`
+	WALSize     uint64                 `json:"wal_size"`
 	Mappings    map[string]interface{} `json:"mappings,omitempty"`
+	Settings    *IndexSettings         `json:"settings,omitempty"`
+	Stats       *IndexStat             `json:"stats,omitempty"`
 }
 
 func NewIndex(name, storageType, version string) *Index {

@@ -17,6 +17,7 @@ package core
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -88,9 +89,15 @@ func TestMultiSearch(t *testing.T) {
 	indexNames := []string{"TestMultiSearch.index_1", "TestMultiSearch.index_2"}
 	t.Run("prepare", func(t *testing.T) {
 		for _, indexName := range indexNames {
-			index, _, err := GetOrCreateIndex(indexName, "disk", 2)
+			index, _, err := GetOrCreateIndex(indexName, "disk", 1)
 			assert.NoError(t, err)
 			assert.NotNil(t, index)
+
+			err = index.CreateDocument("1", map[string]interface{}{"name": "test"}, false)
+			assert.NoError(t, err)
+
+			// wait for WAL write to index
+			time.Sleep(time.Second)
 		}
 	})
 

@@ -68,12 +68,12 @@ func TestDeleteIndex(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 
-		indexS3, _, err := GetOrCreateIndex(indexNameS3, "disk", 2)
+		indexS3, _, err := GetOrCreateIndex(indexNameS3, "disk", 1)
 		assert.NoError(t, err)
 		assert.NotNil(t, indexS3)
 		indexS3.ref.Meta.StorageType = "s3"
 
-		indexMinio, _, err := GetOrCreateIndex(indexNameMinIO, "disk", 2)
+		indexMinio, _, err := GetOrCreateIndex(indexNameMinIO, "disk", 1)
 		assert.NoError(t, err)
 		assert.NotNil(t, indexMinio)
 		indexS3.ref.Meta.StorageType = "minio"

@@ -54,7 +54,7 @@ func ListTemplate(c *gin.Context) {
 func GetTemplate(c *gin.Context) {
 	name := c.Param("target")
 	if name == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template.name should be not empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template name should be not empty"})
 		return
 	}
 	template, exists, err := core.LoadTemplate(name)
@@ -81,7 +81,7 @@ func GetTemplate(c *gin.Context) {
 func CreateTemplate(c *gin.Context) {
 	name := c.Param("target")
 	if name == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template.name should be not empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template name should be not empty"})
 		return
 	}
 

@@ -36,7 +36,7 @@ import (
 func Get(c *gin.Context) {
 	indexName := c.Param("target")
 	if indexName == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index name cannot be empty"})
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: errors.ErrIndexIsEmpty.Error()})
 		return
 	}
 

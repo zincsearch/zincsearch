@@ -19,6 +19,7 @@ import (
 	"sort"
 	"sync"
 
+	"github.com/blugelabs/bluge/analysis"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/sync/errgroup"
 
@@ -140,6 +141,9 @@ func LoadIndex(indexName string, version string) error {
 			return errors.New(errors.ErrorTypeRuntimeException, "parse stored analysis error").Cause(err)
 		}
 	}
+	if index.analyzers == nil {
+		index.analyzers = make(map[string]*analysis.Analyzer)
+	}
 
 	// load in memory
 	ZINC_INDEX_LIST.Set(index)
@@ -208,6 +212,9 @@ func ReloadIndex(indexName string) error {
 		if err != nil {
 			return errors.New(errors.ErrorTypeRuntimeException, "parse stored analysis error").Cause(err)
 		}
+	}
+	if index.analyzers == nil {
+		index.analyzers = make(map[string]*analysis.Analyzer)
 	}
 
 	return nil

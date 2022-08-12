@@ -12,7 +12,7 @@
     This unit test will create document with existing Index:
     1. Create Index request to check that Index already exists by `PUT` call to the endpoint `/api/index` with `{"name": "` + indexName + `", "storage_type": "disk"}` in  body.
     2. Using assert.Equal will test if the response code is equal to http.StatusBadRequest (i.e 400), that means Index already exists.
-    3. Umarshal the response recieved and using assert.Equal will check that error string is equal to index `["+indexName+"] already exists`.
+    3. Umarshal the response recieved and using assert.Equal will check that error string is equal to `index already exists`.
     4. `POST` call to the endpoint `/es/"+indexName+"/_bulk` with bulkData in body.
     5. Send a request to the server and response would be recorded.
     6.  Using assert.Equal will test if the response code is equal to http.StatusOK (i.e 200),that means test is OK and bulk document is indexed.

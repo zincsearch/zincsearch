@@ -60,7 +60,7 @@ func TestSearchDSL(t *testing.T) {
 				code:   http.StatusBadRequest,
 				data:   `{"query":{"match_all":{}},"size":10}`,
 				params: map[string]string{"target": "NotExist" + indexName},
-				result: "does not exists",
+				result: "index not exists",
 			},
 		},
 		{
@@ -134,7 +134,7 @@ func TestMultipleSearch(t *testing.T) {
 				code: http.StatusOK,
 				data: `{"index":"TestMultipleSearch.notExists"}
 {"query":{"match_all":{}},"size":10}`,
-				result: "does not exists",
+				result: "index not exists",
 			},
 		},
 	}

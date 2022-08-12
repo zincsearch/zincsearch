@@ -50,6 +50,7 @@ func NewCluster() *Cluster {
 		name: config.Global.Cluster.Name,
 	}
 	cluster.HandleClusterEvent()
+	cluster.HandleInactiveShards()
 	return cluster
 }
 
@@ -182,20 +183,17 @@ func (c *Cluster) handleDistributionEvent() {
 		columns := strings.Split(string(e.Key), "/")
 		indexName := columns[0]
 		shardName := columns[1]
+		disIndex, ok := c.distribution.Load(indexName)
+		if !ok {
+			disIndex = new(sync.Map)
+			c.distribution.Store(indexName, disIndex)
+		}
 		switch e.Type {
 		case meta.StorageEventTypePut, meta.StorageEventTypeCreate, meta.StorageEventTypeUpdate:
 			nodeID, _ := strconv.ParseInt(string(e.Value), 10, 64)
-			disIndex, ok := c.distribution.Load(indexName)
-			if !ok {
-				disIndex = new(sync.Map)
-				c.distribution.Store(indexName, disIndex)
-			}
 			disIndex.(*sync.Map).Store(shardName, nodeID)
 		case meta.StorageEventTypeDelete:
-			disIndex, ok := c.distribution.Load(indexName)
-			if ok {
-				disIndex.(*sync.Map).Store(shardName, int64(0))
-			}
+			disIndex.(*sync.Map).Store(shardName, int64(0))
 		}
 	}
 }
@@ -289,6 +287,10 @@ func (c *Cluster) LoadDistribution() {
 			c.distribution.Store(indexName, disIndex)
 		}
 		for shard, nodeID := range data {
+			if nodeID == c.Local().ID {
+				// skip local node, local distribute need more other operations
+				nodeID = int64(0)
+			}
 			disIndex.(*sync.Map).Store(shard, nodeID)
 		}
 		return true
@@ -446,4 +448,8 @@ func (c *Cluster) ReleaseNodeShards(nodeID int64) {
 		}
 		return true
 	})
+}
+
+func (c *Cluster) HandleInactiveShards() {
+
 }

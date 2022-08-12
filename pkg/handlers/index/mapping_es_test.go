@@ -16,7 +16,7 @@ func TestESMapping_GetConverted(t *testing.T) {
 	config.Global.EnableTextKeywordMapping = true
 
 	t.Run("create index", func(t *testing.T) {
-		index, _, err := core.GetOrCreateIndex("TestEsMapping.index_1", "disk", 2)
+		index, _, err := core.GetOrCreateIndex("TestEsMapping.index_1", "disk", 1)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 	})
@@ -138,7 +138,7 @@ func TestESMapping_GetConverted(t *testing.T) {
 				args: args{
 					code:   http.StatusBadRequest,
 					target: "",
-					result: `{"error":"index  does not exists"}`,
+					result: `{"error":"index not exists"}`,
 				},
 				wantErr: false,
 			},

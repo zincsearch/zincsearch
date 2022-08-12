@@ -31,7 +31,7 @@ import (
 
 func TestIndex_Index(t *testing.T) {
 	indexName := "TestIndex_Index.index_1"
-	index, _, err := GetOrCreateIndex(indexName, "disk", 2)
+	index, _, err := GetOrCreateIndex(indexName, "disk", 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, index)
 
@@ -254,7 +254,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 	}
 
 	t.Run("prepare", func(t *testing.T) {
-		index, _, err = GetOrCreateIndex(indexName, "disk", 2)
+		index, _, err = GetOrCreateIndex(indexName, "disk", 1)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 		index.GetMappings().SetProperty("time", meta.NewProperty("date"))
@@ -303,7 +303,7 @@ func TestIndex_Settings(t *testing.T) {
 	indexName := "TestIndex_Settings.index_1"
 
 	t.Run("prepare", func(t *testing.T) {
-		index, _, err = GetOrCreateIndex(indexName, "disk", 2)
+		index, _, err = GetOrCreateIndex(indexName, "disk", 1)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 	})

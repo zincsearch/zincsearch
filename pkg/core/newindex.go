@@ -68,6 +68,7 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 	metaIndex := meta.NewIndex(name, storageType, meta.Version)
 	index := new(Index)
 	index.ref = metaIndex
+	index.analyzers = make(map[string]*analysis.Analyzer)
 
 	// use template
 	if err := index.UseTemplate(); err != nil {

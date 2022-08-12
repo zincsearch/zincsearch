@@ -74,7 +74,7 @@ func (t *boltStorage) List(prefix string, offset, limit int64) ([][]byte, error)
 		i := int64(0)
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			if !bytes.HasPrefix(k, pre) {
+			if len(pre) > 0 && !bytes.HasPrefix(k, pre) {
 				continue
 			}
 			i++
@@ -104,7 +104,7 @@ func (t *boltStorage) ListEntries(prefix string, offset, limit int64) ([]*storag
 		i := int64(0)
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			if !bytes.HasPrefix(k, pre) {
+			if len(pre) > 0 && !bytes.HasPrefix(k, pre) {
 				continue
 			}
 			i++
@@ -170,23 +170,6 @@ func (t *boltStorage) Delete(key string) error {
 	if key == "" {
 		return errors.ErrKeyIsEmpty
 	}
-	data, err := t.ListEntries(key, 0, 0)
-	if err != nil {
-		return err
-	}
-	for _, d := range data {
-		err := t.delete(key + string(d.Key))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (t *boltStorage) delete(key string) error {
-	if key == "" {
-		return errors.ErrKeyIsEmpty
-	}
 	bucket, name := t.splitBucketAndKey(key)
 	return t.db.Update(func(Tx *bbolt.Tx) error {
 		b := Tx.Bucket(bucket)
@@ -195,6 +178,23 @@ func (t *boltStorage) delete(key string) error {
 		}
 		return b.Delete(name)
 	})
+}
+
+func (t *boltStorage) DeleteWithPrefix(key string) error {
+	if key == "" {
+		return errors.ErrKeyIsEmpty
+	}
+	data, err := t.ListEntries(key, 0, 0)
+	if err != nil {
+		return err
+	}
+	for _, d := range data {
+		err := t.Delete(key + string(d.Key))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (t *boltStorage) Watch(key string) <-chan storage.StorageEvent {

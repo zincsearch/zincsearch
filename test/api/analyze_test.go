@@ -70,8 +70,8 @@ func TestAnalyze(t *testing.T) {
 			body := bytes.NewBuffer(nil)
 			body.WriteString(index)
 			resp := request("PUT", "/api/index/"+indexName, body)
-			buf, err := io.ReadAll(resp.Body)
-			fmt.Println(string(buf), err)
+			_, err := io.ReadAll(resp.Body)
+			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
 			// analyze

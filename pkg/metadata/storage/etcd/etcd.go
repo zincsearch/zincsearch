@@ -18,7 +18,6 @@ package etcd
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
@@ -148,7 +147,6 @@ func (t *etcdStorage) SetWithKeepAlive(key string, value []byte, ttl int64) erro
 		for range event {
 			<-event
 		}
-		fmt.Println("etcdStorage: keepalive lease expired")
 	}()
 
 	ctx, cancel := context.WithTimeout(context.Background(), t.timeout)
@@ -172,6 +170,16 @@ func (t *etcdStorage) CancelWithKeepAlive(key string) error {
 }
 
 func (t *etcdStorage) Delete(key string) error {
+	if key == "" {
+		return errors.ErrKeyIsEmpty
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), t.timeout)
+	defer cancel()
+	_, err := t.cli.Delete(ctx, t.prefix+key)
+	return err
+}
+
+func (t *etcdStorage) DeleteWithPrefix(key string) error {
 	if key == "" {
 		return errors.ErrKeyIsEmpty
 	}

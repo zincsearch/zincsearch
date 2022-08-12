@@ -197,7 +197,7 @@ func (t *index) SetShard(id string, data *meta.IndexFirstShard) error {
 
 func (t *index) Delete(id string) error {
 	for _, key := range []string{"meta", "stats", "settings", "mappings", "shards"} {
-		err := db.Delete(t.key(id, key))
+		err := db.DeleteWithPrefix(t.key(id, key))
 		if err != nil {
 			return err
 		}

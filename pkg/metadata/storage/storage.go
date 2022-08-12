@@ -27,6 +27,7 @@ type Storager interface {
 	SetWithKeepAlive(string, []byte, int64) error
 	CancelWithKeepAlive(string) error
 	Delete(string) error
+	DeleteWithPrefix(string) error
 	Close() error
 }
 

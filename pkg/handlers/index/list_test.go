@@ -29,7 +29,7 @@ import (
 
 func TestList(t *testing.T) {
 	t.Run("prepare", func(t *testing.T) {
-		index, _, err := core.GetOrCreateIndex("TestIndexList.index_1", "disk", 2)
+		index, _, err := core.GetOrCreateIndex("TestIndexList.index_1", "disk", 1)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 	})
@@ -54,15 +54,15 @@ func TestList(t *testing.T) {
 				assert.NotNil(t, w.Body)
 
 				resp := struct {
-					List []*meta.Index `json:"list"`
-					Page meta.Page     `json:"page"`
+					List []*meta.IndexSimple `json:"list"`
+					Page meta.Page           `json:"page"`
 				}{}
 				err := json.Unmarshal(w.Body.Bytes(), &resp)
 				assert.NoError(t, err)
 				assert.NotNil(t, resp.List)
 				assert.NotNil(t, resp.Page)
 				assert.Equal(t, len(resp.List), 1)
-				assert.Equal(t, resp.List[0].GetName(), "TestIndexList.index_1")
+				assert.Equal(t, resp.List[0].Name, "TestIndexList.index_1")
 				assert.Equal(t, resp.Page.PageSize, int64(20))
 				assert.Equal(t, resp.Page.PageNum, int64(1))
 				assert.Equal(t, resp.Page.Total, int64(1))
@@ -79,7 +79,7 @@ func TestList(t *testing.T) {
 
 func TestIndexNameList(t *testing.T) {
 	t.Run("prepare", func(t *testing.T) {
-		index, _, err := core.GetOrCreateIndex("TestIndexNameList.index_1", "disk", 2)
+		index, _, err := core.GetOrCreateIndex("TestIndexNameList.index_1", "disk", 1)
 		assert.NoError(t, err)
 		assert.NotNil(t, index)
 	})

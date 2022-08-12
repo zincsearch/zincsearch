@@ -55,6 +55,22 @@ func (index *Index) MarshalJSON() ([]byte, error) {
 	return b, err
 }
 
+func (index *Index) ToSimple() *meta.IndexSimple {
+	data := new(meta.IndexSimple)
+	data.Name = index.GetName()
+	data.StorageType = index.GetStorageType()
+	data.ShardNum = index.GetShardNum()
+	data.AllShardNum = index.GetAllShardNum()
+	data.WALSize = index.GetWALSize()
+	data.Stats = index.GetStats().Copy()
+	data.Settings = index.GetSettings().Copy()
+	data.Mappings = make(map[string]interface{})
+	for field, prop := range index.GetMappings().ListProperty() {
+		data.Mappings[field] = prop.Copy()
+	}
+	return data
+}
+
 func (index *Index) GetName() string {
 	return index.ref.GetName()
 }
@@ -304,10 +320,21 @@ func (index *Index) UpdateMetadataByShard(id string) {
 	var totalDocNum, totalSize uint64
 	// update docNum and storageSize
 	shard := index.shards[id]
-	for i := int64(0); i < shard.GetShardNum(); i++ {
+	shardNum := shard.GetShardNum()
+	for i := int64(0); i < shardNum; i++ {
 		index.UpdateStatsBySecondShard(id, i)
 		totalDocNum += atomic.LoadUint64(&shard.ref.Shards[i].Stats.DocNum)
 		totalSize += atomic.LoadUint64(&shard.ref.Shards[i].Stats.StorageSize)
+		// we just keep latest two shards open
+		if i+2 < shardNum {
+			secondShard := shard.shards[i]
+			secondShard.lock.Lock()
+			if secondShard.writer != nil {
+				_ = secondShard.writer.Close()
+				secondShard.writer = nil
+			}
+			secondShard.lock.Unlock()
+		}
 	}
 	if totalDocNum > 0 && totalSize > 0 {
 		index.lock.Lock()

@@ -326,9 +326,11 @@ func (s *IndexShard) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error)
 		eg.Go(func() error {
 			r, err := s.GetReader(i)
 			if err != nil {
-				return err
+				log.Error().Err(err).Msgf("IndexShard.GetReader(%d)", i)
 			}
-			chs <- r
+			if r != nil {
+				chs <- r
+			}
 			return nil
 		})
 		if sMin > 0 && sMin < timeMin {

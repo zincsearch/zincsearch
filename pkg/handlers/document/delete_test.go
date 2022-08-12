@@ -76,7 +76,7 @@ func TestDelete(t *testing.T) {
 					"target": "TestDocumentDelete.index_2",
 					"id":     "1",
 				},
-				result: "index does not exists",
+				result: "index not exists",
 			},
 		},
 	}
