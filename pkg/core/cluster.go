@@ -20,6 +20,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
@@ -28,15 +29,17 @@ import (
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/metadata"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 var ZINC_CLUSTER *Cluster
 
 type Cluster struct {
 	name         string
-	nodes        sync.Map
-	indexes      sync.Map
-	distribution sync.Map
+	nodes        sync.Map // cluster node
+	indexes      sync.Map // cluster indexes
+	distribution sync.Map // cluster distribution: index -> shard -> nodeID
+	localShards  sync.Map // local held shards
 }
 
 func SetupCluster() {
@@ -120,7 +123,7 @@ func (c *Cluster) GetDistribution() map[string]map[string]string {
 func (c *Cluster) handleNodeEvent() {
 	events := metadata.Cluster.Watch(meta.ClusterEventTypeNode)
 	for e := range events {
-		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster node event")
+		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster: node event")
 		nodeID, _ := strconv.ParseInt(string(e.Key), 10, 64)
 		switch e.Type {
 		case meta.StorageEventTypePut, meta.StorageEventTypeCreate, meta.StorageEventTypeUpdate:
@@ -128,8 +131,10 @@ func (c *Cluster) handleNodeEvent() {
 			_ = json.Unmarshal(e.Value, node)
 			c.nodes.Store(nodeID, node)
 			// need release some shards for new node
-			c.ReleaseNodeShards(c.Local().ID)
+			c.ReleaseNodeShards()
 		case meta.StorageEventTypeDelete:
+			// no need to release shards for deleted node
+			// because it will be deleted from cluster event
 			c.nodes.Delete(nodeID)
 		}
 	}
@@ -138,7 +143,7 @@ func (c *Cluster) handleNodeEvent() {
 func (c *Cluster) handleIndexEvent() {
 	events := metadata.Cluster.Watch(meta.ClusterEventTypeIndex)
 	for e := range events {
-		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster index event")
+		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster: index event")
 		indexName := string(e.Key)
 		switch e.Type {
 		case meta.StorageEventTypePut, meta.StorageEventTypeCreate, meta.StorageEventTypeUpdate:
@@ -151,7 +156,7 @@ func (c *Cluster) handleIndexEvent() {
 				// not exists, need load
 				err := LoadIndex(indexName, meta.Version)
 				if err != nil {
-					log.Error().Err(err).Str("index", indexName).Int64("version", metaVersion).Msg("cluster index event: load index")
+					log.Error().Err(err).Str("index", indexName).Int64("version", metaVersion).Msg("cluster: index event, load index")
 					continue
 				}
 			} else {
@@ -159,7 +164,7 @@ func (c *Cluster) handleIndexEvent() {
 				// Reload: just update settings, mappings, shards
 				err := ReloadIndex(indexName)
 				if err != nil {
-					log.Error().Err(err).Str("index", indexName).Int64("version", metaVersion).Msg("cluster index event: update index")
+					log.Error().Err(err).Str("index", indexName).Int64("version", metaVersion).Msg("cluster: index event, update index")
 					continue
 				}
 			}
@@ -168,7 +173,7 @@ func (c *Cluster) handleIndexEvent() {
 			// delete from local cache
 			err := c.DeleteIndex(indexName)
 			if err != nil {
-				log.Error().Err(err).Str("index", indexName).Msg("cluster index event, delete index")
+				log.Error().Err(err).Str("index", indexName).Msg("cluster: index event, delete index")
 			}
 			// delete from local metadata
 			ZINC_INDEX_LIST.Delete(indexName)
@@ -179,7 +184,7 @@ func (c *Cluster) handleIndexEvent() {
 func (c *Cluster) handleDistributionEvent() {
 	events := metadata.Cluster.Watch(meta.ClusterEventTypeDistribution)
 	for e := range events {
-		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster distribution event")
+		log.Debug().Str("type", meta.StorageEventTypeString[e.Type]).Str("key", string(e.Key)).Str("value", string(e.Value)).Msg("cluster: distribution event")
 		columns := strings.Split(string(e.Key), "/")
 		indexName := columns[0]
 		shardName := columns[1]
@@ -245,7 +250,7 @@ func (c *Cluster) Leave() error {
 }
 
 func (c *Cluster) SetIndex(indexName string, metaVersion int64, update bool) error {
-	log.Debug().Str("index", indexName).Int64("version", metaVersion).Msg("set index")
+	log.Debug().Str("index", indexName).Int64("version", metaVersion).Msg("cluster: set index")
 
 	c.indexes.Store(indexName, metaVersion)
 	if update {
@@ -269,6 +274,14 @@ func (c *Cluster) DeleteIndex(indexName string) error {
 	}
 	c.distribution.Delete(indexName)
 
+	// delete from local shards
+	c.localShards.Range(func(shardName, _ interface{}) bool {
+		if strings.HasPrefix(shardName.(string), indexName+"/") {
+			c.localShards.Delete(shardName)
+		}
+		return true
+	})
+
 	return nil
 }
 
@@ -278,7 +291,7 @@ func (c *Cluster) LoadDistribution() {
 		indexName := key.(string)
 		data, err := metadata.Cluster.ListDistribution(indexName)
 		if err != nil {
-			log.Error().Err(err).Str("index", indexName).Msg("cluster load distribution")
+			log.Error().Err(err).Str("index", indexName).Msg("cluster: load distribution")
 			return false
 		}
 		disIndex, ok := c.distribution.Load(indexName)
@@ -376,6 +389,8 @@ func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
 			index.localShards[shard] = index.shards[shard]
 			index.shardHashing.Add(shard)
 			shards[shard] = true
+			// add to local shards
+			c.localShards.Store(indexName+"/"+shard, time.Now().Unix())
 		}
 	}
 
@@ -399,11 +414,14 @@ func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
 	index.localShards[shard] = index.shards[shard]
 	index.shardHashing.Add(shard)
 
+	// add to local shards
+	c.localShards.Store(indexName+"/"+shard, time.Now().Unix())
+
 	return nil
 }
 
 // ReleaseIndexShards release some shards let node just hold math.Ceil(shards / nodes)
-func (c *Cluster) ReleaseIndexShards(indexName string, nodeID int64) error {
+func (c *Cluster) ReleaseIndexShards(indexName string) error {
 	index, ok := GetIndex(indexName)
 	if !ok {
 		return errors.ErrIndexNotExists
@@ -415,22 +433,20 @@ func (c *Cluster) ReleaseIndexShards(indexName string, nodeID int64) error {
 		return nil
 	}
 	shards := 0
+	nodeID := c.Local().ID
 	disIndex.(*sync.Map).Range(func(shardName, value interface{}) bool {
-		if nodeID == value.(int64) {
-			shards++
-			if shards > needShards {
-				// close shards
-				index.shards[shardName.(string)].Close()
-				// release distribution
-				err := metadata.Cluster.ReleaseDistribute(indexName, shardName.(string))
-				if err != nil {
-					return false
-				}
-				delete(index.localShards, shardName.(string))
-				index.shardHashing.Remove(shardName.(string))
-				// clear cache
-				disIndex.(*sync.Map).Store(shardName, int64(0))
-			}
+		if nodeID != value.(int64) {
+			return true
+		}
+
+		shards++
+		if shards <= needShards {
+			return true
+		}
+
+		err := c.ReleaseIndexShard(indexName, shardName.(string))
+		if err != nil {
+			log.Error().Err(err).Str("index", indexName).Str("shard", shardName.(string)).Msg("cluster: release index shard error")
 		}
 		return true
 	})
@@ -438,18 +454,79 @@ func (c *Cluster) ReleaseIndexShards(indexName string, nodeID int64) error {
 	return nil
 }
 
+// ReleaseIndexShards release some shards let node just hold math.Ceil(shards / nodes)
+func (c *Cluster) ReleaseIndexShard(indexName, shardName string) error {
+	disIndex, ok := c.distribution.Load(indexName)
+	if !ok {
+		return nil
+	}
+	nodeID := c.Local().ID
+	nid, ok := disIndex.(*sync.Map).Load(shardName)
+	if !ok {
+		return nil
+	}
+	if nodeID != nid.(int64) {
+		return nil
+	}
+
+	// close shards
+	index, ok := GetIndex(indexName)
+	if !ok {
+		return errors.ErrIndexNotExists
+	}
+	index.shards[shardName].Close()
+	index.shardHashing.Remove(shardName)
+	delete(index.localShards, shardName)
+	// release distribution
+	err := metadata.Cluster.ReleaseDistribute(indexName, shardName)
+	if err != nil {
+		return err
+	}
+	// clear cache
+	disIndex.(*sync.Map).Store(shardName, int64(0))
+	// clear local shards
+	c.localShards.Delete(indexName + "/" + shardName)
+
+	return nil
+}
+
 // ReleaseNodeShards release some shards for each index, let node just hold math.Ceil(shards / nodes)
-func (c *Cluster) ReleaseNodeShards(nodeID int64) {
+func (c *Cluster) ReleaseNodeShards() {
 	c.indexes.Range(func(indexName, version interface{}) bool {
-		err := c.ReleaseIndexShards(indexName.(string), nodeID)
+		err := c.ReleaseIndexShards(indexName.(string))
 		if err != nil {
-			log.Error().Err(err).Str("index", indexName.(string)).Msg("release shards distribution")
+			log.Error().Err(err).Str("index", indexName.(string)).Msg("cluster: release node shards")
 			return false
 		}
 		return true
 	})
 }
 
+// HandleInactiveShards close inactive shards after 10 minutes
 func (c *Cluster) HandleInactiveShards() {
+	interval, err := zutils.ParseDuration(config.Global.IndexMaxIdleTime)
+	if err != nil {
+		log.Error().Err(err).Str("IndexMaxIdleTime", config.Global.IndexMaxIdleTime).Msg("cluste: handle inactive shards, ParseDuration error")
+		interval = 10 * time.Minute
+	}
+	intervalSecond := int64(interval.Seconds())
 
+	go func() {
+		tick := time.NewTicker(interval)
+		for range tick.C {
+			now := time.Now().Unix()
+			c.localShards.Range(func(key, value interface{}) bool {
+				columns := strings.Split(key.(string), "/")
+				indexName := columns[0]
+				shardName := columns[1]
+				if now-value.(int64) > intervalSecond {
+					err := c.ReleaseIndexShard(indexName, shardName)
+					if err != nil {
+						log.Error().Err(err).Str("index", indexName).Str("shard", shardName).Msg("cluster: release index shard error")
+					}
+				}
+				return true
+			})
+		}
+	}()
 }

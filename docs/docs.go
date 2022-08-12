@@ -241,6 +241,39 @@ const docTemplate = `{
             }
         },
         "/api/index/{index}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Get index metadata",
+                "operationId": "GetIndex",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core.Index"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "produces": [
                     "application/json"
@@ -1665,7 +1698,7 @@ const docTemplate = `{
                 "list": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/core.Index"
+                        "$ref": "#/definitions/meta.IndexSimple"
                     }
                 },
                 "page": {
@@ -2275,6 +2308,9 @@ const docTemplate = `{
         "meta.IndexSimple": {
             "type": "object",
             "properties": {
+                "all_shard_num": {
+                    "type": "integer"
+                },
                 "mappings": {
                     "type": "object",
                     "additionalProperties": true
@@ -2288,8 +2324,34 @@ const docTemplate = `{
                 "shard_num": {
                     "type": "integer"
                 },
+                "stats": {
+                    "$ref": "#/definitions/meta.IndexStat"
+                },
                 "storage_type": {
                     "type": "string"
+                },
+                "wal_size": {
+                    "type": "integer"
+                }
+            }
+        },
+        "meta.IndexStat": {
+            "type": "object",
+            "properties": {
+                "doc_num": {
+                    "type": "integer"
+                },
+                "doc_time_max": {
+                    "type": "integer"
+                },
+                "doc_time_min": {
+                    "type": "integer"
+                },
+                "storage_size": {
+                    "type": "integer"
+                },
+                "wal_size": {
+                    "type": "integer"
                 }
             }
         },

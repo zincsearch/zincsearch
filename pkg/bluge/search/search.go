@@ -36,7 +36,8 @@ func MultiSearch(
 	query *meta.ZincQuery,
 	mappings *meta.Mappings,
 	analyzers map[string]*analysis.Analyzer,
-	readers ...*bluge.Reader) (search.DocumentMatchIterator, error) {
+	readers ...*bluge.Reader,
+) (search.DocumentMatchIterator, error) {
 	if len(readers) == 0 {
 		return &DocumentList{
 			bucket: search.NewBucket("",
@@ -86,8 +87,8 @@ func MultiSearch(
 		return nil
 	})
 
-	for _, r := range readers {
-		r := r
+	for _, reader := range readers {
+		r := reader
 		req, err := uquery.ParseQueryDSL(query, mappings, analyzers)
 		if err != nil {
 			return nil, err
@@ -115,7 +116,7 @@ func MultiSearch(
 				atomic.StoreInt64(&docList.size, n)
 			}
 			// close index reader
-			_ = r.Close()
+			// _ = r.Close()
 
 			return err
 		})

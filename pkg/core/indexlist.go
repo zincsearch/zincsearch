@@ -321,8 +321,3 @@ func (t *IndexList) Close() error {
 	}
 	return eg.Wait()
 }
-
-// GC auto close unused indexes what inactive for a long time (10m)
-func (t *IndexList) GC() error {
-	return nil // TODO: implement GC
-}

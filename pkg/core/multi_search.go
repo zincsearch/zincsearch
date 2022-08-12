@@ -56,6 +56,7 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 
 		reader, err := index.GetReaders(timeMin, timeMax)
 		if err != nil {
+			log.Error().Err(err).Msg("search.v2: get readers error")
 			return nil, err
 		}
 		readers = append(readers, reader...)

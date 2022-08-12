@@ -21,7 +21,9 @@ import (
 
 	blugeindex "github.com/blugelabs/bluge/index"
 	"github.com/stretchr/testify/assert"
+
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func Test_parseInterval(t *testing.T) {
@@ -53,13 +55,21 @@ func Test_parseInterval(t *testing.T) {
 			args: args{
 				v: "1m",
 			},
+			want:    time.Minute,
+			wantErr: false,
+		},
+		{
+			name: "1x",
+			args: args{
+				v: "1x",
+			},
 			want:    time.Duration(0),
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := parseInterval(tt.args.v)
+			got, err := zutils.ParseDuration(tt.args.v)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseInterval() error = %v, wantErr %v", err, tt.wantErr)
 				return

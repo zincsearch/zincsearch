@@ -106,7 +106,7 @@ func Search(index *core.Index, iQuery *ZincQuery) (*SearchResponse, error) {
 	timeMin, timeMax := timerange.Query(iQuery.Query)
 	readers, err := index.GetReaders(timeMin, timeMax)
 	if err != nil {
-		log.Printf("error accessing reader: %s", err.Error())
+		log.Error().Err(err).Msg("search.v1: get reader error")
 	}
 	defer func() {
 		for _, reader := range readers {

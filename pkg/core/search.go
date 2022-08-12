@@ -43,7 +43,7 @@ func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) 
 	timeMin, timeMax := timerange.Query(query.Query)
 	readers, err := index.GetReaders(timeMin, timeMax)
 	if err != nil {
-		log.Printf("index.SearchV2: error accessing reader: %s", err.Error())
+		log.Error().Err(err).Msg("search.v2: get readers error")
 		return nil, err
 	}
 	defer func() {

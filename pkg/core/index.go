@@ -326,7 +326,7 @@ func (index *Index) UpdateMetadataByShard(id string) {
 		totalDocNum += atomic.LoadUint64(&shard.ref.Shards[i].Stats.DocNum)
 		totalSize += atomic.LoadUint64(&shard.ref.Shards[i].Stats.StorageSize)
 		// we just keep latest two shards open
-		if i+2 < shardNum {
+		if i+1 < shardNum {
 			secondShard := shard.shards[i]
 			secondShard.lock.Lock()
 			if secondShard.writer != nil {

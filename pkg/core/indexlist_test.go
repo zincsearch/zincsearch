@@ -44,9 +44,6 @@ func TestIndexList_List(t *testing.T) {
 
 	err = DeleteIndex(indexName)
 	assert.NoError(t, err)
-
-	err = ZINC_INDEX_LIST.GC()
-	assert.NoError(t, err)
 }
 
 func TestLoadIndexes(t *testing.T) {

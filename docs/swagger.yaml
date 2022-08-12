@@ -60,7 +60,7 @@ definitions:
     properties:
       list:
         items:
-          $ref: '#/definitions/core.Index'
+          $ref: '#/definitions/meta.IndexSimple'
         type: array
       page:
         $ref: '#/definitions/meta.Page'
@@ -470,6 +470,8 @@ definitions:
     type: object
   meta.IndexSimple:
     properties:
+      all_shard_num:
+        type: integer
       mappings:
         additionalProperties: true
         type: object
@@ -479,8 +481,25 @@ definitions:
         $ref: '#/definitions/meta.IndexSettings'
       shard_num:
         type: integer
+      stats:
+        $ref: '#/definitions/meta.IndexStat'
       storage_type:
         type: string
+      wal_size:
+        type: integer
+    type: object
+  meta.IndexStat:
+    properties:
+      doc_num:
+        type: integer
+      doc_time_max:
+        type: integer
+      doc_time_min:
+        type: integer
+      storage_size:
+        type: integer
+      wal_size:
+        type: integer
     type: object
   meta.IndexTemplate:
     properties:
@@ -1629,6 +1648,28 @@ paths:
           schema:
             $ref: '#/definitions/meta.HTTPResponseError'
       summary: Delete index
+      tags:
+      - Index
+    get:
+      operationId: GetIndex
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.Index'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Get index metadata
       tags:
       - Index
     head:

@@ -25,6 +25,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // Record opened WAL used to do consume
@@ -70,9 +71,9 @@ func (t *IndexShardWALList) Len() int {
 }
 
 func (t *IndexShardWALList) ConsumeWAL() {
-	interval, err := parseInterval(config.Global.WalSyncInterval)
+	interval, err := zutils.ParseDuration(config.Global.WalSyncInterval)
 	if err != nil {
-		log.Fatal().Err(err).Msg("consume ParseInterval")
+		log.Fatal().Err(err).Msg("core.IndexShardWALList: consume ParseDuration")
 	}
 
 	indexes := make(map[string]*Index)
