@@ -115,8 +115,6 @@ func MultiSearch(
 			if n > atomic.LoadInt64(&docList.size) {
 				atomic.StoreInt64(&docList.size, n)
 			}
-			// close index reader
-			// _ = r.Close()
 
 			return err
 		})

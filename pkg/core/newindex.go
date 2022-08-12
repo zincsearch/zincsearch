@@ -171,8 +171,6 @@ func openIndexReader(name string, storageType string, ans *analysis.Analyzer, ti
 
 // openIndexWriter load the index writer from the storage
 func openIndexWriter(name string, storageType string, ans *analysis.Analyzer, timeRange ...int64) (*bluge.Writer, error) {
-	fmt.Println("openIndexWriter", name, storageType)
-
 	cfg := getOpenConfig(name, storageType, ans, timeRange...)
 	return bluge.OpenWriter(cfg)
 }

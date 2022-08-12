@@ -328,6 +328,7 @@ func (c *Cluster) DistributeIndexShards(indexName string) error {
 	disIndex.(*sync.Map).Range(func(shardName, value interface{}) bool {
 		if nodeID == value.(int64) {
 			shards[shardName.(string)] = true
+			c.localShards.Store(indexName+"/"+shardName.(string), time.Now().Unix())
 		}
 		return true
 	})
