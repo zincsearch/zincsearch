@@ -25,6 +25,7 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
@@ -98,7 +99,7 @@ func MultipleSearch(c *gin.Context) {
 	scanner := bufio.NewScanner(c.Request.Body)
 	defer c.Request.Body.Close()
 
-	const maxCapacityPerLine = 1024 * 1024
+	maxCapacityPerLine := config.Global.MaxDocumentSize
 	buf := make([]byte, maxCapacityPerLine)
 	scanner.Buffer(buf, maxCapacityPerLine)
 
