@@ -311,7 +311,8 @@ func (c *Cluster) LoadDistribution() {
 }
 
 // DistributeIndexShards distribute shards by the index for the node id
-func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
+func (c *Cluster) DistributeIndexShards(indexName string) error {
+	nodeID := c.Local().ID
 	index, ok := GetIndex(indexName)
 	if !ok {
 		return errors.ErrIndexNotExists
@@ -370,28 +371,29 @@ func (c *Cluster) DistributeIndexShards(indexName string, nodeID int64) error {
 			disIndex.(*sync.Map).Store(shard, nid)
 			continue
 		}
-		if len(shards) < needShards {
-			// distribute to this node
-			if nid != nodeID {
-				// if already distributed, skip
-				err := metadata.Cluster.ShardDistribute(indexName, shard, nodeID)
-				if err != nil {
-					return err
-				}
-				// reload shard from storage
-				if err := index.ReloadShard(shard); err != nil {
-					return err
-				}
-			}
-			// cache distribution
-			disIndex.(*sync.Map).Store(shard, nodeID)
-			// add to shards
-			index.localShards[shard] = index.shards[shard]
-			index.shardHashing.Add(shard)
-			shards[shard] = true
-			// add to local shards
-			c.localShards.Store(indexName+"/"+shard, time.Now().Unix())
+		if len(shards) >= needShards {
+			break
 		}
+
+		// distribute to this node
+		if nid != nodeID {
+			err := metadata.Cluster.ShardDistribute(indexName, shard, nodeID)
+			if err != nil {
+				return err
+			}
+			// reload shard from storage
+			if err := index.ReloadShard(shard); err != nil {
+				return err
+			}
+		}
+		shards[shard] = true
+		// cache distribution
+		disIndex.(*sync.Map).Store(shard, nodeID)
+		// add to shards
+		index.localShards[shard] = index.shards[shard]
+		index.shardHashing.Add(shard)
+		// add to local shards
+		c.localShards.Store(indexName+"/"+shard, time.Now().Unix())
 	}
 
 	if len(shards) > 0 {

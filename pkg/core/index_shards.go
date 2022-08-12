@@ -75,7 +75,7 @@ type IndexSecondShard struct {
 
 // GetShardByDocID return the shard by hash docID
 func (index *Index) GetShardByDocID(docID string) *IndexShard {
-	err := ZINC_CLUSTER.DistributeIndexShards(index.GetName(), ZINC_NODE.GetID())
+	err := ZINC_CLUSTER.DistributeIndexShards(index.GetName())
 	if err != nil {
 		log.Error().Err(err).Msgf("cluster.GetShardsDistribution")
 	}
