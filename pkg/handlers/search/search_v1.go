@@ -60,7 +60,7 @@ func SearchV1(c *gin.Context) {
 		return
 	}
 
-	storageSize := index.GetStats().StorageSize
+	storageSize := index.GetStats().GetStorageSize()
 	eventData := make(map[string]interface{})
 	eventData["search_type"] = iQuery.SearchType
 	eventData["search_index_storage"] = index.GetStorageType()
