@@ -192,8 +192,6 @@ export default defineComponent({
         });
     };
 
-    getIndexes();
-
     const resultColumns = [
       {
         name: "no",
@@ -339,6 +337,9 @@ export default defineComponent({
         getIndexes();
       },
     };
+  },
+  activated() {
+    this.getIndexes();
   },
 });
 </script>
