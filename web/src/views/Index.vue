@@ -39,6 +39,12 @@
           :label="t('index.delete')"
           @click="deleteSelectedIndexes"
         />
+        <q-btn
+          class="q-ml-sm"
+          color="primary"
+          icon="refresh"
+          @click="getIndexes"
+        />
       </template>
 
       <template #body-cell-no="props">
