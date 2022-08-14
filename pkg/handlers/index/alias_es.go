@@ -169,8 +169,19 @@ func getRegex(s string) (*regexp.Regexp, error) {
 }
 
 func matchAndAddToMap(indexList []*core.Index, indexName string, m map[string][]string, b *base) {
+	if !strings.Contains(indexName, "*") {
+		x, ok := core.ZINC_INDEX_LIST.Get(indexName)
+		if !ok {
+			return
+		}
+		m[b.Alias] = append(m[b.Alias], x.GetName())
+		return
+	}
+
+	// indexName contains a wi;dcard(*) r, range over the entire indexlist looking for matches
+	var n string // reuse same string variable
 	for _, index := range indexList {
-		n := index.GetName()
+		n = index.GetName()
 		if indexNameMatches(indexName, n) {
 			if b.Alias != "" { // alias takes precedence over aliases
 				m[b.Alias] = append(m[b.Alias], n)
