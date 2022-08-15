@@ -90,7 +90,7 @@ npm run dev
 
 This will start UI server on port 8080
 
-In order for you to effectively use the UI you would wnat to have the Zinc API server running in a seperate window that will accept requests from the UI.
+In order for you to effectively use the UI you would want to have the Zinc API server running in a seperate window that will accept requests from the UI.
 
 ## Swagger
 

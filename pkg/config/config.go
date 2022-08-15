@@ -49,6 +49,7 @@ type config struct {
 	BatchSize                 int    `env:"ZINC_BATCH_SIZE,default=1024"`
 	MaxResults                int    `env:"ZINC_MAX_RESULTS,default=10000"`
 	AggregationTermsSize      int    `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
+	MaxDocumentSize           int    `env:"ZINC_MAX_DOCUMENT_SIZE,default=1048576"` // Max size for a single document . Default = 1 MB = 1024 * 1024
 	WalSyncInterval           string `env:"ZINC_WAL_SYNC_INTERVAL,default=1s"`      // sync wal to disk, 1s, 10ms
 	WalRedoLogNoSync          bool   `env:"ZINC_WAL_REDOLOG_NO_SYNC,default=false"` // control sync after every write
 	Cluster                   cluster

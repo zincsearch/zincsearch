@@ -24,6 +24,7 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 
+	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
@@ -66,7 +67,7 @@ func MultiWorker(indexName string, body io.Reader) (int64, error) {
 
 	// Set 1 MB max per line. docs at - https://pkg.go.dev/bufio#pkg-constants
 	// This is the max size of a line in a file that we will process
-	const maxCapacityPerLine = 1024 * 1024
+	maxCapacityPerLine := config.Global.MaxDocumentSize
 	buf := make([]byte, maxCapacityPerLine)
 	scanner.Buffer(buf, maxCapacityPerLine)
 
