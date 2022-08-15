@@ -63,12 +63,11 @@ func AddOrRemoveESAlias(c *gin.Context) {
 
 	indexList := core.ZINC_INDEX_LIST.List()
 
-outerLoop:
 	for _, action := range alias.Actions {
 		if action.Add != nil {
 			if action.Add.Index != "" {
 				matchAndAddToMap(indexList, action.Add.Index, addMap, action.Add)
-				continue outerLoop
+				continue
 			}
 
 			// index is empty, try the indices field
@@ -76,13 +75,13 @@ outerLoop:
 				matchAndAddToMap(indexList, indexName, addMap, action.Add)
 			}
 
-			continue outerLoop // this was an add action, don't bother checking action.Remove
+			continue // this was an add action, don't bother checking action.Remove
 		}
 
 		if action.Remove != nil {
 			if action.Remove.Index != "" {
 				matchAndAddToMap(indexList, action.Remove.Index, removeMap, action.Remove)
-				continue outerLoop
+				continue
 			}
 
 			// index is empty, try the indices field
@@ -107,8 +106,8 @@ outerLoop:
 // @Summary Get index alias for compatible ES
 // @Tags    Index
 // @Produce json
-// @Param   index path  string  false  "Index"
-// @Param   alias path  string  false  "Alias"
+// @Param   target path  string  false  "Target Index"
+// @Param   target_alias path  string  false  "Target Alias"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} meta.HTTPResponseError
 // @Router /es/{target}/_alias/{target_alias} [get]
