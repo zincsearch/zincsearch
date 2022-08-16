@@ -36,7 +36,8 @@ func MultiSearch(
 	query *meta.ZincQuery,
 	mappings *meta.Mappings,
 	analyzers map[string]*analysis.Analyzer,
-	readers ...*bluge.Reader) (search.DocumentMatchIterator, error) {
+	readers ...*bluge.Reader,
+) (search.DocumentMatchIterator, error) {
 	if len(readers) == 0 {
 		return &DocumentList{
 			bucket: search.NewBucket("",

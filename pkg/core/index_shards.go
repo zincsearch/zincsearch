@@ -205,7 +205,7 @@ func (s *IndexShard) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error)
 	eg := errgroup.Group{}
 	eg.SetLimit(config.Global.Shard.GorutineNum)
 	for i := s.GetLatestShardID(); i >= 0; i-- {
-		var i = i
+		i := i
 		s.lock.RLock()
 		secondShard := s.shards[i]
 		s.lock.RUnlock()

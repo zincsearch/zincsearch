@@ -13,33 +13,35 @@
 * limitations under the License.
  */
 
-package zutils
+package metadata
 
 import (
-	"strconv"
-	"unicode"
+	"github.com/goccy/go-json"
 )
 
-func StringToInt(s string) int {
-	i, _ := strconv.Atoi(s)
-	return i
+type alias struct{}
+
+var Alias = new(alias)
+
+func (t *alias) Set(data map[string][]string) error {
+	buf, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return db.Set("/aliases/alias", buf)
 }
 
-func IsNumeric(s string) bool {
-	for _, r := range s {
-		if !unicode.IsDigit(r) {
-			return false
-		}
+func (t *alias) Get() (map[string][]string, error) {
+	data, err := db.List("/aliases/", 0, 0)
+	if err != nil {
+		return nil, err
 	}
-	return true
-}
 
-// SliceExists checks if a string is in a set.
-func SliceExists(set []string, find string) bool {
-	for _, s := range set {
-		if s == find {
-			return true
-		}
+	if len(data) == 0 {
+		return map[string][]string{}, nil
 	}
-	return false
+
+	als := map[string][]string{}
+	err = json.Unmarshal(data[0], &als)
+	return als, err
 }

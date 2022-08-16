@@ -45,7 +45,8 @@ func init() {
 
 	// start loading index
 	ZINC_INDEX_LIST.Indexes = make(map[string]*Index)
-	if err := LoadZincIndexesFromMetadata(string(version)); err != nil {
+	err := LoadZincIndexesFromMetadata(string(version))
+	if err != nil {
 		log.Fatal().Err(err).Msg("Error loading index")
 	}
 
@@ -55,6 +56,11 @@ func init() {
 		if err != nil {
 			log.Error().Err(err).Msg("Error set version")
 		}
+	}
+
+	ZINC_INDEX_ALIAS_LIST.Aliases, err = metadata.Alias.Get()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Error loading alias")
 	}
 }
 
@@ -123,6 +129,16 @@ func (t *IndexList) List() []*Index {
 	indexes := make([]*Index, 0, len(t.Indexes))
 	for _, index := range t.Indexes {
 		indexes = append(indexes, index)
+	}
+	t.lock.RUnlock()
+	return indexes
+}
+
+func (t *IndexList) ListMap() map[string]*Index {
+	t.lock.RLock()
+	indexes := make(map[string]*Index, len(t.Indexes))
+	for _, index := range t.Indexes {
+		indexes[index.ref.Name] = index
 	}
 	t.lock.RUnlock()
 	return indexes

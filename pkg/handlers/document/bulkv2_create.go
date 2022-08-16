@@ -75,7 +75,7 @@ func Bulkv2Worker(indexName string, body meta.JSONIngest) (int64, error) {
 	for _, doc := range body.Records { // Read each line
 		update := false
 
-		var docID = ""
+		docID := ""
 		if val, ok := doc["_id"]; ok && val != nil {
 			docID = val.(string)
 		}

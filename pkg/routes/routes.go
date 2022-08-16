@@ -39,7 +39,6 @@ import (
 
 // SetRoutes sets up all gin HTTP API endpoints that can be called by front end
 func SetRoutes(r *gin.Engine) {
-
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "HEAD", "OPTIONS"},
@@ -141,10 +140,10 @@ func SetRoutes(r *gin.Engine) {
 		c.JSON(http.StatusOK, elastic.NewESXPack(c))
 	})
 
-	r.POST("/es/_search", AuthMiddleware, ESMiddleware, search.SearchDSL)
-	r.POST("/es/_msearch", AuthMiddleware, ESMiddleware, search.MultipleSearch)
-	r.POST("/es/:target/_search", AuthMiddleware, ESMiddleware, search.SearchDSL)
-	r.POST("/es/:target/_msearch", AuthMiddleware, ESMiddleware, search.MultipleSearch)
+	r.POST("/es/_search", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.SearchDSL)
+	r.POST("/es/_msearch", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.MultipleSearch)
+	r.POST("/es/:target/_search", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.SearchDSL)
+	r.POST("/es/:target/_msearch", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.MultipleSearch)
 
 	r.GET("/es/_index_template", AuthMiddleware, ESMiddleware, index.ListTemplate)
 	r.POST("/es/_index_template", AuthMiddleware, ESMiddleware, index.CreateTemplate)
@@ -168,6 +167,12 @@ func SetRoutes(r *gin.Engine) {
 
 	r.POST("/es/_analyze", AuthMiddleware, ESMiddleware, index.Analyze)
 	r.POST("/es/:target/_analyze", AuthMiddleware, ESMiddleware, index.Analyze)
+
+	r.POST("/es/_aliases", AuthMiddleware, ESMiddleware, index.AddOrRemoveESAlias)
+
+	r.GET("/es/_alias", AuthMiddleware, ESMiddleware, index.GetESAliases)
+	r.GET("/es/:target/_alias", AuthMiddleware, ESMiddleware, index.GetESAliases)
+	r.GET("/es/_alias/:target_alias", AuthMiddleware, ESMiddleware, index.GetESAliases)
 
 	// ES Bulk update/insert
 	r.POST("/es/_bulk", AuthMiddleware, ESMiddleware, document.ESBulk)

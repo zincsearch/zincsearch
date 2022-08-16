@@ -61,15 +61,18 @@ func SearchDSL(c *gin.Context) {
 	}
 
 	if indexName != "" {
-		idx, _ := core.ZINC_INDEX_LIST.Get(indexName)
-		storageSize := idx.GetStats().StorageSize
-		eventData := make(map[string]interface{})
-		eventData["search_type"] = "query_dsl"
-		eventData["search_index_storage"] = idx.GetStorageType()
-		eventData["search_index_size_in_mb"] = storageSize / 1024 / 1024
-		eventData["time_taken_to_search_in_ms"] = resp.Took
-		eventData["aggregations_count"] = len(query.Aggregations)
-		core.Telemetry.Event("search", eventData)
+		// TODO: adapt this to allow strings.Split(indexName, ",") slice
+		idx, ok := core.ZINC_INDEX_LIST.Get(indexName)
+		if ok {
+			storageSize := idx.GetStats().StorageSize
+			eventData := make(map[string]interface{})
+			eventData["search_type"] = "query_dsl"
+			eventData["search_index_storage"] = idx.GetStorageType()
+			eventData["search_index_size_in_mb"] = storageSize / 1024 / 1024
+			eventData["time_taken_to_search_in_ms"] = resp.Took
+			eventData["aggregations_count"] = len(query.Aggregations)
+			core.Telemetry.Event("search", eventData)
+		}
 	}
 
 	c.JSON(http.StatusOK, resp)
@@ -151,7 +154,7 @@ func MultipleSearch(c *gin.Context) {
 }
 
 func searchIndex(indexNames []string, query *meta.ZincQuery) (*meta.SearchResponse, error) {
-	var indexName = ""
+	indexName := ""
 	if len(indexNames) > 0 {
 		indexName = indexNames[0]
 	}
