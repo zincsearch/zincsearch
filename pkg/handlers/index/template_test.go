@@ -73,9 +73,10 @@ func TestTemplate(t *testing.T) {
 			{
 				name: "empty",
 				args: args{
-					code:   http.StatusBadRequest,
-					target: "",
-					result: `should be not empty`,
+					code:    http.StatusBadRequest,
+					rawData: `{}`,
+					target:  "",
+					result:  `should be not empty`,
 				},
 				wantErr: false,
 			},
