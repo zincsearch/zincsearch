@@ -79,15 +79,20 @@ func GetTemplate(c *gin.Context) {
 // @Failure 400 {object} meta.HTTPResponseError
 // @Router /es/_index_template [post]
 func CreateTemplate(c *gin.Context) {
-	name := c.Param("target")
-	if name == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template.name should be not empty"})
+	data := make(map[string]interface{})
+	if err := zutils.GinBindJSON(c, &data); err != nil {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
-	var data map[string]interface{}
-	if err := zutils.GinBindJSON(c, &data); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+	name := c.Param("target")
+	if name == "" {
+		if v, ok := data["name"]; ok {
+			name, _ = v.(string)
+		}
+	}
+	if name == "" {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template.name should be not empty"})
 		return
 	}
 
