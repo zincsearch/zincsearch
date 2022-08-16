@@ -81,11 +81,11 @@ func TestAliasList_RemoveIndexesFromAlias(t *testing.T) {
 		{
 			name: "should_remove_indexes_from_alias",
 			nFn: func(al *AliasList) {
-				al.Aliases["alias_1"] = append(al.Aliases["alias_1"], "index_0", "index_1", "index_2")
+				al.Aliases["alias_1"] = append(al.Aliases["alias_1"], "index_0", "index_1", "index_2", "index_3")
 			},
 			args: args{
 				alias:         "alias_1",
-				removeIndexes: []string{"index_1"},
+				removeIndexes: []string{"index_1", "index_3"},
 			},
 			wantErr:     false,
 			wantIndexes: []string{"index_0", "index_2"},

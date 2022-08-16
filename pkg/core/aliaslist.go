@@ -58,21 +58,21 @@ func (al *AliasList) RemoveIndexesFromAlias(alias string, removeIndexes []string
 		return nil
 	}
 
-outer:
-	for _, removeIndex := range removeIndexes {
-		for i, s := range indexes {
-			if s == removeIndex {
-				if i < len(indexes)-1 {
-					indexes = append(indexes[:i], indexes[i+1:]...)
-				} else {
-					indexes = indexes[:i]
-				}
-				continue outer
-			}
+	removeIndexesMap := make(map[string]bool)
+	for _, index := range removeIndexes {
+		removeIndexesMap[index] = true
+	}
+
+	lastIndex := len(indexes)
+	for i := 0; i < lastIndex; i++ {
+		if _, ok := removeIndexesMap[indexes[i]]; ok {
+			indexes[lastIndex-1], indexes[i] = indexes[i], indexes[lastIndex-1]
+			i--
+			lastIndex--
 		}
 	}
 
-	al.Aliases[alias] = indexes
+	al.Aliases[alias] = indexes[:lastIndex]
 
 	err := metadata.Alias.Set(al.Aliases)
 	if err != nil {
