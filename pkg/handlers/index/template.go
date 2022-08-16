@@ -79,7 +79,7 @@ func GetTemplate(c *gin.Context) {
 // @Failure 400 {object} meta.HTTPResponseError
 // @Router /es/_index_template [post]
 func CreateTemplate(c *gin.Context) {
-	var data map[string]interface{}
+	data := make(map[string]interface{})
 	if err := zutils.GinBindJSON(c, &data); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
