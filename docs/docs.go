@@ -241,6 +241,39 @@ const docTemplate = `{
             }
         },
         "/api/index/{index}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Get index metadata",
+                "operationId": "GetIndex",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core.Index"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "produces": [
                     "application/json"
@@ -1577,14 +1610,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Index",
-                        "name": "index",
+                        "description": "Target Index",
+                        "name": "target",
                         "in": "path"
                     },
                     {
                         "type": "string",
-                        "description": "Alias",
-                        "name": "alias",
+                        "description": "Target Alias",
+                        "name": "target_alias",
                         "in": "path"
                     }
                 ],

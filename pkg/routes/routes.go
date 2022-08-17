@@ -95,6 +95,7 @@ func SetRoutes(r *gin.Engine) {
 	r.PUT("/api/index", AuthMiddleware, index.Create)
 	r.PUT("/api/index/:target", AuthMiddleware, index.Create)
 	r.DELETE("/api/index/:target", AuthMiddleware, index.Delete)
+	r.GET("/api/index/:target", AuthMiddleware, index.Get)
 	r.HEAD("/api/index/:target", AuthMiddleware, index.Exists)
 	r.POST("/api/index/:target/refresh", AuthMiddleware, index.Refresh)
 	// index settings
