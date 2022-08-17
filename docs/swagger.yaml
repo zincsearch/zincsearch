@@ -1631,6 +1631,28 @@ paths:
       summary: Delete index
       tags:
       - Index
+    get:
+      operationId: GetIndex
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.Index'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Get index metadata
+      tags:
+      - Index
     head:
       operationId: Exists
       parameters:
@@ -2123,13 +2145,13 @@ paths:
     get:
       operationId: GetESAliases
       parameters:
-      - description: Index
+      - description: Target Index
         in: path
-        name: index
+        name: target
         type: string
-      - description: Alias
+      - description: Target Alias
         in: path
-        name: alias
+        name: target_alias
         type: string
       produces:
       - application/json

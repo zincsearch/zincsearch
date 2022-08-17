@@ -174,7 +174,12 @@ func (index *Index) SetMappings(mappings *meta.Mappings) error {
 
 	// update in the cache
 	index.lock.Lock()
-	index.ref.Mappings = mappings
+	if index.ref.Mappings == nil {
+		index.ref.Mappings = meta.NewMappings()
+	}
+	for field, prop := range mappings.ListProperty() {
+		index.ref.Mappings.SetProperty(field, prop)
+	}
 	index.lock.Unlock()
 
 	return nil
