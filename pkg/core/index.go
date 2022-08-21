@@ -128,7 +128,52 @@ func (index *Index) SetSettings(settings *meta.IndexSettings) error {
 	}
 
 	index.lock.Lock()
-	index.ref.Settings = settings
+	if index.ref.Settings == nil {
+		index.ref.Settings = new(meta.IndexSettings)
+	}
+	if settings.NumberOfReplicas > 0 {
+		index.ref.Settings.NumberOfReplicas = settings.NumberOfReplicas
+	}
+	if settings.NumberOfShards > 0 && index.ref.Settings.NumberOfShards == 0 {
+		index.ref.Settings.NumberOfShards = settings.NumberOfShards
+	}
+	if settings.Analysis != nil {
+		if index.ref.Settings.Analysis == nil {
+			index.ref.Settings.Analysis = new(meta.IndexAnalysis)
+		}
+		if settings.Analysis.Analyzer != nil {
+			if index.ref.Settings.Analysis.Analyzer == nil {
+				index.ref.Settings.Analysis.Analyzer = make(map[string]*meta.Analyzer)
+			}
+			for k, v := range settings.Analysis.Analyzer {
+				index.ref.Settings.Analysis.Analyzer[k] = v
+			}
+		}
+		if settings.Analysis.CharFilter != nil {
+			if index.ref.Settings.Analysis.CharFilter == nil {
+				index.ref.Settings.Analysis.CharFilter = make(map[string]interface{})
+			}
+			for k, v := range settings.Analysis.CharFilter {
+				index.ref.Settings.Analysis.CharFilter[k] = v
+			}
+		}
+		if settings.Analysis.Tokenizer != nil {
+			if index.ref.Settings.Analysis.Tokenizer == nil {
+				index.ref.Settings.Analysis.Tokenizer = make(map[string]interface{})
+			}
+			for k, v := range settings.Analysis.Tokenizer {
+				index.ref.Settings.Analysis.Tokenizer[k] = v
+			}
+		}
+		if settings.Analysis.TokenFilter != nil {
+			if index.ref.Settings.Analysis.TokenFilter == nil {
+				index.ref.Settings.Analysis.TokenFilter = make(map[string]interface{})
+			}
+			for k, v := range settings.Analysis.TokenFilter {
+				index.ref.Settings.Analysis.TokenFilter[k] = v
+			}
+		}
+	}
 	index.lock.Unlock()
 
 	return nil
