@@ -564,7 +564,7 @@ export default defineComponent({
             if (["_id", "_index", "_score"].includes(indexData.columns[i])) {
               return row[indexData.columns[i]];
             } else {
-              return Object.byString(row._source, indexData.columns[i]);
+              return row._source[indexData.columns[i]];
             }
           },
           align: "left",
