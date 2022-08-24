@@ -26,17 +26,14 @@ import (
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
 func CreateUser(id, name, plaintextPassword, role string) (*meta.User, error) {
 	id = strings.ToLower(id)
 	var newUser *meta.User
 	existingUser, userExists, err := GetUser(id)
-	if err != nil {
-		if err != errors.ErrKeyNotFound {
-			return nil, err
-		}
+	if err != nil && !errors.Is(err, errors.ErrKeyNotFound) {
+		return nil, err
 	}
 
 	if userExists {
@@ -61,7 +58,7 @@ func CreateUser(id, name, plaintextPassword, role string) (*meta.User, error) {
 		newUser.Password = GeneratePassword(plaintextPassword, newUser.Salt)
 	}
 
-	err = metadata.User.Set(newUser.ID, *newUser)
+	err = SetUser(newUser.ID, *newUser)
 	if err != nil {
 		return nil, err
 	}
