@@ -31,3 +31,7 @@ func GetUser(id string) (*meta.User, bool, error) {
 	}
 	return user, true, nil
 }
+
+func SetUser(id string, user meta.User) error {
+	return metadata.User.Set(id, user)
+}
