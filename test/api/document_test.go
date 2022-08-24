@@ -22,8 +22,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 func TestDocument(t *testing.T) {

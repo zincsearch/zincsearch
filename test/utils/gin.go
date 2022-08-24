@@ -17,13 +17,13 @@ package utils
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 
 	"github.com/gin-gonic/gin"
-	"github.com/goccy/go-json"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 func NewGinContext() (*gin.Context, *httptest.ResponseRecorder) {
@@ -42,14 +42,14 @@ func SetGinRequestData(c *gin.Context, data interface{}) {
 	c.Request.Header.Set("Content-Type", "application/json;charset=utf-8")
 	switch v := data.(type) {
 	case string:
-		c.Request.Body = ioutil.NopCloser(bytes.NewBufferString(v))
+		c.Request.Body = io.NopCloser(bytes.NewBufferString(v))
 	case map[string]interface{}:
 		jsonBytes, err := json.Marshal(data)
 		if err != nil {
 			return
 		}
 		buf := bytes.NewBuffer(jsonBytes)
-		c.Request.Body = ioutil.NopCloser(buf)
+		c.Request.Body = io.NopCloser(buf)
 	default:
 	}
 }

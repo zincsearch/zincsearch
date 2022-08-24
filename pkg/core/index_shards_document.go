@@ -21,13 +21,13 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
-	"github.com/goccy/go-json"
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/zutils"
 	"github.com/zinclabs/zinc/pkg/zutils/flatten"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.

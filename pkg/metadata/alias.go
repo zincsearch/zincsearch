@@ -15,9 +15,7 @@
 
 package metadata
 
-import (
-	"github.com/goccy/go-json"
-)
+import "github.com/zinclabs/zinc/pkg/zutils/json"
 
 type alias struct{}
 

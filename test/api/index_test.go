@@ -21,10 +21,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 func TestIndex(t *testing.T) {

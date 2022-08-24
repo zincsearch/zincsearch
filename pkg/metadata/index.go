@@ -16,10 +16,9 @@
 package metadata
 
 import (
-	"github.com/goccy/go-json"
-
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/upgrade"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 type index struct{}

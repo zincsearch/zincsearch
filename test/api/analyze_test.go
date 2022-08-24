@@ -23,8 +23,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 func TestAnalyze(t *testing.T) {

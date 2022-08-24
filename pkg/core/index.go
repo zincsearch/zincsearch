@@ -21,12 +21,12 @@ import (
 
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
-	"github.com/goccy/go-json"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/zinclabs/zinc/pkg/meta"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 type Index struct {

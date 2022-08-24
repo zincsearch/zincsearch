@@ -19,10 +19,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 	"github.com/zinclabs/zinc/test/utils"
 )
 

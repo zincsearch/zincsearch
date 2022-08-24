@@ -18,9 +18,8 @@ package timerange
 import (
 	"strings"
 
-	"github.com/goccy/go-json"
-
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 func Query(query interface{}) (int64, int64) {
