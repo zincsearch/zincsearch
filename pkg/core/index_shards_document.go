@@ -45,7 +45,7 @@ func (s *IndexShard) BuildBlugeDocumentFromJSON(docID string, doc map[string]int
 	bdoc := bluge.NewDocument(docID)
 	// Iterate through each field and add it to the bluge document
 	for key, value := range doc {
-		if value == nil || key == meta.TimeFieldName {
+		if value == nil || key == meta.TimeFieldName || key == meta.SourceFieldName {
 			continue
 		}
 
@@ -76,9 +76,17 @@ func (s *IndexShard) BuildBlugeDocumentFromJSON(docID string, doc map[string]int
 	}
 	bdoc.AddField(bluge.NewDateTimeField(meta.TimeFieldName, timestamp).StoreValue().Sortable().Aggregatable())
 
-	docByteVal, _ := json.Marshal(doc)
+	// set source
+	var sourceByteVal []byte
+	if v, ok := doc[meta.SourceFieldName]; ok && v != nil {
+		sourceByteVal, _ = json.Marshal(v)
+	} else {
+		delete(doc, meta.SourceFieldName)
+		sourceByteVal, _ = json.Marshal(doc)
+	}
+	bdoc.AddField(bluge.NewStoredOnlyField("_source", sourceByteVal))
+
 	bdoc.AddField(bluge.NewStoredOnlyField("_index", []byte(s.GetIndexName())))
-	bdoc.AddField(bluge.NewStoredOnlyField("_source", docByteVal))
 	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", []string{"_id", "_index", "_source", meta.TimeFieldName}))
 
 	// Add time for index
@@ -211,6 +219,7 @@ func (s *IndexShard) CheckDocument(docID string, doc map[string]interface{}, upd
 	flatDoc[meta.IDFieldName] = docID
 	flatDoc[meta.ShardFieldName] = shard
 	flatDoc[meta.TimeFieldName] = timestamp.UnixNano()
+	flatDoc[meta.SourceFieldName] = doc
 
 	return json.Marshal(flatDoc)
 }

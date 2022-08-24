@@ -16,6 +16,7 @@
 package core
 
 import (
+	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/errors"
@@ -51,7 +52,15 @@ func LoadZincIndexesFromMetadata(version string) error {
 			if err := upgrade.Do(version, readIndex); err != nil {
 				return err
 			}
-			index.ref.Version = meta.Version
+			// save updated metadata
+			readIndex.Version = meta.Version
+			data, err := json.Marshal(readIndex)
+			if err != nil {
+				return err
+			}
+			if err := metadata.Index.Set(readIndex.Name, data); err != nil {
+				return err
+			}
 		}
 
 		// init shards

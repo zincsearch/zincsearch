@@ -47,10 +47,14 @@ func UpgradeFromV026T027(index *meta.Index) error {
 
 	// update metadata
 	if len(index.Shards) == 0 {
-		err := UpgradeMetadataFromV026T027(index, nil)
+		newIndex, err := UpgradeMetadataFromV026T027(nil)
 		if err != nil {
 			return err
 		}
+		index.ShardNum = newIndex.ShardNum
+		index.Shards = newIndex.Shards
+		index.Stats.DocNum = newIndex.Stats.DocNum
+		index.Stats.StorageSize = newIndex.Stats.StorageSize
 	}
 
 	// check if index has been upgraded
@@ -104,14 +108,14 @@ func UpgradeFromV026T027(index *meta.Index) error {
 	return os.Remove(path.Join(rootPath, indexName+"_old"))
 }
 
-func UpgradeMetadataFromV026T027(idx *meta.Index, data []byte) error {
+func UpgradeMetadataFromV026T027(data []byte) (*meta.Index, error) {
 	idx026 := new(meta.IndexV026)
 	if data == nil {
 		data = []byte(`{"shard_num":1,"shards":[{"id":0,"doc_num":0}]}`)
 	}
 	err := json.Unmarshal(data, idx026)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	shardNames := make([]string, config.Global.Shard.Num)
@@ -119,7 +123,7 @@ func UpgradeMetadataFromV026T027(idx *meta.Index, data []byte) error {
 	for i := int64(0); i < config.Global.Shard.Num; i++ {
 		node, err := ider.NewNode(int(i))
 		if err != nil {
-			return err
+			return nil, err
 		}
 		id := node.Generate()
 		shard := &meta.IndexShard{ID: id, ShardNum: 1}
@@ -154,15 +158,17 @@ func UpgradeMetadataFromV026T027(idx *meta.Index, data []byte) error {
 	idx026.Shards = nil
 	newJson, err := json.Marshal(idx026)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	idx := new(meta.Index)
 	err = json.Unmarshal(newJson, idx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	idx.Shards = shards
 	idx.ShardNum = config.Global.Shard.Num
 	idx.Stats.DocNum = shards[firstShardName].Stats.DocNum
 	idx.Stats.StorageSize = shards[firstShardName].Stats.StorageSize
-	return nil
+	return idx, nil
 }
