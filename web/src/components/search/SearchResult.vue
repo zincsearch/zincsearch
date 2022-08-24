@@ -176,16 +176,28 @@ export default defineComponent({
       if (s == undefined) {
         return "";
       }
+      if (s in o) {
+        return o[s];
+      }
       s = s.replace(/\[(\w+)\]/g, ".$1"); // convert indexes to properties
       s = s.replace(/^\./, ""); // strip a leading dot
       var a = s.split(".");
+      var k = "";
+      var lk = "";
       for (var i = 0, n = a.length; i < n; ++i) {
-        var k = a[i];
+        lk = k + "." + a[i];
+        k = a[i];
         if (typeof o == "object" && k in o) {
           o = o[k];
+        } else if (typeof o == "object" && lk in o) {
+          o = o[lk];
+          lk = "";
         } else {
-          return;
+          continue;
         }
+      }
+      if (typeof o == "object") {
+        return "";
       }
       return o;
     };

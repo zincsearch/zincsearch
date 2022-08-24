@@ -17,6 +17,7 @@ package upgrade
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/rs/zerolog/log"
 
@@ -26,18 +27,18 @@ import (
 func Do(oldVersion string, index *meta.Index) error {
 	var err error
 	log.Info().Msgf("Begin upgrade[%s] from version[%s]", index.Name, oldVersion)
-	switch oldVersion {
-	case "v0.2.4":
+	switch strings.TrimPrefix(oldVersion, "v") {
+	case "0.2.4":
 		if err = UpgradeFromV024T025(index); err != nil {
 			return err
 		}
-		return Do("v0.2.5", index)
-	case "v0.2.5":
+		return Do("0.2.5", index)
+	case "0.2.5":
 		if err = UpgradeFromV025T026(index); err != nil {
 			return err
 		}
-		return Do("v0.2.6", index)
-	case "v0.2.6":
+		return Do("0.2.6", index)
+	case "0.2.6":
 		if err = UpgradeFromV026T027(index); err != nil {
 			return err
 		}

@@ -22,6 +22,5 @@ import (
 )
 
 func DeleteUser(id string) error {
-	id = strings.ToLower(id)
-	return metadata.User.Delete(id)
+	return metadata.User.Delete(strings.ToLower(id))
 }

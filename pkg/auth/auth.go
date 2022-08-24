@@ -33,5 +33,5 @@ func VerifyCredentials(userID, password string) (*meta.User, bool) {
 		return user, true
 	}
 
-	return user, false
+	return nil, false
 }
