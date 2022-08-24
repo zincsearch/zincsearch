@@ -16,7 +16,6 @@
 package core
 
 import (
-	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/errors"
@@ -25,6 +24,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/upgrade"
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 func LoadZincIndexesFromMetadata(version string) error {

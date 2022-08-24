@@ -43,6 +43,8 @@ func Do(oldVersion string, index *meta.Index) error {
 			return err
 		}
 		return nil
+	case "0.2.7", "0.2.8", "0.2.9", "0.3.0", "0.3.1":
+		return nil
 	default:
 		return fmt.Errorf("unsupported upgrade from version: %s", oldVersion)
 	}

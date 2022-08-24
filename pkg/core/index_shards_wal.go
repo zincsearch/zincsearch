@@ -24,7 +24,6 @@ import (
 
 	"github.com/blugelabs/bluge"
 	blugeindex "github.com/blugelabs/bluge/index"
-	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 
 	"github.com/zinclabs/zinc/pkg/config"
@@ -32,6 +31,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/wal"
 	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 // MaxBatchSize used to limit memory

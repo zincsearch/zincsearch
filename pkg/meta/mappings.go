@@ -19,7 +19,7 @@ import (
 	"bytes"
 	"sync"
 
-	"github.com/goccy/go-json"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 type Mappings struct {

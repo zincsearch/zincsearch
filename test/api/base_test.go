@@ -20,8 +20,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 func TestApiBase(t *testing.T) {
