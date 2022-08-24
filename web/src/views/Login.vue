@@ -89,6 +89,7 @@ export default defineComponent({
           if (res.data.validated) {
             creds.name = res.data.user.name;
             creds.role = res.data.user.role;
+            creds.password = "";
 
             localStorage.setItem("creds", JSON.stringify(creds));
             store.dispatch("login", creds);

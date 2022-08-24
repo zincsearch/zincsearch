@@ -38,7 +38,7 @@ func (t *index) List(offset, limit int) ([]*meta.Index, error) {
 		if err != nil {
 			if err.Error() == "expected { character for map value" {
 				// compatible for v026 --> begin
-				err = upgrade.UpgradeMetadataFromV026T027(idx, d)
+				idx, err = upgrade.UpgradeMetadataFromV026T027(d)
 				if err != nil {
 					return nil, err
 				}

@@ -21,6 +21,7 @@ const (
 	IDFieldName     = "@_id"
 	ActionFieldName = "@_action"
 	ShardFieldName  = "@_shard"
+	SourceFieldName = "@_source"
 )
 
 const (
