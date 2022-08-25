@@ -70,6 +70,7 @@ func MultiSearch(
 	}
 	heap.Init(docList)
 	// handle skip and limit
+	maxSize := int64(query.Size)
 	query.Size += query.From
 	query.From = 0
 
@@ -129,6 +130,10 @@ func MultiSearch(
 
 	docList.Done()
 	docList.bucket.Aggregation("duration").Finish()
+
+	if docList.size > maxSize {
+		docList.size = maxSize
+	}
 
 	return docList, nil
 }

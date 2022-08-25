@@ -155,6 +155,7 @@ import { useI18n } from "vue-i18n";
 
 import searchService from "../../services/search";
 import HighLight from "../HighLight.vue";
+import { byString, deepKeys } from "../../utils/json";
 
 export default defineComponent({
   name: "SearchResult",
@@ -172,58 +173,6 @@ export default defineComponent({
     // Accessing nested JavaScript objects and arrays by string path
     // https://stackoverflow.com/questions/6491463/accessing-nested-javascript-objects-and-arrays-by-string-path
     const { t } = useI18n();
-    Object.byString = function (o, s) {
-      if (s == undefined) {
-        return "";
-      }
-      if (s in o) {
-        return o[s];
-      }
-      s = s.replace(/\[(\w+)\]/g, ".$1"); // convert indexes to properties
-      s = s.replace(/^\./, ""); // strip a leading dot
-      var a = s.split(".");
-      var k = "";
-      var lk = "";
-      for (var i = 0, n = a.length; i < n; ++i) {
-        lk = k + "." + a[i];
-        k = a[i];
-        if (typeof o == "object" && k in o) {
-          o = o[k];
-        } else if (typeof o == "object" && lk in o) {
-          o = o[lk];
-          lk = "";
-        } else {
-          continue;
-        }
-      }
-      if (typeof o == "object") {
-        return "";
-      }
-      return o;
-    };
-
-    Object.deepKeys = function (o) {
-      if (!(o instanceof Object)) {
-        return [];
-      }
-      let results = [];
-      let keys = Object.keys(o);
-      for (var i in keys) {
-        if (o[keys[i]] == undefined || o[keys[i]].length) {
-          results.push(keys[i]);
-        } else {
-          let subKeys = Object.deepKeys(o[keys[i]]);
-          if (subKeys.length > 0) {
-            subKeys.forEach((key) => {
-              results.push(keys[i] + "." + key);
-            });
-          } else {
-            results.push(keys[i]);
-          }
-        }
-      }
-      return results;
-    };
 
     const defaultColumns = () => {
       return [
@@ -487,7 +436,7 @@ export default defineComponent({
             // update index fields
             let fields = {};
             results.forEach((row) => {
-              let keys = Object.deepKeys(row._source);
+              let keys = deepKeys(row._source);
               for (let i in keys) {
                 fields[keys[i]] = {};
               }
@@ -569,14 +518,14 @@ export default defineComponent({
 
       // add all the selected fields one by one
       for (let i = 0; i < indexData.columns.length; i++) {
-        var newCol = {
+        let newCol = {
           name: indexData.columns[i],
           label: indexData.columns[i],
           field: (row) => {
             if (["_id", "_index", "_score"].includes(indexData.columns[i])) {
               return row[indexData.columns[i]];
             } else {
-              return Object.byString(row._source, indexData.columns[i]);
+              return byString(row._source, indexData.columns[i]);
             }
           },
           align: "left",
