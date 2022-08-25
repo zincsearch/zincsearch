@@ -18,6 +18,7 @@ package directory
 import (
 	"bytes"
 	"context"
+	"crypto/md5"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -184,8 +185,14 @@ func (s *S3Directory) Persist(kind string, id uint64, w index.WriterTo, closeCh 
 		return err
 	}
 
-	log.Print("Persist: s3 object "+s.Bucket+"/"+path+" written. Its md5 hash is: ", *output.ETag) // TODO: compare md5 hashes here to ensure successful write
+	h := md5.New()
+	h.Write(buf.Bytes())
 
+	if output.ETag == nil || *output.ETag != fmt.Sprintf("%x", h.Sum(nil)) {
+		log.Print("Warning: s3 object " + s.Bucket + "/" + path + " has mismatched md5 checksum")
+	}
+
+	log.Print("Persist: s3 object "+s.Bucket+"/"+path+" written. Its md5 hash is: ", *output.ETag)
 	return nil
 }
 
@@ -217,7 +224,7 @@ func (s *S3Directory) Stats() (numItems uint64, numBytes uint64) {
 	return objectCount, sizeOfObjects
 }
 
-// Stats returns total number of items and their cumulative size
+// GetS3PrefixSize Stats returns total number of items and their cumulative size
 func GetS3PrefixSize(bucket, prefix string) (numItems uint64, numBytes uint64) {
 
 	objectCount := uint64(0)

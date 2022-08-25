@@ -111,7 +111,7 @@ func (a *TermsCalculator) Consume(d *search.DocumentMatch) {
 	case BooleanValuesSource:
 		a.consumeBooleanValuesSource(d)
 	default:
-		// not supoort
+		// not support
 	}
 }
 

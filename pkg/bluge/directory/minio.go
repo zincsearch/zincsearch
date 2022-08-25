@@ -19,6 +19,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/md5"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -181,7 +182,14 @@ func (s *MinIODirectory) Persist(kind string, id uint64, w index.WriterTo, close
 		return err
 	}
 
-	log.Print("Persist: MinIO object "+s.Bucket+"/"+key+" written. Its md5 hash is: ", output.ETag) // TODO: compare md5 hashes here to ensure successful write
+	h := md5.New()
+	h.Write(buf.Bytes())
+
+	if output.ETag != fmt.Sprintf("%x", h.Sum(nil)) {
+		log.Print("Warning: MinIO object " + s.Bucket + "/" + key + " has incorrect checksum")
+	}
+
+	log.Print("Persist: MinIO object "+s.Bucket+"/"+key+" written. Its md5 hash is: ", output.ETag)
 
 	return nil
 }

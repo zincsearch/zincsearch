@@ -243,22 +243,21 @@ func (a *AutoDateHistogramCalculator) Finish() {
 			}
 		}
 		// check bucket size
-		if len(a.bucketsMap) > a.size && a.currentInterval < len(a.intervals)-1 {
-			a.currentInterval++
-			for key, bucket := range a.bucketsMap {
-				delete(a.bucketsMap, key)
-				termKey, termStr := a.bucketKey(key)
-				newBucket, ok := a.bucketsMap[termKey]
-				if ok {
-					newBucket.Merge(bucket)
-				} else {
-					newBucket = search.NewBucket(termStr, a.aggregations)
-					newBucket.Merge(bucket)
-					a.bucketsMap[termKey] = newBucket
-				}
-			}
-		} else {
+		if !(len(a.bucketsMap) > a.size && a.currentInterval < len(a.intervals)-1) {
 			break
+		}
+		a.currentInterval++
+		for key, bucket := range a.bucketsMap {
+			delete(a.bucketsMap, key)
+			termKey, termStr := a.bucketKey(key)
+			newBucket, ok := a.bucketsMap[termKey]
+			if ok {
+				newBucket.Merge(bucket)
+			} else {
+				newBucket = search.NewBucket(termStr, a.aggregations)
+				newBucket.Merge(bucket)
+				a.bucketsMap[termKey] = newBucket
+			}
 		}
 	}
 
