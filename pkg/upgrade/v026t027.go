@@ -20,12 +20,11 @@ import (
 	"path"
 	"sort"
 
-	"github.com/goccy/go-json"
-
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 // UpgradeFromV026T027 upgrades from version v0.2.6

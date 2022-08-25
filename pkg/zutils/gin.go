@@ -19,7 +19,7 @@ import (
 	"io"
 
 	"github.com/gin-gonic/gin"
-	"github.com/goccy/go-json"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 func GinBindJSON(c *gin.Context, obj interface{}) error {

@@ -18,10 +18,9 @@ package source
 import (
 	"strings"
 
-	"github.com/goccy/go-json"
-
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
 func Request(v interface{}) (*meta.Source, error) {
