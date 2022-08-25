@@ -31,10 +31,19 @@ export const byString = (o: any, s: string) => {
   s = s.replace(/\[(\w+)\]/g, ".$1"); // convert indexes to properties
   s = s.replace(/^\./, ""); // strip a leading dot
   let a = s.split(".");
+
+  // eg.1, o = {"a1": {"b1": "1234", "b2": "1", "b3": {"c1":"12", "c2":"22"}}, "a2":"334"}, s = "a1.b3.c2"
+  // eg.2, o = {"a1.b1": "1234", "a1":"233", "a2":"334"}, s = "a1.b1"
+  // eg.3, o = {"a1.b1": {"c1": "123"}, "a1":"233", "a2":"334"}, s = "a1.b1.c1"
+  // eg.4, o = {"a1": [{"b1":"12", "b2":"222"}], "a2":"334"}, s = "a1"
   for (let i = 0, n = a.length; i < n; ++i) {
-    const k = a[i];
-    if (typeof o == "object" && k in o) {
-      o = o[k];
+    for (let j = n; j > i; j--) {
+      // Priority matching (longest)
+      let key = a.slice(i, j).join(".");
+      if (typeof o == "object" && key in o) {
+        o = o[key];
+        break;
+      }
     }
   }
   return ToString(o);
