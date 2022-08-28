@@ -21,8 +21,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/core"
-	v1 "github.com/zinclabs/zinc/pkg/core/search/v1"
 	"github.com/zinclabs/zinc/pkg/meta"
+	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
+	"github.com/zinclabs/zinc/pkg/uquery"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
@@ -35,7 +36,7 @@ import (
 // @Produce json
 // @Param   index  path  string  true  "Index"
 // @Param   query  body  v1.ZincQueryForSDK  true  "Query"
-// @Success 200 {object} v1.SearchResponse
+// @Success 200 {object} meta.SearchResponse
 // @Failure 400 {object} meta.HTTPResponseError
 // @Router /api/{index}/_search [post]
 func SearchV1(c *gin.Context) {
@@ -46,14 +47,21 @@ func SearchV1(c *gin.Context) {
 		return
 	}
 
-	var iQuery v1.ZincQuery
+	iQuery := new(v1.ZincQuery)
 	iQuery.MaxResults = 10
 	if err := zutils.GinBindJSON(c, &iQuery); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
-	res, err := v1.Search(index, &iQuery)
+	// convert to new query DSL
+	newQuery, err := uquery.ParseQueryDSLFromV1(iQuery)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		return
+	}
+
+	resp, err := index.Search(newQuery)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
@@ -64,9 +72,9 @@ func SearchV1(c *gin.Context) {
 	eventData["search_type"] = iQuery.SearchType
 	eventData["search_index_storage"] = index.GetStorageType()
 	eventData["search_index_size_in_mb"] = storageSize / 1024 / 1024
-	eventData["time_taken_to_search_in_ms"] = res.Took
+	eventData["time_taken_to_search_in_ms"] = resp.Took
 	eventData["aggregations_count"] = len(iQuery.Aggregations)
 	core.Telemetry.Event("search", eventData)
 
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, resp)
 }

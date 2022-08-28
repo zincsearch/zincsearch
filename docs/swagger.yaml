@@ -931,17 +931,6 @@ definitions:
       track_total_hits:
         type: boolean
     type: object
-  v1.AggregationBucket:
-    properties:
-      aggregations:
-        additionalProperties:
-          $ref: '#/definitions/v1.AggregationResponse'
-        type: object
-      doc_count:
-        type: integer
-      key:
-        type: string
-    type: object
   v1.AggregationDateRange:
     properties:
       from:
@@ -981,42 +970,6 @@ definitions:
           weighted average aggregation
         type: string
     type: object
-  v1.AggregationResponse:
-    properties:
-      buckets:
-        items:
-          $ref: '#/definitions/v1.AggregationBucket'
-        type: array
-      value: {}
-    type: object
-  v1.Hit:
-    properties:
-      '@timestamp':
-        type: string
-      _id:
-        type: string
-      _index:
-        type: string
-      _score:
-        type: number
-      _source: {}
-      _type:
-        type: string
-      highlight:
-        additionalProperties: true
-        type: object
-    type: object
-  v1.Hits:
-    properties:
-      hits:
-        items:
-          $ref: '#/definitions/v1.Hit'
-        type: array
-      max_score:
-        type: number
-      total:
-        $ref: '#/definitions/v1.Total'
-    type: object
   v1.QueryParams:
     properties:
       boost:
@@ -1036,28 +989,6 @@ definitions:
             type: string
           type: array
         type: array
-    type: object
-  v1.SearchResponse:
-    properties:
-      aggregations:
-        additionalProperties:
-          $ref: '#/definitions/v1.AggregationResponse'
-        type: object
-      error:
-        type: string
-      hits:
-        $ref: '#/definitions/v1.Hits'
-      timed_out:
-        type: boolean
-      took:
-        description: Time it took to generate the response
-        type: integer
-    type: object
-  v1.Total:
-    properties:
-      value:
-        description: Count of documents returned
-        type: integer
     type: object
   v1.ZincQueryForSDK:
     properties:
@@ -1438,7 +1369,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.SearchResponse'
+            $ref: '#/definitions/meta.SearchResponse'
         "400":
           description: Bad Request
           schema:

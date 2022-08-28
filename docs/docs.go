@@ -988,7 +988,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.SearchResponse"
+                            "$ref": "#/definitions/meta.SearchResponse"
                         }
                     },
                     "400": {
@@ -3046,23 +3046,6 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.AggregationBucket": {
-            "type": "object",
-            "properties": {
-                "aggregations": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/v1.AggregationResponse"
-                    }
-                },
-                "doc_count": {
-                    "type": "integer"
-                },
-                "key": {
-                    "type": "string"
-                }
-            }
-        },
         "v1.AggregationDateRange": {
             "type": "object",
             "properties": {
@@ -3121,60 +3104,6 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.AggregationResponse": {
-            "type": "object",
-            "properties": {
-                "buckets": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.AggregationBucket"
-                    }
-                },
-                "value": {}
-            }
-        },
-        "v1.Hit": {
-            "type": "object",
-            "properties": {
-                "@timestamp": {
-                    "type": "string"
-                },
-                "_id": {
-                    "type": "string"
-                },
-                "_index": {
-                    "type": "string"
-                },
-                "_score": {
-                    "type": "number"
-                },
-                "_source": {},
-                "_type": {
-                    "type": "string"
-                },
-                "highlight": {
-                    "type": "object",
-                    "additionalProperties": true
-                }
-            }
-        },
-        "v1.Hits": {
-            "type": "object",
-            "properties": {
-                "hits": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.Hit"
-                    }
-                },
-                "max_score": {
-                    "type": "number"
-                },
-                "total": {
-                    "$ref": "#/definitions/v1.Total"
-                }
-            }
-        },
         "v1.QueryParams": {
             "type": "object",
             "properties": {
@@ -3202,39 +3131,6 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
-                }
-            }
-        },
-        "v1.SearchResponse": {
-            "type": "object",
-            "properties": {
-                "aggregations": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/v1.AggregationResponse"
-                    }
-                },
-                "error": {
-                    "type": "string"
-                },
-                "hits": {
-                    "$ref": "#/definitions/v1.Hits"
-                },
-                "timed_out": {
-                    "type": "boolean"
-                },
-                "took": {
-                    "description": "Time it took to generate the response",
-                    "type": "integer"
-                }
-            }
-        },
-        "v1.Total": {
-            "type": "object",
-            "properties": {
-                "value": {
-                    "description": "Count of documents returned",
-                    "type": "integer"
                 }
             }
         },
