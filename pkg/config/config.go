@@ -16,18 +16,20 @@
 package config
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/rs/zerolog/log"
 	"os"
 	"path"
 	"reflect"
 	"strconv"
 	"strings"
 
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"github.com/rs/zerolog/log"
-
 	"github.com/blugelabs/ice/compress"
+	"github.com/docker/go-units"
 )
+
+var defaultMaxDocumentSize = 1048576
 
 type config struct {
 	GinMode                   string `env:"GIN_MODE"`
@@ -49,9 +51,10 @@ type config struct {
 	BatchSize                 int    `env:"ZINC_BATCH_SIZE,default=1024"`
 	MaxResults                int    `env:"ZINC_MAX_RESULTS,default=10000"`
 	AggregationTermsSize      int    `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
-	MaxDocumentSize           int    `env:"ZINC_MAX_DOCUMENT_SIZE,default=1048576"` // Max size for a single document . Default = 1 MB = 1024 * 1024
-	WalSyncInterval           string `env:"ZINC_WAL_SYNC_INTERVAL,default=1s"`      // sync wal to disk, 1s, 10ms
-	WalRedoLogNoSync          bool   `env:"ZINC_WAL_REDOLOG_NO_SYNC,default=false"` // control sync after every write
+	MaxDocumentSize           int    `env:"ZINC_MAX_DOCUMENT_SIZE_HUMAN"`             // Max size for a single document . Default = 1048576 = ( 1 MB = 1024 * 1024)
+	MaxDocumentSizeHuman      string `env:"ZINC_MAX_DOCUMENT_SIZE_HUMAN,default=1mb"` // Max size for a single document . Default = 1 MB
+	WalSyncInterval           string `env:"ZINC_WAL_SYNC_INTERVAL,default=1s"`        // sync wal to disk, 1s, 10ms
+	WalRedoLogNoSync          bool   `env:"ZINC_WAL_REDOLOG_NO_SYNC,default=false"`   // control sync after every write
 	Cluster                   cluster
 	Shard                     shard
 	Etcd                      etcd
@@ -113,8 +116,7 @@ func init() {
 	if err != nil {
 		log.Print(err.Error())
 	}
-	rv := reflect.ValueOf(Global).Elem()
-	loadConfig(rv)
+	warpLoadConfig(Global)
 
 	// configure gin
 	if Global.GinMode == "release" {
@@ -139,6 +141,23 @@ func init() {
 	case "ZSTD":
 		compress.Algorithm = compress.ZSTD
 	}
+}
+func warpLoadConfig(cfg *config) {
+	if cfg == nil {
+		return
+	}
+	rv := reflect.ValueOf(cfg).Elem()
+	loadConfig(rv)
+	if cfg.MaxDocumentSize != 0 {
+		return
+	}
+	maxSize, err := units.FromHumanSize(cfg.MaxDocumentSizeHuman)
+	if err == nil {
+		cfg.MaxDocumentSize = int(maxSize)
+		return
+	}
+	cfg.MaxDocumentSize = defaultMaxDocumentSize
+	log.Print(err.Error())
 }
 
 func loadConfig(rv reflect.Value) {

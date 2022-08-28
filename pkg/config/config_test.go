@@ -17,7 +17,6 @@ package config
 
 import (
 	"os"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,12 +27,12 @@ func TestConfig(t *testing.T) {
 		os.Setenv("ZINC_SERVER_MODE", "node")
 		os.Setenv("ZINC_NODE_ID", "8")
 		os.Setenv("ZINC_ETCD_ENDPOINTS", "localhost:2379")
+		os.Setenv("ZINC_MAX_DOCUMENT_SIZE_HUMAN", "1m")
 	})
 
 	t.Run("check", func(t *testing.T) {
 		c := new(config)
-		rv := reflect.ValueOf(c).Elem()
-		loadConfig(rv)
+		warpLoadConfig(c)
 
 		assert.Equal(t, "", c.GinMode)
 		assert.Equal(t, "4080", c.ServerPort)
@@ -44,6 +43,8 @@ func TestConfig(t *testing.T) {
 		assert.Equal(t, "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942", c.SentryDSN) // Add check for default value
 		assert.Equal(t, true, c.TelemetryEnable)
 		assert.Equal(t, false, c.PrometheusEnable)
+		assert.Equal(t, "1m", c.MaxDocumentSizeHuman)
+		assert.Equal(t, 1000000, c.MaxDocumentSize)
 
 		assert.Equal(t, 1024, c.BatchSize)
 		assert.Equal(t, 10000, c.MaxResults)
@@ -69,8 +70,7 @@ func TestSentryDSNOverride(t *testing.T) {
 
 	t.Run("check", func(t *testing.T) {
 		c := new(config)
-		rv := reflect.ValueOf(c).Elem()
-		loadConfig(rv)
+		warpLoadConfig(c)
 
 		assert.Equal(t, customDSN, c.SentryDSN)
 	})
@@ -85,8 +85,7 @@ func TestS3Override(t *testing.T) {
 
 	t.Run("check", func(t *testing.T) {
 		c := new(config)
-		rv := reflect.ValueOf(c).Elem()
-		loadConfig(rv)
+		warpLoadConfig(c)
 
 		assert.Equal(t, bucket, c.S3.Bucket)
 	})
