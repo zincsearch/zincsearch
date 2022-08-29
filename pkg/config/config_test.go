@@ -27,7 +27,7 @@ func TestConfig(t *testing.T) {
 		os.Setenv("ZINC_SERVER_MODE", "node")
 		os.Setenv("ZINC_NODE_ID", "8")
 		os.Setenv("ZINC_ETCD_ENDPOINTS", "localhost:2379")
-		os.Setenv("ZINC_MAX_DOCUMENT_SIZE_HUMAN", "1m")
+		os.Setenv("ZINC_MAX_DOCUMENT_SIZE", "1m")
 	})
 
 	t.Run("check", func(t *testing.T) {
@@ -58,6 +58,15 @@ func TestConfig(t *testing.T) {
 		assert.Equal(t, false, c.Plugin.GSE.Enable)
 		assert.Equal(t, "small", c.Plugin.GSE.DictEmbed)
 		assert.Equal(t, "./plugins/gse/dict", c.Plugin.GSE.DictPath)
+	})
+
+	t.Run("human check", func(t *testing.T) {
+		os.Setenv("ZINC_MAX_DOCUMENT_SIZE", "2048576")
+
+		c := new(config)
+		warpLoadConfig(c)
+		assert.Equal(t, "2048576", c.MaxDocumentSizeHuman)
+		assert.Equal(t, 2048576, c.MaxDocumentSize)
 	})
 }
 
