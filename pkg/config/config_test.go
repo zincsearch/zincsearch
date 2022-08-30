@@ -65,12 +65,86 @@ func TestConfig(t *testing.T) {
 	})
 
 	t.Run("human check", func(t *testing.T) {
-		os.Setenv("ZINC_MAX_DOCUMENT_SIZE", "2048576")
+		tests := []struct {
+			value  string
+			expect int
+		}{
+			{
+				value:  "2048576",
+				expect: 2048576,
+			},
+			{
+				value:  "1k",
+				expect: 1000,
+			},
+			{
+				value:  "1kb",
+				expect: 1000,
+			},
+			{
+				value:  "1m",
+				expect: 1000000,
+			},
+			{
+				value:  "1mb",
+				expect: 1000000,
+			},
+			{
+				value:  "1g",
+				expect: 1000000000,
+			},
+			{
+				value:  "1gb",
+				expect: 1000000000,
+			},
+			{
+				value:  "1G",
+				expect: 1000000000,
+			},
+			{
+				value:  "1GB",
+				expect: 1000000000,
+			},
+		}
+		for _, v := range tests {
+			os.Setenv("ZINC_MAX_DOCUMENT_SIZE", v.value)
 
-		c := new(config)
-		loadConfig(reflect.ValueOf(c).Elem())
-		assert.Equal(t, 2048576, c.MaxDocumentSize)
+			c := new(config)
+			loadConfig(reflect.ValueOf(c).Elem())
+			assert.Equal(t, c.MaxDocumentSize, v.expect)
+		}
+
+		dt := []struct {
+			value  string
+			expect time.Duration
+		}{
+			{
+				value:  "1",
+				expect: time.Nanosecond,
+			},
+			{
+				value:  "1ns",
+				expect: time.Nanosecond,
+			},
+			{
+				value:  "1s",
+				expect: time.Second,
+			},
+			{
+				value:  "1m",
+				expect: time.Minute,
+			},
+		}
+		for _, v := range dt {
+			os.Setenv("ZINC_WAL_SYNC_INTERVAL", v.value)
+
+			c := new(config)
+			loadConfig(reflect.ValueOf(c).Elem())
+			assert.Equal(t, c.WalSyncInterval, v.expect)
+		}
+
 	})
+
 }
 
 func TestSentryDSNOverride(t *testing.T) {

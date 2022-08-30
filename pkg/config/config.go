@@ -184,8 +184,12 @@ func setField(field reflect.Value, tag string) {
 		switch ok {
 		case true:
 			d, e := time.ParseDuration(v)
-			vi = int64(d)
-			err = e
+			if e != nil && strings.Contains(e.Error(), "time: missing unit in duration") {
+				vi, err = strconv.ParseInt(v, 10, 64)
+			} else {
+				vi, err = int64(d), e
+			}
+
 		default:
 			vi, err = units.FromHumanSize(v)
 		}

@@ -17,11 +17,12 @@ package core
 
 import (
 	"fmt"
+	"strings"
+	"sync/atomic"
+
 	"github.com/blugelabs/bluge"
 	blugeindex "github.com/blugelabs/bluge/index"
 	"github.com/rs/zerolog/log"
-	"strings"
-	"sync/atomic"
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
