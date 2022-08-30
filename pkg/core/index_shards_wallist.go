@@ -21,7 +21,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/rs/zerolog/log"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/zinclabs/zinc/pkg/config"
@@ -70,15 +69,11 @@ func (t *IndexShardWALList) Len() int {
 }
 
 func (t *IndexShardWALList) ConsumeWAL() {
-	interval, err := parseInterval(config.Global.WalSyncInterval)
-	if err != nil {
-		log.Fatal().Err(err).Msg("consume ParseInterval")
-	}
 
 	indexes := make(map[string]*Index)
 	eg := &errgroup.Group{}
 	eg.SetLimit(config.Global.Shard.GorutineNum)
-	tick := time.NewTicker(interval)
+	tick := time.NewTicker(config.Global.WalSyncInterval)
 	for range tick.C {
 		shardClosed := make(chan string, t.Len())
 		indexUpdated := make(chan string, t.Len())

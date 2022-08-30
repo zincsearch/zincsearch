@@ -21,37 +21,38 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/blugelabs/ice/compress"
+	"github.com/docker/go-units"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
-
-	"github.com/blugelabs/ice/compress"
 )
 
 type config struct {
-	GinMode                   string `env:"GIN_MODE"`
-	ServerPort                string `env:"ZINC_SERVER_PORT,default=4080"`
-	ServerMode                string `env:"ZINC_SERVER_MODE,default=node"`
-	NodeID                    int    `env:"ZINC_NODE_ID,default=1"`
-	DataPath                  string `env:"ZINC_DATA_PATH,default=./data"`
-	MetadataStorage           string `env:"ZINC_METADATA_STORAGE,default=bolt"`
-	IceCompressor             string `env:"ZINC_ICE_COMPRESSOR,default=zstd"`
-	SentryEnable              bool   `env:"ZINC_SENTRY,default=true"`
-	SentryDSN                 string `env:"ZINC_SENTRY_DSN,default=https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942"`
-	ProfilerEnable            bool   `env:"ZINC_PROFILER,default=false"`
-	ProfilerServer            string `env:"ZINC_PROFILER_SERVER,default=https://pyroscope.dev.zincsearch.com"`
-	ProfilerAPIKey            string `env:"ZINC_PROFILER_API_KEY,default=psx-AfPbC5Bh6gI4dHkCMpoxM2Qd7Xblsqhip5nlwvHdhAE1"`
-	ProfilerFriendlyProfileID string `env:"ZINC_PROFILER_FRIENDLY_PROFILE_ID"`
-	TelemetryEnable           bool   `env:"ZINC_TELEMETRY,default=true"`
-	PrometheusEnable          bool   `env:"ZINC_PROMETHEUS_ENABLE,default=false"`
-	EnableTextKeywordMapping  bool   `env:"ZINC_ENABLE_TEXT_KEYWORD_MAPPING,default=false"`
-	BatchSize                 int    `env:"ZINC_BATCH_SIZE,default=1024"`
-	MaxResults                int    `env:"ZINC_MAX_RESULTS,default=10000"`
-	AggregationTermsSize      int    `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
-	MaxDocumentSize           int    `env:"ZINC_MAX_DOCUMENT_SIZE,default=1048576"` // Max size for a single document . Default = 1 MB = 1024 * 1024
-	WalSyncInterval           string `env:"ZINC_WAL_SYNC_INTERVAL,default=1s"`      // sync wal to disk, 1s, 10ms
-	WalRedoLogNoSync          bool   `env:"ZINC_WAL_REDOLOG_NO_SYNC,default=false"` // control sync after every write
+	GinMode                   string        `env:"GIN_MODE"`
+	ServerPort                string        `env:"ZINC_SERVER_PORT,default=4080"`
+	ServerMode                string        `env:"ZINC_SERVER_MODE,default=node"`
+	NodeID                    int           `env:"ZINC_NODE_ID,default=1"`
+	DataPath                  string        `env:"ZINC_DATA_PATH,default=./data"`
+	MetadataStorage           string        `env:"ZINC_METADATA_STORAGE,default=bolt"`
+	IceCompressor             string        `env:"ZINC_ICE_COMPRESSOR,default=zstd"`
+	SentryEnable              bool          `env:"ZINC_SENTRY,default=true"`
+	SentryDSN                 string        `env:"ZINC_SENTRY_DSN,default=https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942"`
+	ProfilerEnable            bool          `env:"ZINC_PROFILER,default=false"`
+	ProfilerServer            string        `env:"ZINC_PROFILER_SERVER,default=https://pyroscope.dev.zincsearch.com"`
+	ProfilerAPIKey            string        `env:"ZINC_PROFILER_API_KEY,default=psx-AfPbC5Bh6gI4dHkCMpoxM2Qd7Xblsqhip5nlwvHdhAE1"`
+	ProfilerFriendlyProfileID string        `env:"ZINC_PROFILER_FRIENDLY_PROFILE_ID"`
+	TelemetryEnable           bool          `env:"ZINC_TELEMETRY,default=true"`
+	PrometheusEnable          bool          `env:"ZINC_PROMETHEUS_ENABLE,default=false"`
+	EnableTextKeywordMapping  bool          `env:"ZINC_ENABLE_TEXT_KEYWORD_MAPPING,default=false"`
+	BatchSize                 int           `env:"ZINC_BATCH_SIZE,default=1024"`
+	MaxResults                int           `env:"ZINC_MAX_RESULTS,default=10000"`
+	AggregationTermsSize      int           `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
+	MaxDocumentSize           int           `env:"ZINC_MAX_DOCUMENT_SIZE,default=1m"`      // Max size for a single document . Default = 1 MB = 1024 * 1024
+	WalSyncInterval           time.Duration `env:"ZINC_WAL_SYNC_INTERVAL,default=1s"`      // sync wal to disk, 1s, 10ms
+	WalRedoLogNoSync          bool          `env:"ZINC_WAL_REDOLOG_NO_SYNC,default=false"` // control sync after every write
 	Cluster                   cluster
 	Shard                     shard
 	Etcd                      etcd
@@ -113,8 +114,7 @@ func init() {
 	if err != nil {
 		log.Print(err.Error())
 	}
-	rv := reflect.ValueOf(Global).Elem()
-	loadConfig(rv)
+	loadConfig(reflect.ValueOf(Global).Elem())
 
 	// configure gin
 	if Global.GinMode == "release" {
@@ -176,10 +176,27 @@ func setField(field reflect.Value, tag string) {
 	}
 	switch field.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		vi, err := strconv.ParseInt(v, 10, 64)
+		_, ok := field.Interface().(time.Duration)
+		var (
+			vi  int64
+			err error
+		)
+		switch ok {
+		case true:
+			d, e := time.ParseDuration(v)
+			if e != nil && strings.Contains(e.Error(), "time: missing unit in duration") {
+				vi, err = strconv.ParseInt(v, 10, 64)
+			} else {
+				vi, err = int64(d), e
+			}
+
+		default:
+			vi, err = units.FromHumanSize(v)
+		}
 		if err != nil {
 			log.Fatal().Err(err).Msgf("env %s is not int", tag)
 		}
+
 		field.SetInt(int64(vi))
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		vi, err := strconv.ParseUint(v, 10, 64)
