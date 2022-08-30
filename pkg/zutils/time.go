@@ -23,12 +23,24 @@ import (
 )
 
 func ParseDuration(s string) (time.Duration, error) {
-	v, err := time.ParseDuration(s)
-	if err != nil && strings.Contains(err.Error(), "time: missing unit in duration") {
+	d, err := time.ParseDuration(s)
+	if err == nil {
+		return d, nil
+	}
+
+	if strings.Contains(err.Error(), "time: missing unit in duration") {
 		nv, err := strconv.ParseInt(s, 10, 64)
 		return time.Duration(nv), err
 	}
-	return v, nil
+
+	if !strings.HasSuffix(s, "d") {
+		return 0, err
+	}
+
+	h := strings.TrimSuffix(s, "d")
+	hour, _ := strconv.Atoi(h)
+	d = time.Hour * time.Duration(hour) * 24
+	return d, nil
 }
 
 func FormatDuration(d time.Duration) string {
