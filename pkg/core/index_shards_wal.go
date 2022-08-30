@@ -17,14 +17,11 @@ package core
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
-	"sync/atomic"
-	"time"
-
 	"github.com/blugelabs/bluge"
 	blugeindex "github.com/blugelabs/bluge/index"
 	"github.com/rs/zerolog/log"
+	"strings"
+	"sync/atomic"
 
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
@@ -479,22 +476,4 @@ func (w *walMergeDocs) WriteToShardRollback(shard *IndexShard, shardID int64, ba
 	}
 
 	return writer.Batch(batch)
-}
-
-// parseInterval parse interval string to time.Duration: 1s, 10ms
-func parseInterval(v string) (time.Duration, error) {
-	if v == "" {
-		return time.Second, nil
-	}
-	v = strings.ToLower(v)
-	if strings.HasSuffix(v, "ms") {
-		i, err := strconv.Atoi(v[:len(v)-2])
-		return time.Millisecond * time.Duration(i), err
-	}
-	if strings.HasSuffix(v, "s") {
-		i, err := strconv.Atoi(v[:len(v)-1])
-		return time.Second * time.Duration(i), err
-	}
-	i, err := strconv.Atoi(v)
-	return time.Second * time.Duration(i), err
 }
