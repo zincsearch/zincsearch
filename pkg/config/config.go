@@ -16,9 +16,6 @@
 package config
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"github.com/rs/zerolog/log"
 	"os"
 	"path"
 	"reflect"
@@ -28,9 +25,10 @@ import (
 
 	"github.com/blugelabs/ice/compress"
 	"github.com/docker/go-units"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/rs/zerolog/log"
 )
-
-var defaultMaxDocumentSize = 1048576
 
 type config struct {
 	GinMode                   string        `env:"GIN_MODE"`
