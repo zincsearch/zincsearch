@@ -27,14 +27,16 @@ func ParseDuration(s string) (time.Duration, error) {
 	if err == nil {
 		return d, nil
 	}
-	if !strings.HasSuffix(s, "d") {
-		return 0, err
+
+	if strings.HasSuffix(s, "d") {
+		h := strings.TrimSuffix(s, "d")
+		hour, _ := strconv.Atoi(h)
+		d = time.Hour * 24 * time.Duration(hour)
+		return d, nil
 	}
 
-	h := strings.TrimSuffix(s, "d")
-	hour, _ := strconv.Atoi(h)
-	d = time.Hour * time.Duration(hour) * 24
-	return d, nil
+	dv, err := strconv.ParseInt(s, 10, 64)
+	return time.Duration(dv), err
 }
 
 func FormatDuration(d time.Duration) string {

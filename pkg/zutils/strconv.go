@@ -115,29 +115,13 @@ func ToBool(v interface{}) (bool, error) {
 	case string:
 		return strconv.ParseBool(v)
 	case float64:
-		if v == 0 {
-			return false, nil
-		} else {
-			return true, nil
-		}
+		return v != 0, nil
 	case uint64:
-		if v == 0 {
-			return false, nil
-		} else {
-			return true, nil
-		}
+		return v != 0, nil
 	case int64:
-		if v == 0 {
-			return false, nil
-		} else {
-			return true, nil
-		}
+		return v != 0, nil
 	case int:
-		if v == 0 {
-			return false, nil
-		} else {
-			return true, nil
-		}
+		return v != 0, nil
 	default:
 		return false, fmt.Errorf("ToInt: unknown supported type %T", v)
 	}
