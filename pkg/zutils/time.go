@@ -18,11 +18,17 @@ package zutils
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
 func ParseDuration(s string) (time.Duration, error) {
-	return time.ParseDuration(s)
+	v, err := time.ParseDuration(s)
+	if err != nil && strings.Contains(err.Error(), "time: missing unit in duration") {
+		nv, err := strconv.ParseInt(s, 10, 64)
+		return time.Duration(nv), err
+	}
+	return v, nil
 }
 
 func FormatDuration(d time.Duration) string {
