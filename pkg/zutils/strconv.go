@@ -17,95 +17,24 @@ package zutils
 
 import (
 	"fmt"
+	"github.com/spf13/cast"
 	"strconv"
 )
 
 func ToString(v interface{}) (string, error) {
-	switch v := v.(type) {
-	case string:
-		return v, nil
-	case float64:
-		return strconv.FormatFloat(v, 'f', -1, 64), nil
-	case uint64:
-		return strconv.FormatUint(v, 10), nil
-	case int64:
-		return strconv.FormatInt(v, 10), nil
-	case int:
-		return strconv.Itoa(v), nil
-	case bool:
-		return strconv.FormatBool(v), nil
-	default:
-		return fmt.Sprintf("%v", v), nil
-	}
+	return cast.ToStringE(v)
 }
 
 func ToFloat64(v interface{}) (float64, error) {
-	switch v := v.(type) {
-	case float64:
-		return v, nil
-	case uint64:
-		return float64(v), nil
-	case int64:
-		return float64(v), nil
-	case int:
-		return float64(v), nil
-	case string:
-		return strconv.ParseFloat(v, 64)
-	case bool:
-		if v {
-			return 1, nil
-		} else {
-			return 0, nil
-		}
-	default:
-		return 0, fmt.Errorf("ToFloat64: unknown supported type %T", v)
-	}
+	return cast.ToFloat64E(v)
 }
 
 func ToUint64(v interface{}) (uint64, error) {
-	switch v := v.(type) {
-	case uint64:
-		return v, nil
-	case float64:
-		return uint64(v), nil
-	case int64:
-		return uint64(v), nil
-	case int:
-		return uint64(v), nil
-	case string:
-		return strconv.ParseUint(v, 10, 64)
-	case bool:
-		if v {
-			return 1, nil
-		} else {
-			return 0, nil
-		}
-	default:
-		return 0, fmt.Errorf("ToInt: unknown supported type %T", v)
-	}
+	return cast.ToUint64E(v)
 }
 
 func ToInt(v interface{}) (int, error) {
-	switch v := v.(type) {
-	case int:
-		return v, nil
-	case float64:
-		return int(v), nil
-	case uint64:
-		return int(v), nil
-	case int64:
-		return int(v), nil
-	case string:
-		return strconv.Atoi(v)
-	case bool:
-		if v {
-			return 1, nil
-		} else {
-			return 0, nil
-		}
-	default:
-		return 0, fmt.Errorf("ToInt: unknown supported type %T", v)
-	}
+	return cast.ToIntE(v)
 }
 
 func ToBool(v interface{}) (bool, error) {
@@ -115,29 +44,13 @@ func ToBool(v interface{}) (bool, error) {
 	case string:
 		return strconv.ParseBool(v)
 	case float64:
-		if v == 0 {
-			return false, nil
-		} else {
-			return true, nil
-		}
+		return v != 0, nil
 	case uint64:
-		if v == 0 {
-			return false, nil
-		} else {
-			return true, nil
-		}
+		return v != 0, nil
 	case int64:
-		if v == 0 {
-			return false, nil
-		} else {
-			return true, nil
-		}
+		return v != 0, nil
 	case int:
-		if v == 0 {
-			return false, nil
-		} else {
-			return true, nil
-		}
+		return v != 0, nil
 	default:
 		return false, fmt.Errorf("ToInt: unknown supported type %T", v)
 	}

@@ -26,6 +26,7 @@ require (
 	github.com/rs/zerolog v1.27.0
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/shirou/gopsutil/v3 v3.22.7
+	github.com/spf13/cast v1.3.0
 	github.com/stretchr/testify v1.8.0
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe
 	github.com/swaggo/gin-swagger v1.5.2
