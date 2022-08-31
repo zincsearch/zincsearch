@@ -70,7 +70,7 @@ func RangeQueryNumeric(field string, query map[string]interface{}, mappings *met
 		case "boost":
 			value.Boost, _ = zutils.ToFloat64(v)
 		default:
-			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[range] unknown field [%s]", k))
+			// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[range] unknown field [%s]", k))
 		}
 	}
 
@@ -125,7 +125,7 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 		case "boost":
 			value.Boost, _ = zutils.ToFloat64(v)
 		default:
-			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[range] unknown field [%s]", k))
+			// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[range] unknown field [%s]", k))
 		}
 	}
 

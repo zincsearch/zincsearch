@@ -69,7 +69,7 @@ func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, anal
 				return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[multi_match] %s doesn't support values of type: %T", k, v))
 			}
 		default:
-			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[multi_match] unknown field [%s]", k))
+			// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[multi_match] unknown field [%s]", k))
 		}
 	}
 
