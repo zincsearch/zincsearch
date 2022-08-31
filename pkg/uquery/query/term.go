@@ -55,7 +55,7 @@ func TermQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Que
 				case "boost":
 					value.Boost = v.(float64)
 				default:
-					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[term] unknown field [%s]", k))
+					// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[term] unknown field [%s]", k))
 				}
 			}
 		default:

@@ -47,7 +47,7 @@ func WildcardQuery(query map[string]interface{}) (bluge.Query, error) {
 				case "boost":
 					value.Boost = v.(float64)
 				default:
-					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[wildcard] unknown field [%s]", k))
+					// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[wildcard] unknown field [%s]", k))
 				}
 			}
 		default:

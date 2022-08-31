@@ -51,7 +51,7 @@ func MatchPhraseQuery(query map[string]interface{}, mappings *meta.Mappings, ana
 				case "boost":
 					value.Boost = v.(float64)
 				default:
-					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[match_phrase] unknown field [%s]", k))
+					// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[match_phrase] unknown field [%s]", k))
 				}
 			}
 		default:
