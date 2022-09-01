@@ -17,11 +17,12 @@ package zutils
 
 import (
 	"strconv"
+	"strings"
 	"unicode"
 )
 
 func StringToInt(s string) int {
-	i, _ := strconv.Atoi(s)
+	i, _ := strconv.Atoi(strings.TrimSpace(s))
 	return i
 }
 
