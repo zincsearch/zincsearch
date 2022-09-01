@@ -24,53 +24,6 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-func Test_parseInterval(t *testing.T) {
-	type args struct {
-		v string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    time.Duration
-		wantErr bool
-	}{
-		{
-			name: "1s",
-			args: args{
-				v: "1s",
-			},
-			want: time.Second,
-		},
-		{
-			name: "1ms",
-			args: args{
-				v: "1ms",
-			},
-			want: time.Millisecond,
-		},
-		{
-			name: "1m",
-			args: args{
-				v: "1m",
-			},
-			want:    time.Duration(0),
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := parseInterval(tt.args.v)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("parseInterval() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("parseInterval() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func Test_walMergeDocs_WriteTo(t *testing.T) {
 	testData := []map[string]interface{}{
 		{

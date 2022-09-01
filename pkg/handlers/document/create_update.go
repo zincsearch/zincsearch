@@ -71,7 +71,16 @@ func CreateUpdate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, meta.HTTPResponseID{Message: "ok", ID: docID})
+	c.JSON(http.StatusOK, meta.HTTPResponseESID{
+		Message:     "ok",
+		ID:          docID,
+		ESID:        docID,
+		Index:       indexName,
+		Version:     1,
+		SeqNo:       0,
+		PrimaryTerm: 0,
+		Result:      "created",
+	})
 }
 
 // @Id IndexDocumentWithID

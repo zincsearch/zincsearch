@@ -52,7 +52,7 @@ func MatchBoolPrefixQuery(query map[string]interface{}, mappings *meta.Mappings,
 				case "boost":
 					value.Boost = v.(float64)
 				default:
-					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[match_bool_prefix] unknown field [%s]", k))
+					// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[match_bool_prefix] unknown field [%s]", k))
 				}
 			}
 		default:

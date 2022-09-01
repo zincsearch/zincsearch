@@ -55,7 +55,7 @@ func IdsQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Quer
 						return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[ids] %s doesn't support values of type: %T", k, v))
 					}
 				default:
-					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[ids] unknown field [%s]", k))
+					// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[ids] unknown field [%s]", k))
 				}
 			}
 		default:

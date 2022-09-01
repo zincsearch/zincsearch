@@ -104,11 +104,11 @@ func TestApiES(t *testing.T) {
 				resp := request("POST", "/es/"+indexName+"/_doc", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
 
-				data := make(map[string]string)
+				data := make(map[string]interface{})
 				err := json.Unmarshal(resp.Body.Bytes(), &data)
 				assert.NoError(t, err)
 				assert.NotEqual(t, "", data["id"])
-				_id = data["id"]
+				_id = data["id"].(string)
 			})
 			t.Run("update document with exist indexName and exist id", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)

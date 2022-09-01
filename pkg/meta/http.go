@@ -49,3 +49,14 @@ type HTTPResponseRecordCount struct {
 type HTTPResponseError struct {
 	Error string `json:"error"`
 }
+
+type HTTPResponseESID struct {
+	Message     string `json:"message"`
+	ID          string `json:"id"`
+	ESID        string `json:"_id"`
+	Index       string `json:"_index"`
+	Version     int    `json:"_version"`
+	SeqNo       int    `json:"_seq_no"`
+	PrimaryTerm int    `json:"_primary_term"`
+	Result      string `json:"result"` // created, updated, deleted
+}

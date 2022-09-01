@@ -58,7 +58,7 @@ func MatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers
 				case "boost":
 					value.Boost, _ = zutils.ToFloat64(v)
 				default:
-					return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[match] unknown field [%s]", k))
+					// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[match] unknown field [%s]", k))
 				}
 			}
 		default:

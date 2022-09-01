@@ -19,6 +19,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -28,12 +29,13 @@ func TestConfig(t *testing.T) {
 		os.Setenv("ZINC_SERVER_MODE", "node")
 		os.Setenv("ZINC_NODE_ID", "8")
 		os.Setenv("ZINC_ETCD_ENDPOINTS", "localhost:2379")
+		os.Setenv("ZINC_MAX_DOCUMENT_SIZE", "1m")
+		os.Setenv("ZINC_WAL_SYNC_INTERVAL", "10s")
 	})
 
 	t.Run("check", func(t *testing.T) {
 		c := new(config)
-		rv := reflect.ValueOf(c).Elem()
-		loadConfig(rv)
+		loadConfig(reflect.ValueOf(c).Elem())
 
 		assert.Equal(t, "", c.GinMode)
 		assert.Equal(t, "4080", c.ServerPort)
@@ -44,10 +46,13 @@ func TestConfig(t *testing.T) {
 		assert.Equal(t, "https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942", c.SentryDSN) // Add check for default value
 		assert.Equal(t, true, c.TelemetryEnable)
 		assert.Equal(t, false, c.PrometheusEnable)
+		assert.Equal(t, 1000000, c.MaxDocumentSize)
 
 		assert.Equal(t, 1024, c.BatchSize)
 		assert.Equal(t, 10000, c.MaxResults)
 		assert.Equal(t, 1000, c.AggregationTermsSize)
+
+		assert.Equal(t, 10*time.Second, c.WalSyncInterval)
 
 		assert.Equal(t, []string{"localhost:2379"}, c.Etcd.Endpoints)
 
@@ -58,6 +63,88 @@ func TestConfig(t *testing.T) {
 		assert.Equal(t, "small", c.Plugin.GSE.DictEmbed)
 		assert.Equal(t, "./plugins/gse/dict", c.Plugin.GSE.DictPath)
 	})
+
+	t.Run("human check", func(t *testing.T) {
+		tests := []struct {
+			value  string
+			expect int
+		}{
+			{
+				value:  "2048576",
+				expect: 2048576,
+			},
+			{
+				value:  "1k",
+				expect: 1000,
+			},
+			{
+				value:  "1kb",
+				expect: 1000,
+			},
+			{
+				value:  "1m",
+				expect: 1000000,
+			},
+			{
+				value:  "1mb",
+				expect: 1000000,
+			},
+			{
+				value:  "1g",
+				expect: 1000000000,
+			},
+			{
+				value:  "1gb",
+				expect: 1000000000,
+			},
+			{
+				value:  "1G",
+				expect: 1000000000,
+			},
+			{
+				value:  "1GB",
+				expect: 1000000000,
+			},
+		}
+		for _, v := range tests {
+			os.Setenv("ZINC_MAX_DOCUMENT_SIZE", v.value)
+
+			c := new(config)
+			loadConfig(reflect.ValueOf(c).Elem())
+			assert.Equal(t, c.MaxDocumentSize, v.expect)
+		}
+
+		dt := []struct {
+			value  string
+			expect time.Duration
+		}{
+			{
+				value:  "1",
+				expect: time.Nanosecond,
+			},
+			{
+				value:  "1ns",
+				expect: time.Nanosecond,
+			},
+			{
+				value:  "1s",
+				expect: time.Second,
+			},
+			{
+				value:  "1m",
+				expect: time.Minute,
+			},
+		}
+		for _, v := range dt {
+			os.Setenv("ZINC_WAL_SYNC_INTERVAL", v.value)
+
+			c := new(config)
+			loadConfig(reflect.ValueOf(c).Elem())
+			assert.Equal(t, c.WalSyncInterval, v.expect)
+		}
+
+	})
+
 }
 
 func TestSentryDSNOverride(t *testing.T) {
@@ -69,8 +156,7 @@ func TestSentryDSNOverride(t *testing.T) {
 
 	t.Run("check", func(t *testing.T) {
 		c := new(config)
-		rv := reflect.ValueOf(c).Elem()
-		loadConfig(rv)
+		loadConfig(reflect.ValueOf(c).Elem())
 
 		assert.Equal(t, customDSN, c.SentryDSN)
 	})
@@ -85,8 +171,7 @@ func TestS3Override(t *testing.T) {
 
 	t.Run("check", func(t *testing.T) {
 		c := new(config)
-		rv := reflect.ValueOf(c).Elem()
-		loadConfig(rv)
+		loadConfig(reflect.ValueOf(c).Elem())
 
 		assert.Equal(t, bucket, c.S3.Bucket)
 	})
