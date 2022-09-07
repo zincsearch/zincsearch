@@ -21,10 +21,13 @@ ARG BUILD_DATE
 
 RUN update-ca-certificates
 # RUN apk update && apk add --no-cache git
-# Create appuser.
-ENV USER=appuser
+# Create zinc.
+ENV USER=zinc
+ENV GROUP=zinc
 ENV UID=10001
+ENV GID=10001
 # See https://stackoverflow.com/a/55757473/12429735RUN
+RUN groupadd --gid "${GID}" "${GROUP}"
 RUN adduser \
     --disabled-password \
     --gecos "" \
@@ -32,7 +35,11 @@ RUN adduser \
     --shell "/sbin/nologin" \
     --no-create-home \
     --uid "${UID}" \
+    --gid "${GID}" \
     "${USER}"
+# Default directory for persistent Zinc data used in final build stage. It follows the Linux filesystem hierarchy pattern
+# https://tldp.org/LDP/Linux-Filesystem-Hierarchy/html/var.html
+RUN mkdir -p /var/lib/zinc && chown zinc:zinc /var/lib/zinc
 WORKDIR $GOPATH/src/github.com/zinclabs/zinc/
 COPY . .
 COPY --from=webBuilder /web/dist web/dist
@@ -61,6 +68,7 @@ RUN CGO_ENABLED=0 go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta.
 ############################
 # FROM public.ecr.aws/lts/ubuntu:latest
 FROM scratch
+
 # Import the user and group files from the builder.
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
@@ -71,8 +79,15 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certifi
 # Copy our static executable.
 COPY --from=builder  /go/src/github.com/zinclabs/zinc/zinc /go/bin/zinc
 
+# Create directory that can be used to keep Zinc data persistent along with host source or named volumes
+COPY --from=builder --chown=zinc:zinc /var/lib/zinc /var/lib/zinc
+
+# Default directory for persistent Zinc data. It follows the Linux filesystem hierarchy pattern
+# https://tldp.org/LDP/Linux-Filesystem-Hierarchy/html/var.html
+ENV ZINC_DATA_PATH=/var/lib/zinc
+
 # Use an unprivileged user.
-USER appuser:appuser
+USER zinc:zinc
 # Port on which the service will be exposed.
 EXPOSE 4080
 # Run the zinc binary.
