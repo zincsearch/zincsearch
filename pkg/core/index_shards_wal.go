@@ -37,7 +37,7 @@ const MaxBatchSize = 10240
 
 // OpenWAL open WAL for index
 func (s *IndexShard) OpenWAL() error {
-	if atomic.LoadUint32(&s.open) == 1 {
+	if atomic.LoadUint64(&s.open) == 1 {
 		return nil
 	}
 
@@ -57,7 +57,7 @@ func (s *IndexShard) OpenWAL() error {
 	s.lock.Unlock()
 
 	// set wal opened
-	atomic.StoreUint32(&s.open, 1)
+	atomic.StoreUint64(&s.open, 1)
 	s.close = make(chan struct{})
 
 	// check wal rollback
