@@ -29,6 +29,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/zutils"
+	. "github.com/zinclabs/zinc/pkg/zutils"
 	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
@@ -50,7 +51,7 @@ func SearchDSL(c *gin.Context) {
 	query := &meta.ZincQuery{Size: 10}
 	if err := zutils.GinBindJSON(c, query); err != nil {
 		log.Printf("handlers.search.searchDSL: %s", err.Error())
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -75,7 +76,7 @@ func SearchDSL(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, resp)
+	GetRenderer(c)(http.StatusOK, resp)
 }
 
 // MultipleSearch like bulk searches
@@ -150,7 +151,7 @@ func MultipleSearch(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"responses": responses})
+	GetRenderer(c)(http.StatusOK, gin.H{"responses": responses})
 }
 
 func searchIndex(indexNames []string, query *meta.ZincQuery) (*meta.SearchResponse, error) {

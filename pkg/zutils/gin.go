@@ -17,6 +17,7 @@ package zutils
 
 import (
 	"io"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/zinclabs/zinc/pkg/zutils/json"
@@ -29,4 +30,20 @@ func GinBindJSON(c *gin.Context, obj interface{}) error {
 	}
 	defer c.Request.Body.Close()
 	return json.Unmarshal(body, obj)
+}
+
+type Renderer func(code int, obj interface{})
+
+func GetRenderer(c *gin.Context) Renderer {
+	if requestsPrettyRendering(c) {
+		return c.IndentedJSON
+	}
+	return c.JSON
+}
+
+func requestsPrettyRendering(c *gin.Context) bool {
+	if p, ok := c.GetQuery("pretty"); ok && (strings.EqualFold(p, "true") || strings.EqualFold(p, "")) {
+		return true
+	}
+	return false
 }

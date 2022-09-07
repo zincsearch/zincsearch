@@ -24,6 +24,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/zutils"
+	. "github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id IndexDocument
@@ -44,7 +45,7 @@ func CreateUpdate(c *gin.Context) {
 	var err error
 	var doc map[string]interface{}
 	if err = zutils.GinBindJSON(c, &doc); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -62,16 +63,16 @@ func CreateUpdate(c *gin.Context) {
 	// If the index does not exist, then create it
 	index, _, err := core.GetOrCreateIndex(indexName, "", 0)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		GetRenderer(c)(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
 	err = index.CreateDocument(docID, doc, update)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		GetRenderer(c)(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, meta.HTTPResponseESID{
+	GetRenderer(c)(http.StatusOK, meta.HTTPResponseESID{
 		Message:     "ok",
 		ID:          docID,
 		ESID:        docID,

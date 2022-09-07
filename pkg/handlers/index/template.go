@@ -24,6 +24,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/uquery/template"
 	"github.com/zinclabs/zinc/pkg/zutils"
+	. "github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id ListTemplates
@@ -37,10 +38,10 @@ func ListTemplate(c *gin.Context) {
 	pattern := c.Query("pattern")
 	templates, err := core.ListTemplates(pattern)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, templates)
+	GetRenderer(c)(http.StatusOK, templates)
 }
 
 // @Id GetTemplate
@@ -54,19 +55,19 @@ func ListTemplate(c *gin.Context) {
 func GetTemplate(c *gin.Context) {
 	name := c.Param("target")
 	if name == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template.name should be not empty"})
+		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: "template.name should be not empty"})
 		return
 	}
 	template, exists, err := core.LoadTemplate(name)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 	if !exists {
-		c.JSON(http.StatusNotFound, meta.HTTPResponseError{Error: "template " + name + " does not exists"})
+		GetRenderer(c)(http.StatusNotFound, meta.HTTPResponseError{Error: "template " + name + " does not exists"})
 		return
 	}
-	c.JSON(http.StatusOK, template)
+	GetRenderer(c)(http.StatusOK, template)
 }
 
 // @Id CreateTemplate
@@ -81,7 +82,7 @@ func GetTemplate(c *gin.Context) {
 func CreateTemplate(c *gin.Context) {
 	data := make(map[string]interface{})
 	if err := zutils.GinBindJSON(c, &data); err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -92,23 +93,23 @@ func CreateTemplate(c *gin.Context) {
 		}
 	}
 	if name == "" {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "template.name should be not empty"})
+		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: "template.name should be not empty"})
 		return
 	}
 
 	template, err := template.Request(data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
 	err = core.NewTemplate(name, template)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, meta.HTTPResponseTemplate{Message: "ok", Template: name})
+	GetRenderer(c)(http.StatusOK, meta.HTTPResponseTemplate{Message: "ok", Template: name})
 }
 
 // @Id UpdateTemplate
@@ -135,8 +136,8 @@ func DeleteTemplate(c *gin.Context) {
 	name := c.Param("target")
 	err := core.DeleteTemplate(name)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, meta.HTTPResponse{Message: "ok"})
+	GetRenderer(c)(http.StatusOK, meta.HTTPResponse{Message: "ok"})
 }

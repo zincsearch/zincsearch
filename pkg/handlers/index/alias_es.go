@@ -25,6 +25,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/zutils"
+	. "github.com/zinclabs/zinc/pkg/zutils"
 )
 
 type Alias struct {
@@ -54,7 +55,7 @@ func AddOrRemoveESAlias(c *gin.Context) {
 	var alias Alias
 	err := zutils.GinBindJSON(c, &alias)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -99,7 +100,7 @@ func AddOrRemoveESAlias(c *gin.Context) {
 		_ = core.ZINC_INDEX_ALIAS_LIST.RemoveIndexesFromAlias(alias, indexes)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"acknowledged": true})
+	GetRenderer(c)(http.StatusOK, gin.H{"acknowledged": true})
 }
 
 // @Id GetESAliases
@@ -128,7 +129,7 @@ func GetESAliases(c *gin.Context) {
 
 	m := core.ZINC_INDEX_ALIAS_LIST.GetAliasMap(targetIndexes, targetAliases)
 
-	c.JSON(http.StatusOK, m)
+	GetRenderer(c)(http.StatusOK, m)
 }
 
 func indexNameMatches(name, indexName string) bool {
