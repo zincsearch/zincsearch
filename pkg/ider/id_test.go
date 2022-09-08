@@ -27,9 +27,11 @@ func TestGenerate(t *testing.T) {
 }
 
 func TestNewNode(t *testing.T) {
-	node, err := NewNode(1)
-	assert.NoError(t, err)
-	assert.NotNil(t, node)
-	id := node.Generate()
-	assert.NotEmpty(t, id)
+	for i := 1023; i < 1026; i++ {
+		node, err := NewNode(i)
+		assert.NoError(t, err)
+		assert.NotNil(t, node)
+		id := node.Generate()
+		assert.NotEmpty(t, id)
+	}
 }

@@ -42,7 +42,7 @@ func Generate() string {
 }
 
 func NewNode(id int) (*Node, error) {
-	node, err := snowflake.NewNode(int64(id % 1023))
+	node, err := snowflake.NewNode(int64(id % 1024))
 	return &Node{node: node}, err
 }
 
