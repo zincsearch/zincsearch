@@ -21,7 +21,7 @@ ARG BUILD_DATE
 
 RUN update-ca-certificates
 # RUN apk update && apk add --no-cache git
-# Create zinc.
+# Create zinc user.
 ENV USER=zinc
 ENV GROUP=zinc
 ENV UID=10001
@@ -37,9 +37,10 @@ RUN adduser \
     --uid "${UID}" \
     --gid "${GID}" \
     "${USER}"
-# Default directory for persistent Zinc data used in final build stage. It follows the Linux filesystem hierarchy pattern
+# Create default directories for persistent Zinc data used in final build stage.
+# It follows the Linux filesystem hierarchy pattern
 # https://tldp.org/LDP/Linux-Filesystem-Hierarchy/html/var.html
-RUN mkdir -p /var/lib/zinc && chown zinc:zinc /var/lib/zinc
+RUN mkdir -p /var/lib/zinc /data && chown zinc:zinc /var/lib/zinc /data
 WORKDIR $GOPATH/src/github.com/zinclabs/zinc/
 COPY . .
 COPY --from=webBuilder /web/dist web/dist
@@ -79,12 +80,9 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certifi
 # Copy our static executable.
 COPY --from=builder  /go/src/github.com/zinclabs/zinc/zinc /go/bin/zinc
 
-# Create directory that can be used to keep Zinc data persistent along with host source or named volumes
+# Create directories that can be used to keep Zinc data persistent along with host source or named volumes
 COPY --from=builder --chown=zinc:zinc /var/lib/zinc /var/lib/zinc
-
-# Default directory for persistent Zinc data. It follows the Linux filesystem hierarchy pattern
-# https://tldp.org/LDP/Linux-Filesystem-Hierarchy/html/var.html
-ENV ZINC_DATA_PATH=/var/lib/zinc
+COPY --from=builder --chown=zinc:zinc /data /data
 
 # Use an unprivileged user.
 USER zinc:zinc
