@@ -33,7 +33,7 @@ func GinBindJSON(c *gin.Context, obj interface{}) error {
 }
 
 
-func GinRenderJSON(c *gin.Context, code int, obj any) {
+func GinRenderJSON(c *gin.Context, code int, obj interface{}) {
 	if requestsPrettyRendering(c) {
 		c.IndentedJSON(code, obj)
 	} else {
