@@ -128,7 +128,7 @@ export default defineComponent({
         title: "Delete user",
         message:
           "You are about to delete this user: <ul><li>" +
-          props.row.id +
+          escape(props.row.id) +
           "</li></ul>",
         cancel: true,
         persistent: true,
