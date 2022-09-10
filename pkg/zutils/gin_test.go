@@ -1,10 +1,11 @@
 package zutils
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/zinclabs/zinc/test/utils"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/zinclabs/zinc/test/utils"
 )
 
 func TestGetRenderer(t *testing.T) {
@@ -63,7 +64,7 @@ func TestGetRenderer(t *testing.T) {
 			c, w := utils.NewGinContext()
 			utils.SetGinRequestURL(c, "/", tt.args.qparams)
 
-			GetRenderer(c)(http.StatusOK, Response{Name: "zinc"})
+			GinRenderJSON(c, http.StatusOK, Response{Name: "zinc"})
 
 			if tt.want.pretty {
 				assert.Contains(t, w.Body.String(), "\n")

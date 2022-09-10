@@ -27,7 +27,6 @@ import (
 	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
 	"github.com/zinclabs/zinc/pkg/uquery/mappings"
 	"github.com/zinclabs/zinc/pkg/zutils"
-	. "github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id CreateIndex
@@ -42,18 +41,18 @@ import (
 func Create(c *gin.Context) {
 	var newIndex meta.IndexSimple
 	if err := zutils.GinBindJSON(c, &newIndex); err != nil {
-		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
 	indexName := c.Param("target")
 	err := CreateIndexWorker(&newIndex, indexName)
 	if err != nil {
-		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
-	GetRenderer(c)(http.StatusOK, meta.HTTPResponseIndex{
+	zutils.GinRenderJSON(c, http.StatusOK, meta.HTTPResponseIndex{
 		Message:     "ok",
 		Index:       newIndex.Name,
 		StorageType: newIndex.StorageType,
@@ -74,7 +73,7 @@ func CreateES(c *gin.Context) {
 
 	var newIndex meta.IndexSimple
 	if err := zutils.GinBindJSON(c, &newIndex); err != nil {
-		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -86,11 +85,11 @@ func CreateES(c *gin.Context) {
 
 	err := CreateIndexWorker(&newIndex, indexName)
 	if err != nil {
-		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
-	GetRenderer(c)(http.StatusOK, gin.H{
+	zutils.GinRenderJSON(c, http.StatusOK, gin.H{
 		"acknowledged":        true,
 		"shards_acknowledged": true,
 		"index":               newIndex.Name,

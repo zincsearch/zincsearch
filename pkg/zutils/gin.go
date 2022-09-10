@@ -32,13 +32,13 @@ func GinBindJSON(c *gin.Context, obj interface{}) error {
 	return json.Unmarshal(body, obj)
 }
 
-type Renderer func(code int, obj interface{})
 
-func GetRenderer(c *gin.Context) Renderer {
+func GinRenderJSON(c *gin.Context, code int, obj any) {
 	if requestsPrettyRendering(c) {
-		return c.IndentedJSON
+		c.IndentedJSON(code, obj)
+	} else {
+		c.JSON(code, obj)
 	}
-	return c.JSON
 }
 
 func requestsPrettyRendering(c *gin.Context) bool {

@@ -35,7 +35,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/handlers/search"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/meta/elastic"
-	. "github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // SetRoutes sets up all gin HTTP API endpoints that can be called by front end
@@ -130,16 +130,16 @@ func SetRoutes(r *gin.Engine) {
 	 */
 
 	r.GET("/es/", ESMiddleware, func(c *gin.Context) {
-		GetRenderer(c)(http.StatusOK, elastic.NewESInfo(c))
+		zutils.GinRenderJSON(c, http.StatusOK, elastic.NewESInfo(c))
 	})
 	r.HEAD("/es/", ESMiddleware, func(c *gin.Context) {
-		GetRenderer(c)(http.StatusOK, elastic.NewESInfo(c))
+		zutils.GinRenderJSON(c, http.StatusOK, elastic.NewESInfo(c))
 	})
 	r.GET("/es/_license", ESMiddleware, func(c *gin.Context) {
-		GetRenderer(c)(http.StatusOK, elastic.NewESLicense(c))
+		zutils.GinRenderJSON(c, http.StatusOK, elastic.NewESLicense(c))
 	})
 	r.GET("/es/_xpack", ESMiddleware, func(c *gin.Context) {
-		GetRenderer(c)(http.StatusOK, elastic.NewESXPack(c))
+		zutils.GinRenderJSON(c, http.StatusOK, elastic.NewESXPack(c))
 	})
 
 	r.POST("/es/_search", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.SearchDSL)

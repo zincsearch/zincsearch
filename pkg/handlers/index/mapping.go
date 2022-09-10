@@ -24,7 +24,6 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/uquery/mappings"
 	"github.com/zinclabs/zinc/pkg/zutils"
-	. "github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id GetMapping
@@ -39,14 +38,14 @@ func GetMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
 		return
 	}
 
 	// format mappings
 	mappings := index.GetMappings()
 
-	GetRenderer(c)(http.StatusOK, gin.H{index.GetName(): gin.H{"mappings": mappings}})
+	zutils.GinRenderJSON(c, http.StatusOK, gin.H{index.GetName(): gin.H{"mappings": mappings}})
 }
 
 // @Id SetMapping
@@ -63,25 +62,25 @@ func GetMapping(c *gin.Context) {
 func SetMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	if indexName == "" {
-		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: "index.name should be not empty"})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: "index.name should be not empty"})
 		return
 	}
 
 	var mappingRequest map[string]interface{}
 	if err := zutils.GinBindJSON(c, &mappingRequest); err != nil {
-		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
 	mappings, err := mappings.Request(nil, mappingRequest)
 	if err != nil {
-		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
 	index, exists, err := core.GetOrCreateIndex(indexName, "", 0)
 	if err != nil {
-		GetRenderer(c)(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -91,7 +90,7 @@ func SetMapping(c *gin.Context) {
 		if indexMappings != nil && indexMappings.Len() > 0 {
 			for field := range mappings.ListProperty() {
 				if _, ok := indexMappings.GetProperty(field); ok {
-					GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: "index [" + indexName + "] already exists mapping of field [" + field + "]"})
+					zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: "index [" + indexName + "] already exists mapping of field [" + field + "]"})
 					return
 				}
 			}
@@ -128,9 +127,9 @@ func SetMapping(c *gin.Context) {
 
 	// store index
 	if err := core.StoreIndex(index); err != nil {
-		GetRenderer(c)(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
-	GetRenderer(c)(http.StatusOK, meta.HTTPResponse{Message: "ok"})
+	zutils.GinRenderJSON(c, http.StatusOK, meta.HTTPResponse{Message: "ok"})
 }

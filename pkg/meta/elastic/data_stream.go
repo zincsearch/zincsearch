@@ -19,12 +19,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	. "github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 func GetDataStream(c *gin.Context) {
 	target := c.Param("target")
-	GetRenderer(c)(http.StatusOK, gin.H{
+	zutils.GinRenderJSON(c, http.StatusOK, gin.H{
 		"data_streams": []gin.H{
 			gin.H{
 				"name": target,
@@ -38,7 +38,7 @@ func GetDataStream(c *gin.Context) {
 
 func PutDataStream(c *gin.Context) {
 	target := c.Param("target")
-	GetRenderer(c)(http.StatusOK, gin.H{
+	zutils.GinRenderJSON(c, http.StatusOK, gin.H{
 		"name":    target,
 		"message": "ok",
 	})

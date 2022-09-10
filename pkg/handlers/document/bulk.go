@@ -30,7 +30,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/ider"
 	"github.com/zinclabs/zinc/pkg/meta"
-	. "github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zinc/pkg/zutils"
 	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
@@ -52,11 +52,11 @@ func Bulk(c *gin.Context) {
 
 	ret, err := BulkWorker(target, c.Request.Body)
 	if err != nil {
-		GetRenderer(c)(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
-	GetRenderer(c)(http.StatusOK, meta.HTTPResponseRecordCount{Message: "bulk data inserted", RecordCount: ret.Count})
+	zutils.GinRenderJSON(c, http.StatusOK, meta.HTTPResponseRecordCount{Message: "bulk data inserted", RecordCount: ret.Count})
 }
 
 // ESBulk accept multiple documents, first line index metadata, second line document
@@ -85,7 +85,7 @@ func ESBulk(c *gin.Context) {
 	// update seqNo
 	atomic.AddInt64(&globalSeqNo, int64(ret.Count))
 
-	GetRenderer(c)(http.StatusOK, ret)
+	zutils.GinRenderJSON(c, http.StatusOK, ret)
 }
 
 func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {

@@ -23,7 +23,6 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/zutils"
-	. "github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id UpdateDocument
@@ -47,7 +46,7 @@ func Update(c *gin.Context) {
 	var err error
 	var doc map[string]interface{}
 	if err = zutils.GinBindJSON(c, &doc); err != nil {
-		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -56,21 +55,21 @@ func Update(c *gin.Context) {
 		docID = id.(string)
 	}
 	if docID == "" {
-		GetRenderer(c)(http.StatusBadRequest, meta.HTTPResponseError{Error: "id is empty"})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: "id is empty"})
 		return
 	}
 
 	// If the index does not exist, then create it
 	index, _, err := core.GetOrCreateIndex(indexName, "", 0)
 	if err != nil {
-		GetRenderer(c)(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
 	err = index.UpdateDocument(docID, doc, insertBool)
 	if err != nil {
-		GetRenderer(c)(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
-	GetRenderer(c)(http.StatusOK, meta.HTTPResponseID{Message: "ok", ID: docID})
+	zutils.GinRenderJSON(c, http.StatusOK, meta.HTTPResponseID{Message: "ok", ID: docID})
 }
