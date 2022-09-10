@@ -54,7 +54,7 @@ func AddOrRemoveESAlias(c *gin.Context) {
 	var alias Alias
 	err := zutils.GinBindJSON(c, &alias)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 
@@ -99,7 +99,7 @@ func AddOrRemoveESAlias(c *gin.Context) {
 		_ = core.ZINC_INDEX_ALIAS_LIST.RemoveIndexesFromAlias(alias, indexes)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"acknowledged": true})
+	zutils.GinRenderJSON(c, http.StatusOK, gin.H{"acknowledged": true})
 }
 
 // @Id GetESAliases
@@ -128,7 +128,7 @@ func GetESAliases(c *gin.Context) {
 
 	m := core.ZINC_INDEX_ALIAS_LIST.GetAliasMap(targetIndexes, targetAliases)
 
-	c.JSON(http.StatusOK, m)
+	zutils.GinRenderJSON(c, http.StatusOK, m)
 }
 
 func indexNameMatches(name, indexName string) bool {
