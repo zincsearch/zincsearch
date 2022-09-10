@@ -63,9 +63,7 @@ func TestGetRenderer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c, w := utils.NewGinContext()
 			utils.SetGinRequestURL(c, "/", tt.args.qparams)
-
 			GinRenderJSON(c, http.StatusOK, Response{Name: "zinc"})
-
 			if tt.want.pretty {
 				assert.Contains(t, w.Body.String(), "\n")
 			} else {
