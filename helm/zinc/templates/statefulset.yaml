@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "zinc.labels" . | nindent 4 }}
 spec:
-  serviceName: {{ include "zinc.fullname" . }}
+  serviceName: {{ include "zinc.fullname" . }}-headless
   # Until Zinc is not HA
   replicas: 1
   selector:
