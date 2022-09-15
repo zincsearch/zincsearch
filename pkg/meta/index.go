@@ -16,20 +16,20 @@
 package meta
 
 type Index struct {
+	ShardNum    int64                  `json:"shard_num"`
 	Name        string                 `json:"name"`
 	StorageType string                 `json:"storage_type"`
 	Settings    *IndexSettings         `json:"settings,omitempty"`
 	Mappings    *Mappings              `json:"mappings,omitempty"`
-	ShardNum    int64                  `json:"shard_num"`
 	Shards      map[string]*IndexShard `json:"shards"`
 	Stats       IndexStat              `json:"stats"`
 	Version     string                 `json:"version"`
 }
 
 type IndexShard struct {
+	ShardNum int64               `json:"shard_num"`
 	ID       string              `json:"id"`
 	NodeID   string              `json:"node_id"` // remote instance ID
-	ShardNum int64               `json:"shard_num"`
 	Shards   []*IndexSecondShard `json:"shards"`
 	Stats    IndexStat           `json:"stats"`
 }

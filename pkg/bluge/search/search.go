@@ -143,12 +143,12 @@ type Document struct {
 }
 
 type DocumentList struct {
-	docs   []*Document
-	bucket *search.Bucket
 	from   int64
 	size   int64
 	len    int64
 	next   int64
+	docs   []*Document
+	bucket *search.Bucket
 	sort   search.SortOrder
 }
 

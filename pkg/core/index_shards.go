@@ -45,13 +45,13 @@ const (
 // then we will can not found the old document, maybe cause duplicate documents.
 // First layer shard just used for distribute not really store documents.
 type IndexShard struct {
+	open   uint64
 	name   string // shard name: index/shardID
 	root   *Index
 	ref    *meta.IndexShard
 	shards []*IndexSecondShard
 	wal    *wal.Log
 	lock   sync.RWMutex
-	open   uint32
 	close  chan struct{}
 }
 
@@ -262,12 +262,12 @@ func (s *IndexShard) openWriter(shardID int64) error {
 }
 
 func (s *IndexShard) Close() error {
-	if atomic.LoadUint32(&s.open) == 0 {
+	if atomic.LoadUint64(&s.open) == 0 {
 		return nil
 	}
 
 	s.close <- struct{}{}
-	atomic.StoreUint32(&s.open, 0)
+	atomic.StoreUint64(&s.open, 0)
 
 	s.lock.Lock()
 	defer s.lock.Unlock()
