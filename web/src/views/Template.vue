@@ -175,7 +175,7 @@ export default defineComponent({
         title: "Delete template",
         message:
           "You are about to delete this template: <ul><li>" +
-          props.row.name +
+          escape(props.row.name) +
           "</li></ul>",
         cancel: true,
         persistent: true,

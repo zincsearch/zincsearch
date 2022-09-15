@@ -9,6 +9,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/meta/elastic"
+	"github.com/zinclabs/zinc/pkg/zutils"
 )
 
 // @Id ESGetMapping
@@ -23,7 +24,7 @@ func GetESMapping(c *gin.Context) {
 	indexName := c.Param("target")
 	index, exists := core.GetIndex(indexName)
 	if !exists {
-		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: "index " + indexName + " does not exists"})
 		return
 	}
 
@@ -50,7 +51,7 @@ func GetESMapping(c *gin.Context) {
 	// kept in the resulting mapping.
 	es := convertToESMapping(mappings)
 
-	c.JSON(http.StatusOK, gin.H{index.GetName(): gin.H{"mappings": es}})
+	zutils.GinRenderJSON(c, http.StatusOK, gin.H{index.GetName(): gin.H{"mappings": es}})
 }
 
 // convertToESMapping converts the given Zinc mappings to the ElasticSearch representation.
