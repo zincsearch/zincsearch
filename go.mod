@@ -34,7 +34,7 @@ require (
 	github.com/zinclabs/go-gin-prometheus v0.1.1
 	github.com/zinclabs/wal v1.2.4
 	go.etcd.io/bbolt v1.3.6
-	go.etcd.io/etcd/client/v3 v3.5.4
+	go.etcd.io/etcd/client/v3 v3.5.5
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f
 	golang.org/x/text v0.3.7
