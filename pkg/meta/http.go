@@ -60,3 +60,23 @@ type HTTPResponseESID struct {
 	PrimaryTerm int    `json:"_primary_term"`
 	Result      string `json:"result"` // created, updated, deleted
 }
+
+type HttpRetriesResponse struct {
+	Bulk   int `json:"bulk"`
+	Search int `json:"search"`
+}
+
+type HTTPResponseDeleteByQuery struct {
+	Took                 int64               `json:"took"`
+	TimedOut             bool                `json:"time_out"`
+	Total                int                 `json:"total"`
+	Deleted              int                 `json:"deleted"`
+	Batches              int                 `json:"batches"`
+	VersionConflicts     int                 `json:"version_conflicts"`
+	Noops                int                 `json:"noops"`
+	Failures             []string            `json:"failures"`
+	Retries              HttpRetriesResponse `json:"retries"`
+	ThrottledMillis      int                 `json:"throttled_millis"`
+	RequestsPerSecond    int                 `json:"requests_per_second"`
+	ThrottledUntilMillis int                 `json:"throttled_until_millis"`
+}
