@@ -1514,6 +1514,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/es/{index}/_delete_by_query": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Searches the index and deletes all matched documents",
+                "operationId": "DeleteByQuery",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Index",
+                        "name": "index",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Query",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/meta.ZincQueryForSDK"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseDeleteByQuery"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
         "/es/{index}/_mapping": {
             "get": {
                 "produces": [
@@ -2157,6 +2204,50 @@ const docTemplate = `{
                 }
             }
         },
+        "meta.HTTPResponseDeleteByQuery": {
+            "type": "object",
+            "properties": {
+                "batches": {
+                    "type": "integer"
+                },
+                "deleted": {
+                    "type": "integer"
+                },
+                "failures": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "noops": {
+                    "type": "integer"
+                },
+                "requests_per_second": {
+                    "type": "integer"
+                },
+                "retries": {
+                    "$ref": "#/definitions/meta.HttpRetriesResponse"
+                },
+                "throttled_millis": {
+                    "type": "integer"
+                },
+                "throttled_until_millis": {
+                    "type": "integer"
+                },
+                "time_out": {
+                    "type": "boolean"
+                },
+                "took": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "version_conflicts": {
+                    "type": "integer"
+                }
+            }
+        },
         "meta.HTTPResponseDocument": {
             "type": "object",
             "properties": {
@@ -2306,6 +2397,17 @@ const docTemplate = `{
                 },
                 "total": {
                     "$ref": "#/definitions/meta.Total"
+                }
+            }
+        },
+        "meta.HttpRetriesResponse": {
+            "type": "object",
+            "properties": {
+                "bulk": {
+                    "type": "integer"
+                },
+                "search": {
+                    "type": "integer"
                 }
             }
         },

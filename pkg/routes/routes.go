@@ -146,6 +146,7 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/es/_msearch", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.MultipleSearch)
 	r.POST("/es/:target/_search", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.SearchDSL)
 	r.POST("/es/:target/_msearch", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.MultipleSearch)
+	r.POST("/es/:target/_delete_by_query", AuthMiddleware, IndexAliasMiddleware, search.DeleteByQuery)
 
 	r.GET("/es/_index_template", AuthMiddleware, ESMiddleware, index.ListTemplate)
 	r.POST("/es/_index_template", AuthMiddleware, ESMiddleware, index.CreateTemplate)

@@ -326,6 +326,35 @@ definitions:
       message:
         type: string
     type: object
+  meta.HTTPResponseDeleteByQuery:
+    properties:
+      batches:
+        type: integer
+      deleted:
+        type: integer
+      failures:
+        items:
+          type: string
+        type: array
+      noops:
+        type: integer
+      requests_per_second:
+        type: integer
+      retries:
+        $ref: '#/definitions/meta.HttpRetriesResponse'
+      throttled_millis:
+        type: integer
+      throttled_until_millis:
+        type: integer
+      time_out:
+        type: boolean
+      took:
+        type: integer
+      total:
+        type: integer
+      version_conflicts:
+        type: integer
+    type: object
   meta.HTTPResponseDocument:
     properties:
       id:
@@ -424,6 +453,13 @@ definitions:
         type: number
       total:
         $ref: '#/definitions/meta.Total'
+    type: object
+  meta.HttpRetriesResponse:
+    properties:
+      bulk:
+        type: integer
+      search:
+        type: integer
     type: object
   meta.IPRange:
     properties:
@@ -2017,6 +2053,37 @@ paths:
       summary: Create index for compatible ES
       tags:
       - Index
+  /es/{index}/_delete_by_query:
+    post:
+      consumes:
+      - application/json
+      operationId: DeleteByQuery
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      - description: Query
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/meta.ZincQueryForSDK'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseDeleteByQuery'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Searches the index and deletes all matched documents
+      tags:
+      - Search
   /es/{index}/_mapping:
     get:
       operationId: ESGetMapping
