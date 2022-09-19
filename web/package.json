@@ -54,7 +54,7 @@
     "prettier": "^2.4.1",
     "sass": "^1.32.0",
     "sass-loader": "^13.0.2",
-    "stylelint": "^14.1.0",
+    "stylelint": "^14.12.0",
     "stylelint-config-recommended-vue": "^1.0.0",
     "typescript": "^4.7.4",
     "vite": "^2.9.14",
