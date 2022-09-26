@@ -35,6 +35,7 @@ const routes = [
         meta: {
           keepAlive: true,
         },
+        role: true,
       },
       {
         path: "template",
@@ -43,11 +44,13 @@ const routes = [
         meta: {
           keepAlive: true,
         },
+        role: true,
       },
       {
         path: "user",
         name: "user",
         component: User,
+        role: true,
       },
       {
         path: "about",
@@ -76,9 +79,12 @@ const router = createRouter({
 
 router.beforeEach((to: any, from: any, next: any) => {
   var isAuthenticated = store.state.user.isLoggedIn;
+  var role = store.state.user.role === "admin";
 
   if (to.path !== "/login" && !isAuthenticated) {
     next({ path: "/login" });
+  } else if (to.role && role) {
+    next();
   } else {
     next();
   }

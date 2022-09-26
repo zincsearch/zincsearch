@@ -25,19 +25,26 @@ import (
 	"github.com/zinclabs/zinc/pkg/auth"
 )
 
-func AuthMiddleware(c *gin.Context) {
-	// Get the Basic Authentication credentials
-	user, password, hasAuth := c.Request.BasicAuth()
-	if hasAuth {
-		if _, ok := auth.VerifyCredentials(user, password); ok {
-			c.Next()
+func AuthMiddleware(role string) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		// Get the Basic Authentication credentials
+		user, password, hasAuth := c.Request.BasicAuth()
+		if hasAuth {
+			if u, ok := auth.VerifyCredentials(user, password); ok {
+				if role == "admin" && u.Role == role || role == "user" {
+					c.Next()
+				} else {
+					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "No permission"})
+					return
+				}
+			} else {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "Invalid credentials"})
+				return
+			}
 		} else {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "Invalid credentials"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "Missing credentials"})
 			return
 		}
-	} else {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "Missing credentials"})
-		return
 	}
 }
 

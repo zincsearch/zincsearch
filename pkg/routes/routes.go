@@ -84,46 +84,46 @@ func SetRoutes(r *gin.Engine) {
 
 	// auth
 	r.POST("/api/login", auth.Login)
-	r.POST("/api/user", AuthMiddleware, auth.CreateUpdate)
-	r.PUT("/api/user", AuthMiddleware, auth.CreateUpdate)
-	r.DELETE("/api/user/:id", AuthMiddleware, auth.Delete)
-	r.GET("/api/user", AuthMiddleware, auth.List)
+	r.POST("/api/user", AuthMiddleware("admin"), auth.CreateUpdate)
+	r.PUT("/api/user", AuthMiddleware("admin"), auth.CreateUpdate)
+	r.DELETE("/api/user/:id", AuthMiddleware("admin"), auth.Delete)
+	r.GET("/api/user", AuthMiddleware("admin"), auth.List)
 
 	// index
-	r.GET("/api/index", AuthMiddleware, index.List)
-	r.GET("/api/index_name", AuthMiddleware, index.IndexNameList)
-	r.POST("/api/index", AuthMiddleware, index.Create)
-	r.PUT("/api/index", AuthMiddleware, index.Create)
-	r.PUT("/api/index/:target", AuthMiddleware, index.Create)
-	r.DELETE("/api/index/:target", AuthMiddleware, index.Delete)
-	r.GET("/api/index/:target", AuthMiddleware, index.Get)
-	r.HEAD("/api/index/:target", AuthMiddleware, index.Exists)
-	r.POST("/api/index/:target/refresh", AuthMiddleware, index.Refresh)
+	r.GET("/api/index", AuthMiddleware("admin"), index.List)
+	r.GET("/api/index_name", AuthMiddleware("admin"), index.IndexNameList)
+	r.POST("/api/index", AuthMiddleware("admin"), index.Create)
+	r.PUT("/api/index", AuthMiddleware("admin"), index.Create)
+	r.PUT("/api/index/:target", AuthMiddleware("admin"), index.Create)
+	r.DELETE("/api/index/:target", AuthMiddleware("admin"), index.Delete)
+	r.GET("/api/index/:target", AuthMiddleware("admin"), index.Get)
+	r.HEAD("/api/index/:target", AuthMiddleware("admin"), index.Exists)
+	r.POST("/api/index/:target/refresh", AuthMiddleware("admin"), index.Refresh)
 	// index settings
-	r.GET("/api/:target/_mapping", AuthMiddleware, index.GetMapping)
-	r.PUT("/api/:target/_mapping", AuthMiddleware, index.SetMapping)
-	r.GET("/api/:target/_settings", AuthMiddleware, index.GetSettings)
-	r.PUT("/api/:target/_settings", AuthMiddleware, index.SetSettings)
+	r.GET("/api/:target/_mapping", AuthMiddleware("admin"), index.GetMapping)
+	r.PUT("/api/:target/_mapping", AuthMiddleware("admin"), index.SetMapping)
+	r.GET("/api/:target/_settings", AuthMiddleware("admin"), index.GetSettings)
+	r.PUT("/api/:target/_settings", AuthMiddleware("admin"), index.SetSettings)
 	// analyze
-	r.POST("/api/_analyze", AuthMiddleware, index.Analyze)
-	r.POST("/api/:target/_analyze", AuthMiddleware, index.Analyze)
+	r.POST("/api/_analyze", AuthMiddleware("admin"), index.Analyze)
+	r.POST("/api/:target/_analyze", AuthMiddleware("admin"), index.Analyze)
 
 	// search
-	r.POST("/api/:target/_search", AuthMiddleware, search.SearchV1)
+	r.POST("/api/:target/_search", AuthMiddleware("admin"), search.SearchV1)
 
 	// document
 	// Document Bulk update/insert
-	r.POST("/api/_bulk", AuthMiddleware, document.Bulk)
-	r.POST("/api/:target/_bulk", AuthMiddleware, document.Bulk)
-	r.POST("/api/:target/_multi", AuthMiddleware, document.Multi)
-	r.POST("/api/_bulkv2", AuthMiddleware, document.Bulkv2)         // New JSON format
-	r.POST("/api/:target/_bulkv2", AuthMiddleware, document.Bulkv2) // New JSON format
+	r.POST("/api/_bulk", AuthMiddleware("admin"), document.Bulk)
+	r.POST("/api/:target/_bulk", AuthMiddleware("admin"), document.Bulk)
+	r.POST("/api/:target/_multi", AuthMiddleware("admin"), document.Multi)
+	r.POST("/api/_bulkv2", AuthMiddleware("admin"), document.Bulkv2)         // New JSON format
+	r.POST("/api/:target/_bulkv2", AuthMiddleware("admin"), document.Bulkv2) // New JSON format
 	// Document CRUD APIs. Update is same as create.
-	r.POST("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)    // create
-	r.PUT("/api/:target/_doc", AuthMiddleware, document.CreateUpdate)     // create
-	r.PUT("/api/:target/_doc/:id", AuthMiddleware, document.CreateUpdate) // create or update
-	r.POST("/api/:target/_update/:id", AuthMiddleware, document.Update)   // update
-	r.DELETE("/api/:target/_doc/:id", AuthMiddleware, document.Delete)    // delete
+	r.POST("/api/:target/_doc", AuthMiddleware("admin"), document.CreateUpdate)    // create
+	r.PUT("/api/:target/_doc", AuthMiddleware("admin"), document.CreateUpdate)     // create
+	r.PUT("/api/:target/_doc/:id", AuthMiddleware("admin"), document.CreateUpdate) // create or update
+	r.POST("/api/:target/_update/:id", AuthMiddleware("admin"), document.Update)   // update
+	r.DELETE("/api/:target/_doc/:id", AuthMiddleware("admin"), document.Delete)    // delete
 
 	/**
 	 * elastic compatible APIs
@@ -142,49 +142,49 @@ func SetRoutes(r *gin.Engine) {
 		zutils.GinRenderJSON(c, http.StatusOK, elastic.NewESXPack(c))
 	})
 
-	r.POST("/es/_search", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.SearchDSL)
-	r.POST("/es/_msearch", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.MultipleSearch)
-	r.POST("/es/:target/_search", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.SearchDSL)
-	r.POST("/es/:target/_msearch", AuthMiddleware, ESMiddleware, IndexAliasMiddleware, search.MultipleSearch)
-	r.POST("/es/:target/_delete_by_query", AuthMiddleware, IndexAliasMiddleware, search.DeleteByQuery)
+	r.POST("/es/_search", AuthMiddleware("user"), ESMiddleware, IndexAliasMiddleware, search.SearchDSL)
+	r.POST("/es/_msearch", AuthMiddleware("admin"), ESMiddleware, IndexAliasMiddleware, search.MultipleSearch)
+	r.POST("/es/:target/_search", AuthMiddleware("admin"), ESMiddleware, IndexAliasMiddleware, search.SearchDSL)
+	r.POST("/es/:target/_msearch", AuthMiddleware("admin"), ESMiddleware, IndexAliasMiddleware, search.MultipleSearch)
+	r.POST("/es/:target/_delete_by_query", AuthMiddleware("admin"), IndexAliasMiddleware, search.DeleteByQuery)
 
-	r.GET("/es/_index_template", AuthMiddleware, ESMiddleware, index.ListTemplate)
-	r.POST("/es/_index_template", AuthMiddleware, ESMiddleware, index.CreateTemplate)
-	r.PUT("/es/_index_template/:target", AuthMiddleware, ESMiddleware, index.CreateTemplate)
-	r.GET("/es/_index_template/:target", AuthMiddleware, ESMiddleware, index.GetTemplate)
-	r.HEAD("/es/_index_template/:target", AuthMiddleware, ESMiddleware, index.GetTemplate)
-	r.DELETE("/es/_index_template/:target", AuthMiddleware, ESMiddleware, index.DeleteTemplate)
+	r.GET("/es/_index_template", AuthMiddleware("admin"), ESMiddleware, index.ListTemplate)
+	r.POST("/es/_index_template", AuthMiddleware("admin"), ESMiddleware, index.CreateTemplate)
+	r.PUT("/es/_index_template/:target", AuthMiddleware("admin"), ESMiddleware, index.CreateTemplate)
+	r.GET("/es/_index_template/:target", AuthMiddleware("admin"), ESMiddleware, index.GetTemplate)
+	r.HEAD("/es/_index_template/:target", AuthMiddleware("admin"), ESMiddleware, index.GetTemplate)
+	r.DELETE("/es/_index_template/:target", AuthMiddleware("admin"), ESMiddleware, index.DeleteTemplate)
 	// ES Compatible data stream
-	r.PUT("/es/_data_stream/:target", AuthMiddleware, ESMiddleware, elastic.PutDataStream)
-	r.GET("/es/_data_stream/:target", AuthMiddleware, ESMiddleware, elastic.GetDataStream)
-	r.HEAD("/es/_data_stream/:target", AuthMiddleware, ESMiddleware, elastic.GetDataStream)
+	r.PUT("/es/_data_stream/:target", AuthMiddleware("admin"), ESMiddleware, elastic.PutDataStream)
+	r.GET("/es/_data_stream/:target", AuthMiddleware("admin"), ESMiddleware, elastic.GetDataStream)
+	r.HEAD("/es/_data_stream/:target", AuthMiddleware("admin"), ESMiddleware, elastic.GetDataStream)
 
-	r.PUT("/es/:target", AuthMiddleware, ESMiddleware, index.CreateES)
-	r.HEAD("/es/:target", AuthMiddleware, ESMiddleware, index.Exists)
+	r.PUT("/es/:target", AuthMiddleware("admin"), ESMiddleware, index.CreateES)
+	r.HEAD("/es/:target", AuthMiddleware("admin"), ESMiddleware, index.Exists)
 
-	r.GET("/es/:target/_mapping", AuthMiddleware, ESMiddleware, index.GetESMapping)
-	r.PUT("/es/:target/_mapping", AuthMiddleware, ESMiddleware, index.SetMapping)
+	r.GET("/es/:target/_mapping", AuthMiddleware("admin"), ESMiddleware, index.GetESMapping)
+	r.PUT("/es/:target/_mapping", AuthMiddleware("admin"), ESMiddleware, index.SetMapping)
 
-	r.GET("/es/:target/_settings", AuthMiddleware, ESMiddleware, index.GetSettings)
-	r.PUT("/es/:target/_settings", AuthMiddleware, ESMiddleware, index.SetSettings)
+	r.GET("/es/:target/_settings", AuthMiddleware("admin"), ESMiddleware, index.GetSettings)
+	r.PUT("/es/:target/_settings", AuthMiddleware("admin"), ESMiddleware, index.SetSettings)
 
-	r.POST("/es/_analyze", AuthMiddleware, ESMiddleware, index.Analyze)
-	r.POST("/es/:target/_analyze", AuthMiddleware, ESMiddleware, index.Analyze)
+	r.POST("/es/_analyze", AuthMiddleware("admin"), ESMiddleware, index.Analyze)
+	r.POST("/es/:target/_analyze", AuthMiddleware("admin"), ESMiddleware, index.Analyze)
 
-	r.POST("/es/_aliases", AuthMiddleware, ESMiddleware, index.AddOrRemoveESAlias)
+	r.POST("/es/_aliases", AuthMiddleware("admin"), ESMiddleware, index.AddOrRemoveESAlias)
 
-	r.GET("/es/_alias", AuthMiddleware, ESMiddleware, index.GetESAliases)
-	r.GET("/es/:target/_alias", AuthMiddleware, ESMiddleware, index.GetESAliases)
-	r.GET("/es/_alias/:target_alias", AuthMiddleware, ESMiddleware, index.GetESAliases)
+	r.GET("/es/_alias", AuthMiddleware("admin"), ESMiddleware, index.GetESAliases)
+	r.GET("/es/:target/_alias", AuthMiddleware("admin"), ESMiddleware, index.GetESAliases)
+	r.GET("/es/_alias/:target_alias", AuthMiddleware("admin"), ESMiddleware, index.GetESAliases)
 
 	// ES Bulk update/insert
-	r.POST("/es/_bulk", AuthMiddleware, ESMiddleware, document.ESBulk)
-	r.POST("/es/:target/_bulk", AuthMiddleware, ESMiddleware, document.ESBulk)
+	r.POST("/es/_bulk", AuthMiddleware("admin"), ESMiddleware, document.ESBulk)
+	r.POST("/es/:target/_bulk", AuthMiddleware("admin"), ESMiddleware, document.ESBulk)
 	// ES Document
-	r.POST("/es/:target/_doc", AuthMiddleware, ESMiddleware, document.CreateUpdate)        // create
-	r.PUT("/es/:target/_doc/:id", AuthMiddleware, ESMiddleware, document.CreateUpdate)     // create or update
-	r.PUT("/es/:target/_create/:id", AuthMiddleware, ESMiddleware, document.CreateUpdate)  // create
-	r.POST("/es/:target/_create/:id", AuthMiddleware, ESMiddleware, document.CreateUpdate) // create
-	r.POST("/es/:target/_update/:id", AuthMiddleware, ESMiddleware, document.Update)       // update part of document
-	r.DELETE("/es/:target/_doc/:id", AuthMiddleware, ESMiddleware, document.Delete)        // delete
+	r.POST("/es/:target/_doc", AuthMiddleware("admin"), ESMiddleware, document.CreateUpdate)        // create
+	r.PUT("/es/:target/_doc/:id", AuthMiddleware("admin"), ESMiddleware, document.CreateUpdate)     // create or update
+	r.PUT("/es/:target/_create/:id", AuthMiddleware("admin"), ESMiddleware, document.CreateUpdate)  // create
+	r.POST("/es/:target/_create/:id", AuthMiddleware("admin"), ESMiddleware, document.CreateUpdate) // create
+	r.POST("/es/:target/_update/:id", AuthMiddleware("admin"), ESMiddleware, document.Update)       // update part of document
+	r.DELETE("/es/:target/_doc/:id", AuthMiddleware("admin"), ESMiddleware, document.Delete)        // delete
 }

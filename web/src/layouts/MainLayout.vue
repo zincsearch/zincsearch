@@ -151,23 +151,26 @@ export default {
         title: t("menu.index"),
         icon: "list",
         link: "/index",
+        role: true,
       },
       {
         title: t("menu.template"),
         icon: "apps",
         link: "/template",
+        role: true,
       },
       {
         title: t("menu.user"),
         icon: "people",
         link: "/user",
+        role: true,
       },
       {
         title: t("menu.about"),
         icon: "info",
         link: "/about",
       },
-    ];
+    ].filter((l) => (l.role && store.state.user.role === "admin") || !l.role);
 
     const langList = [
       {
