@@ -20,7 +20,7 @@ require (
 	github.com/go-ego/gse v0.70.2
 	github.com/goccy/go-json v0.9.11
 	github.com/joho/godotenv v1.4.0
-	github.com/minio/minio-go/v7 v7.0.34
+	github.com/minio/minio-go/v7 v7.0.38
 	github.com/prometheus/client_golang v1.13.0
 	github.com/pyroscope-io/client v0.3.0
 	github.com/robfig/cron/v3 v3.0.1
