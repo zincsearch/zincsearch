@@ -70,7 +70,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(window.location.pathname),
+  history: createWebHistory(),
   routes,
 });
 
