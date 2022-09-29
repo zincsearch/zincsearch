@@ -1,10 +1,10 @@
 <template>
-  <q-card>
+  <q-card class="my-card">
     <q-card-section>
       <div v-if="beingUpdated" class="text-h6">Update role</div>
       <div v-else class="text-h6">Add role</div>
     </q-card-section>
-    <q-card-section class="q-w-md">
+    <q-card-section>
       <q-form ref="addRoleForm" @submit="onSubmit">
         <q-input
           v-model="roleData._id"
@@ -26,6 +26,7 @@
           :rules="[validateRoleName]"
         />
         <q-select
+          class="q-field--with-bottom"
           v-model="roleData.permission"
           :options="permissions"
           dense
@@ -143,3 +144,10 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.my-card {
+  width: 100%;
+  max-width: 800px;
+}
+</style>
