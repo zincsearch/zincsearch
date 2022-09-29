@@ -24,7 +24,7 @@ import (
 	"github.com/zinclabs/zinc/test/utils"
 )
 
-func TestCreateUpdate(t *testing.T) {
+func TestCreateUpdateUser(t *testing.T) {
 	type args struct {
 		code   int
 		data   map[string]interface{}
@@ -72,7 +72,80 @@ func TestCreateUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c, w := utils.NewGinContext()
 			utils.SetGinRequestData(c, tt.args.data)
-			CreateUpdate(c)
+			CreateUpdateUser(c)
+			assert.Equal(t, tt.args.code, w.Code)
+			assert.Contains(t, w.Body.String(), tt.args.result)
+		})
+	}
+}
+
+func TestListUser(t *testing.T) {
+	type args struct {
+		code   int
+		result string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "normal",
+			args: args{
+				code:   http.StatusOK,
+				result: `[{"_id":`,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c, w := utils.NewGinContext()
+			ListUser(c)
+			assert.Equal(t, tt.args.code, w.Code)
+			assert.Contains(t, w.Body.String(), tt.args.result)
+		})
+	}
+}
+
+func TestDeleteUser(t *testing.T) {
+	type args struct {
+		code   int
+		data   map[string]string
+		result string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "normal",
+			args: args{
+				code:   http.StatusOK,
+				data:   map[string]string{"id": "1"},
+				result: "message",
+			},
+		},
+		{
+			name: "empty",
+			args: args{
+				code:   http.StatusOK,
+				data:   map[string]string{"id": ""},
+				result: "message",
+			},
+		},
+		{
+			name: "nil",
+			args: args{
+				code:   http.StatusOK,
+				data:   nil,
+				result: "message",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c, w := utils.NewGinContext()
+			utils.SetGinRequestParams(c, tt.args.data)
+			DeleteUser(c)
 			assert.Equal(t, tt.args.code, w.Code)
 			assert.Contains(t, w.Body.String(), tt.args.result)
 		})

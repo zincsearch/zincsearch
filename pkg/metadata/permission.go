@@ -13,40 +13,18 @@
 * limitations under the License.
  */
 
-package auth
+package metadata
 
-import (
-	"net/http"
-	"testing"
+type permission struct {
+	ps []string
+}
 
-	"github.com/stretchr/testify/assert"
+var Permission = &permission{ps: []string{}}
 
-	"github.com/zinclabs/zinc/test/utils"
-)
+func (p *permission) List() []string {
+	return p.ps
+}
 
-func TestList(t *testing.T) {
-	type args struct {
-		code   int
-		result string
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			name: "normal",
-			args: args{
-				code:   http.StatusOK,
-				result: `[{"_id":`,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c, w := utils.NewGinContext()
-			List(c)
-			assert.Equal(t, tt.args.code, w.Code)
-			assert.Contains(t, w.Body.String(), tt.args.result)
-		})
-	}
+func (p *permission) Add(v string) {
+	p.ps = append(p.ps, v)
 }

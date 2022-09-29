@@ -25,13 +25,14 @@ import (
 	"github.com/zinclabs/zinc/pkg/auth"
 )
 
-func AuthMiddleware(role string) func(c *gin.Context) {
+func AuthMiddleware(permission string) func(c *gin.Context) {
+	auth.AddPermission(permission)
 	return func(c *gin.Context) {
 		// Get the Basic Authentication credentials
 		user, password, hasAuth := c.Request.BasicAuth()
 		if hasAuth {
 			if u, ok := auth.VerifyCredentials(user, password); ok {
-				if role == "admin" && u.Role == role || role == "user" {
+				if auth.VerifyRolePermission(u.Role, permission) {
 					c.Next()
 				} else {
 					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "No permission"})

@@ -30,6 +30,7 @@ import (
 	"github.com/pyroscope-io/client/pyroscope"
 	"github.com/rs/zerolog/log"
 
+	"github.com/zinclabs/zinc/pkg/auth"
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
@@ -70,6 +71,9 @@ func main() {
 	// HTTP init
 	app := gin.New()
 	routes.Setup(app)
+
+	// Init User
+	auth.Init()
 
 	// Run the server
 	PORT := config.Global.ServerPort
@@ -174,13 +178,12 @@ func profiling() {
 			pyroscope.ProfileInuseSpace,
 		},
 	})
-
 	if err != nil {
 		log.Print("pyroscope.Start: ", err.Error())
 	}
 }
 
-//shutdown support twice signal must exit
+// shutdown support twice signal must exit
 func shutdown(stop func(grace bool, done chan<- struct{})) <-chan struct{} {
 	done := make(chan struct{})
 	sig := make(chan os.Signal, 2)

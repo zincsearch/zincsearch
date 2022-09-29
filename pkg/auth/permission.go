@@ -16,33 +16,13 @@
 package auth
 
 import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-
-	"github.com/zinclabs/zinc/pkg/auth"
-	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-// @Id ListUsers
-// @Summary List user
-// @Tags    User
-// @Produce json
-// @Success 200 {object} []meta.User
-// @Failure 500 {object} meta.HTTPResponseError
-// @Router /api/user [get]
-func List(c *gin.Context) {
-	users, err := auth.GetUsers()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
-		return
-	}
+func GetPermission() []string {
+	return metadata.Permission.List()
+}
 
-	for _, u := range users {
-		// remove password and salt from response
-		u.Salt = ""
-		u.Password = ""
-
-	}
-	c.JSON(http.StatusOK, users)
+func AddPermission(p string) {
+	metadata.Permission.Add(p)
 }

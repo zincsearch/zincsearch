@@ -24,7 +24,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-func init() {
+func Init() {
 	// init cache users
 	ZINC_CACHED_USERS.users = make(map[string]*meta.User)
 	// init first start
@@ -63,6 +63,11 @@ func initFirstUser() error {
 	if adminUser == "" || adminPassword == "" {
 		return errors.New("ZINC_FIRST_ADMIN_USER and ZINC_FIRST_ADMIN_PASSWORD must be set on first start. You should also change the credentials after first login")
 	}
-	_, err := CreateUser(adminUser, adminUser, adminPassword, "admin")
-	return err
+	if _, err := CreateUser(adminUser, adminUser, adminPassword, "admin"); err != nil {
+		return err
+	}
+	if _, err := CreateRole("user", "user", GetPermission()); err != nil {
+		return err
+	}
+	return nil
 }
