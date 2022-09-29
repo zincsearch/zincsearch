@@ -25,7 +25,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-var ZINC_CACHED_PERMISSIONS cachedPermissions
+var ZINC_CACHED_PERMISSIONS = cachedPermissions{pm: map[string]map[string]struct{}{}}
 
 type cachedPermissions struct {
 	pm   map[string]map[string]struct{}

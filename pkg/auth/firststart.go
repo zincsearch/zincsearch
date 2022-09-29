@@ -20,13 +20,9 @@ import (
 	"os"
 
 	"github.com/rs/zerolog/log"
-
-	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func Init() {
-	// init cache users
-	ZINC_CACHED_USERS.users = make(map[string]*meta.User)
 	// init first start
 	firstStart, err := isFirstStart()
 	if err != nil {
@@ -66,7 +62,7 @@ func initFirstUser() error {
 	if _, err := CreateUser(adminUser, adminUser, adminPassword, "admin"); err != nil {
 		return err
 	}
-	if _, err := CreateRole("user", "user", GetPermission()); err != nil {
+	if _, err := CreateRole("admin", "admin", GetPermission()); err != nil {
 		return err
 	}
 	return nil
