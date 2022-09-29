@@ -13,6 +13,7 @@ export default {
   menu: {
     about: "About",
     user: "User",
+    role: "Role",
     index: "Index",
     search: "Search",
     template: "Template",
@@ -44,6 +45,17 @@ export default {
     addOrUpdate: "Add/Update User",
     add: "Add User",
     search: "Search User",
+  },
+  role: {
+    header: "Roles",
+    id: "Role ID",
+    name: "Role name",
+    CREATED: "CREATED",
+    UPDATED: "UPDATED",
+    addOrUpdate: "Add/Update Role",
+    add: "Add Role",
+    search: "Search Role",
+    permission: "Permission",
   },
   index: {
     header: "Indexes",

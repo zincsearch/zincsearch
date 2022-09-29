@@ -35,7 +35,7 @@ func AuthMiddleware(permission string) func(c *gin.Context) {
 				if auth.VerifyRolePermission(u.Role, permission) {
 					c.Next()
 				} else {
-					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "No permission"})
+					c.AbortWithStatusJSON(http.StatusOK, gin.H{"auth": "No permission:" + permission})
 					return
 				}
 			} else {

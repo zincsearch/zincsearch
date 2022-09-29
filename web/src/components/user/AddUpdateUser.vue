@@ -31,6 +31,7 @@
           dense
           borderless
           filled
+          emit-value
           :label="t('user.role')"
           :rules="[validateUserRole]"
         />
@@ -85,6 +86,7 @@
 <script>
 import { defineComponent, ref } from "vue";
 import userService from "../../services/user";
+import roleService from "../../services/role";
 import { useI18n } from "vue-i18n";
 
 const defaultValue = () => {
@@ -108,11 +110,24 @@ export default defineComponent({
   emits: ["update:modelValue", "updated"],
   setup() {
     const beingUpdated = ref(false);
-    const roles = ref(["admin", "user"]);
     const addUserForm = ref(null);
     const disableColor = ref("");
     const userData = ref(defaultValue());
     const { t } = useI18n();
+    const roles = ref([]);
+    const getRoles = () => {
+      roleService.list().then((res) => {
+        roles.value = res.data.map((data) => {
+          return {
+            value: data._id,
+            label: data.name,
+          };
+        });
+        roles.value.push({ value: "admin", label: "admin" });
+      });
+    };
+
+    getRoles();
 
     return {
       t,

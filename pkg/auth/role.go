@@ -61,6 +61,9 @@ func strArrayToMap(ss []string) map[string]struct{} {
 
 func CreateRole(id, name string, permissions []string) (*meta.Role, error) {
 	id = strings.ToLower(id)
+	if id == "admin" {
+		return nil, errors.New(errors.ErrorTypeInvalidArgument, "role id admin not allowed")
+	}
 	var newRole *meta.Role
 	existingRole, roleExists, err := GetRole(id)
 	if err != nil && !errors.Is(err, errors.ErrKeyNotFound) {

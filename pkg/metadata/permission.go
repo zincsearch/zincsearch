@@ -26,5 +26,13 @@ func (p *permission) List() []string {
 }
 
 func (p *permission) Add(v string) {
-	p.ps = append(p.ps, v)
+	has := false
+	for _, o := range p.ps {
+		if o == v {
+			has = true
+		}
+	}
+	if !has {
+		p.ps = append(p.ps, v)
+	}
 }

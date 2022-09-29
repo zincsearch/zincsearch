@@ -22,7 +22,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Init() {
+func init() {
 	// init first start
 	firstStart, err := isFirstStart()
 	if err != nil {
@@ -59,11 +59,8 @@ func initFirstUser() error {
 	if adminUser == "" || adminPassword == "" {
 		return errors.New("ZINC_FIRST_ADMIN_USER and ZINC_FIRST_ADMIN_PASSWORD must be set on first start. You should also change the credentials after first login")
 	}
-	if _, err := CreateUser(adminUser, adminUser, adminPassword, "admin"); err != nil {
-		return err
-	}
-	if _, err := CreateRole("admin", "admin", GetPermission()); err != nil {
-		return err
-	}
-	return nil
+
+	_, err := CreateUser(adminUser, adminUser, adminPassword, "admin")
+
+	return err
 }

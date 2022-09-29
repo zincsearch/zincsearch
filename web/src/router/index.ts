@@ -7,6 +7,7 @@ import Login from "../views/Login.vue";
 import Search from "../views/Search.vue";
 import Template from "../views/Template.vue";
 import User from "../views/User.vue";
+import Role from "../views/Role.vue";
 
 const routes = [
   {
@@ -35,7 +36,6 @@ const routes = [
         meta: {
           keepAlive: true,
         },
-        role: true,
       },
       {
         path: "template",
@@ -44,13 +44,16 @@ const routes = [
         meta: {
           keepAlive: true,
         },
-        role: true,
       },
       {
         path: "user",
         name: "user",
         component: User,
-        role: true,
+      },
+      {
+        path: "role",
+        name: "role",
+        component: Role,
       },
       {
         path: "about",
@@ -79,12 +82,9 @@ const router = createRouter({
 
 router.beforeEach((to: any, from: any, next: any) => {
   var isAuthenticated = store.state.user.isLoggedIn;
-  var role = store.state.user.role === "admin";
 
   if (to.path !== "/login" && !isAuthenticated) {
     next({ path: "/login" });
-  } else if (to.role && role) {
-    next();
   } else {
     next();
   }

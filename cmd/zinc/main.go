@@ -30,7 +30,6 @@ import (
 	"github.com/pyroscope-io/client/pyroscope"
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zinc/pkg/auth"
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/core"
 	"github.com/zinclabs/zinc/pkg/meta"
@@ -71,9 +70,6 @@ func main() {
 	// HTTP init
 	app := gin.New()
 	routes.Setup(app)
-
-	// Init User
-	auth.Init()
 
 	// Run the server
 	PORT := config.Global.ServerPort
