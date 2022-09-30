@@ -175,7 +175,7 @@ export default defineComponent({
         html: true,
       }).onOk(() => {
         roleService.delete(props.row.id).then(() => {
-          getroles();
+          getRoles();
         });
       });
     };
