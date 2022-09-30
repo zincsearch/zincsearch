@@ -2,7 +2,7 @@ import http from "./http";
 
 var permission = {
   list: () => {
-    return http().get("/api/permission");
+    return http().get("/api/permissions");
   },
 };
 

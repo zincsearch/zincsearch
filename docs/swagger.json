@@ -450,7 +450,7 @@
                 }
             }
         },
-        "/api/permission": {
+        "/api/permissions": {
             "get": {
                 "produces": [
                     "application/json"
@@ -458,8 +458,8 @@
                 "tags": [
                     "Permission"
                 ],
-                "summary": "List permission",
-                "operationId": "ListPermission",
+                "summary": "List permissions",
+                "operationId": "ListPermissions",
                 "responses": {
                     "200": {
                         "description": "OK",

@@ -22,13 +22,13 @@ import (
 	"github.com/zinclabs/zinc/pkg/auth"
 )
 
-// @Id ListPermission
-// @Summary List permission
+// @Id ListPermissions
+// @Summary List permissions
 // @Tags    Permission
 // @Produce json
 // @Success 200 {object} []string
 // @Failure 500 {object} meta.HTTPResponseError
-// @Router /api/permission [get]
-func ListPermission(c *gin.Context) {
-	c.JSON(http.StatusOK, auth.GetPermission())
+// @Router /api/permissions [get]
+func ListPermissions(c *gin.Context) {
+	c.JSON(http.StatusOK, auth.GetPermissions())
 }

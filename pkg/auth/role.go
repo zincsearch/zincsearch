@@ -90,7 +90,6 @@ func CreateRole(id, name string, permissions []string) (*meta.Role, error) {
 		return nil, err
 	}
 
-	// cache user
 	ZINC_CACHED_PERMISSIONS.Set(newRole.ID, strArrayToMap(permissions))
 
 	return newRole, nil

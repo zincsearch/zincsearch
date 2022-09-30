@@ -1728,9 +1728,9 @@ paths:
       summary: Login
       tags:
       - User
-  /api/permission:
+  /api/permissions:
     get:
-      operationId: ListPermission
+      operationId: ListPermissions
       produces:
       - application/json
       responses:
@@ -1744,7 +1744,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/meta.HTTPResponseError'
-      summary: List permission
+      summary: List permissions
       tags:
       - Permission
   /api/role:

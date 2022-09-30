@@ -19,7 +19,7 @@ import (
 	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-func GetPermission() []string {
+func GetPermissions() []string {
 	return metadata.Permission.List()
 }
 

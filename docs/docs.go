@@ -453,7 +453,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/permission": {
+        "/api/permissions": {
             "get": {
                 "produces": [
                     "application/json"
@@ -461,8 +461,8 @@ const docTemplate = `{
                 "tags": [
                     "Permission"
                 ],
-                "summary": "List permission",
-                "operationId": "ListPermission",
+                "summary": "List permissions",
+                "operationId": "ListPermissions",
                 "responses": {
                     "200": {
                         "description": "OK",

@@ -32,7 +32,7 @@ func AuthMiddleware(permission string) func(c *gin.Context) {
 		user, password, hasAuth := c.Request.BasicAuth()
 		if hasAuth {
 			if u, ok := auth.VerifyCredentials(user, password); ok {
-				if auth.VerifyRolePermission(u.Role, permission) {
+				if auth.VerifyRoleHasPermission(u.Role, permission) {
 					c.Next()
 				} else {
 					c.AbortWithStatusJSON(http.StatusOK, gin.H{"auth": "No permission:" + permission})

@@ -88,7 +88,7 @@ func SetRoutes(r *gin.Engine) {
 	r.PUT("/api/user", AuthMiddleware("auth.CreateUpdateUser"), auth.CreateUpdateUser)
 	r.DELETE("/api/user/:id", AuthMiddleware("auth.DeleteUser"), auth.DeleteUser)
 	r.GET("/api/user", AuthMiddleware("auth.ListUser"), auth.ListUser)
-	r.GET("/api/permission", AuthMiddleware("auth.ListPermission"), auth.ListPermission)
+	r.GET("/api/permissions", AuthMiddleware("auth.ListPermissions"), auth.ListPermissions)
 	r.GET("/api/role", AuthMiddleware("auth.ListRole"), auth.ListRole)
 	r.POST("/api/role", AuthMiddleware("auth.CreateUpdateRole"), auth.CreateUpdateRole)
 	r.PUT("/api/role", AuthMiddleware("auth.CreateUpdateRole"), auth.CreateUpdateRole)
@@ -96,7 +96,7 @@ func SetRoutes(r *gin.Engine) {
 
 	// index
 	r.GET("/api/index", AuthMiddleware("index.List"), index.List)
-	r.GET("/api/index_name", AuthMiddleware("Index.NameList"), index.IndexNameList)
+	r.GET("/api/index_name", AuthMiddleware("index.IndexNameList"), index.IndexNameList)
 	r.POST("/api/index", AuthMiddleware("index.Create"), index.Create)
 	r.PUT("/api/index", AuthMiddleware("index.Create"), index.Create)
 	r.PUT("/api/index/:target", AuthMiddleware("index.Create"), index.Create)
