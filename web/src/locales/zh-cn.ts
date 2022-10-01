@@ -13,6 +13,7 @@ export default {
   menu: {
     about: "关于",
     user: "用户",
+    role: "角色",
     index: "索引",
     search: "搜索",
     template: "模板",
@@ -34,7 +35,7 @@ export default {
   },
   user: {
     header: "用户管理",
-    id: "用户名",
+    id: "ID",
     name: "名字",
     role: "角色",
     password: "输入密码",
@@ -42,6 +43,15 @@ export default {
     addOrUpdate: "添加/更新用户",
     add: "添加",
     search: "查询",
+  },
+  role: {
+    header: "角色管理",
+    id: "ID",
+    name: "名字",
+    addOrUpdate: "添加/更新用户",
+    add: "添加",
+    search: "查询",
+    permission: "权限",
   },
   index: {
     header: "索引管理",

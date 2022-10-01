@@ -19,25 +19,16 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
 	"github.com/zinclabs/zinc/pkg/auth"
-	"github.com/zinclabs/zinc/pkg/meta"
 )
 
-// @Id DeleteUser
-// @Summary Delete user
-// @Tags    User
+// @Id ListPermissions
+// @Summary List permissions
+// @Tags    Permission
 // @Produce json
-// @Param   id  path  string  true  "User id"
-// @Success 200 {object} meta.HTTPResponseID
-// @Success 500 {object} meta.HTTPResponseError
-// @Router /api/user/{id} [delete]
-func Delete(c *gin.Context) {
-	id := c.Param("id")
-	err := auth.DeleteUser(id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, meta.HTTPResponseID{Message: "deleted", ID: id})
+// @Success 200 {object} []string
+// @Failure 500 {object} meta.HTTPResponseError
+// @Router /api/permissions [get]
+func ListPermissions(c *gin.Context) {
+	c.JSON(http.StatusOK, auth.GetPermissions())
 }

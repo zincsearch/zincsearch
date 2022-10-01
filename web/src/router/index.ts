@@ -7,6 +7,7 @@ import Login from "../views/Login.vue";
 import Search from "../views/Search.vue";
 import Template from "../views/Template.vue";
 import User from "../views/User.vue";
+import Role from "../views/Role.vue";
 
 const routes = [
   {
@@ -48,6 +49,11 @@ const routes = [
         path: "user",
         name: "user",
         component: User,
+      },
+      {
+        path: "role",
+        name: "role",
+        component: Role,
       },
       {
         path: "about",

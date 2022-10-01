@@ -163,6 +163,11 @@ export default {
         link: "/user",
       },
       {
+        title: t("menu.role"),
+        icon: "manage_accounts",
+        link: "/role",
+      },
+      {
         title: t("menu.about"),
         icon: "info",
         link: "/about",

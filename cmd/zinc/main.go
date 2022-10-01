@@ -174,13 +174,12 @@ func profiling() {
 			pyroscope.ProfileInuseSpace,
 		},
 	})
-
 	if err != nil {
 		log.Print("pyroscope.Start: ", err.Error())
 	}
 }
 
-//shutdown support twice signal must exit
+// shutdown support twice signal must exit
 func shutdown(stop func(grace bool, done chan<- struct{})) <-chan struct{} {
 	done := make(chan struct{})
 	sig := make(chan os.Signal, 2)

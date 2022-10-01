@@ -35,7 +35,7 @@ import (
 // @Failure 400 {object} meta.HTTPResponseError
 // @Failure 500 {object} meta.HTTPResponseError
 // @Router /api/user [post]
-func CreateUpdate(c *gin.Context) {
+func CreateUpdateUser(c *gin.Context) {
 	var user meta.User
 	if err := zutils.GinBindJSON(c, &user); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
@@ -66,3 +66,44 @@ func CreateUpdate(c *gin.Context) {
 // @Failure 500 {object} meta.HTTPResponseError
 // @Router /api/user [put]
 func UpdateForSDK() {}
+
+// @Id ListUsers
+// @Summary List user
+// @Tags    User
+// @Produce json
+// @Success 200 {object} []meta.User
+// @Failure 500 {object} meta.HTTPResponseError
+// @Router /api/user [get]
+func ListUser(c *gin.Context) {
+	users, err := auth.GetUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		return
+	}
+
+	for _, u := range users {
+		// remove password and salt from response
+		u.Salt = ""
+		u.Password = ""
+
+	}
+	c.JSON(http.StatusOK, users)
+}
+
+// @Id DeleteUser
+// @Summary Delete user
+// @Tags    User
+// @Produce json
+// @Param   id  path  string  true  "User id"
+// @Success 200 {object} meta.HTTPResponseID
+// @Success 500 {object} meta.HTTPResponseError
+// @Router /api/user/{id} [delete]
+func DeleteUser(c *gin.Context) {
+	id := c.Param("id")
+	err := auth.DeleteUser(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, meta.HTTPResponseID{Message: "deleted", ID: id})
+}

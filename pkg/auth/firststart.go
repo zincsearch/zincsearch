@@ -20,13 +20,9 @@ import (
 	"os"
 
 	"github.com/rs/zerolog/log"
-
-	"github.com/zinclabs/zinc/pkg/meta"
 )
 
 func init() {
-	// init cache users
-	ZINC_CACHED_USERS.users = make(map[string]*meta.User)
 	// init first start
 	firstStart, err := isFirstStart()
 	if err != nil {
@@ -63,6 +59,8 @@ func initFirstUser() error {
 	if adminUser == "" || adminPassword == "" {
 		return errors.New("ZINC_FIRST_ADMIN_USER and ZINC_FIRST_ADMIN_PASSWORD must be set on first start. You should also change the credentials after first login")
 	}
+
 	_, err := CreateUser(adminUser, adminUser, adminPassword, "admin")
+
 	return err
 }

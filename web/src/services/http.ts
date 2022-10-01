@@ -46,6 +46,18 @@ const http = () => {
             localStorage.setItem("creds", "");
             router.replace({ name: "login" });
             break;
+          case 403:
+            Notify.create({
+              position: "bottom-right",
+              progress: true,
+              multiLine: true,
+              color: "red-5",
+              textColor: "white",
+              icon: "warning",
+              message: error.response.data["error"] || "No Permission",
+            });
+            break;
+
           case 404:
             Notify.create({
               position: "bottom-right",
