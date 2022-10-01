@@ -13,36 +13,26 @@
 * limitations under the License.
  */
 
-package auth
+package metadata
 
-import (
-	"sync"
-
-	"github.com/zinclabs/zinc/pkg/meta"
-)
-
-var ZINC_CACHED_USERS = cachedUsers{users: map[string]*meta.User{}}
-
-type cachedUsers struct {
-	users map[string]*meta.User
-	lock  sync.RWMutex
+type permission struct {
+	ps []string
 }
 
-func (t *cachedUsers) Get(userID string) (*meta.User, bool) {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
-	user, ok := t.users[userID]
-	return user, ok
+var Permission = &permission{ps: []string{}}
+
+func (p *permission) List() []string {
+	return p.ps
 }
 
-func (t *cachedUsers) Set(userID string, user *meta.User) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-	t.users[userID] = user
-}
-
-func (t *cachedUsers) Delete(userID string) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-	delete(t.users, userID)
+func (p *permission) Add(v string) {
+	has := false
+	for _, o := range p.ps {
+		if o == v {
+			has = true
+		}
+	}
+	if !has {
+		p.ps = append(p.ps, v)
+	}
 }

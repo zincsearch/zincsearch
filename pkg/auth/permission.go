@@ -16,37 +16,13 @@
 package auth
 
 import (
-	"net/http"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-
-	"github.com/zinclabs/zinc/test/utils"
+	"github.com/zinclabs/zinc/pkg/metadata"
 )
 
-func TestList(t *testing.T) {
-	type args struct {
-		code   int
-		result string
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			name: "normal",
-			args: args{
-				code:   http.StatusOK,
-				result: `[{"_id":`,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c, w := utils.NewGinContext()
-			List(c)
-			assert.Equal(t, tt.args.code, w.Code)
-			assert.Contains(t, w.Body.String(), tt.args.result)
-		})
-	}
+func GetPermissions() []string {
+	return metadata.Permission.List()
+}
+
+func AddPermission(p string) {
+	metadata.Permission.Add(p)
 }

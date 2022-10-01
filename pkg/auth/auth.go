@@ -35,3 +35,16 @@ func VerifyCredentials(userID, password string) (*meta.User, bool) {
 
 	return nil, false
 }
+
+func VerifyRoleHasPermission(roleId, permission string) bool {
+	roleId = strings.ToLower(roleId)
+	if roleId == "admin" {
+		return true
+	}
+	pm, ok := ZINC_CACHED_PERMISSIONS.Get(roleId)
+	if !ok {
+		return false
+	}
+	_, ok = pm[permission]
+	return ok
+}

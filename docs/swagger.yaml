@@ -814,6 +814,23 @@ definitions:
       value:
         type: string
     type: object
+  meta.Role:
+    properties:
+      _id:
+        type: string
+      created_at:
+        type: string
+      name:
+        type: string
+      permission:
+        items:
+          type: string
+        type: array
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
   meta.SearchResponse:
     properties:
       _shards:
@@ -1711,6 +1728,96 @@ paths:
       summary: Login
       tags:
       - User
+  /api/permissions:
+    get:
+      operationId: ListPermissions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: List permissions
+      tags:
+      - Permission
+  /api/role:
+    get:
+      operationId: ListRoles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/meta.Role'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: List role
+      tags:
+      - Role
+    post:
+      consumes:
+      - application/json
+      operationId: CreateRole
+      parameters:
+      - description: Role data
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/meta.Role'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseID'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Create role
+      tags:
+      - Role
+  /api/role/{id}:
+    delete:
+      operationId: DeleteRole
+      parameters:
+      - description: Role id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseID'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Delete role
+      tags:
+      - Role
   /api/user:
     get:
       operationId: ListUsers
