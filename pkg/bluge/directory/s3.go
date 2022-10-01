@@ -57,9 +57,9 @@ type S3Directory struct {
 }
 
 var endpointResolver = aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
-	if zincConfig.Global.S3.Endpoint != "" {
+	if zincConfig.Global.S3.Url != "" {
 		return aws.Endpoint{
-			URL:           zincConfig.Global.S3.Endpoint,
+			URL:           zincConfig.Global.S3.Url,
 			SigningRegion: region,
 			Source:        aws.EndpointSourceCustom,
 		}, nil

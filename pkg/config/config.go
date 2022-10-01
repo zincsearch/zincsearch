@@ -82,8 +82,8 @@ type etcd struct {
 }
 
 type s3 struct {
-	Bucket   string `env:"ZINC_S3_BUCKET"`
-	Endpoint string `env:"ZINC_S3_ENDPOINT"`
+	Bucket string `env:"ZINC_S3_BUCKET"`
+	Url    string `env:"ZINC_S3_URL"`
 }
 
 type minIO struct {
