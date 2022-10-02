@@ -34,7 +34,7 @@
     "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@cypress/vue": "^4.0.0",
+    "@cypress/vue": "^4.2.0",
     "@cypress/webpack-dev-server": "^2.0.0",
     "@quasar/vite-plugin": "^1.0.10",
     "@types/js-cookie": "^3.0.2",
