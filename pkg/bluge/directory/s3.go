@@ -25,12 +25,14 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/index"
 	segment "github.com/blugelabs/bluge_segment_api"
 	"github.com/rs/zerolog/log"
+	zincConfig "github.com/zinclabs/zinc/pkg/config"
 )
 
 // GetS3Config returns a bluge config that will store index data in S3
@@ -55,11 +57,22 @@ type S3Directory struct {
 	Client *s3.Client
 }
 
+var endpointResolver = aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+	if zincConfig.Global.S3.Url != "" {
+		return aws.Endpoint{
+			URL:           zincConfig.Global.S3.Url,
+			SigningRegion: region,
+			Source:        aws.EndpointSourceCustom,
+		}, nil
+	}
+	// returning EndpointNotFoundError will allow the service to fallback to it's default resolution
+	return aws.Endpoint{}, &aws.EndpointNotFoundError{}
+})
+
 // NewS3Directory creates a new S3Directory instance which can be used to create s3 backed indexes
 func NewS3Directory(bucket, prefix string) index.Directory {
-
 	// Load the Shared AWS Configuration (~/.aws/config)
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithEndpointResolverWithOptions(endpointResolver))
 	if err != nil {
 		log.Print("Error loading AWS config: ", err)
 	}
@@ -237,7 +250,7 @@ func GetS3PrefixSize(bucket, prefix string) (numItems uint64, numBytes uint64) {
 	}
 
 	// Load the Shared AWS Configuration (~/.aws/config)
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithEndpointResolverWithOptions(endpointResolver))
 	if err != nil {
 		log.Print("Error loading AWS config: ", err)
 	}
