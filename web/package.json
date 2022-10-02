@@ -3,7 +3,7 @@
   "description": "A web console for Zinc",
   "productName": "Zinc Console",
   "private": true,
-  "version": "0.2.6",
+  "version": "0.3.3",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -19,24 +19,24 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@quasar/extras": "^1.14.3",
+    "@quasar/extras": "^1.15.3",
     "apexcharts": "^3.35.4",
     "axios": "^0.27.2",
     "buffer": "^6.0.3",
     "js-cookie": "^3.0.1",
-    "jsoneditor": "^9.9.0",
+    "jsoneditor": "^9.9.2",
     "lodash-es": "^4.17.21",
     "quasar": "^2.7.5",
     "vue": "^3.2.37",
-    "vue-i18n": "^9.1.10",
+    "vue-i18n": "^9.2.2",
     "vue-router": "^4.1.2",
     "vue3-apexcharts": "^1.4.1",
     "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@cypress/vue": "^4.0.0",
+    "@cypress/vue": "^4.2.0",
     "@cypress/webpack-dev-server": "^2.0.0",
-    "@quasar/vite-plugin": "^1.0.10",
+    "@quasar/vite-plugin": "^1.2.3",
     "@types/js-cookie": "^3.0.2",
     "@types/lodash-es": "^4.17.6",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
@@ -45,7 +45,7 @@
     "@vitest/ui": "^0.18.1",
     "@vue/test-utils": "^2.0.2",
     "c8": "^7.11.3",
-    "cypress": "^10.3.1",
+    "cypress": "^10.9.0",
     "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -58,7 +58,7 @@
     "stylelint-config-recommended-vue": "^1.0.0",
     "typescript": "^4.7.4",
     "vite": "^2.9.14",
-    "vitest": "^0.18.1",
+    "vitest": "^0.23.4",
     "vue-tsc": "^0.38.9"
   }
 }
