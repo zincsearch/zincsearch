@@ -24,7 +24,7 @@
     "axios": "^0.27.2",
     "buffer": "^6.0.3",
     "js-cookie": "^3.0.1",
-    "jsoneditor": "^9.9.0",
+    "jsoneditor": "^9.9.2",
     "lodash-es": "^4.17.21",
     "quasar": "^2.7.5",
     "vue": "^3.2.37",
