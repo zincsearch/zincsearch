@@ -20,6 +20,11 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"path/filepath"
+	"strconv"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -28,10 +33,6 @@ import (
 	segment "github.com/blugelabs/bluge_segment_api"
 	"github.com/rs/zerolog/log"
 	zincConfig "github.com/zinclabs/zinc/pkg/config"
-	"io"
-	"io/ioutil"
-	"path/filepath"
-	"strconv"
 )
 
 // GetS3Config returns a bluge config that will store index data in S3
