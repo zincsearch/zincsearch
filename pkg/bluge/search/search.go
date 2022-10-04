@@ -185,6 +185,8 @@ func (d *DocumentList) Pop() interface{} {
 	return doc
 }
 
-func (d *DocumentList) Len() int           { return len(d.docs) }
+func (d *DocumentList) Len() int { return len(d.docs) }
+
 func (d *DocumentList) Less(i, j int) bool { return d.sort.Compare(d.docs[i].doc, d.docs[j].doc) < 0 }
-func (d *DocumentList) Swap(i, j int)      { d.docs[i], d.docs[j] = d.docs[j], d.docs[i] }
+
+func (d *DocumentList) Swap(i, j int) { d.docs[i], d.docs[j] = d.docs[j], d.docs[i] }

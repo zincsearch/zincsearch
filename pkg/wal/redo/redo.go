@@ -33,6 +33,7 @@ import (
  */
 
 var ErrNotFound = errors.New("not found")
+
 var ErrValueTooLarge = errors.New("value too large")
 
 const ValueFixedLength = 64

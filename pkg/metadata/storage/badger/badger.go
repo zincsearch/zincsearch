@@ -18,7 +18,7 @@ package badger
 import (
 	"path"
 
-	"github.com/dgraph-io/badger/v3"
+	badger "github.com/dgraph-io/badger/v3"
 	"github.com/dgraph-io/badger/v3/options"
 	"github.com/rs/zerolog/log"
 

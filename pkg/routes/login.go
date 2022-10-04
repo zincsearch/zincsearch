@@ -13,12 +13,13 @@
 * limitations under the License.
  */
 
-package auth
+package routes
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 
 	"github.com/zinclabs/zinc/pkg/auth"
 	"github.com/zinclabs/zinc/pkg/meta"
@@ -26,35 +27,35 @@ import (
 )
 
 // @Id Login
-// @Summary Login
+// @Summary Login user
 // @Tags    User
 // @Accept  json
 // @Produce json
 // @Param   login body LoginRequest true "Login credentials"
-// @Success 200 {object} LoginResponse
+// @Success 200 {object} meta.HttpResponseUser
 // @Failure 400 {object} meta.HTTPResponseError
 // @Router /api/login [post]
-func Login(c *gin.Context) {
-	// Read login input
+func Login(c *gin.Context) (interface{}, error) {
 	var loginInput LoginRequest
 	if err := zutils.GinBindJSON(c, &loginInput); err != nil {
 		c.JSON(http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
-		return
+		return nil, errors.New("Invalid credentials structure")
 	}
 
 	loggedInUser, validationResult := auth.VerifyCredentials(loginInput.ID, loginInput.Password)
-	var resUser LoginUser
+	var user LoginUser
 	if validationResult {
-		resUser = LoginUser{
+		user = LoginUser{
 			ID:   loggedInUser.ID,
 			Name: loggedInUser.Name,
 			Role: loggedInUser.Role,
 		}
+		c.Set("user", user)
+		return user, nil
+	} else {
+		return nil, errors.New("Invalid credentials")
 	}
-	c.JSON(http.StatusOK, LoginResponse{
-		Validated: validationResult,
-		User:      resUser,
-	})
+
 }
 
 type LoginUser struct {

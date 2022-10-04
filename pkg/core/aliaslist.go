@@ -19,6 +19,7 @@ import (
 	"sync"
 
 	"github.com/rs/zerolog/log"
+
 	"github.com/zinclabs/zinc/pkg/metadata"
 	"github.com/zinclabs/zinc/pkg/zutils"
 )

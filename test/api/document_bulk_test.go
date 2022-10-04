@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 

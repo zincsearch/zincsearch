@@ -5,6 +5,7 @@
 <script lang="ts">
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import user from "./services/user";
 
 export default {
   setup() {
@@ -18,12 +19,20 @@ export default {
     }
 
     const router = useRouter();
-    const creds = localStorage.getItem("creds");
-    if (creds) {
-      const credsInfo = JSON.parse(creds);
-      store.dispatch("login", credsInfo);
-      router.push("/search");
-    }
+    user
+      .isLoggedIn()
+      .then((r) => {
+        store.dispatch("login", {
+          _id: r.data._id,
+          password: r.data.password,
+          name: r.data.name,
+          role: r.data.role,
+        });
+        router.push("/search");
+      })
+      .catch((_) => {
+        store.dispatch("logout");
+      });
   },
 };
 </script>

@@ -29,7 +29,7 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/index"
 	segment "github.com/blugelabs/bluge_segment_api"
-	"github.com/minio/minio-go/v7"
+	minio "github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
 

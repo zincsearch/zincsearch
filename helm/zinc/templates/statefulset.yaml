@@ -33,8 +33,27 @@ spec:
                 secretKeyRef:
                   key: "password"
                   name: {{ include "zinc.fullname" . }}
+            - name: ZINC_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: "jwtSecret"
+                  name: {{ include "zinc.fullname" . }}
             - name: ZINC_DATA_PATH
               value: /go/bin/data
+            {{- if .Values.jwt.realm }}
+            - name: ZINC_JWT_REALM
+              value: {{ .Values.jwt.realm }}
+            {{- end }}
+            {{- if .Values.jwt.publicHostname }}
+            - name: ZINC_PUBLIC_HOSTNAME
+              value: {{ .Values.jwt.publicHostname }}
+            {{- end }}
+            {{- if .Values.jwt.scheme }}
+            - name: ZINC_FRONTEND_SCHEME
+              value: {{ .Values.jwt.scheme }}
+            {{- end }}
+            - name: ZINC_FRONTEND_PORT
+              value: {{ .Values.service.port }}
           # command: ["/bin/bash", "-c", "while true; do sleep 1; done"]
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

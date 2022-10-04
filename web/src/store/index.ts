@@ -7,7 +7,6 @@ export default createStore({
       isLoggedIn: false,
       _id: "",
       password: "",
-      base64encoded: "",
       name: "",
       email: "",
       role: "",
@@ -15,12 +14,11 @@ export default createStore({
   },
   mutations: {
     login(state, payload) {
-      if (payload && payload._id && payload.base64encoded) {
+      if (payload && payload._id) {
         state.user.isLoggedIn = true;
         state.user._id = payload._id;
         state.user.name = payload.name || payload._id;
         state.user.role = payload.role;
-        state.user.base64encoded = payload.base64encoded;
       }
     },
     logout(state) {
@@ -28,7 +26,6 @@ export default createStore({
       state.user._id = "";
       state.user.name = "";
       state.user.role = "";
-      state.user.base64encoded = "";
     },
     endpoint(state, payload) {
       state.API_ENDPOINT = payload;

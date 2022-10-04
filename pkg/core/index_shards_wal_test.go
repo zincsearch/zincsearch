@@ -21,6 +21,7 @@ import (
 
 	blugeindex "github.com/blugelabs/bluge/index"
 	"github.com/stretchr/testify/assert"
+
 	"github.com/zinclabs/zinc/pkg/meta"
 )
 

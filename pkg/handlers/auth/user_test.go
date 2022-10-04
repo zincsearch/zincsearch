@@ -18,9 +18,13 @@ package auth
 import (
 	"net/http"
 	"testing"
+	"time"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zinclabs/zinc/pkg/auth"
+	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/test/utils"
 )
 
@@ -148,6 +152,64 @@ func TestDeleteUser(t *testing.T) {
 			DeleteUser(c)
 			assert.Equal(t, tt.args.code, w.Code)
 			assert.Contains(t, w.Body.String(), tt.args.result)
+		})
+	}
+}
+
+func TestGetUser(t *testing.T) {
+	type args struct {
+		jwtPayloadId string
+		mockUserId   string
+		code         int
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "should not return unauthorized(401) when id claim is missing",
+			args: args{
+				code: 401,
+			},
+		},
+		{
+			name: "should return ok(200) and the user when correct claim is provided",
+			args: args{
+				jwtPayloadId: "123",
+				mockUserId:   "123",
+				code:         200,
+			},
+		},
+		{
+			name: "should return unauthorized(401) when user with given id claim is not found",
+			args: args{
+				jwtPayloadId: "123",
+				code:         200,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c, w := utils.NewGinContext()
+			if tt.args.mockUserId != "" {
+				err := auth.SetUser(tt.args.jwtPayloadId, meta.User{
+					ID:        tt.args.jwtPayloadId,
+					Name:      "admin",
+					Role:      "admin",
+					Salt:      "pepper",
+					Password:  "secret123",
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				})
+				assert.NoError(t, err)
+			}
+			if tt.args.jwtPayloadId != "" {
+				c.Set("JWT_PAYLOAD", jwt.MapClaims{
+					"id": tt.args.jwtPayloadId,
+				})
+			}
+			GetUser(c)
+			assert.Equal(t, tt.args.code, w.Code)
 		})
 	}
 }

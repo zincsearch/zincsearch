@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/goccy/go-json"
+	json "github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zinclabs/zinc/pkg/core"

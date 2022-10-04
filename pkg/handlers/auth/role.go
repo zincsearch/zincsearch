@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/zinclabs/zinc/pkg/auth"
 	"github.com/zinclabs/zinc/pkg/meta"
 	"github.com/zinclabs/zinc/pkg/zutils"

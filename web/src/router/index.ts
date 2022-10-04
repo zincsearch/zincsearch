@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import store from "../store/index.js";
 
 import About from "../views/About.vue";
 import Index from "../views/Index.vue";
@@ -78,16 +77,6 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(window.location.pathname),
   routes,
-});
-
-router.beforeEach((to: any, from: any, next: any) => {
-  var isAuthenticated = store.state.user.isLoggedIn;
-
-  if (to.path !== "/login" && !isAuthenticated) {
-    next({ path: "/login" });
-  } else {
-    next();
-  }
 });
 
 export default router;

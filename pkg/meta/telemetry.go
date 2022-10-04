@@ -20,7 +20,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/segmentio/analytics-go/v3"
+	analytics "github.com/segmentio/analytics-go/v3"
 )
 
 var (

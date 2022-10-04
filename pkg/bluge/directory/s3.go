@@ -32,6 +32,7 @@ import (
 	"github.com/blugelabs/bluge/index"
 	segment "github.com/blugelabs/bluge_segment_api"
 	"github.com/rs/zerolog/log"
+
 	zincConfig "github.com/zinclabs/zinc/pkg/config"
 )
 

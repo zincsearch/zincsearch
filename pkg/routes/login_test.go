@@ -13,10 +13,9 @@
 * limitations under the License.
  */
 
-package auth
+package routes
 
 import (
-	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,56 +24,75 @@ import (
 )
 
 func TestLogin(t *testing.T) {
+	type result struct {
+		authenticated bool
+		errMsg        string
+	}
 	type args struct {
 		code   int
 		data   map[string]interface{}
-		result string
+		result result
 	}
 	tests := []struct {
 		name string
 		args args
 	}{
 		{
-			name: "normal",
+			name: "should authenticate user",
 			args: args{
-				code: http.StatusOK,
 				data: map[string]interface{}{
 					"_id":      "admin",
 					"password": "Complexpass#123",
 				},
-				result: "validated\":true",
+				result: result{
+					authenticated: true,
+				},
 			},
 		},
 		{
-			name: "error",
+			name: "should not authenticate user with incorrect credentials",
 			args: args{
-				code: http.StatusOK,
 				data: map[string]interface{}{
 					"_id":      "user_not_exists",
 					"password": "password",
 				},
-				result: "validated\":false",
-			},
+				result: result{
+					authenticated: false,
+					errMsg:        "Invalid credentials",
+				}},
 		},
 		{
-			name: "error",
+			name: "should not authenticate user with invalid credentials structure",
 			args: args{
-				code: http.StatusBadRequest,
 				data: map[string]interface{}{
 					"_id":      1233,
 					"password": "password",
 				},
-				result: "error",
+				result: result{
+					authenticated: false,
+					errMsg:        "Invalid credentials structure",
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c, w := utils.NewGinContext()
+			c, _ := utils.NewGinContext()
 			utils.SetGinRequestData(c, tt.args.data)
-			Login(c)
-			assert.Equal(t, tt.args.code, w.Code)
-			assert.Contains(t, w.Body.String(), tt.args.result)
+
+			user, err := Login(c)
+
+			if tt.args.result.authenticated {
+				assert.NoError(t, err)
+				assert.Equal(t, LoginUser{
+					ID:   "admin",
+					Name: "admin",
+					Role: "admin",
+				}, user)
+			} else {
+				assert.Error(t, err)
+				assert.EqualError(t, err, tt.args.result.errMsg)
+			}
 		})
 	}
 }

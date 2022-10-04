@@ -25,7 +25,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/getsentry/sentry-go"
+	sentry "github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"github.com/pyroscope-io/client/pyroscope"
 	"github.com/rs/zerolog/log"

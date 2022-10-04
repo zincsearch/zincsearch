@@ -5,6 +5,7 @@ export ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
 export ZINC_WAL_SYNC_INTERVAL=10ms
 export ZINC_WAL_REDOLOG_NO_SYNC=true
 export ZINC_ENABLE_TEXT_KEYWORD_MAPPING=true
+export ZINC_JWT_SECRET=jwtSecret#123
 
 # clean up
 find ./pkg -name data -type d|xargs rm -fR
@@ -58,7 +59,8 @@ fi
 # enable threshold
 COVERAGE_THRESHOLD=81
 
-totalCoverage=`go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]'`
+grep -v -E "(middleware.go|routes.go|setup.go)" coverage.out > coverage.excludes.out
+totalCoverage=`go tool cover -func=coverage.excludes.out | grep total | grep -Eo '[0-9]+\.[0-9]'`
 
 # clean up
 find ./pkg -name data -type d|xargs rm -fR

@@ -26,32 +26,50 @@ import (
 
 	"github.com/zinclabs/zinc/pkg/auth"
 	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zinc/pkg/routes"
 	"github.com/zinclabs/zinc/pkg/zutils/json"
 )
 
-type userLoginResponse struct {
-	User      meta.User `json:"user"`
-	Validated bool      `json:"validated"`
+type errorResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 func TestAuth(t *testing.T) {
 	t.Run("test auth api", func(t *testing.T) {
 		r := server()
-		t.Run("check auth with auth", func(t *testing.T) {
+		t.Run("check jwt auth", func(t *testing.T) {
+			req, _ := http.NewRequest("GET", "/api/index", nil)
+			token, _, err := routes.JWTMiddleWare.TokenGenerator(routes.LoginUser{
+				ID:   "admin",
+				Name: "admin",
+				Role: "admin",
+			})
+			assert.NoError(t, err)
+			cookie := http.Cookie{
+				Name:  "token",
+				Value: token,
+			}
+			req.AddCookie(&cookie)
+			resp := httptest.NewRecorder()
+			r.ServeHTTP(resp, req)
+			assert.Equal(t, http.StatusOK, resp.Code)
+		})
+		t.Run("check basic auth", func(t *testing.T) {
 			req, _ := http.NewRequest("GET", "/api/index", nil)
 			req.SetBasicAuth(username, password)
 			resp := httptest.NewRecorder()
 			r.ServeHTTP(resp, req)
 			assert.Equal(t, http.StatusOK, resp.Code)
 		})
-		t.Run("check auth with error password", func(t *testing.T) {
+		t.Run("check basic auth with error password", func(t *testing.T) {
 			req, _ := http.NewRequest("GET", "/api/index", nil)
 			req.SetBasicAuth(username, "xxx")
 			resp := httptest.NewRecorder()
 			r.ServeHTTP(resp, req)
 			assert.Equal(t, http.StatusUnauthorized, resp.Code)
 		})
-		t.Run("check auth without auth", func(t *testing.T) {
+		t.Run("check auth without jwt or basic auth", func(t *testing.T) {
 			req, _ := http.NewRequest("GET", "/api/index", nil)
 			resp := httptest.NewRecorder()
 			r.ServeHTTP(resp, req)
@@ -62,24 +80,37 @@ func TestAuth(t *testing.T) {
 			t.Run("with username and password", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(fmt.Sprintf(`{"_id": "%s", "password": "%s"}`, username, password))
-				resp := request("POST", "/api/login", body)
+				req, _ := http.NewRequest("POST", "/api/login", body)
+				resp := httptest.NewRecorder()
+				server().ServeHTTP(resp, req)
+
 				assert.Equal(t, http.StatusOK, resp.Code)
 
-				data := new(userLoginResponse)
+				data := new(meta.HttpResponseUser)
 				err := json.Unmarshal(resp.Body.Bytes(), &data)
 				assert.NoError(t, err)
-				assert.True(t, data.Validated)
+				assert.Equal(t, &meta.HttpResponseUser{
+					Id:   "admin",
+					Name: "admin",
+					Role: "admin",
+				}, data)
 			})
 			t.Run("with bad username or password", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
 				body.WriteString(fmt.Sprintf(`{"_id": "%s", "password": "xxx"}`, username))
-				resp := request("POST", "/api/login", body)
-				assert.Equal(t, http.StatusOK, resp.Code)
+				req, _ := http.NewRequest("POST", "/api/login", body)
+				resp := httptest.NewRecorder()
+				server().ServeHTTP(resp, req)
 
-				data := new(userLoginResponse)
-				err := json.Unmarshal(resp.Body.Bytes(), &data)
+				assert.Equal(t, http.StatusUnauthorized, resp.Code)
+
+				response := new(errorResponse)
+				err := json.Unmarshal(resp.Body.Bytes(), &response)
 				assert.NoError(t, err)
-				assert.False(t, data.Validated)
+				assert.Equal(t, &errorResponse{
+					Code:    401,
+					Message: "Invalid credentials",
+				}, response)
 			})
 		})
 	})
@@ -101,10 +132,15 @@ func TestAuth(t *testing.T) {
 				resp = request("POST", "/api/login", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
 
-				data := new(userLoginResponse)
+				data := new(meta.HttpResponseUser)
 				err := json.Unmarshal(resp.Body.Bytes(), &data)
 				assert.NoError(t, err)
-				assert.True(t, data.Validated)
+				assert.Equal(t, &meta.HttpResponseUser{
+					Id:   "user1",
+					Name: "user1",
+					Role: "admin",
+				}, data)
+
 			})
 			t.Run("update user", func(t *testing.T) {
 				// update user

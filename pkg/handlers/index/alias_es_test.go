@@ -19,10 +19,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/zinclabs/zinc/pkg/metadata"
-
 	"github.com/stretchr/testify/require"
+
 	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zinc/pkg/metadata"
 	"github.com/zinclabs/zinc/test/utils"
 )
 

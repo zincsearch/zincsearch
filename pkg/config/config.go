@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/blugelabs/ice/compress"
-	"github.com/docker/go-units"
+	units "github.com/docker/go-units"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
@@ -34,6 +34,11 @@ type config struct {
 	GinMode                   string        `env:"GIN_MODE"`
 	ServerPort                string        `env:"ZINC_SERVER_PORT,default=4080"`
 	ServerMode                string        `env:"ZINC_SERVER_MODE,default=node"`
+	Hostname                  string        `env:"ZINC_PUBLIC_HOSTNAME,default=localhost"`
+	JWTSecret                 string        `env:"ZINC_JWT_SECRET"`
+	JWTRealm                  string        `env:"ZINC_JWT_REALM,default=zinc"`
+	FrontendPort              string        `env:"ZINC_FRONTEND_PORT,default=8080"`
+	FrontendScheme            string        `env:"ZINC_FRONTEND_SCHEME,default=http"`
 	NodeID                    int           `env:"ZINC_NODE_ID,default=1"`
 	DataPath                  string        `env:"ZINC_DATA_PATH,default=./data"`
 	MetadataStorage           string        `env:"ZINC_METADATA_STORAGE,default=bolt"`

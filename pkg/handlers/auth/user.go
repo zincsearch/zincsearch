@@ -18,6 +18,7 @@ package auth
 import (
 	"net/http"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 
 	"github.com/zinclabs/zinc/pkg/auth"
@@ -106,4 +107,29 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, meta.HTTPResponseID{Message: "deleted", ID: id})
+}
+
+// @Id GetUser
+// @Summary Get logged-in user
+// @Tags    User
+// @Produce json
+// @Success 200 {object} meta.HttpResponseUser
+// @Failure 500 {object} meta.HTTPResponseError
+// @Router /api/login/verify [get]
+func GetUser(c *gin.Context) {
+	claims := jwt.ExtractClaims(c)
+	if id, ok := claims["id"]; ok {
+		user, _, err := auth.GetUser(id.(string))
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, meta.HTTPResponseError{Error: err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, meta.HttpResponseUser{
+			Id:   user.ID,
+			Name: user.Name,
+			Role: user.Role,
+		})
+	} else {
+		c.JSON(http.StatusUnauthorized, meta.HTTPResponseError{Error: "Missing id claim"})
+	}
 }

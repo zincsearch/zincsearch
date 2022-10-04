@@ -33,6 +33,14 @@ persistence:
   # PVC Storage Request for Zinc data volume
   size: "10Gi"
 
+jwt:
+  # public hostname used to make cors cookies work
+  publicHostname: zincsearch.com
+  # jwt realm: https://www.rfc-editor.org/rfc/rfc7235#section-2.2
+  realm: zinc
+  # http scheme used either http or https
+  scheme: https
+
 securityContext:
   fsGroup: 2000
   runAsUser: 10000

@@ -3,6 +3,7 @@ module github.com/zinclabs/zinc
 go 1.18
 
 require (
+	github.com/appleboy/gin-jwt/v2 v2.9.0
 	github.com/aws/aws-sdk-go-v2 v1.16.16
 	github.com/aws/aws-sdk-go-v2/config v1.17.8
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.27.11
@@ -88,6 +89,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

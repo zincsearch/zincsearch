@@ -128,6 +128,7 @@ import { setLanguage } from "../utils/cookies";
 import { ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import user from "../services/user";
 
 export default {
   name: "MainLayout",
@@ -202,9 +203,10 @@ export default {
       router.go(0);
     };
     const signout = () => {
-      store.dispatch("logout");
-      localStorage.setItem("creds", "");
-      router.push("/login");
+      user.logout().then(() => {
+        store.dispatch("logout");
+        router.push("/login");
+      });
     };
 
     return {

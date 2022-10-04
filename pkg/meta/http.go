@@ -80,3 +80,9 @@ type HTTPResponseDeleteByQuery struct {
 	RequestsPerSecond    int                 `json:"requests_per_second"`
 	ThrottledUntilMillis int                 `json:"throttled_until_millis"`
 }
+
+type HttpResponseUser struct {
+	Id   string `json:"_id"`
+	Name string `json:"name"`
+	Role string `json:"role"`
+}

@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
+
 	"github.com/zinclabs/zinc/pkg/wal"
 )
 

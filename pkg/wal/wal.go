@@ -19,6 +19,7 @@ import (
 	"path"
 
 	"github.com/zinclabs/wal"
+
 	"github.com/zinclabs/zinc/pkg/config"
 	"github.com/zinclabs/zinc/pkg/errors"
 	"github.com/zinclabs/zinc/pkg/wal/redo"

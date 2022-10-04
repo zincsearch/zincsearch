@@ -49,7 +49,6 @@
 import { defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
-import { Buffer } from "buffer";
 import { useRouter } from "vue-router";
 import authapi from "../services/auth";
 import { useI18n } from "vue-i18n";
@@ -67,7 +66,7 @@ export default defineComponent({
     const submitting = ref(false);
 
     const onSubmit = () => {
-      if (id.value == "" || password.value == "") {
+      if (id.value === "" || password.value === "") {
         $q.notify({
           position: "top",
           color: "warning",
@@ -77,37 +76,35 @@ export default defineComponent({
         });
       } else {
         submitting.value = true;
-        let creds = {
-          _id: id.value,
-          password: password.value,
-          base64encoded: Buffer.from(id.value + ":" + password.value).toString(
-            "base64"
-          ),
-        };
 
-        authapi.login(creds).then((res) => {
-          if (res.data.validated) {
-            creds.name = res.data.user.name;
-            creds.role = res.data.user.role;
-            creds.password = "";
-
-            localStorage.setItem("creds", JSON.stringify(creds));
-            store.dispatch("login", creds);
-            router.replace({ path: "/search" });
-          } else {
-            $q.notify({
-              position: "bottom-right",
-              progress: true,
-              multiLine: true,
-              color: "red-5",
-              textColor: "white",
-              icon: "warning",
-              message: "Invalid credentials",
-            });
-            store.dispatch("logout");
-            submitting.value = false;
-          }
-        });
+        authapi
+          .login({
+            _id: id.value,
+            password: password.value,
+          })
+          .then((res) => {
+            if (res.status === 200) {
+              const user = {
+                _id: res.data._id,
+                name: res.data.name,
+                role: res.data.role,
+              };
+              store.dispatch("login", user);
+              router.replace({ path: "/search" });
+            } else {
+              $q.notify({
+                position: "bottom-right",
+                progress: true,
+                multiLine: true,
+                color: "red-5",
+                textColor: "white",
+                icon: "warning",
+                message: "Invalid credentials",
+              });
+              store.dispatch("logout");
+              submitting.value = false;
+            }
+          });
       }
     };
 

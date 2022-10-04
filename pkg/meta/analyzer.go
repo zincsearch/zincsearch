@@ -31,6 +31,7 @@ type Analyzer struct {
 type Tokenizer struct {
 	Type string `json:"type"`
 }
+
 type TokenFilter struct {
 	Type string `json:"type"`
 }

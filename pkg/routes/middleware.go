@@ -19,33 +19,37 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/zinclabs/zinc/pkg/core"
-
 	"github.com/gin-gonic/gin"
+
 	"github.com/zinclabs/zinc/pkg/auth"
+	"github.com/zinclabs/zinc/pkg/core"
 )
 
-func AuthMiddleware(permission string) func(c *gin.Context) {
-	auth.AddPermission(permission)
+func AuthMiddleware(permission string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Get the Basic Authentication credentials
-		user, password, hasAuth := c.Request.BasicAuth()
-		if hasAuth {
-			if u, ok := auth.VerifyCredentials(user, password); ok {
-				if auth.VerifyRoleHasPermission(u.Role, permission) {
-					c.Next()
-				} else {
-					c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "No permission:" + permission})
-					return
-				}
+		if _, _, ok := c.Request.BasicAuth(); ok {
+			handleBasicAuth(c, permission)
+		} else {
+			c.Set(PermissionKey, permission)
+			handleJwtAuth(c)
+		}
+	}
+}
+
+func handleBasicAuth(c *gin.Context, permission string) {
+	user, password, hasAuth := c.Request.BasicAuth()
+	if hasAuth {
+		if u, ok := auth.VerifyCredentials(user, password); ok {
+			if auth.VerifyRoleHasPermission(u.Role, permission) {
+				c.Next()
 			} else {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "Invalid credentials"})
-				return
+				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "No permission:" + permission})
 			}
 		} else {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "Missing credentials"})
-			return
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "Invalid credentials"})
 		}
+	} else {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"auth": "Missing credentials"})
 	}
 }
 

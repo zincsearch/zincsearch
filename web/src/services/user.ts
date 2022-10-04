@@ -10,6 +10,12 @@ var user = {
   delete: (id: string) => {
     return http().delete("/api/user/" + id);
   },
+  isLoggedIn: () => {
+    return http().get("/api/login/verify");
+  },
+  logout() {
+    return http().post("/api/logout");
+  },
 };
 
 export default user;

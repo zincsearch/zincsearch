@@ -32,3 +32,6 @@ tmp/
 
 # zinc binary in root
 zinc
+
+# intellij .run folder
+.run

@@ -95,7 +95,16 @@ func server() *gin.Engine {
 
 func request(method, api string, body io.Reader) *httptest.ResponseRecorder {
 	req, _ := http.NewRequest(method, api, body)
-	req.SetBasicAuth(username, password)
+	token, _, _ := routes.JWTMiddleWare.TokenGenerator(routes.LoginUser{
+		ID:   "admin",
+		Name: "admin",
+		Role: "admin",
+	})
+	cookie := http.Cookie{
+		Name:  "token",
+		Value: token,
+	}
+	req.AddCookie(&cookie)
 	w := httptest.NewRecorder()
 	server().ServeHTTP(w, req)
 	return w

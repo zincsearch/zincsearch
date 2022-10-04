@@ -21,9 +21,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/robfig/cron/v3"
+	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
-	"github.com/segmentio/analytics-go/v3"
+	analytics "github.com/segmentio/analytics-go/v3"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/mem"
 
