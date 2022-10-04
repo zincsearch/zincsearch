@@ -39,7 +39,7 @@
     "@quasar/vite-plugin": "^1.2.3",
     "@types/js-cookie": "^3.0.2",
     "@types/lodash-es": "^4.17.6",
-    "@typescript-eslint/eslint-plugin": "^5.30.7",
+    "@typescript-eslint/eslint-plugin": "^5.39.0",
     "@typescript-eslint/parser": "^5.30.7",
     "@vitejs/plugin-vue": "^2.3.3",
     "@vitest/ui": "^0.18.1",
