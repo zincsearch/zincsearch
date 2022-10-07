@@ -33,6 +33,9 @@ func init() {
 			log.Fatal().Err(err).Msg("init first user")
 		}
 	}
+	if err := initPermissionCache(); err != nil {
+		log.Print(err)
+	}
 }
 
 func isFirstStart() (bool, error) {
@@ -50,6 +53,19 @@ func isFirstStart() (bool, error) {
 	}
 
 	return false, nil
+}
+
+func initPermissionCache() error {
+	roles, err := GetRoles()
+	if err != nil {
+		return err
+	}
+
+	for _, role := range roles {
+		ZINC_CACHED_PERMISSIONS.Set(role.ID, strArrayToMap(role.Permission))
+	}
+
+	return nil
 }
 
 func initFirstUser() error {
