@@ -22,7 +22,7 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/minio/minio-go/v7 v7.0.39
 	github.com/prometheus/client_golang v1.13.0
-	github.com/pyroscope-io/client v0.3.0
+	github.com/pyroscope-io/client v0.4.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.28.0
 	github.com/segmentio/analytics-go/v3 v3.2.1
