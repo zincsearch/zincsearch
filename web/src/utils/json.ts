@@ -32,21 +32,28 @@ export const byString = (o: any, s: string) => {
   s = s.replace(/^\./, ""); // strip a leading dot
   let a = s.split(".");
 
-  // eg.1, o = {"a1": {"b1": "1234", "b2": "1", "b3": {"c1":"12", "c2":"22"}}, "a2":"334"}, s = "a1.b3.c2"
-  // eg.2, o = {"a1.b1": "1234", "a1":"233", "a2":"334"}, s = "a1.b1"
-  // eg.3, o = {"a1.b1": {"c1": "123"}, "a1":"233", "a2":"334"}, s = "a1.b1.c1"
-  // eg.4, o = {"a1": [{"b1":"12", "b2":"222"}], "a2":"334"}, s = "a1"
+  // eg.1, o = {"a1": {"b1": "1234", "b2": "1", "b3": {"c1":"12", "c2":"22"}}, "a2":"334"}, s = "a1.b3.c2", return "22"
+  // eg.2, o = {"a1.b1": "1234", "a1":"233", "a2":"334"}, s = "a1.b1", return "1234"
+  // eg.3, o = {"a1.b1": {"c1": "123"}, "a1":"233", "a2":"334"}, s = "a1.b1.c1", return "123"
+  // eg.4, o = {"a1": [{"b1":"12", "b2":"222"}], "a2":"334"}, s = "a1", return [{"b1":"12", "b2":"222"}]
+  // eg.5, o = {"a1": [{"b1":"12", "b2":"222"}], "a2":"334"}, s = "a3", return ""
+  let has = false;
   for (let i = 0, n = a.length; i < n; ++i) {
     for (let j = n; j > i; j--) {
       // Priority matching (longest)
       let key = a.slice(i, j).join(".");
       if (typeof o == "object" && key in o) {
         o = o[key];
+        has = true;
         break;
       }
     }
   }
-  return ToString(o);
+  if (has) {
+    return ToString(o);
+  } else {
+    return "";
+  }
 };
 
 export const deepKeys = (o: any) => {
