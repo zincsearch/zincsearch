@@ -14,7 +14,7 @@ RUN npm run build
 # STEP 2 build executable binary
 ############################
 # FROM golang:alpine AS builder
-FROM public.ecr.aws/docker/library/golang:1.18 as builder
+FROM public.ecr.aws/docker/library/golang:1.19 as builder
 ARG VERSION
 ARG COMMIT_HASH
 ARG BUILD_DATE

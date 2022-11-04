@@ -9,7 +9,7 @@ Zinc uses Go (For server) and VueJS (For Web UI)
 You must have follwing installed:
 
 1. Git
-2. Go 1.16 + (We recommend go 1.18+)
+2. Go 1.16 + (We recommend go 1.19+)
 3. nodejs v14+ and npm v6+
 
 ## Building from source code
