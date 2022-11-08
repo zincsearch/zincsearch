@@ -20,7 +20,8 @@ phases:
   pre_build:
     commands:
       # - echo Logging in to Amazon ECR...
-      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/zinclabs
+      # - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/zinclabs
+      - docker login -u AWS -p $(aws ecr-public get-login-password --region us-east-1) public.ecr.aws/zinclabs
       - export DOCKER_CLI_EXPERIMENTAL=enabled
       # - export DOCKER_BUILDKIT=1
   build:
