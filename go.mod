@@ -21,7 +21,7 @@ require (
 	github.com/goccy/go-json v0.9.11
 	github.com/joho/godotenv v1.4.0
 	github.com/minio/minio-go/v7 v7.0.43
-	github.com/prometheus/client_golang v1.13.1
+	github.com/prometheus/client_golang v1.14.0
 	github.com/pyroscope-io/client v0.4.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.28.0
@@ -113,7 +113,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
-	github.com/prometheus/client_model v0.2.0 // indirect
+	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/rs/xid v1.4.0 // indirect
