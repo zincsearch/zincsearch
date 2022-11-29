@@ -83,8 +83,8 @@ Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap item
 | Open source         | Yes | Willl soon be available |
 | ES API compatibility| Search and Ingestion | Ingestion only | 
 | GUI                 | Basic     | Advanced for log search |
-| Cost                | Free (self hosting may cost money based on size)| Generous free tier. 1 TB ingest / month free. Pricing to be finalized upon GA.| 
-| Get started         | [Quick start](https://docs.zincsearch.com/quickstart/) | [![Sign up](./screenshots/sign-up.jpg)](https://z9uzdkifovs.typeform.com/zinc-cloud) |
+| Cost                | Free (self hosting may cost money based on size)| Generous free tier. 1 TB ingest / month free.| 
+| Get started         | [Quick start](https://docs.zincsearch.com/quickstart/) | [![Sign up](./screenshots/get-started-for-free.png)](https://cloud.zincsearch.com) |
 
 
 
