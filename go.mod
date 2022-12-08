@@ -13,7 +13,7 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dgraph-io/badger/v3 v3.2103.4
 	github.com/docker/go-units v0.5.0
-	github.com/getsentry/sentry-go v0.14.0
+	github.com/getsentry/sentry-go v0.16.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.8.1
