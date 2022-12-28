@@ -40,6 +40,10 @@ Note: Do not store sensitive data on this server as its available to everyone on
 7. Index storage in disk (default), s3 or minio (experimental)
 8. aggregation support
 
+# How to get support
+
+Easiet way to get suppport is to join the [slack channel](https://join.slack.com/t/zincsearch/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg).
+
 # Roadmap items:
 
 Public roadmap is available at https://github.com/orgs/zinclabs/projects/3/views/1
