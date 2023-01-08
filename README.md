@@ -42,7 +42,7 @@ Note: Do not store sensitive data on this server as its available to everyone on
 
 # How to get support
 
-Easiet way to get suppport is to join the [slack channel](https://join.slack.com/t/zincsearch/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg).
+Easiest way to get support is to join the [Slack channel](https://join.slack.com/t/zincsearch/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg).
 
 # Roadmap items:
 
