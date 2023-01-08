@@ -28,6 +28,7 @@ import (
 
 // @Id GetMapping
 // @Summary Get index mappings
+// @security BasicAuth
 // @Tags    Index
 // @Produce json
 // @Param   index  path  string  true  "Index"
@@ -50,6 +51,7 @@ func GetMapping(c *gin.Context) {
 
 // @Id SetMapping
 // @Summary Set index mappings
+// @security BasicAuth
 // @Tags    Index
 // @Accept  json
 // @Produce json

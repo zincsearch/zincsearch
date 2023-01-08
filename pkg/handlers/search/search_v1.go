@@ -31,6 +31,7 @@ import (
 //
 // @Id SearchV1
 // @Summary Search V1
+// @security BasicAuth
 // @Tags    Search
 // @Accept  json
 // @Produce json

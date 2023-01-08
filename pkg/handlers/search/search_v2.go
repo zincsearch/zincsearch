@@ -36,6 +36,7 @@ import (
 //
 // @Id Search
 // @Summary Search V2 DSL for compatible ES
+// @security BasicAuth
 // @Tags    Search
 // @Accept  json
 // @Produce json
@@ -82,6 +83,7 @@ func SearchDSL(c *gin.Context) {
 //
 // @Id MSearch
 // @Summary Search V2 MultipleSearch for compatible ES
+// @security BasicAuth
 // @Tags    Search
 // @Accept  plain
 // @Produce json

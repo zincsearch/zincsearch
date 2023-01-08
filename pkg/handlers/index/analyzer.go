@@ -31,6 +31,7 @@ import (
 
 // @Id Analyze
 // @Summary Analyze
+// @security BasicAuth
 // @Tags    Index
 // @Accept  json
 // @Produce json
@@ -140,6 +141,7 @@ func Analyze(c *gin.Context) {
 
 // @Id AnalyzeIndex
 // @Summary Analyze
+// @security BasicAuth
 // @Tags    Index
 // @Accept  json
 // @Produce json

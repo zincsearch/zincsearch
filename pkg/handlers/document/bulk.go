@@ -38,6 +38,7 @@ import (
 //
 // @Id Bulk
 // @Summary Bulk documents
+// @security BasicAuth
 // @Tags    Document
 // @Accept  plain
 // @Produce json
@@ -63,6 +64,7 @@ func Bulk(c *gin.Context) {
 //
 // @Id ESBulk
 // @Summary ES bulk documents
+// @security BasicAuth
 // @Tags    Document
 // @Accept  plain
 // @Produce json

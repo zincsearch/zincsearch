@@ -27,6 +27,7 @@ import (
 
 // @Id UpdateDocument
 // @Summary Update document with id
+// @security BasicAuth
 // @Tags    Document
 // @Accept  json
 // @Produce json

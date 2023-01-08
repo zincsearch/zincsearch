@@ -29,6 +29,7 @@ import (
 
 // @Id ListIndexes
 // @Summary List indexes
+// @security BasicAuth
 // @Tags    Index
 // @Param   page_num  query  integer false  "page num"
 // @Param   page_size query  integer false  "page size"
@@ -125,6 +126,7 @@ func List(c *gin.Context) {
 
 // @Id IndexNameList
 // @Summary List index Name
+// @security BasicAuth
 // @Tags    Index
 // @Param   name  query  string  false  "IndexName"
 // @Produce json

@@ -35,6 +35,7 @@ import (
 //
 // @Id Multi
 // @Summary Multi documents
+// @security BasicAuth
 // @Tags    Document
 // @Accept  plain
 // @Produce json
