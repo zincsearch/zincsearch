@@ -26,6 +26,7 @@ import (
 
 // @Id Refresh
 // @Summary Resfresh index
+// @security BasicAuth
 // @Tags    Index
 // @Produce json
 // @Param   index  path  string  true  "Index"

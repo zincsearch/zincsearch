@@ -30,6 +30,7 @@ import (
 
 // @Id GetSettings
 // @Summary Get index settings
+// @security BasicAuth
 // @Tags    Index
 // @Produce json
 // @Param   index path  string  true  "Index"
@@ -54,6 +55,7 @@ func GetSettings(c *gin.Context) {
 
 // @Id SetSettings
 // @Summary Set index Settings
+// @security BasicAuth
 // @Tags    Index
 // @Accept  json
 // @Produce json

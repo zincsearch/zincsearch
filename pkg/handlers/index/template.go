@@ -28,6 +28,7 @@ import (
 
 // @Id ListTemplates
 // @Summary List index teplates
+// @security BasicAuth
 // @Tags    Index
 // @Produce json
 // @Success 200 {object} []meta.Template
@@ -45,6 +46,7 @@ func ListTemplate(c *gin.Context) {
 
 // @Id GetTemplate
 // @Summary Get index template
+// @security BasicAuth
 // @Tags    Index
 // @Produce json
 // @Param   name path  string  true  "Template"
@@ -71,6 +73,7 @@ func GetTemplate(c *gin.Context) {
 
 // @Id CreateTemplate
 // @Summary Create update index template
+// @security BasicAuth
 // @Tags    Index
 // @Accept  json
 // @Produce json
@@ -113,6 +116,7 @@ func CreateTemplate(c *gin.Context) {
 
 // @Id UpdateTemplate
 // @Summary Create update index template
+// @security BasicAuth
 // @Tags    Index
 // @Accept  json
 // @Produce json
@@ -125,6 +129,7 @@ func UpdateTemplateForSDK() {}
 
 // @Id DeleteTemplate
 // @Summary Delete template
+// @security BasicAuth
 // @Tags    Index
 // @Produce json
 // @Param   name  path  string  true  "Template"

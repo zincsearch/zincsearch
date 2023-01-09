@@ -31,6 +31,7 @@ import (
 //
 // @Id Bulkv2
 // @Summary Bulkv2 documents
+// @security BasicAuth
 // @Tags    Document
 // @Accept  json
 // @Produce json

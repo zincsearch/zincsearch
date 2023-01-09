@@ -24,6 +24,7 @@ import (
 
 // @Id ListPermissions
 // @Summary List permissions
+// @security BasicAuth
 // @Tags    Permission
 // @Produce json
 // @Success 200 {object} []string

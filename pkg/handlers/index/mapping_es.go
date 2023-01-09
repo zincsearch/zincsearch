@@ -14,6 +14,7 @@ import (
 
 // @Id ESGetMapping
 // @Summary Get index mappings for compatible ES
+// @security BasicAuth
 // @Tags    Index
 // @Produce json
 // @Param   index path  string  true  "Index"

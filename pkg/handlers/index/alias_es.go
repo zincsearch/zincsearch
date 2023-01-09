@@ -45,6 +45,7 @@ type base struct {
 
 // @Id AddOrRemoveESAlias
 // @Summary Add or remove index alias for compatible ES
+// @security BasicAuth
 // @Tags    Index
 // @Produce json
 // @Success 200 {object} map[string]interface{}
@@ -104,6 +105,7 @@ func AddOrRemoveESAlias(c *gin.Context) {
 
 // @Id GetESAliases
 // @Summary Get index alias for compatible ES
+// @security BasicAuth
 // @Tags    Index
 // @Produce json
 // @Param   target path  string  false  "Target Index"

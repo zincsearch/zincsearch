@@ -27,6 +27,7 @@ import (
 
 // @Id CreateUser
 // @Summary Create user
+// @security BasicAuth
 // @Tags    User
 // @Accept  json
 // @Produce json
@@ -57,6 +58,7 @@ func CreateUpdateUser(c *gin.Context) {
 
 // @Id UpdateUser
 // @Summary Update user
+// @security BasicAuth
 // @Tags    User
 // @Accept  json
 // @Produce json
@@ -69,6 +71,7 @@ func UpdateForSDK() {}
 
 // @Id ListUsers
 // @Summary List user
+// @security BasicAuth
 // @Tags    User
 // @Produce json
 // @Success 200 {object} []meta.User
@@ -92,6 +95,7 @@ func ListUser(c *gin.Context) {
 
 // @Id DeleteUser
 // @Summary Delete user
+// @security BasicAuth
 // @Tags    User
 // @Produce json
 // @Param   id  path  string  true  "User id"

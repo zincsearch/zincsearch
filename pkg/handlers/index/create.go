@@ -31,6 +31,7 @@ import (
 
 // @Id CreateIndex
 // @Summary Create index
+// @security BasicAuth
 // @Tags    Index
 // @Accept  json
 // @Produce json
@@ -61,6 +62,7 @@ func Create(c *gin.Context) {
 
 // @Id ESCreateIndex
 // @Summary Create index for compatible ES
+// @security BasicAuth
 // @Tags    Index
 // @Produce json
 // @Param   index path  string  true  "Index"

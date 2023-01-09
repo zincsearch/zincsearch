@@ -26,6 +26,7 @@ import (
 
 // @Id DeleteDocument
 // @Summary Delete document
+// @security BasicAuth
 // @Tags    Document
 // @Produce json
 // @Param   index  path  string  true  "Index"

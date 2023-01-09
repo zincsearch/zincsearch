@@ -17,6 +17,7 @@ import (
 //
 // @Id DeleteByQuery
 // @Summary Searches the index and deletes all matched documents
+// @security BasicAuth
 // @Tags    Search
 // @Accept  json
 // @Produce json

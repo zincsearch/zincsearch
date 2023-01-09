@@ -26,6 +26,7 @@ import (
 
 // @Id GetIndex
 // @Summary Get index metadata
+// @security BasicAuth
 // @Tags    Index
 // @Produce json
 // @Param   index  path  string  true  "Index"

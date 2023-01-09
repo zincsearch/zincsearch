@@ -28,6 +28,7 @@ import (
 
 // @Id IndexDocument
 // @Summary Create or update document
+// @security BasicAuth
 // @Tags    Document
 // @Accept  json
 // @Produce json
@@ -85,6 +86,7 @@ func CreateUpdate(c *gin.Context) {
 
 // @Id IndexDocumentWithID
 // @Summary Create or update document with id
+// @security BasicAuth
 // @Tags    Document
 // @Accept  json
 // @Produce json
