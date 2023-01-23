@@ -34,7 +34,7 @@ require (
 	github.com/zinclabs/go-gin-prometheus v0.1.1
 	github.com/zinclabs/wal v1.2.4
 	go.etcd.io/bbolt v1.3.6
-	go.etcd.io/etcd/client/v3 v3.5.5
+	go.etcd.io/etcd/client/v3 v3.5.7
 	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
 	golang.org/x/text v0.4.0
@@ -125,8 +125,8 @@ require (
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/vcaesar/cedar v0.20.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.5 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.5 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.7 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.7 // indirect
 	go.opencensus.io v0.22.5 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
