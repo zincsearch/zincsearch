@@ -51,7 +51,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^7.0.0",
     "happy-dom": "^6.0.4",
-    "prettier": "^2.4.1",
+    "prettier": "^2.8.3",
     "sass": "^1.32.0",
     "sass-loader": "^13.0.2",
     "stylelint": "^14.1.0",
