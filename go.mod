@@ -37,7 +37,7 @@ require (
 	go.etcd.io/etcd/client/v3 v3.5.5
 	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
-	golang.org/x/text v0.4.0
+	golang.org/x/text v0.6.0
 )
 
 require (
