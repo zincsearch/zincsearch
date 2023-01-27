@@ -24,7 +24,7 @@ require (
 	github.com/prometheus/client_golang v1.13.1
 	github.com/pyroscope-io/client v0.4.0
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/rs/zerolog v1.28.0
+	github.com/rs/zerolog v1.29.0
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/shirou/gopsutil/v3 v3.22.10
 	github.com/stretchr/testify v1.8.1
