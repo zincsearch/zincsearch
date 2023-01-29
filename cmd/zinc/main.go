@@ -49,7 +49,6 @@ import (
 // @contact.url     https://www.zincsearch.com
 
 // @securityDefinitions.basic BasicAuth
-// @host            localhost:4080
 // @BasePath        /
 // @schemes http https
 func main() {
