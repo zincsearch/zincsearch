@@ -210,6 +210,66 @@ func TestIndex_UpdateDocument(t *testing.T) {
 	})
 }
 
+func TestIndex_GetDocument(t *testing.T) {
+	type args struct {
+		docID string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "normal",
+			args: args{
+				docID: "1",
+			},
+		},
+		{
+			name: "normal",
+			args: args{
+				docID: "2",
+			},
+			wantErr: true,
+		},
+	}
+	indexName := "TestIndex_GetDocument.index_1"
+	var index *Index
+	var err error
+	t.Run("prepare", func(t *testing.T) {
+		index, err = NewIndex(indexName, "disk", 2)
+		assert.NoError(t, err)
+		assert.NotNil(t, index)
+		err = StoreIndex(index)
+		assert.NoError(t, err)
+
+		err = index.CreateDocument("1", map[string]interface{}{
+			"name": "Hello",
+			"time": float64(1579098983),
+		}, false)
+		assert.NoError(t, err)
+
+		// wait for WAL write to index
+		time.Sleep(time.Second)
+	})
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := index.GetDocument(tt.args.docID)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+		})
+	}
+
+	t.Run("cleanup", func(t *testing.T) {
+		err = DeleteIndex(indexName)
+		assert.NoError(t, err)
+	})
+}
+
 func TestIndex_DeleteDocument(t *testing.T) {
 	type args struct {
 		docID string

@@ -56,7 +56,7 @@ func Get(c *gin.Context) {
 
 	source, err := index.GetDocument(docID)
 	if err != nil {
-		zutils.GinRenderJSON(c, http.StatusInternalServerError, meta.HTTPResponseError{Error: err.Error()})
+		zutils.GinRenderJSON(c, http.StatusBadRequest, meta.HTTPResponseError{Error: err.Error()})
 		return
 	}
 	zutils.GinRenderJSON(c, http.StatusOK, source)
