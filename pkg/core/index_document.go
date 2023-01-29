@@ -47,6 +47,17 @@ func (index *Index) CreateDocument(docID string, doc map[string]interface{}, upd
 	return shard.wal.Write(data)
 }
 
+// GetDocument get a document in the zinc index
+func (index *Index) GetDocument(docID string) (*meta.Hit, error) {
+	// check WAL
+	shard := index.GetShardByDocID(docID)
+	if err := shard.OpenWAL(); err != nil {
+		return nil, err
+	}
+
+	return shard.FindDocumentByDocID(docID)
+}
+
 // UpdateDocument updates a document in the zinc index
 func (index *Index) UpdateDocument(docID string, doc map[string]interface{}, insert bool) error {
 	// metrics

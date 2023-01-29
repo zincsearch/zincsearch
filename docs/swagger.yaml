@@ -1081,7 +1081,6 @@ definitions:
           type: string
         type: array
     type: object
-host: localhost:4080
 info:
   contact:
     name: Zinc Search
@@ -1285,6 +1284,48 @@ paths:
       security:
       - BasicAuth: []
       summary: Delete document
+      tags:
+      - Document
+    get:
+      consumes:
+      - application/json
+      operationId: GetDocument
+      parameters:
+      - description: Index
+        in: path
+        name: index
+        required: true
+        type: string
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Document
+        in: body
+        name: document
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/meta.Hit'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      security:
+      - BasicAuth: []
+      summary: get document with id
       tags:
       - Document
     put:
