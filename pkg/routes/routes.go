@@ -127,6 +127,8 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/api/:target/_doc", AuthMiddleware("document.Create"), document.CreateUpdate)    // create
 	r.PUT("/api/:target/_doc", AuthMiddleware("document.Create"), document.CreateUpdate)     // create
 	r.PUT("/api/:target/_doc/:id", AuthMiddleware("document.Create"), document.CreateUpdate) // create or update
+	r.HEAD("/api/:target/_doc/:id", AuthMiddleware("document.Get"), document.Get)            // get
+	r.GET("/api/:target/_doc/:id", AuthMiddleware("document.Get"), document.Get)             // get
 	r.POST("/api/:target/_update/:id", AuthMiddleware("document.Update"), document.Update)   // update
 	r.DELETE("/api/:target/_doc/:id", AuthMiddleware("document.Delete"), document.Delete)    // delete
 
