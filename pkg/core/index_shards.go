@@ -404,7 +404,7 @@ func (s *IndexShard) FindDocumentByDocID(docID string) (*meta.Hit, error) {
 				var timestamp time.Time
 				var sourceData map[string]interface{}
 				if next, err := dmi.Next(); err == nil {
-					next.VisitStoredFields(func(field string, value []byte) bool {
+					_ = next.VisitStoredFields(func(field string, value []byte) bool {
 						switch field {
 						case "_id":
 							id = string(value)
