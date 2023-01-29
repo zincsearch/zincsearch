@@ -1,5 +1,5 @@
 export const ToString = (o: any) => {
-  if (!o) {
+  if (o == undefined) {
     return "";
   }
   if (typeof o == "string") {
