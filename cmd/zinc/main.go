@@ -72,8 +72,9 @@ func main() {
 
 	// Run the server
 	PORT := config.Global.ServerPort
+	ADDRESS := config.Global.ServerAddress
 	server := &http.Server{
-		Addr:    ":" + PORT,
+		Addr:    ADDRESS + ":" + PORT,
 		Handler: app,
 	}
 
