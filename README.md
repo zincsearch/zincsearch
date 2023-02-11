@@ -63,7 +63,7 @@ Please create an issue if you would like something to be added to the roadmap.
 
 ## Quickstart
 
-Check [Quickstart](https://docs.zincsearch.com/quickstart/) 
+Check [Quickstart](https://docs.zinc.dev/quickstart/)
 
 
 # Releases
@@ -88,7 +88,7 @@ Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap item
 | ES API compatibility| Search and Ingestion | Ingestion only | 
 | GUI                 | Basic     | Advanced for log search |
 | Cost                | Free (self hosting may cost money based on size)| Generous free tier. 1 TB ingest / month free.| 
-| Get started         | [Quick start](https://docs.zincsearch.com/quickstart/) | [![Sign up](./screenshots/get-started-for-free.png)](https://cloud.zincsearch.com) |
+| Get started         | [Quick start](https://docs.zinc.dev/quickstart/) | [![Sign up](./screenshots/get-started-for-free.png)](https://cloud.zincsearch.com) |
 
 
 
