@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "cmd/zinc/main.go",
+            "program": "cmd/zincsearch/main.go",
             "env": {
                 "ZINC_FIRST_ADMIN_USER": "admin",
                 "ZINC_FIRST_ADMIN_PASSWORD": "Complexpass#123",

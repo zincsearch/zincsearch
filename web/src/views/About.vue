@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pa-lg">
-    <h3 class="q-ma-none">Zinc</h3>
+    <h3 class="q-ma-none">Zinc Search</h3>
     <p class="q-mt-md">{{ t("about.introduction") }}</p>
 
     <div class="q-pa-md">

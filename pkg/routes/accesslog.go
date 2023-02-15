@@ -21,7 +21,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/meta"
 )
 
 func AccessLog(app *gin.Engine) {

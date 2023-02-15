@@ -23,12 +23,12 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
 
-	"github.com/zinclabs/zinc/pkg/bluge/directory"
-	"github.com/zinclabs/zinc/pkg/config"
-	"github.com/zinclabs/zinc/pkg/ider"
-	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/metadata"
-	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
+	"github.com/zinclabs/zincsearch/pkg/bluge/directory"
+	"github.com/zinclabs/zincsearch/pkg/config"
+	"github.com/zinclabs/zincsearch/pkg/ider"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/metadata"
+	"github.com/zinclabs/zincsearch/pkg/zutils/hash/rendezvous"
 )
 
 var indexNameRe = regexp.MustCompile(`^[a-zA-Z0-9_.-]+$`)

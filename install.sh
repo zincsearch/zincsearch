@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Installs zinc the quick way, for adventurers that want to spend more time
+# Installs ZincSearch the quick way, for adventurers that want to spend more time
 # grooming their cats.
 #
 # Requires curl, grep, cut, tar, uname, chmod, mv, rm.
@@ -9,11 +9,11 @@
 
 header() {
     cat 1>&2 <<EOF
-zinc Installer
+ZincSearch Installer
 
-Website: https://zincsearch.com
-Docs: https://docs.zincsearch.com
-Repo: https://github.com/zinclabs/zinc
+Website: https://zinc.dev
+Docs: https://docs.zinc.dev
+Repo: https://github.com/zinclabs/zincsearch
 
 EOF
 }
@@ -33,7 +33,7 @@ check_tools() {
 	done
 }
 
-install_zinc()
+install_zincsearch()
 {
 	trap 'echo -e "Aborted, error $? in command: $BASH_COMMAND"; trap ERR; exit 1' ERR
 	install_path="/usr/local/bin"
@@ -60,7 +60,7 @@ install_zinc()
 	# Which OS and version? #
 	#########################
 
-	zinc_bin="zinc"
+	zinc_bin="zincsearch"
 	zinc_dl_ext=".tar.gz"
 
 	# NOTE: `uname -m` is more accurate and universal than `arch`
@@ -107,12 +107,12 @@ install_zinc()
 	# Download and extract #
 	########################
 
-	echo "Downloading zinc for ${zinc_os}/${zinc_arch}${zinc_arm}..."
+	echo "Downloading ZincSearch for ${zinc_os}/${zinc_arch}${zinc_arm}..."
 	zinc_file="zinc_${zinc_os}_${zinc_arch}${zinc_arm}${zinc_dl_ext}"
 
 	if [[ "$#" -eq 0 ]]; then
 		# get latest release
-		zinc_tag=$(curl -s https://api.github.com/repos/zinclabs/zinc/releases/latest | grep 'tag_name' | cut -d\" -f4)
+		zinc_tag=$(curl -s https://api.github.com/repos/zinclabs/zincsearch/releases/latest | grep 'tag_name' | cut -d\" -f4)
 		zinc_version=$(echo ${zinc_tag} | cut -c2-)
 	elif [[ "$#" -gt 1 ]]; then
 		echo "Too many arguments."
@@ -123,7 +123,7 @@ install_zinc()
 		zinc_version=$1
 	fi
 
-	zinc_url="https://github.com/zinclabs/zinc/releases/download/${zinc_tag}/zinc_${zinc_version}_${zinc_os}_${zinc_arch}${zinc_arm}.tar.gz"
+	zinc_url="https://github.com/zinclabs/zincsearch/releases/download/${zinc_tag}/zinc_${zinc_version}_${zinc_os}_${zinc_arch}${zinc_arm}.tar.gz"
 
 	dl="/tmp/$zinc_file"
 	rm -rf -- "$dl"
@@ -138,7 +138,7 @@ install_zinc()
 	esac
 	chmod +x "$PREFIX/tmp/$zinc_bin"
 
-	echo "Putting zinc in $install_path (may require password)"
+	echo "Putting ZincSearch in $install_path (may require password)"
 	$sudo_cmd mv "$PREFIX/tmp/$zinc_bin" "$install_path/$zinc_bin"
 	$sudo_cmd rm -- "$dl"
 
@@ -150,4 +150,4 @@ install_zinc()
 	return 0
 }
 
-install_zinc $@
+install_zincsearch $@

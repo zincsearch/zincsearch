@@ -25,7 +25,7 @@ export default {
     openapi: "开放API",
   },
   about: {
-    name: "Zinc",
+    name: "ZincSearch",
     introduction: "一个现代化搜索引擎.",
   },
   login: {

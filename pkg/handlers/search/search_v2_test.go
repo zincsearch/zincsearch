@@ -21,8 +21,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zinclabs/zinc/pkg/core"
-	"github.com/zinclabs/zinc/test/utils"
+	"github.com/zinclabs/zincsearch/pkg/core"
+	"github.com/zinclabs/zincsearch/test/utils"
 )
 
 func TestSearchDSL(t *testing.T) {

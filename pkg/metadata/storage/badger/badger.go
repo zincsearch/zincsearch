@@ -22,9 +22,9 @@ import (
 	"github.com/dgraph-io/badger/v3/options"
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zinc/pkg/config"
-	"github.com/zinclabs/zinc/pkg/errors"
-	"github.com/zinclabs/zinc/pkg/metadata/storage"
+	"github.com/zinclabs/zincsearch/pkg/config"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/metadata/storage"
 )
 
 type badgerStorage struct {

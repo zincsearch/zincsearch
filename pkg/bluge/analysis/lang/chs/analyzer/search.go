@@ -19,8 +19,8 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/go-ego/gse"
 
-	"github.com/zinclabs/zinc/pkg/bluge/analysis/lang/chs/token"
-	"github.com/zinclabs/zinc/pkg/bluge/analysis/lang/chs/tokenizer"
+	"github.com/zinclabs/zincsearch/pkg/bluge/analysis/lang/chs/token"
+	"github.com/zinclabs/zincsearch/pkg/bluge/analysis/lang/chs/tokenizer"
 )
 
 func NewSearchAnalyzer(seg *gse.Segmenter) *analysis.Analyzer {

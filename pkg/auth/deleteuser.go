@@ -18,7 +18,7 @@ package auth
 import (
 	"strings"
 
-	"github.com/zinclabs/zinc/pkg/metadata"
+	"github.com/zinclabs/zincsearch/pkg/metadata"
 )
 
 func DeleteUser(id string) error {

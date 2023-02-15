@@ -22,12 +22,12 @@ import (
 
 	"github.com/blugelabs/bluge"
 
-	"github.com/zinclabs/zinc/pkg/config"
-	"github.com/zinclabs/zinc/pkg/meta"
-	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
-	"github.com/zinclabs/zinc/pkg/zutils"
-	"github.com/zinclabs/zinc/pkg/zutils/flatten"
-	"github.com/zinclabs/zinc/pkg/zutils/json"
+	"github.com/zinclabs/zincsearch/pkg/config"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	zincanalysis "github.com/zinclabs/zincsearch/pkg/uquery/analysis"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
+	"github.com/zinclabs/zincsearch/pkg/zutils/flatten"
+	"github.com/zinclabs/zincsearch/pkg/zutils/json"
 )
 
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.

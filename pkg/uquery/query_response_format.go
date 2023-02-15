@@ -18,9 +18,9 @@ package uquery
 import (
 	"github.com/blugelabs/bluge/search"
 
-	"github.com/zinclabs/zinc/pkg/errors"
-	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/uquery/aggregation"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/uquery/aggregation"
 )
 
 func FormatResponse(resp *meta.SearchResponse, q *meta.ZincQuery, buckets *search.Bucket) error {

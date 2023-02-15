@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/blugelabs/bluge"
-	"github.com/zinclabs/zinc/pkg/wal"
+	"github.com/zinclabs/zincsearch/pkg/wal"
 )
 
 // IndexV026 compatible for v0.2.6 index

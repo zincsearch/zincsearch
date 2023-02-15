@@ -21,9 +21,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zinclabs/zinc/pkg/core"
-	"github.com/zinclabs/zinc/pkg/zutils/json"
-	"github.com/zinclabs/zinc/test/utils"
+	"github.com/zinclabs/zincsearch/pkg/core"
+	"github.com/zinclabs/zincsearch/pkg/zutils/json"
+	"github.com/zinclabs/zincsearch/test/utils"
 )
 
 func TestDelete(t *testing.T) {

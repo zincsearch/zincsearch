@@ -18,13 +18,13 @@ package core
 import (
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zinc/pkg/errors"
-	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/metadata"
-	"github.com/zinclabs/zinc/pkg/upgrade"
-	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
-	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
-	"github.com/zinclabs/zinc/pkg/zutils/json"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/metadata"
+	"github.com/zinclabs/zincsearch/pkg/upgrade"
+	zincanalysis "github.com/zinclabs/zincsearch/pkg/uquery/analysis"
+	"github.com/zinclabs/zincsearch/pkg/zutils/hash/rendezvous"
+	"github.com/zinclabs/zincsearch/pkg/zutils/json"
 )
 
 func LoadZincIndexesFromMetadata(version string) error {

@@ -19,7 +19,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
 )
 
 func GetDataStream(c *gin.Context) {

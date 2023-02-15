@@ -21,8 +21,8 @@ import (
 
 	"github.com/blugelabs/bluge"
 
-	"github.com/zinclabs/zinc/pkg/errors"
-	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/meta"
 )
 
 func RegexpQuery(query map[string]interface{}) (bluge.Query, error) {

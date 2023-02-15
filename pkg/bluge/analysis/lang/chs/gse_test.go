@@ -23,7 +23,7 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zincsearch/pkg/config"
 )
 
 func TestLoadDict(t *testing.T) {

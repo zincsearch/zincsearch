@@ -19,8 +19,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
 )
 
 func RangeQuery(query map[string]interface{}) (int64, int64) {

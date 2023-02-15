@@ -19,8 +19,8 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/token"
 
-	"github.com/zinclabs/zinc/pkg/errors"
-	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
 )
 
 func NewDictTokenFilter(options interface{}) (analysis.TokenFilter, error) {

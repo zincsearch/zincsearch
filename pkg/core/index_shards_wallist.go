@@ -23,7 +23,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zincsearch/pkg/config"
 )
 
 // Record opened WAL used to do consume

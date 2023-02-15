@@ -33,7 +33,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zinc/pkg/config"
+	"github.com/zinclabs/zincsearch/pkg/config"
 )
 
 // GetMinIOConfig returns a bluge config that will store index data in MinIO

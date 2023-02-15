@@ -20,11 +20,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zinclabs/zinc/pkg/core"
-	"github.com/zinclabs/zinc/pkg/meta"
-	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
-	"github.com/zinclabs/zinc/pkg/uquery"
-	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zincsearch/pkg/core"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	v1 "github.com/zinclabs/zincsearch/pkg/meta/v1"
+	"github.com/zinclabs/zincsearch/pkg/uquery"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
 )
 
 // SearchV1 searches the index for the given http request from end user

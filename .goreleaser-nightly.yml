@@ -1,6 +1,6 @@
 # This is an example .goreleaser.yml file with some sensible defaults.
 # Make sure to check the documentation at https://goreleaser.com
-project_name: zinc
+project_name: zincsearch
 before:
   hooks:
     # You may remove this if you don't use go modules.
@@ -16,12 +16,12 @@ nightly:
   name_template: "{{ incpatch .Version }}-{{ .ShortCommit }}-nightly"
 builds:
   - 
-    id: zinc_binaries
+    id: zincsearch_binaries
     ldflags:
     - -s -w 
-    - -X github.com/zinclabs/zinc/pkg/meta.Version={{.Version}} # https://goreleaser.com/customization/templates/
-    - "-X github.com/zinclabs/zinc/pkg/meta.BuildDate={{.Date}}"
-    - "-X github.com/zinclabs/zinc/pkg/meta.CommitHash={{.Commit}}"
+    - -X github.com/zinclabs/zincsearch/pkg/meta.Version={{.Version}} # https://goreleaser.com/customization/templates/
+    - "-X github.com/zinclabs/zincsearch/pkg/meta.BuildDate={{.Date}}"
+    - "-X github.com/zinclabs/zincsearch/pkg/meta.CommitHash={{.Commit}}"
     env:
       - CGO_ENABLED=0
     goos:
@@ -37,7 +37,7 @@ builds:
     goarm:
       - "6"
       - "7"
-    main: ./cmd/zinc/main.go
+    main: ./cmd/zincsearch/main.go
 archives:
   - replacements:
       darwin: Darwin
@@ -114,7 +114,7 @@ dockers:
       - web
       - embed.go
 docker_manifests:
-- id: zinc_docker
+- id: zincsearch_docker
 
   # Name template for the manifest.
   # Defaults to empty.
@@ -129,15 +129,15 @@ docker_manifests:
 
 # https://goreleaser.com/customization/homebrew/
 brews:
-  - name: zinc
+  - name: zincsearch
     tap:
       owner: zinclabs
       name: homebrew-tap-nightly
       # token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     folder: Formula
-    homepage: "https://github.com/zinclabs/zinc"
+    homepage: "https://github.com/zinclabs/zincsearch"
     description: |
-      Zinc is a search engine that does full text indexing. It is a lightweight
+      ZincSearch is a search engine that does full text indexing. It is a lightweight
       alternative to elasticsearch that requires significantly less resources. It uses
       bluge as the underlying indexing library.
 
@@ -146,24 +146,24 @@ brews:
 
       It is a drop-in replacement for elasticsearch if you are just ingesting
       data using APIs and searching using kibana (Kibana is not supported with
-      zinc. Zinc provides its own UI).
+      zinc. ZincSearch provides its own UI).
     license: "Apache-2.0"
 blobs:
   - provider: s3
     region: us-west-2
     bucket: zincsearch-releases
     ids:
-      - zinc_binaries
+      - zincsearch_binaries
     folder: "nightly/{{.Version}}-{{.Date}}"
     extra_files:
       - glob: ./dist/*.tar.gz
       - glob: ./dist/CHANGELOG.md
 # snapcrafts:
-#   - id: zinc-snap
-#     name: zinc-snap
-#     summary: Zinc Search engine. A lightweight alternative to elasticsearch.
+#   - id: zincsearch-snap
+#     name: zincsearch-snap
+#     summary: ZincSearch engine. A lightweight alternative to elasticsearch.
 #     description: |
-#       Zinc is a search engine that does full text indexing. It is a lightweight
+#       ZincSearch is a search engine that does full text indexing. It is a lightweight
 #       alternative to elasticsearch that requires significantly less resources. It uses
 #       bluge as the underlying indexing library.
 
@@ -172,7 +172,7 @@ blobs:
 
 #       It is a drop-in replacement for elasticsearch if you are just ingesting
 #       data using APIs and searching using kibana (Kibana is not supported with
-#       zinc. Zinc provides its own UI).
+#       zinc. ZincSearch provides its own UI).
 
 #     license: Apache-2.0
 #     grade: stable

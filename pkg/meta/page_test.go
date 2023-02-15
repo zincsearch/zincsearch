@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/zinclabs/zinc/test/utils"
+	"github.com/zinclabs/zincsearch/test/utils"
 )
 
 func TestNewPage(t *testing.T) {

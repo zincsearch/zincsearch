@@ -13,7 +13,7 @@
 * limitations under the License.
  */
 
-package zinc
+package zincsearch
 
 import (
 	"embed"

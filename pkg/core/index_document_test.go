@@ -21,8 +21,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zinclabs/zinc/pkg/bluge/aggregation"
-	"github.com/zinclabs/zinc/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/bluge/aggregation"
+	"github.com/zinclabs/zincsearch/pkg/meta"
 )
 
 func TestIndex_CreateUpdateDocument(t *testing.T) {

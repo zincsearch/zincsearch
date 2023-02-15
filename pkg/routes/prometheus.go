@@ -19,8 +19,8 @@ import (
 	"github.com/gin-gonic/gin"
 	ginprometheus "github.com/zinclabs/go-gin-prometheus"
 
-	"github.com/zinclabs/zinc/pkg/config"
-	"github.com/zinclabs/zinc/pkg/core"
+	"github.com/zinclabs/zincsearch/pkg/config"
+	"github.com/zinclabs/zincsearch/pkg/core"
 )
 
 // SetPrometheus sets up prometheus metrics for gin

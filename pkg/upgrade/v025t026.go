@@ -15,7 +15,7 @@
 
 package upgrade
 
-import "github.com/zinclabs/zinc/pkg/meta"
+import "github.com/zinclabs/zincsearch/pkg/meta"
 
 func UpgradeFromV025T026(index *meta.Index) error {
 	return nil
