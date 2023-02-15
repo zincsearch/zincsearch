@@ -415,96 +415,104 @@ export default defineComponent({
         return false;
       }
       searchLoading.value = true;
-      const query = buildSearch(queryData);
+      try {
+        const query = buildSearch(queryData);
 
-      if (!indexData.name) {
-        indexData.name = "";
-      }
+        if (!indexData.name) {
+          indexData.name = "";
+        }
 
-      queryString.value = queryData.query;
-      searchService
-        .search({ index: indexData.name, query: query })
-        .then((res) => {
-          if (lastIndexName != "" && lastIndexName != indexData.name) {
-            resetColumns(indexData);
-          }
-          lastIndexName = indexData.name;
+        queryString.value = queryData.query;
+        searchService
+          .search({ index: indexData.name, query: query })
+          .then((res) => {
+            if (lastIndexName != "" && lastIndexName != indexData.name) {
+              resetColumns(indexData);
+            }
+            lastIndexName = indexData.name;
 
-          var results = [];
-          if (res.data.hits.hits) {
-            results = res.data.hits.hits;
-            // update index fields
-            let fields = {};
-            results.forEach((row) => {
-              let keys = deepKeys(row._source);
-              for (let i in keys) {
-                fields[keys[i]] = {};
-              }
-            });
-            emit("updated:fields", Object.keys(fields));
-          }
-
-          nextTick(() => {
-            searchResult.value = results;
-            resultTotal.value = results.length;
-            resultCount.value =
-              "Found " +
-              res.data.hits.total.value.toLocaleString() +
-              " hits in " +
-              res.data.took +
-              " ms";
-            searchLoading.value = false;
-
-            // rerender the chart
-            nextTick(() => {
-              if (!res.data.aggregations) {
-                console.log("res.data.aggregations is null");
-                return;
-              }
-              const interval = res.data.aggregations.histogram["interval"];
-              if (interval) {
-                if (interval.includes("s")) {
-                  chartKeyFormat.value = "HH:mm:ss";
-                } else if (interval.includes("m")) {
-                  chartKeyFormat.value = "HH:mm";
-                } else if (interval.includes("h")) {
-                  chartKeyFormat.value = "MM-DD HH:mm";
-                } else if (interval.includes("d")) {
-                  chartKeyFormat.value = "YYYY-MM-DD";
+            var results = [];
+            if (res.data.hits.hits) {
+              results = res.data.hits.hits;
+              // update index fields
+              let fields = {};
+              results.forEach((row) => {
+                let keys = deepKeys(row._source);
+                for (let i in keys) {
+                  fields[keys[i]] = {};
                 }
-              }
-              chartHistogram.value.updateOptions({
-                title: {
-                  text: resultCount.value,
-                },
-                xaxis: {
-                  type: "numeric",
-                  labels: {
-                    show: res.data.hits.total.value > 0 ? true : false,
+              });
+              emit("updated:fields", Object.keys(fields));
+            }
+
+            nextTick(() => {
+              searchResult.value = results;
+              resultTotal.value = results.length;
+              resultCount.value =
+                "Found " +
+                res.data.hits.total.value.toLocaleString() +
+                " hits in " +
+                res.data.took +
+                " ms";
+              searchLoading.value = false;
+
+              // rerender the chart
+              nextTick(() => {
+                if (!res.data.aggregations) {
+                  console.log("res.data.aggregations is null");
+                  return;
+                }
+                const interval = res.data.aggregations.histogram["interval"];
+                if (interval) {
+                  if (interval.includes("s")) {
+                    chartKeyFormat.value = "HH:mm:ss";
+                  } else if (interval.includes("m")) {
+                    chartKeyFormat.value = "HH:mm";
+                  } else if (interval.includes("h")) {
+                    chartKeyFormat.value = "MM-DD HH:mm";
+                  } else if (interval.includes("d")) {
+                    chartKeyFormat.value = "YYYY-MM-DD";
+                  }
+                }
+                chartHistogram.value.updateOptions({
+                  title: {
+                    text: resultCount.value,
                   },
-                },
-                series: [
-                  {
-                    name: "Count",
-                    data: res.data.aggregations.histogram.buckets.map(
-                      (bucket) => {
-                        return {
-                          x: date.formatDate(bucket.key, chartKeyFormat.value),
-                          y: parseInt(bucket.doc_count, 10),
-                        };
-                      }
-                    ),
+                  xaxis: {
+                    type: "numeric",
+                    labels: {
+                      show: res.data.hits.total.value > 0 ? true : false,
+                    },
                   },
-                ],
+                  series: [
+                    {
+                      name: "Count",
+                      data: res.data.aggregations.histogram.buckets.map(
+                        (bucket) => {
+                          return {
+                            x: date.formatDate(
+                              bucket.key,
+                              chartKeyFormat.value
+                            ),
+                            y: parseInt(bucket.doc_count, 10),
+                          };
+                        }
+                      ),
+                    },
+                  ],
+                });
               });
             });
+          })
+          .catch((err) => {
+            // handle the errors so as to continue using the applications
+            console.log(err.message);
+            searchLoading.value = false;
           });
-        })
-        .catch((err) => {
-          // handle the errors so as to continue using the applications
-          console.log(err.message);
-          searchLoading.value = false;
-        });
+      } catch (e) {
+        console.log(e.message);
+        searchLoading.value = false;
+      }
     };
 
     const resetColumns = (indexData) => {

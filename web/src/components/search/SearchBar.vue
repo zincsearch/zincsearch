@@ -63,6 +63,7 @@
 
 <script>
 import { defineComponent, nextTick, watch, ref } from "vue";
+import { debounce } from "quasar";
 import { useI18n } from "vue-i18n";
 
 import DateTime from "./DateTime.vue";
@@ -131,12 +132,6 @@ export default defineComponent({
       selectedFullTime: false,
     });
 
-    // when the datetime filter changes then update the results
-    watch(dateVal.value, () => {
-      refreshIcon.value = "search";
-      searchData();
-    });
-
     const searchData = () => {
       if (searching.value) {
         return;
@@ -151,6 +146,16 @@ export default defineComponent({
         searching.value = false;
       });
     };
+
+    const dSearchData = debounce(searchData, 1000);
+
+    // when the datetime filter changes then update the results
+    watch(dateVal.value, (v) => {
+      refreshIcon.value = "search";
+      if (v.startDate != "" && v.endDate != "") {
+        dSearchData();
+      }
+    });
 
     const setSearchQuery = (query) => {
       searchQuery.value = query;
