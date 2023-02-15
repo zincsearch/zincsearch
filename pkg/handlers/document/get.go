@@ -33,7 +33,6 @@ import (
 // @Produce json
 // @Param   index  path  string  true  "Index"
 // @Param   id     path  string  true  "ID"
-// @Param   document  body  map[string]interface{}  true  "Document"
 // @Success 200 {object} meta.Hit
 // @Failure 400 {object} meta.HTTPResponseError
 // @Failure 500 {object} meta.HTTPResponseError
