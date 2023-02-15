@@ -1301,13 +1301,6 @@ paths:
         name: id
         required: true
         type: string
-      - description: Document
-        in: body
-        name: document
-        required: true
-        schema:
-          additionalProperties: true
-          type: object
       produces:
       - application/json
       responses:
