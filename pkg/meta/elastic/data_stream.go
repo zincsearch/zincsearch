@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/zinclabs/zincsearch/pkg/zutils"
 )
 
@@ -26,7 +27,7 @@ func GetDataStream(c *gin.Context) {
 	target := c.Param("target")
 	zutils.GinRenderJSON(c, http.StatusOK, gin.H{
 		"data_streams": []gin.H{
-			gin.H{
+			{
 				"name": target,
 				"timestamp_field": gin.H{
 					"name": "@timestamp",

@@ -137,7 +137,7 @@ brews:
     folder: Formula
     homepage: "https://github.com/zinclabs/zincsearch"
     description: |
-      zincsearch is a search engine that does full text indexing. It is a lightweight
+      ZincSearch is a search engine that does full text indexing. It is a lightweight
       alternative to elasticsearch that requires significantly less resources. It uses
       bluge as the underlying indexing library.
 
@@ -146,7 +146,7 @@ brews:
 
       It is a drop-in replacement for elasticsearch if you are just ingesting
       data using APIs and searching using kibana (Kibana is not supported with
-      zinc. zincsearch provides its own UI).
+      zinc. ZincSearch provides its own UI).
     license: "Apache-2.0"
 blobs:
   - provider: s3

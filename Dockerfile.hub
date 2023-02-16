@@ -81,7 +81,7 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certifi
 # Copy our static executable.
 COPY --from=builder  /go/src/github.com/zinclabs/zincsearch/zincsearch /go/bin/zincsearch
 
-# Create directories that can be used to keep zincsearch data persistent along with host source or named volumes
+# Create directories that can be used to keep ZincSearch data persistent along with host source or named volumes
 COPY --from=builder --chown=zincsearch:zincsearch /var/lib/zincsearch /var/lib/zincsearch
 COPY --from=builder --chown=zincsearch:zincsearch /data /data
 
