@@ -11,7 +11,7 @@ require (
 	github.com/blugelabs/ice v1.0.0
 	github.com/blugelabs/query_string v0.3.0
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/dgraph-io/badger/v3 v3.2103.4
+	github.com/dgraph-io/badger/v3 v3.2103.5
 	github.com/docker/go-units v0.5.0
 	github.com/getsentry/sentry-go v0.17.0
 	github.com/gin-contrib/cors v1.4.0
