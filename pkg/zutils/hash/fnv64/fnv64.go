@@ -15,7 +15,7 @@
 
 package fnv64
 
-import "github.com/zinclabs/zinc/pkg/zutils/hash"
+import "github.com/zinclabs/zincsearch/pkg/zutils/hash"
 
 // newDefaultHasher returns a new 64-bit FNV-1a Hasher which makes no memory allocations.
 // Its Sum64 method will lay the value out in big-endian byte order.

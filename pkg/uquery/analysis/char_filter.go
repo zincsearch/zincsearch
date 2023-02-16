@@ -22,9 +22,9 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/char"
 
-	"github.com/zinclabs/zinc/pkg/errors"
-	zincchar "github.com/zinclabs/zinc/pkg/uquery/analysis/char"
-	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	zincchar "github.com/zinclabs/zincsearch/pkg/uquery/analysis/char"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
 )
 
 func RequestCharFilter(data map[string]interface{}) (map[string]analysis.CharFilter, error) {

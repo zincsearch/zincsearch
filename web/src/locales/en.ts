@@ -25,7 +25,7 @@ export default {
     openapi: "OpenAPI",
   },
   about: {
-    name: "Zinc",
+    name: "ZincSearch",
     introduction: "The modern open source search engine.",
   },
   login: {

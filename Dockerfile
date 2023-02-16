@@ -21,9 +21,9 @@ ARG BUILD_DATE
 
 RUN update-ca-certificates
 # RUN apk update && apk add --no-cache git
-# Create zinc user.
-ENV USER=zinc
-ENV GROUP=zinc
+# Create zincsearch user.
+ENV USER=zincsearch
+ENV GROUP=zincsearch
 ENV UID=10001
 ENV GID=10001
 # See https://stackoverflow.com/a/55757473/12429735RUN
@@ -37,11 +37,11 @@ RUN adduser \
     --uid "${UID}" \
     --gid "${GID}" \
     "${USER}"
-# Create default directories for persistent Zinc data used in final build stage.
+# Create default directories for persistent ZincSearch data used in final build stage.
 # It follows the Linux filesystem hierarchy pattern
 # https://tldp.org/LDP/Linux-Filesystem-Hierarchy/html/var.html
-RUN mkdir -p /var/lib/zinc /data && chown zinc:zinc /var/lib/zinc /data
-WORKDIR $GOPATH/src/github.com/zinclabs/zinc/
+RUN mkdir -p /var/lib/zincsearch /data && chown zincsearch:zincsearch /var/lib/zincsearch /data
+WORKDIR $GOPATH/src/github.com/zinclabs/zincsearch/
 COPY . .
 COPY --from=webBuilder /web/dist web/dist
 
@@ -58,12 +58,12 @@ RUN go mod tidy
 #       -w : Omit the DWARF symbol table.
 #       -s : Omit the symbol table and debug information.
 #       Omit the symbol table and debug information will reduce the binary size.
-# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o zinc cmd/zinc/main.go
+# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o zincsearch cmd/zincsearch/main.go
 ENV VERSION=$VERSION
 ENV COMMIT_HASH=$COMMIT_HASH
 ENV BUILD_DATE=$BUILD_DATE
 
-RUN CGO_ENABLED=0 go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
+RUN CGO_ENABLED=0 go build -ldflags="-s -w -X github.com/zinclabs/zincsearch/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zincsearch/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zincsearch/pkg/meta.BuildDate=${BUILD_DATE}" -o zincsearch cmd/zincsearch/main.go
 ############################
 # STEP 3 build a small image
 ############################
@@ -78,15 +78,15 @@ COPY --from=builder /etc/group /etc/group
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 # Copy our static executable.
-COPY --from=builder  /go/src/github.com/zinclabs/zinc/zinc /go/bin/zinc
+COPY --from=builder  /go/src/github.com/zinclabs/zincsearch/zincsearch /go/bin/zincsearch
 
-# Create directories that can be used to keep Zinc data persistent along with host source or named volumes
-COPY --from=builder --chown=zinc:zinc /var/lib/zinc /var/lib/zinc
-COPY --from=builder --chown=zinc:zinc /data /data
+# Create directories that can be used to keep ZincSearch data persistent along with host source or named volumes
+COPY --from=builder --chown=zincsearch:zincsearch /var/lib/zincsearch /var/lib/zincsearch
+COPY --from=builder --chown=zincsearch:zincsearch /data /data
 
 # Use an unprivileged user.
-USER zinc:zinc
+USER zincsearch:zincsearch
 # Port on which the service will be exposed.
 EXPOSE 4080
-# Run the zinc binary.
-ENTRYPOINT ["/go/bin/zinc"]
+# Run the zincsearch binary.
+ENTRYPOINT ["/go/bin/zincsearch"]

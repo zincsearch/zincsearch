@@ -1,10 +1,10 @@
-# Contributing to Zinc
+# Contributing to ZincSearch
 
 ## Setting up development environment
 
 ### Prerequisite
 
-Zinc uses Go (For server) and VueJS (For Web UI)
+ZincSearch uses Go (For server) and VueJS (For Web UI)
 
 You must have follwing installed:
 
@@ -17,8 +17,8 @@ You must have follwing installed:
 ### Lets clone the repo and get started
 
 ```shell
-git clone https://github.com/zinclabs/zinc
-cd zinc
+git clone https://github.com/zinclabs/zincsearch
+cd zincsearch
 ```
 
 ### Now let's build the UI
@@ -30,7 +30,7 @@ npm run build
 cd ..
 ```
 
-Output will be stored in web/dist folder. web/dist will be embedded in zinc binary when zinc go application is built.
+Output will be stored in web/dist folder. web/dist will be embedded in ZincSearch binary when ZincSearch go application is built.
 
 It is important that you build the web app every time you make any changes to javascript code as the built code is then embedded in go application.
 
@@ -39,19 +39,19 @@ It is important that you build the web app every time you make any changes to ja
 Download the dependencies
 
 ```shell
-go mod tidy # this will download the go libraries used by zinc
+go mod tidy # this will download the go libraries used by zincsearch
 ```
 
 Simple:
 
 ```shell
-go build -o zinc cmd/zinc/main.go # will build the zinc binary
+go build -o zincsearch cmd/zincsearch/main.go # will build the ZincSearch binary
 ```
 
 Advanced
 
 ```shell
-CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X github.com/zinclabs/zinc/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zinc/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zinc/pkg/meta.BuildDate=${BUILD_DATE}" -o zinc cmd/zinc/main.go
+CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X github.com/zinclabs/zincsearch/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zincsearch/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zincsearch/pkg/meta.BuildDate=${BUILD_DATE}" -o zincsearch cmd/zincsearch/main.go
 ```
 
 Setting GOOS and GOARCH appropriately allows for cross platform compilation. Check [Official docs](https://go.dev/doc/install/source#environment) for all possible values and combinations. This [gist](https://gist.github.com/asukakenji/f15ba7e588ac42795f421b48b8aede63) is also great.
@@ -73,12 +73,12 @@ There are 2 areas of development.
 
 ```shell
 go mod tidy
-ZINC_FIRST_ADMIN_USER=admin ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123 go run cmd/zinc/main.go
+ZINC_FIRST_ADMIN_USER=admin ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123 go run cmd/zincsearch/main.go
 ```
 
-This will start the Zinc API server on port 4080
+This will start the ZincSearch API server on port 4080
 
-environment variables ZINC_FIRST_ADMIN_USER and ZINC_FIRST_ADMIN_PASSWORD are required only first time when zinc is started.
+environment variables ZINC_FIRST_ADMIN_USER and ZINC_FIRST_ADMIN_PASSWORD are required only first time when ZincSearch is started.
 
 ### UI
 
@@ -90,7 +90,7 @@ npm run dev
 
 This will start UI server on port 8080
 
-In order for you to effectively use the UI you would want to have the Zinc API server running in a seperate window that will accept requests from the UI.
+In order for you to effectively use the UI you would want to have the ZincSearch API server running in a seperate window that will accept requests from the UI.
 
 ## Swagger
 
@@ -145,8 +145,8 @@ We check for following in CI pipeline for any pull requests.
 
 ## How to contribute code
 
-1. Fork the repository on github (e.g. awesomedev/zinc)
-1. Clone the repo from the forked repository ( e.g. awesomedev/zinc) to your machine.
+1. Fork the repository on github (e.g. awesomedev/zincsearch)
+1. Clone the repo from the forked repository ( e.g. awesomedev/zincsearch) to your machine.
 1. create a new branch locally. 
 1. Make the changes to code.
 1. Push the code to your repo.

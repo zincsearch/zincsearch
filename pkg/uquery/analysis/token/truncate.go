@@ -19,7 +19,7 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/token"
 
-	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
 )
 
 func NewTruncateTokenFilter(options interface{}) (analysis.TokenFilter, error) {

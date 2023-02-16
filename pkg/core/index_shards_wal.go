@@ -24,12 +24,12 @@ import (
 	blugeindex "github.com/blugelabs/bluge/index"
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zinc/pkg/config"
-	"github.com/zinclabs/zinc/pkg/errors"
-	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/wal"
-	"github.com/zinclabs/zinc/pkg/zutils"
-	"github.com/zinclabs/zinc/pkg/zutils/json"
+	"github.com/zinclabs/zincsearch/pkg/config"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/wal"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
+	"github.com/zinclabs/zincsearch/pkg/zutils/json"
 )
 
 // MaxBatchSize used to limit memory

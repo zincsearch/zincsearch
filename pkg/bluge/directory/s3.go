@@ -32,7 +32,7 @@ import (
 	"github.com/blugelabs/bluge/index"
 	segment "github.com/blugelabs/bluge_segment_api"
 	"github.com/rs/zerolog/log"
-	zincConfig "github.com/zinclabs/zinc/pkg/config"
+	zincConfig "github.com/zinclabs/zincsearch/pkg/config"
 )
 
 // GetS3Config returns a bluge config that will store index data in S3

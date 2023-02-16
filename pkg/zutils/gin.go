@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zinclabs/zinc/pkg/zutils/json"
+	"github.com/zinclabs/zincsearch/pkg/zutils/json"
 )
 
 func GinBindJSON(c *gin.Context, obj interface{}) error {

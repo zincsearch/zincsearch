@@ -20,9 +20,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zinclabs/zinc/pkg/errors"
-	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/uquery/index"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/uquery/index"
 )
 
 func Request(data map[string]interface{}) (*meta.IndexTemplate, error) {

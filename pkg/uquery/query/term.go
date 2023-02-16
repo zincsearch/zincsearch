@@ -22,9 +22,9 @@ import (
 
 	"github.com/blugelabs/bluge"
 
-	"github.com/zinclabs/zinc/pkg/errors"
-	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
 )
 
 func TermQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {

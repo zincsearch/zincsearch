@@ -20,9 +20,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zinclabs/zinc/pkg/errors"
-	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/metadata"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/metadata"
 )
 
 var ZINC_CACHED_PERMISSIONS = cachedPermissions{pm: map[string]map[string]struct{}{}}

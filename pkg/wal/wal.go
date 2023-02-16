@@ -19,9 +19,9 @@ import (
 	"path"
 
 	"github.com/zinclabs/wal"
-	"github.com/zinclabs/zinc/pkg/config"
-	"github.com/zinclabs/zinc/pkg/errors"
-	"github.com/zinclabs/zinc/pkg/wal/redo"
+	"github.com/zinclabs/zincsearch/pkg/config"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/wal/redo"
 )
 
 type Log struct {

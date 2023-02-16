@@ -19,10 +19,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/zinclabs/zinc/pkg/core"
-
 	"github.com/gin-gonic/gin"
-	"github.com/zinclabs/zinc/pkg/auth"
+
+	"github.com/zinclabs/zincsearch/pkg/auth"
+	"github.com/zinclabs/zincsearch/pkg/core"
 )
 
 func AuthMiddleware(permission string) func(c *gin.Context) {

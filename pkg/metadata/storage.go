@@ -19,11 +19,11 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/zinclabs/zinc/pkg/config"
-	"github.com/zinclabs/zinc/pkg/metadata/storage"
-	"github.com/zinclabs/zinc/pkg/metadata/storage/badger"
-	"github.com/zinclabs/zinc/pkg/metadata/storage/bolt"
-	"github.com/zinclabs/zinc/pkg/metadata/storage/etcd"
+	"github.com/zinclabs/zincsearch/pkg/config"
+	"github.com/zinclabs/zincsearch/pkg/metadata/storage"
+	"github.com/zinclabs/zincsearch/pkg/metadata/storage/badger"
+	"github.com/zinclabs/zincsearch/pkg/metadata/storage/bolt"
+	"github.com/zinclabs/zincsearch/pkg/metadata/storage/etcd"
 )
 
 var ErrorKeyNotExists = errors.New("key not exists")

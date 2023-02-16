@@ -19,11 +19,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/zinclabs/zinc/pkg/metadata"
-
 	"github.com/stretchr/testify/require"
-	"github.com/zinclabs/zinc/pkg/core"
-	"github.com/zinclabs/zinc/test/utils"
+
+	"github.com/zinclabs/zincsearch/pkg/core"
+	"github.com/zinclabs/zincsearch/pkg/metadata"
+	"github.com/zinclabs/zincsearch/test/utils"
 )
 
 func TestAddOrRemoveESAlias(t *testing.T) {

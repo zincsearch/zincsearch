@@ -18,7 +18,7 @@ package query
 import (
 	"github.com/blugelabs/bluge"
 
-	"github.com/zinclabs/zinc/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/errors"
 )
 
 func ExistsQuery(query map[string]interface{}) (bluge.Query, error) {

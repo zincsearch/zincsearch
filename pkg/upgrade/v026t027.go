@@ -20,11 +20,11 @@ import (
 	"path"
 	"sort"
 
-	"github.com/zinclabs/zinc/pkg/config"
-	"github.com/zinclabs/zinc/pkg/ider"
-	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/pkg/zutils"
-	"github.com/zinclabs/zinc/pkg/zutils/json"
+	"github.com/zinclabs/zincsearch/pkg/config"
+	"github.com/zinclabs/zincsearch/pkg/ider"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
+	"github.com/zinclabs/zincsearch/pkg/zutils/json"
 )
 
 // UpgradeFromV026T027 upgrades from version v0.2.6

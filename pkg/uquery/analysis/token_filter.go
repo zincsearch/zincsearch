@@ -44,10 +44,10 @@ import (
 	"github.com/blugelabs/bluge/analysis/lang/tr"
 	"github.com/blugelabs/bluge/analysis/token"
 
-	"github.com/zinclabs/zinc/pkg/bluge/analysis/lang/chs"
-	"github.com/zinclabs/zinc/pkg/errors"
-	zinctoken "github.com/zinclabs/zinc/pkg/uquery/analysis/token"
-	"github.com/zinclabs/zinc/pkg/zutils"
+	"github.com/zinclabs/zincsearch/pkg/bluge/analysis/lang/chs"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	zinctoken "github.com/zinclabs/zincsearch/pkg/uquery/analysis/token"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
 )
 
 func RequestTokenFilter(data map[string]interface{}) (map[string]analysis.TokenFilter, error) {

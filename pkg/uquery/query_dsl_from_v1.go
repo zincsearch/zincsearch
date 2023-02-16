@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zinclabs/zinc/pkg/meta"
-	v1 "github.com/zinclabs/zinc/pkg/meta/v1"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	v1 "github.com/zinclabs/zincsearch/pkg/meta/v1"
 )
 
 // ParseQueryDSLFromV1 parse query DSL from search v1 and return new zinc query DSL

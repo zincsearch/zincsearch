@@ -8,10 +8,10 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zinclabs/zinc/pkg/core"
-	"github.com/zinclabs/zinc/pkg/ider"
-	"github.com/zinclabs/zinc/pkg/meta"
-	"github.com/zinclabs/zinc/test/utils"
+	"github.com/zinclabs/zincsearch/pkg/core"
+	"github.com/zinclabs/zincsearch/pkg/ider"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zinclabs/zincsearch/test/utils"
 )
 
 type arg struct {

@@ -23,10 +23,10 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/zinclabs/zinc/pkg/meta"
-	zincanalysis "github.com/zinclabs/zinc/pkg/uquery/analysis"
-	"github.com/zinclabs/zinc/pkg/zutils/hash/rendezvous"
-	"github.com/zinclabs/zinc/pkg/zutils/json"
+	"github.com/zinclabs/zincsearch/pkg/meta"
+	zincanalysis "github.com/zinclabs/zincsearch/pkg/uquery/analysis"
+	"github.com/zinclabs/zincsearch/pkg/zutils/hash/rendezvous"
+	"github.com/zinclabs/zincsearch/pkg/zutils/json"
 )
 
 type Index struct {

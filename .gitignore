@@ -30,5 +30,5 @@ tmp/
 # plugins
 /plugins
 
-# zinc binary in root
-zinc
+# binary in root
+/zincsearch

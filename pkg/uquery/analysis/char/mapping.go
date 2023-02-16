@@ -21,9 +21,9 @@ import (
 
 	"github.com/blugelabs/bluge/analysis"
 
-	zincchar "github.com/zinclabs/zinc/pkg/bluge/analysis/char"
-	"github.com/zinclabs/zinc/pkg/errors"
-	"github.com/zinclabs/zinc/pkg/zutils"
+	zincchar "github.com/zinclabs/zincsearch/pkg/bluge/analysis/char"
+	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zinclabs/zincsearch/pkg/zutils"
 )
 
 func NewMappingCharFilter(options interface{}) (analysis.CharFilter, error) {

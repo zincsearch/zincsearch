@@ -51,7 +51,7 @@ func Test_badgerStorage_List(t *testing.T) {
 		},
 	}
 
-	store := New("/zinc/test")
+	store := New("/zincsearch/test")
 	defer store.Close()
 	t.Run("prepare", func(t *testing.T) {
 		err := store.Set("/test/foo", []byte("bar"))
@@ -98,7 +98,7 @@ func Test_badgerStorage_Get(t *testing.T) {
 		},
 	}
 
-	store := New("/zinc/test")
+	store := New("/zincsearch/test")
 	defer store.Close()
 	t.Run("prepare", func(t *testing.T) {
 		err := store.Set("/test/foo", []byte("bar"))
@@ -145,7 +145,7 @@ func Test_badgerStorage_Set(t *testing.T) {
 		},
 	}
 
-	store := New("/zinc/test")
+	store := New("/zincsearch/test")
 	defer store.Close()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -182,7 +182,7 @@ func Test_badgerStorage_Delete(t *testing.T) {
 		},
 	}
 
-	store := New("/zinc/test")
+	store := New("/zincsearch/test")
 	defer store.Close()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

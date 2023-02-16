@@ -31,7 +31,7 @@ phases:
       - npm install
       - npm run build
       - cd ..
-      # - go build -o main cmd/zinc/main.go
+      # - go build -o main cmd/zincsearch/main.go
       # Build binary and container images using goreleaser
       - echo Build started on `date`
       - GIT_TAG="$(git describe --tags --abbrev=0)"
