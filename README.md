@@ -70,10 +70,6 @@ Check [Quickstart](https://docs.zinc.dev/quickstart/)
 
 ZincSearch currently has most of its API contracts frozen. It's data format may still experience changes as we improve things. Currently ZincSearch is in beta. Data format should become highly stable when we move to GA (version 1).
 
-# How to develop and contribute to Zinc
-
-Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap items](https://github.com/orgs/zinclabs/projects/3)
-
 
 # Editions
 
@@ -88,7 +84,18 @@ Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap item
 | ES API compatibility| Search and Ingestion | Ingestion only | 
 | GUI                 | Basic     | Advanced for log search |
 | Cost                | Free (self hosting may cost money based on size)| Generous free tier. 1 TB ingest / month free.| 
-| Get started         | [Quick start](https://docs.zinc.dev/quickstart/) | [![Sign up](./screenshots/get-started-for-free.png)](https://cloud.zincsearch.com) |
+| Get started         | [Quick start](https://docs.zinc.dev/quickstart/) | [![Sign up](./screenshots/get-started-for-free.png)](https://observe.zinc.dev) |
 
+# Community
 
+- How to develop and contribute to Zinc
 
+Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap items](https://github.com/orgs/zinclabs/projects/3)
+
+- Join our Slack Channel
+
+  [![Slack](./screenshots/slack.png)](https://join.slack.com/t/zinc-nvh4832/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg)
+
+- Join our weChat Group
+
+  [![WechatGroup](https://zinc-public-data.s3.us-west-2.amazonaws.com/zincsearch/wechat_group_cn.jpg | width=300)](https://mp.weixin.qq.com/s?__biz=MzA3NDgyNjQ2MA==&mid=2456275231&idx=1&sn=76710c68cdda54749afd8a821eb50be2)
