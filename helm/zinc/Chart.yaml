@@ -1,8 +1,0 @@
-apiVersion: v2
-name: zinc
-description: Zinc is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs in less than 100 MB of RAM.
-type: application
-version: 0.1.0
-appVersion: v0.2.6
-sources:
-  - https://github.com/zinclabs/zinc

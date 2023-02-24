@@ -38,7 +38,7 @@ Note: Do not store sensitive data on this server as its available to everyone on
 4. Compatibility with Elasticsearch APIs for ingestion of data (single record and bulk API)
 5. Out of the box authentication
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
-7. Index storage in disk (default), s3 or minio (experimental)
+7. Index storage in disk (default), s3 or minio (deprecated)
 8. aggregation support
 
 # How to get support
