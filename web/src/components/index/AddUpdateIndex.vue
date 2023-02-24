@@ -156,7 +156,7 @@ export default defineComponent({
     const disableColor = ref("");
     const disableBtn = ref(false);
     const indexData = ref(defaultValue());
-    const storageTypes = ["disk", "s3", "minio"];
+    const storageTypes = ["disk"];
 
     return {
       step: ref(1),
