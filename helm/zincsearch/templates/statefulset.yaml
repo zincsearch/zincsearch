@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "zinc.fullname" . }}
+  name: {{ include "zincsearch.fullname" . }}
   labels:
-    {{- include "zinc.labels" . | nindent 4 }}
+    {{- include "zincsearch.labels" . | nindent 4 }}
 spec:
-  serviceName: {{ include "zinc.fullname" . }}-headless
-  # Until Zinc is not HA
+  serviceName: {{ include "zincsearch.fullname" . }}-headless
+  # Until zincsearch is not HA
   replicas: 1
   selector:
     matchLabels:
-      {{- include "zinc.selectorLabels" . | nindent 6 }}
+      {{- include "zincsearch.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "zinc.selectorLabels" . | nindent 8 }}
+        {{- include "zincsearch.selectorLabels" . | nindent 8 }}
     spec:
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
       containers:
-        - name: zinc
+        - name: zincsearch
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
@@ -27,12 +27,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: "username"
-                  name: {{ include "zinc.fullname" . }}
+                  name: {{ include "zincsearch.fullname" . }}
             - name: ZINC_FIRST_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: "password"
-                  name: {{ include "zinc.fullname" . }}
+                  name: {{ include "zincsearch.fullname" . }}
             - name: ZINC_DATA_PATH
               value: /go/bin/data
           # command: ["/bin/bash", "-c", "while true; do sleep 1; done"]
