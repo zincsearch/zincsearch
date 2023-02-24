@@ -132,9 +132,16 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 			} else {
 				update = true
 			}
-
-			indexName := lastLineMetaData["_index"].(string)
-			operation := lastLineMetaData["operation"].(string)
+			suppliedIndexName := lastLineMetaData["_index"]
+			if suppliedIndexName == nil && len(target) > 0 {
+				suppliedIndexName = target
+			}
+			suppliedOperation := lastLineMetaData["operation"]
+			if suppliedOperation == nil && len(target) > 0 {
+				suppliedOperation = "create"
+			}
+			indexName := suppliedIndexName.(string)
+			operation := suppliedOperation.(string)
 			switch operation {
 			case "index":
 				bulkRes.Items = append(bulkRes.Items, map[string]BulkResponseItem{
@@ -206,6 +213,9 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 					bulkRes.Items = append(bulkRes.Items, map[string]BulkResponseItem{
 						"delete": NewBulkResponseItem(bulkRes.Count, indexName, docID, "deleted", err),
 					})
+				} else {
+					lastLineMetaData["_index"] = target
+					lastLineMetaData["operation"] = "index"
 				}
 			}
 		}
