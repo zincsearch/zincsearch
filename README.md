@@ -81,7 +81,7 @@ ZincSearch currently has most of its API contracts frozen. It's data format may 
 | Preferred Use case  | App search | Log / event search |
 | Max  data supported | 100s of GBs | Petabyte scale |
 | High availability   | Will be available soon | Yes |
-| Open source         | Yes | Will soon be available |
+| Open source         | Yes | Yes, [ZincObserve](https://github.com/zinclabs/zincobserve)  |
 | ES API compatibility| Search and Ingestion | Ingestion only | 
 | GUI                 | Basic     | Advanced for log search |
 | Cost                | Free (self hosting may cost money based on size)| Generous free tier. 1 TB ingest / month free.| 
