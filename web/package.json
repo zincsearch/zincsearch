@@ -42,7 +42,7 @@
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
     "@vitejs/plugin-vue": "2.3.3",
-    "@vitest/ui": "0.18.1",
+    "@vitest/ui": "0.29.2",
     "@vue/test-utils": "2.2.7",
     "c8": "^7.11.3",
     "cypress": "^10.9.0",
