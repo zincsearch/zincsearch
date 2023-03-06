@@ -24,7 +24,7 @@ type ZincQuery struct {
 	Highlight      *Highlight              `json:"highlight"`
 	Fields         interface{}             `json:"fields"`  // ["field1", "field2.*", {"field": "fieldName", "format": "epoch_millis"}]
 	Source         interface{}             `json:"_source"` // true, false, ["field1", "field2.*"]
-	Sort           interface{}             `json:"sort"`    // "_sorce", ["+Year","-Year", {"Year": "desc"}, "Date": {"order": "asc"", "format": "yyyy-MM-dd"}}"}]
+	Sort           interface{}             `json:"sort"`    // "_score", ["+Year","-Year", {"Year": "desc"}, "Date": {"order": "asc"", "format": "yyyy-MM-dd"}}"}]
 	Explain        bool                    `json:"explain"`
 	From           int                     `json:"from"`
 	Size           int                     `json:"size"`
@@ -38,7 +38,7 @@ type ZincQueryForSDK struct {
 	Highlight      *Highlight              `json:"highlight"`
 	Fields         []string                `json:"fields"`  // ["field1", "field2.*", {"field": "fieldName", "format": "epoch_millis"}]
 	Source         []string                `json:"_source"` // true, false, ["field1", "field2.*"]
-	Sort           []string                `json:"sort"`    // "_sorce", ["+Year","-Year", {"Year": "desc"}, "Date": {"order": "asc"", "format": "yyyy-MM-dd"}}"}]
+	Sort           []string                `json:"sort"`    // "_score", ["+Year","-Year", {"Year": "desc"}, "Date": {"order": "asc"", "format": "yyyy-MM-dd"}}"}]
 	Explain        bool                    `json:"explain"`
 	From           int                     `json:"from"`
 	Size           int                     `json:"size"`
