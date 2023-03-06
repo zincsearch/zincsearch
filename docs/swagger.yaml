@@ -983,7 +983,7 @@ definitions:
       size:
         type: integer
       sort:
-        description: '"_sorce", ["+Year","-Year", {"Year": "desc"}, "Date": {"order":
+        description: '"_score", ["+Year","-Year", {"Year": "desc"}, "Date": {"order":
           "asc"", "format": "yyyy-MM-dd"}}"}]'
         items:
           type: string

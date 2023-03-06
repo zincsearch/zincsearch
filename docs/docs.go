@@ -3602,7 +3602,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "sort": {
-                    "description": "\"_sorce\", [\"+Year\",\"-Year\", {\"Year\": \"desc\"}, \"Date\": {\"order\": \"asc\"\", \"format\": \"yyyy-MM-dd\"}}\"}]",
+                    "description": "\"_score\", [\"+Year\",\"-Year\", {\"Year\": \"desc\"}, \"Date\": {\"order\": \"asc\"\", \"format\": \"yyyy-MM-dd\"}}\"}]",
                     "type": "array",
                     "items": {
                         "type": "string"
