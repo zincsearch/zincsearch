@@ -99,4 +99,5 @@ ZincSearch currently has most of its API contracts frozen. It's data format may 
 
 - Join our weChat Group
 
-  <img src="https://zinc-public-data.s3.us-west-2.amazonaws.com/zincsearch/wechat_group_cn-20230228.jpg" width="300">
+  <img src="./screenshots/wechat_qr.jpg" width="300">
+  
