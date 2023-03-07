@@ -12,6 +12,7 @@ export default defineComponent({
   name: "HighLight",
   props: {
     content: {
+      type: String,
       required: true,
     },
     queryString: {
@@ -113,7 +114,32 @@ export default defineComponent({
           arr.push(keyword);
         }
       }
-      return arr;
+
+      let new_arr = [];
+      for (let i = 0; i < arr.length; i++) {
+        let start = 0;
+        let in_word = false;
+        for (let k = 0; k < arr[i].length; k++) {
+          let c = arr[i].charCodeAt(k);
+          // 0001 ~ 007e is ascii
+          // ff60 ~ ff9f is half width katakana
+          if ((c >= 0x0001 && c <= 0x007e) || (c >= 0xff60 && c <= 0xff9f)) {
+            in_word = true;
+          } else {
+            if (in_word) {
+              new_arr.push(arr[i].substring(start, k));
+            }
+            new_arr.push(arr[i].substring(k, k + 1));
+            start = k + 1;
+            in_word = false;
+          }
+        }
+        if (in_word) {
+          new_arr.push(arr[i].substring(start, arr[i].length));
+        }
+      }
+
+      return new_arr;
     },
   },
 });
