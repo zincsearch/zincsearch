@@ -12,6 +12,7 @@ export default defineComponent({
   name: "HighLight",
   props: {
     content: {
+      type: String,
       required: true,
     },
     queryString: {

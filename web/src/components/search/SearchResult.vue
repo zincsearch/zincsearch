@@ -53,7 +53,7 @@
               </q-td>
               <q-td v-else>
                 <high-light
-                  :content="col.value"
+                  :content="col.value + ''"
                   :query-string="queryString"
                 ></high-light>
               </q-td>
