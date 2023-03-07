@@ -6,7 +6,7 @@
 
 ZincSearch uses Go (For server) and VueJS (For Web UI)
 
-You must have follwing installed:
+You must have following installed:
 
 1. Git
 2. Go 1.16 + (We recommend go 1.19+)
@@ -90,7 +90,7 @@ npm run dev
 
 This will start UI server on port 8080
 
-In order for you to effectively use the UI you would want to have the ZincSearch API server running in a seperate window that will accept requests from the UI.
+In order for you to effectively use the UI you would want to have the ZincSearch API server running in a separate window that will accept requests from the UI.
 
 ## Swagger
 
