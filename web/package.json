@@ -19,7 +19,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@quasar/extras": "1.15.4",
+    "@quasar/extras": "1.15.11",
     "apexcharts": "3.36.3",
     "axios": "1.2.5",
     "buffer": "6.0.3",
