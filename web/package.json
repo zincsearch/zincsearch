@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@quasar/extras": "1.15.4",
-    "apexcharts": "3.36.3",
+    "apexcharts": "3.37.0",
     "axios": "1.2.5",
     "buffer": "6.0.3",
     "js-cookie": "3.0.1",
