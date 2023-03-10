@@ -84,7 +84,7 @@ ZincSearch currently has most of its API contracts frozen. It's data format may 
 | Open source         | Yes | Yes, [ZincObserve](https://github.com/zinclabs/zincobserve)  |
 | ES API compatibility| Search and Ingestion | Ingestion only | 
 | GUI                 | Basic     | Advanced for log search |
-| Cost                | Free (self hosting may cost money based on size)| Generous free tier. 1 TB ingest / month free.| 
+| Cost                | Free (self hosting may cost money based on size)| Generous free tier. 200 GB ingest / month free.| 
 | Get started         | [Quick start](https://docs.zinc.dev/quickstart/) | [![Sign up](./screenshots/get-started-for-free.png)](https://observe.zinc.dev) |
 
 # Community
