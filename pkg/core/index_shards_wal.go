@@ -159,7 +159,7 @@ func (s *IndexShard) ConsumeWAL() bool {
 	if minID == maxID {
 		return false // no new entries
 	}
-	// log.Debug().Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Uint64("minID", minID).Uint64("maxID", maxID).Msg("consume wal begin")
+	log.Debug().Str("index", s.GetIndexName()).Str("shard", s.GetID()).Uint64("minID", minID).Uint64("maxID", maxID).Msg("consume wal begin")
 
 	// limit max batch size
 	if maxID-minID > MaxBatchSize {
@@ -218,7 +218,7 @@ func (s *IndexShard) ConsumeWAL() bool {
 			return false
 		}
 	}
-	// log.Debug().Str("index", s.GetIndexName()).Int64("shard", s.GetID()).Uint64("minID", minID).Uint64("maxID", maxID).Msg("consume wal end")
+	log.Debug().Str("index", s.GetIndexName()).Str("shard", s.GetID()).Uint64("minID", minID).Uint64("maxID", maxID).Msg("consume wal end")
 
 	// Truncate log
 	if err = s.wal.TruncateFront(minID); err != nil {
