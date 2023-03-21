@@ -69,22 +69,22 @@ Check [Quickstart](https://docs.zinc.dev/quickstart/)
 
 # Releases
 
-ZincSearch currently has most of its API contracts frozen. It's data format may still experience changes as we improve things. Currently ZincSearch is in beta. Data format should become highly stable when we move to GA (version 1).
+ZincSearch has hundreds of production installations is in GA.
 
 
 # Editions
 
 | Feature             | Zinc      |   Zinc Cloud                      |
 ----------------------|-----------|-----------------------------------|
-| Ideal use case      | App search| Logs and Events (Immutable Data)  | 
+| Ideal use case      | App search| Logs, metrics, traces (Immutable Data)  | 
 | Storage             | Disk      |  Object (S3), GCS, Azure blob coming soon   |
-| Preferred Use case  | App search | Log / event search |
+| Preferred Use case  | App search | Observability (Logs, metrics, traces) |
 | Max  data supported | 100s of GBs | Petabyte scale |
 | High availability   | Will be available soon | Yes |
 | Open source         | Yes | Yes, [ZincObserve](https://github.com/zinclabs/zincobserve)  |
-| ES API compatibility| Search and Ingestion | Ingestion only | 
+| ES API compatibility| Search and Ingestion | Ingestion (Open source) and Search( enterprise) only | 
 | GUI                 | Basic     | Advanced for log search |
-| Cost                | Free (self hosting may cost money based on size)| Generous free tier. 200 GB ingest / month free.| 
+| Cost                | Free (self hosting may cost money based on size)| Free (self hosted), Generous free tier in cloud 200 GB ingest / month free.| 
 | Get started         | [Quick start](https://docs.zinc.dev/quickstart/) | [![Sign up](./screenshots/get-started-for-free.png)](https://observe.zinc.dev) |
 
 # Community
