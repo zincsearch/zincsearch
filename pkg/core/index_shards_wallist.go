@@ -116,8 +116,9 @@ func (t *IndexShardWALList) ConsumeWAL() {
 			if size == uint64(index.GetShardNum()) {
 				size = 0
 			}
+			index.UpdateWALSize(size)
+
 			stats := index.GetStats()
-			atomic.StoreUint64(&stats.WALSize, size)
 			SetMetricStatsByIndex(name, "doc_num", float64(atomic.LoadUint64(&stats.DocNum)))
 			SetMetricStatsByIndex(name, "storage_size", float64(atomic.LoadUint64(&stats.StorageSize)/1024/1024)) // convert to MB
 

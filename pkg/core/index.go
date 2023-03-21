@@ -90,6 +90,12 @@ func (index *Index) GetStats() meta.IndexStat {
 	return s
 }
 
+func (index *Index) UpdateWALSize(size uint64) {
+	index.lock.Lock()
+	index.ref.Stats.WALSize = size
+	index.lock.Unlock()
+}
+
 func (index *Index) GetAnalyzers() map[string]*analysis.Analyzer {
 	index.lock.RLock()
 	a := index.analyzers
