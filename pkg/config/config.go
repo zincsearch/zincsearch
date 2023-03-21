@@ -54,7 +54,7 @@ type config struct {
 	MaxResults                int           `env:"ZINC_MAX_RESULTS,default=10000"`
 	AggregationTermsSize      int           `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
 	MaxDocumentSize           int           `env:"ZINC_MAX_DOCUMENT_SIZE,default=1m"`      // Max size for a single document . Default = 1 MB = 1024 * 1024
-	WalSyncInterval           time.Duration `env:"ZINC_WAL_SYNC_INTERVAL,default=2s"`      // sync wal to disk, 1s, 10ms
+	WalSyncInterval           time.Duration `env:"ZINC_WAL_SYNC_INTERVAL,default=1s"`      // sync wal to disk, 1s, 10ms
 	WalRedoLogNoSync          bool          `env:"ZINC_WAL_REDOLOG_NO_SYNC,default=false"` // control sync after every write
 	Cluster                   cluster
 	Shard                     shard
@@ -69,12 +69,12 @@ type cluster struct {
 }
 
 type shard struct {
+	// control gorutine number for read
+	GorutineNum int `env:"ZINC_SHARD_GORUTINE_NUM,default=3"`
 	// DefaultNum is the default number of shards.
 	Num int64 `env:"ZINC_SHARD_NUM,default=3"`
 	// MaxSize is the maximum size limit for one shard, or will create a new shard.
 	MaxSize uint64 `env:"ZINC_SHARD_MAX_SIZE,default=1073741824"`
-	// control gorutine number for read
-	GorutineNum int `env:"ZINC_SHARD_GORUTINE_NUM,default=10"`
 }
 
 type etcd struct {
