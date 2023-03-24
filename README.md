@@ -41,6 +41,10 @@ Note: Do not store sensitive data on this server as its available to everyone on
 7. Index storage in disk (default), s3 or minio (deprecated)
 8. aggregation support
 
+# Documentation
+
+Documentation is available at [https://zincsearch-docs.zinc.dev/](https://zincsearch-docs.zinc.dev/)
+
 # How to get support
 
 Easiest way to get support is to join the [Slack channel](https://join.slack.com/t/zincsearch/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg).
