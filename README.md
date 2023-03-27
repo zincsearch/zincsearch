@@ -1,5 +1,5 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/zinclabs/zincsearch)](https://goreportcard.com/report/github.com/zinclabs/zincsearch)
-[![Docs](https://img.shields.io/badge/Docs-Docs-green)](https://docs.zinc.dev/) [![codecov](https://codecov.io/github/zinclabs/zincsearch/branch/main/graph/badge.svg)](https://codecov.io/github/zinclabs/zincsearch)
+[![Docs](https://img.shields.io/badge/Docs-Docs-green)](https://zincsearch-docs.zinc.dev/) [![codecov](https://codecov.io/github/zinclabs/zincsearch/branch/main/graph/badge.svg)](https://codecov.io/github/zinclabs/zincsearch)
 
 ❗Note: If your use case is of log search (app and security logs) instead of app search (implement search feature in your application or website) then you should check [zinclabs/zincobserve](https://github.com/zinclabs/zincobserve) project that is specifically built for observability use case.
 # ZincSearch
@@ -38,7 +38,7 @@ Note: Do not store sensitive data on this server as its available to everyone on
 4. Compatibility with Elasticsearch APIs for ingestion of data (single record and bulk API)
 5. Out of the box authentication
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
-7. Index storage in disk (default), s3 or minio (deprecated)
+7. Index storage in disk
 8. aggregation support
 
 # Documentation
@@ -68,7 +68,7 @@ Please create an issue if you would like something to be added to the roadmap.
 
 ## Quickstart
 
-Check [Quickstart](https://docs.zinc.dev/quickstart/)
+Check [Quickstart](https://zincsearch-docs.zinc.dev/quickstart/)
 
 
 # Releases
@@ -89,7 +89,7 @@ ZincSearch has hundreds of production installations is in GA.
 | ES API compatibility| Search and Ingestion | Ingestion (Open source) and Search( enterprise) only | 
 | GUI                 | Basic     | Advanced for log search |
 | Cost                | Free (self hosting may cost money based on size)| Free (self hosted), Generous free tier in cloud 200 GB ingest / month free.| 
-| Get started         | [Quick start](https://docs.zinc.dev/quickstart/) | [![Sign up](./screenshots/get-started-for-free.png)](https://observe.zinc.dev) |
+| Get started         | [Quick start](https://zincsearch-docs.zinc.dev/quickstart/) | [![Sign up](./screenshots/get-started-for-free.png)](https://observe.zinc.dev) |
 
 # Community
 

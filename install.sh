@@ -12,7 +12,7 @@ header() {
 ZincSearch Installer
 
 Website: https://zinc.dev
-Docs: https://docs.zinc.dev
+Docs: https://zincsearch-docs.zinc.dev
 Repo: https://github.com/zinclabs/zincsearch
 
 EOF

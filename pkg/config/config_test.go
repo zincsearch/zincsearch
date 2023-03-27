@@ -56,9 +56,6 @@ func TestConfig(t *testing.T) {
 
 		assert.Equal(t, []string{"localhost:2379"}, c.Etcd.Endpoints)
 
-		assert.Equal(t, "", c.S3.Bucket)
-		assert.Equal(t, "", c.MinIO.Endpoint)
-
 		assert.Equal(t, false, c.Plugin.GSE.Enable)
 		assert.Equal(t, "small", c.Plugin.GSE.DictEmbed)
 		assert.Equal(t, "./plugins/gse/dict", c.Plugin.GSE.DictPath)
@@ -159,20 +156,5 @@ func TestSentryDSNOverride(t *testing.T) {
 		loadConfig(reflect.ValueOf(c).Elem())
 
 		assert.Equal(t, customDSN, c.SentryDSN)
-	})
-}
-
-func TestS3Override(t *testing.T) {
-	bucket := "zinc-dev-misc1"
-
-	t.Run("prepare", func(t *testing.T) {
-		os.Setenv("ZINC_S3_BUCKET", bucket)
-	})
-
-	t.Run("check", func(t *testing.T) {
-		c := new(config)
-		loadConfig(reflect.ValueOf(c).Elem())
-
-		assert.Equal(t, bucket, c.S3.Bucket)
 	})
 }

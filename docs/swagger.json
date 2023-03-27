@@ -5,7 +5,7 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "Zinc Search engine API documents https://docs.zincsearch.com",
+        "description": "Zinc Search engine API documents https://zincsearch-docs.zinc.dev",
         "title": "Zinc Search engine API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {

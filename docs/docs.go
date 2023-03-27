@@ -3761,7 +3761,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{"http", "https"},
 	Title:            "Zinc Search engine API",
-	Description:      "Zinc Search engine API documents https://docs.zincsearch.com",
+	Description:      "Zinc Search engine API documents https://zincsearch-docs.zinc.dev",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
