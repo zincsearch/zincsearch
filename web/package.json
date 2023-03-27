@@ -40,7 +40,7 @@
     "@types/js-cookie": "3.0.2",
     "@types/lodash-es": "4.17.6",
     "@typescript-eslint/eslint-plugin": "5.42.1",
-    "@typescript-eslint/parser": "5.42.1",
+    "@typescript-eslint/parser": "5.56.0",
     "@vitejs/plugin-vue": "2.3.3",
     "@vitest/ui": "0.18.1",
     "@vue/test-utils": "2.2.7",
