@@ -29,7 +29,7 @@
             no-caps
             padding="xs sm"
             :label="t('menu.documentation')"
-            href="https://docs.zincsearch.com"
+            href="https://zincsearch-docs.zinc.dev"
             target="_blank"
           />
         </div>

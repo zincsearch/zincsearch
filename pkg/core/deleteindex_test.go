@@ -23,8 +23,6 @@ import (
 
 func TestDeleteIndex(t *testing.T) {
 	var indexName = "TestDeleteIndex.index_1"
-	var indexNameS3 = "TestDeleteIndex.index_s3"
-	var indexNameMinIO = "TestDeleteIndex.index_minio"
 	type args struct {
 		name string
 	}
@@ -47,20 +45,6 @@ func TestDeleteIndex(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		{
-			name: "s3",
-			args: args{
-				name: indexNameS3,
-			},
-			wantErr: false,
-		},
-		{
-			name: "minio",
-			args: args{
-				name: indexNameMinIO,
-			},
-			wantErr: false,
-		},
 	}
 
 	t.Run("prepare", func(t *testing.T) {
@@ -69,20 +53,6 @@ func TestDeleteIndex(t *testing.T) {
 		assert.NotNil(t, index)
 		err = StoreIndex(index)
 		assert.NoError(t, err)
-
-		indexS3, err := NewIndex(indexNameS3, "disk", 2)
-		assert.NoError(t, err)
-		assert.NotNil(t, indexS3)
-		err = StoreIndex(indexS3)
-		assert.NoError(t, err)
-		indexS3.ref.StorageType = "s3"
-
-		indexMinio, err := NewIndex(indexNameMinIO, "disk", 2)
-		assert.NoError(t, err)
-		assert.NotNil(t, indexMinio)
-		err = StoreIndex(indexMinio)
-		assert.NoError(t, err)
-		indexMinio.ref.StorageType = "minio"
 	})
 
 	for _, tt := range tests {

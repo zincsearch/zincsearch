@@ -59,8 +59,6 @@ type config struct {
 	Cluster                   cluster
 	Shard                     shard
 	Etcd                      etcd
-	S3                        s3
-	MinIO                     minIO
 	Plugin                    plugin
 }
 
@@ -82,18 +80,6 @@ type etcd struct {
 	Prefix    string   `env:"ZINC_ETCD_PREFIX,default=/zinc"`
 	Username  string   `env:"ZINC_ETCD_USERNAME"`
 	Password  string   `env:"ZINC_ETCD_PASSWORD"`
-}
-
-type s3 struct {
-	Bucket string `env:"ZINC_S3_BUCKET"`
-	Url    string `env:"ZINC_S3_URL"`
-}
-
-type minIO struct {
-	Endpoint        string `env:"ZINC_MINIO_ENDPOINT"`
-	Bucket          string `env:"ZINC_MINIO_BUCKET"`
-	AccessKeyID     string `env:"ZINC_MINIO_ACCESS_KEY_ID"`
-	SecretAccessKey string `env:"ZINC_MINIO_SECRET_ACCESS_KEY"`
 }
 
 type plugin struct {

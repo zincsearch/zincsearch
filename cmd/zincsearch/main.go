@@ -40,7 +40,7 @@ import (
 
 // @title           Zinc Search engine API
 // @version         1.0.0
-// @description     Zinc Search engine API documents https://docs.zincsearch.com
+// @description     Zinc Search engine API documents https://zincsearch-docs.zinc.dev
 // @termsOfService  http://swagger.io/terms/
 
 // @license.name    Apache 2.0

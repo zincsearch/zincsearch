@@ -99,6 +99,7 @@ func CreateES(c *gin.Context) {
 }
 
 func CreateIndexWorker(newIndex *meta.IndexSimple, indexName string) error {
+	newIndex.StorageType = "disk"
 	if newIndex.Name == "" && indexName != "" {
 		newIndex.Name = indexName
 	}

@@ -1085,7 +1085,7 @@ info:
   contact:
     name: Zinc Search
     url: https://www.zincsearch.com
-  description: Zinc Search engine API documents https://docs.zincsearch.com
+  description: Zinc Search engine API documents https://zincsearch-docs.zinc.dev
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html

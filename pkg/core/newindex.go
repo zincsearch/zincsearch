@@ -125,19 +125,8 @@ func OpenIndexWriter(name string, storageType string, defaultSearchAnalyzer *ana
 }
 
 func getOpenConfig(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) bluge.Config {
-	var dataPath string
-	var cfg bluge.Config
-	switch storageType {
-	case "s3":
-		dataPath = config.Global.S3.Bucket
-		cfg = directory.GetS3Config(dataPath, name, timeRange...)
-	case "minio":
-		dataPath = config.Global.MinIO.Bucket
-		cfg = directory.GetMinIOConfig(dataPath, name, timeRange...)
-	default:
-		dataPath = config.Global.DataPath
-		cfg = directory.GetDiskConfig(dataPath, name, timeRange...)
-	}
+	dataPath := config.Global.DataPath
+	cfg := directory.GetDiskConfig(dataPath, name, timeRange...)
 	if defaultSearchAnalyzer != nil {
 		cfg.DefaultSearchAnalyzer = defaultSearchAnalyzer
 	}
