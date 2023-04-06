@@ -15,7 +15,7 @@ require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-ego/gse v0.70.2
 	github.com/goccy/go-json v0.10.0
-	github.com/joho/godotenv v1.4.0
+	github.com/joho/godotenv v1.5.1
 	github.com/prometheus/client_golang v1.14.0
 	github.com/pyroscope-io/client v0.6.0
 	github.com/robfig/cron/v3 v3.0.1
