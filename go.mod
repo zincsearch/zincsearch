@@ -28,7 +28,7 @@ require (
 	github.com/swaggo/swag v1.8.11
 	github.com/zinclabs/go-gin-prometheus v0.1.1
 	github.com/zinclabs/wal v1.2.4
-	go.etcd.io/bbolt v1.3.6
+	go.etcd.io/bbolt v1.3.7
 	go.etcd.io/etcd/client/v3 v3.5.7
 	golang.org/x/crypto v0.5.0
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
