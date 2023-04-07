@@ -1,7 +1,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/zinclabs/zincsearch)](https://goreportcard.com/report/github.com/zinclabs/zincsearch)
 [![Docs](https://img.shields.io/badge/Docs-Docs-green)](https://zincsearch-docs.zinc.dev/) [![codecov](https://codecov.io/github/zinclabs/zincsearch/branch/main/graph/badge.svg)](https://codecov.io/github/zinclabs/zincsearch)
 
-❗Note: If your use case is of log search (app and security logs) instead of app search (implement search feature in your application or website) then you should check [zinclabs/zincobserve](https://github.com/zinclabs/zincobserve) project that is specifically built for log search use case.
+❗Note: If your use case is of log search (app and security logs) instead of app search (implement search feature in your application or website) then you should check [zinclabs/zincobserve](https://github.com/zinclabs/zincobserve) project built in rust that is specifically built for log search use case.
 # ZincSearch
 
 ZincSearch is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs using a fraction of the resources. It uses [bluge](https://github.com/blugelabs/bluge) as the underlying indexing library.
@@ -13,18 +13,6 @@ It is a drop-in replacement for Elasticsearch if you are just ingesting data usi
 Check the below video for a quick demo of Zinc.
 
 [![Zinc Youtube](./screenshots/zinc-youtube.jpg)](https://www.youtube.com/watch?v=aZXtuVjt1ow)
-
-# Playground Server
-
-You could try ZincSearch without installing using below details: 
-
-|          |                                        |
------------|-----------------------------------------
-| Server   | https://playground.dev.zincsearch.com  |
-| User ID  | admin                                  |
-| Password | Complexpass#123                        |
-
-Note: Do not store sensitive data on this server as its available to everyone on internet. Data will also be cleaned on this server regularly.
 
 # Why ZincSearch
 
@@ -49,12 +37,6 @@ Documentation is available at [https://zincsearch-docs.zinc.dev/](https://zincse
 
 Easiest way to get support is to join the [Slack channel](https://join.slack.com/t/zincsearch/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg).
 
-# Roadmap items:
-
-Public roadmap is available at https://github.com/orgs/zinclabs/projects/3/views/1
-
-Please create an issue if you would like something to be added to the roadmap.
-
 # Screenshots
 
 ## Search screen
@@ -76,20 +58,20 @@ Check [Quickstart](https://zincsearch-docs.zinc.dev/quickstart/)
 ZincSearch has hundreds of production installations is in GA.
 
 
-# Editions
+# ZincSearch Vs ZincObserve
 
-| Feature             | Zinc      |   Zinc Cloud                      |
+| Feature             | Zinc      |   ZincObserve                |
 ----------------------|-----------|-----------------------------------|
 | Ideal use case      | App search| Logs, metrics, traces (Immutable Data)  | 
-| Storage             | Disk      |  Object (S3), GCS, Azure blob coming soon   |
+| Storage             | Disk      |  Disk, Object (S3), GCS, MinIO, swift and more.   |
 | Preferred Use case  | App search | Observability (Logs, metrics, traces) |
 | Max  data supported | 100s of GBs | Petabyte scale |
-| High availability   | Will be available soon | Yes |
+| High availability   | Not available | Yes |
 | Open source         | Yes | Yes, [ZincObserve](https://github.com/zinclabs/zincobserve)  |
-| ES API compatibility| Search and Ingestion | Ingestion (Open source) and Search( enterprise) only | 
-| GUI                 | Basic     | Advanced for log search |
-| Cost                | Free (self hosting may cost money based on size)| Free (self hosted), Generous free tier in cloud 200 GB ingest / month free.| 
-| Get started         | [Quick start](https://zincsearch-docs.zinc.dev/quickstart/) | [![Sign up](./screenshots/get-started-for-free.png)](https://observe.zinc.dev) |
+| ES API compatibility| Yes | Yes | 
+| GUI                 | Basic     | Very Advanced, including dashboards |
+| Cost                | Open source | Open source| 
+| Get started         | [Opens ource docs](https://zincsearch-docs.zinc.dev/quickstart/) | [Open source docs](https://docs.zinc.dev/quickstart) or [Cloud](https://observe.zinc.dev) |
 
 # Community
 
