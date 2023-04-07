@@ -71,7 +71,7 @@ ZincSearch has hundreds of production installations is in GA.
 | ES API compatibility| Yes | Yes | 
 | GUI                 | Basic     | Very Advanced, including dashboards |
 | Cost                | Open source | Open source| 
-| Get started         | [Opens ource docs](https://zincsearch-docs.zinc.dev/quickstart/) | [Open source docs](https://docs.zinc.dev/quickstart) or [Cloud](https://observe.zinc.dev) |
+| Get started         | [Open source docs](https://zincsearch-docs.zinc.dev/quickstart/) | [Open source docs](https://docs.zinc.dev/quickstart) or [Cloud](https://observe.zinc.dev) |
 
 # Community
 
