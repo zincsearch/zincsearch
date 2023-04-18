@@ -23,7 +23,7 @@ import (
 	"net/url"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zinclabs/zincsearch/pkg/zutils/json"
+	"github.com/zincsearch/zincsearch/pkg/zutils/json"
 )
 
 func NewGinContext() (*gin.Context, *httptest.ResponseRecorder) {

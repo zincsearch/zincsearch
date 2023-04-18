@@ -21,7 +21,7 @@ import (
 
 	blugeindex "github.com/blugelabs/bluge/index"
 	"github.com/stretchr/testify/assert"
-	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
 func Test_walMergeDocs_WriteTo(t *testing.T) {

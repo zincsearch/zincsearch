@@ -20,7 +20,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/zinclabs/zincsearch/pkg/handlers/document"
+	"github.com/zincsearch/zincsearch/pkg/handlers/document"
 )
 
 func BenchmarkBulk(b *testing.B) {
@@ -28,7 +28,7 @@ func BenchmarkBulk(b *testing.B) {
 	if err != nil {
 		fmt.Println("# !!! Please download olympics.ndjosn first")
 		fmt.Println("# mkdir -p tmp")
-		fmt.Println("# wget https://github.com/zinclabs/zincsearch/releases/download/v0.2.4/olympics.ndjson.tar.gz -O tmp/olympics.ndjson.tar.gz")
+		fmt.Println("# wget https://github.com/zincsearch/zincsearch/releases/download/v0.2.4/olympics.ndjson.tar.gz -O tmp/olympics.ndjson.tar.gz")
 		fmt.Println("# tar zxf tmp/olympics.ndjson.tar.gz -C tmp/")
 		b.Error(err)
 	}

@@ -23,8 +23,8 @@ import (
 	"github.com/blugelabs/bluge/analysis/token"
 	"golang.org/x/text/unicode/norm"
 
-	"github.com/zinclabs/zincsearch/pkg/errors"
-	"github.com/zinclabs/zincsearch/pkg/zutils"
+	"github.com/zincsearch/zincsearch/pkg/errors"
+	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
 func NewUnicodenormTokenFilter(options interface{}) (analysis.TokenFilter, error) {

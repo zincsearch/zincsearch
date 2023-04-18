@@ -31,11 +31,11 @@ import (
 	"github.com/pyroscope-io/client/pyroscope"
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zincsearch/pkg/config"
-	"github.com/zinclabs/zincsearch/pkg/core"
-	"github.com/zinclabs/zincsearch/pkg/meta"
-	"github.com/zinclabs/zincsearch/pkg/metadata"
-	"github.com/zinclabs/zincsearch/pkg/routes"
+	"github.com/zincsearch/zincsearch/pkg/config"
+	"github.com/zincsearch/zincsearch/pkg/core"
+	"github.com/zincsearch/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/metadata"
+	"github.com/zincsearch/zincsearch/pkg/routes"
 )
 
 // @title           Zinc Search engine API

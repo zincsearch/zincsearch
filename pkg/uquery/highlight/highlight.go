@@ -16,7 +16,7 @@
 package highlight
 
 import (
-	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
 func Request(highlight *meta.Highlight) error {

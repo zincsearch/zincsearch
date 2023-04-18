@@ -21,8 +21,8 @@ import (
 
 	"github.com/blugelabs/bluge"
 
-	"github.com/zinclabs/zincsearch/pkg/errors"
-	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/errors"
+	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
 func WildcardQuery(query map[string]interface{}) (bluge.Query, error) {

@@ -24,12 +24,12 @@ import (
 	"github.com/blugelabs/bluge/search/highlight"
 	"github.com/rs/zerolog/log"
 
-	zincsearch "github.com/zinclabs/zincsearch/pkg/bluge/search"
-	"github.com/zinclabs/zincsearch/pkg/meta"
-	"github.com/zinclabs/zincsearch/pkg/uquery"
-	"github.com/zinclabs/zincsearch/pkg/uquery/fields"
-	"github.com/zinclabs/zincsearch/pkg/uquery/source"
-	"github.com/zinclabs/zincsearch/pkg/uquery/timerange"
+	zincsearch "github.com/zincsearch/zincsearch/pkg/bluge/search"
+	"github.com/zincsearch/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/uquery"
+	"github.com/zincsearch/zincsearch/pkg/uquery/fields"
+	"github.com/zincsearch/zincsearch/pkg/uquery/source"
+	"github.com/zincsearch/zincsearch/pkg/uquery/timerange"
 )
 
 func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) {

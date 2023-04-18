@@ -23,9 +23,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"go.etcd.io/bbolt"
 
-	"github.com/zinclabs/zincsearch/pkg/config"
-	"github.com/zinclabs/zincsearch/pkg/errors"
-	"github.com/zinclabs/zincsearch/pkg/metadata/storage"
+	"github.com/zincsearch/zincsearch/pkg/config"
+	"github.com/zincsearch/zincsearch/pkg/errors"
+	"github.com/zincsearch/zincsearch/pkg/metadata/storage"
 )
 
 type boltStorage struct {

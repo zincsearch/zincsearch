@@ -17,7 +17,7 @@ You must have following installed:
 ### Lets clone the repo and get started
 
 ```shell
-git clone https://github.com/zinclabs/zincsearch
+git clone https://github.com/zincsearch/zincsearch
 cd zincsearch
 ```
 
@@ -51,7 +51,7 @@ go build -o zincsearch cmd/zincsearch/main.go # will build the ZincSearch binary
 Advanced
 
 ```shell
-CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X github.com/zinclabs/zincsearch/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zincsearch/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zincsearch/pkg/meta.BuildDate=${BUILD_DATE}" -o zincsearch cmd/zincsearch/main.go
+CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X github.com/zincsearch/zincsearch/pkg/meta.Version=${VERSION} -X github.com/zincsearch/zincsearch/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zincsearch/zincsearch/pkg/meta.BuildDate=${BUILD_DATE}" -o zincsearch cmd/zincsearch/main.go
 ```
 
 Setting GOOS and GOARCH appropriately allows for cross platform compilation. Check [Official docs](https://go.dev/doc/install/source#environment) for all possible values and combinations. This [gist](https://gist.github.com/asukakenji/f15ba7e588ac42795f421b48b8aede63) is also great.

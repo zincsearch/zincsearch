@@ -22,15 +22,15 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/search"
 
-	"github.com/zinclabs/zincsearch/pkg/config"
-	"github.com/zinclabs/zincsearch/pkg/errors"
-	"github.com/zinclabs/zincsearch/pkg/meta"
-	"github.com/zinclabs/zincsearch/pkg/uquery/aggregation"
-	"github.com/zinclabs/zincsearch/pkg/uquery/fields"
-	"github.com/zinclabs/zincsearch/pkg/uquery/highlight"
-	"github.com/zinclabs/zincsearch/pkg/uquery/query"
-	"github.com/zinclabs/zincsearch/pkg/uquery/sort"
-	"github.com/zinclabs/zincsearch/pkg/uquery/source"
+	"github.com/zincsearch/zincsearch/pkg/config"
+	"github.com/zincsearch/zincsearch/pkg/errors"
+	"github.com/zincsearch/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/uquery/aggregation"
+	"github.com/zincsearch/zincsearch/pkg/uquery/fields"
+	"github.com/zincsearch/zincsearch/pkg/uquery/highlight"
+	"github.com/zincsearch/zincsearch/pkg/uquery/query"
+	"github.com/zincsearch/zincsearch/pkg/uquery/sort"
+	"github.com/zincsearch/zincsearch/pkg/uquery/source"
 )
 
 // ParseQueryDSL parse query DSL and return searchRequest

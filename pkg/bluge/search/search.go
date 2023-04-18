@@ -26,9 +26,9 @@ import (
 	"github.com/blugelabs/bluge/search/aggregations"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/zinclabs/zincsearch/pkg/config"
-	"github.com/zinclabs/zincsearch/pkg/meta"
-	"github.com/zinclabs/zincsearch/pkg/uquery"
+	"github.com/zincsearch/zincsearch/pkg/config"
+	"github.com/zincsearch/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/uquery"
 )
 
 func MultiSearch(

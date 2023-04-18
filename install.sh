@@ -13,7 +13,7 @@ ZincSearch Installer
 
 Website: https://zinc.dev
 Docs: https://zincsearch-docs.zinc.dev
-Repo: https://github.com/zinclabs/zincsearch
+Repo: https://github.com/zincsearch/zincsearch
 
 EOF
 }
@@ -112,7 +112,7 @@ install_zincsearch()
 
 	if [[ "$#" -eq 0 ]]; then
 		# get latest release
-		zinc_tag=$(curl -s https://api.github.com/repos/zinclabs/zincsearch/releases/latest | grep 'tag_name' | cut -d\" -f4)
+		zinc_tag=$(curl -s https://api.github.com/repos/zincsearch/zincsearch/releases/latest | grep 'tag_name' | cut -d\" -f4)
 		zinc_version=$(echo ${zinc_tag} | cut -c2-)
 	elif [[ "$#" -gt 1 ]]; then
 		echo "Too many arguments."
@@ -123,7 +123,7 @@ install_zincsearch()
 		zinc_version=$1
 	fi
 
-	zinc_url="https://github.com/zinclabs/zincsearch/releases/download/${zinc_tag}/zinc_${zinc_version}_${zinc_os}_${zinc_arch}${zinc_arm}.tar.gz"
+	zinc_url="https://github.com/zincsearch/zincsearch/releases/download/${zinc_tag}/zinc_${zinc_version}_${zinc_os}_${zinc_arch}${zinc_arm}.tar.gz"
 
 	dl="/tmp/$zinc_file"
 	rm -rf -- "$dl"

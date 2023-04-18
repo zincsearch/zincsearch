@@ -42,10 +42,10 @@ import (
 	"github.com/blugelabs/bluge/analysis/lang/sv"
 	"github.com/blugelabs/bluge/analysis/lang/tr"
 
-	"github.com/zinclabs/zincsearch/pkg/bluge/analysis/lang/chs"
-	"github.com/zinclabs/zincsearch/pkg/errors"
-	"github.com/zinclabs/zincsearch/pkg/meta"
-	zincanalyzer "github.com/zinclabs/zincsearch/pkg/uquery/analysis/analyzer"
+	"github.com/zincsearch/zincsearch/pkg/bluge/analysis/lang/chs"
+	"github.com/zincsearch/zincsearch/pkg/errors"
+	"github.com/zincsearch/zincsearch/pkg/meta"
+	zincanalyzer "github.com/zincsearch/zincsearch/pkg/uquery/analysis/analyzer"
 )
 
 func RequestAnalyzer(data *meta.IndexAnalysis) (map[string]*analysis.Analyzer, error) {
