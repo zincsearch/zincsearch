@@ -19,8 +19,8 @@ import (
 	"github.com/bwmarrin/snowflake"
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zincsearch/pkg/config"
-	"github.com/zinclabs/zincsearch/pkg/zutils/base62"
+	"github.com/zincsearch/zincsearch/pkg/config"
+	"github.com/zincsearch/zincsearch/pkg/zutils/base62"
 )
 
 type Node struct {

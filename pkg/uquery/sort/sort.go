@@ -20,7 +20,7 @@ import (
 
 	"github.com/blugelabs/bluge/search"
 
-	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zincsearch/zincsearch/pkg/errors"
 )
 
 func Request(v interface{}) (search.SortOrder, error) {

@@ -24,8 +24,8 @@ import (
 	"github.com/blugelabs/bluge/search/aggregations"
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zincsearch/pkg/config"
-	"github.com/zinclabs/zincsearch/pkg/zutils"
+	"github.com/zincsearch/zincsearch/pkg/config"
+	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
 type AutoDateHistogramAggregation struct {

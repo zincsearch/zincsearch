@@ -19,7 +19,7 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/blugelabs/bluge/analysis"
 
-	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
 func SimpleQueryStringQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {

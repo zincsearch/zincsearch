@@ -21,7 +21,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zinclabs/zincsearch/pkg/config"
+	"github.com/zincsearch/zincsearch/pkg/config"
 )
 
 func TestMain(m *testing.M) {

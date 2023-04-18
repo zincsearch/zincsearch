@@ -25,10 +25,10 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/rs/zerolog/log"
 
-	zincsearch "github.com/zinclabs/zincsearch/pkg/bluge/search"
-	"github.com/zinclabs/zincsearch/pkg/meta"
-	"github.com/zinclabs/zincsearch/pkg/uquery"
-	"github.com/zinclabs/zincsearch/pkg/uquery/timerange"
+	zincsearch "github.com/zincsearch/zincsearch/pkg/bluge/search"
+	"github.com/zincsearch/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/uquery"
+	"github.com/zincsearch/zincsearch/pkg/uquery/timerange"
 )
 
 func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchResponse, error) {

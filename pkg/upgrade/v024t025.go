@@ -19,9 +19,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/zinclabs/zincsearch/pkg/config"
-	"github.com/zinclabs/zincsearch/pkg/meta"
-	"github.com/zinclabs/zincsearch/pkg/zutils"
+	"github.com/zincsearch/zincsearch/pkg/config"
+	"github.com/zincsearch/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
 // UpgradeFromV024T025 upgrades from version <= 0.2.4

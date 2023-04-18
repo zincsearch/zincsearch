@@ -18,7 +18,7 @@ package auth
 import (
 	"strings"
 
-	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
 func VerifyCredentials(userID, password string) (*meta.User, bool) {

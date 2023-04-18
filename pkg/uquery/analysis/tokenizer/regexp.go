@@ -22,8 +22,8 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/tokenizer"
 
-	"github.com/zinclabs/zincsearch/pkg/errors"
-	"github.com/zinclabs/zincsearch/pkg/zutils"
+	"github.com/zincsearch/zincsearch/pkg/errors"
+	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
 func NewRegexpTokenizer(options interface{}) (analysis.Tokenizer, error) {

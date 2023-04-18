@@ -20,10 +20,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zinclabs/zincsearch/pkg/core"
-	"github.com/zinclabs/zincsearch/pkg/ider"
-	"github.com/zinclabs/zincsearch/pkg/meta"
-	"github.com/zinclabs/zincsearch/pkg/zutils"
+	"github.com/zincsearch/zincsearch/pkg/core"
+	"github.com/zincsearch/zincsearch/pkg/ider"
+	"github.com/zincsearch/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
 // @Id IndexDocument

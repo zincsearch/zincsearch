@@ -21,9 +21,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/zinclabs/zincsearch/pkg/core"
-	"github.com/zinclabs/zincsearch/pkg/metadata"
-	"github.com/zinclabs/zincsearch/test/utils"
+	"github.com/zincsearch/zincsearch/pkg/core"
+	"github.com/zincsearch/zincsearch/pkg/metadata"
+	"github.com/zincsearch/zincsearch/test/utils"
 )
 
 func TestAddOrRemoveESAlias(t *testing.T) {

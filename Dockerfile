@@ -41,7 +41,7 @@ RUN adduser \
 # It follows the Linux filesystem hierarchy pattern
 # https://tldp.org/LDP/Linux-Filesystem-Hierarchy/html/var.html
 RUN mkdir -p /var/lib/zincsearch /data && chown zincsearch:zincsearch /var/lib/zincsearch /data
-WORKDIR $GOPATH/src/github.com/zinclabs/zincsearch/
+WORKDIR $GOPATH/src/github.com/zincsearch/zincsearch/
 COPY . .
 COPY --from=webBuilder /web/dist web/dist
 
@@ -63,7 +63,7 @@ ENV VERSION=$VERSION
 ENV COMMIT_HASH=$COMMIT_HASH
 ENV BUILD_DATE=$BUILD_DATE
 
-RUN CGO_ENABLED=0 go build -ldflags="-s -w -X github.com/zinclabs/zincsearch/pkg/meta.Version=${VERSION} -X github.com/zinclabs/zincsearch/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zinclabs/zincsearch/pkg/meta.BuildDate=${BUILD_DATE}" -o zincsearch cmd/zincsearch/main.go
+RUN CGO_ENABLED=0 go build -ldflags="-s -w -X github.com/zincsearch/zincsearch/pkg/meta.Version=${VERSION} -X github.com/zincsearch/zincsearch/pkg/meta.CommitHash=${COMMIT_HASH} -X github.com/zincsearch/zincsearch/pkg/meta.BuildDate=${BUILD_DATE}" -o zincsearch cmd/zincsearch/main.go
 ############################
 # STEP 3 build a small image
 ############################
@@ -78,7 +78,7 @@ COPY --from=builder /etc/group /etc/group
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 # Copy our static executable.
-COPY --from=builder  /go/src/github.com/zinclabs/zincsearch/zincsearch /go/bin/zincsearch
+COPY --from=builder  /go/src/github.com/zincsearch/zincsearch/zincsearch /go/bin/zincsearch
 
 # Create directories that can be used to keep ZincSearch data persistent along with host source or named volumes
 COPY --from=builder --chown=zincsearch:zincsearch /var/lib/zincsearch /var/lib/zincsearch

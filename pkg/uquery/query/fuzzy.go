@@ -23,10 +23,10 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/analyzer"
 
-	"github.com/zinclabs/zincsearch/pkg/errors"
-	"github.com/zinclabs/zincsearch/pkg/meta"
-	zincanalysis "github.com/zinclabs/zincsearch/pkg/uquery/analysis"
-	"github.com/zinclabs/zincsearch/pkg/zutils"
+	"github.com/zincsearch/zincsearch/pkg/errors"
+	"github.com/zincsearch/zincsearch/pkg/meta"
+	zincanalysis "github.com/zincsearch/zincsearch/pkg/uquery/analysis"
+	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
 func FuzzyQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {

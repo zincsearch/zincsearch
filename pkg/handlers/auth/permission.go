@@ -19,7 +19,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zinclabs/zincsearch/pkg/auth"
+	"github.com/zincsearch/zincsearch/pkg/auth"
 )
 
 // @Id ListPermissions

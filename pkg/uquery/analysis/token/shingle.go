@@ -19,7 +19,7 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/token"
 
-	"github.com/zinclabs/zincsearch/pkg/zutils"
+	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
 func NewShingleTokenFilter(options interface{}) (analysis.TokenFilter, error) {

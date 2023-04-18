@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/zinclabs/zincsearch)](https://goreportcard.com/report/github.com/zinclabs/zincsearch)
+[![Go Report Card](https://goreportcard.com/badge/github.com/zincsearch/zincsearch)](https://goreportcard.com/report/github.com/zincsearch/zincsearch)
 [![Docs](https://img.shields.io/badge/Docs-Docs-green)](https://zincsearch-docs.zinc.dev/) [![codecov](https://codecov.io/github/zinclabs/zincsearch/branch/main/graph/badge.svg)](https://codecov.io/github/zinclabs/zincsearch)
 
 ❗Note: If your use case is of log search (app and security logs) instead of app search (implement search feature in your application or website) then you should check [zinclabs/zincobserve](https://github.com/zinclabs/zincobserve) project built in rust that is specifically built for log search use case.

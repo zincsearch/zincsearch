@@ -18,9 +18,9 @@ package tokenizer
 import (
 	"github.com/blugelabs/bluge/analysis"
 
-	zinctokenizer "github.com/zinclabs/zincsearch/pkg/bluge/analysis/tokenizer"
-	"github.com/zinclabs/zincsearch/pkg/errors"
-	"github.com/zinclabs/zincsearch/pkg/zutils"
+	zinctokenizer "github.com/zincsearch/zincsearch/pkg/bluge/analysis/tokenizer"
+	"github.com/zincsearch/zincsearch/pkg/errors"
+	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
 func NewEdgeNgramTokenizer(options interface{}) (analysis.Tokenizer, error) {

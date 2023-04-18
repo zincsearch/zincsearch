@@ -20,7 +20,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
 func Do(oldVersion string, index *meta.Index) error {

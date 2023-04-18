@@ -1,4 +1,4 @@
-module github.com/zinclabs/zincsearch
+module github.com/zincsearch/zincsearch
 
 go 1.18
 

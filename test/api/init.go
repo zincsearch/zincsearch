@@ -23,7 +23,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zinclabs/zincsearch/pkg/routes"
+	"github.com/zincsearch/zincsearch/pkg/routes"
 )
 
 var (

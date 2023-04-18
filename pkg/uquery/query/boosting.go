@@ -18,7 +18,7 @@ package query
 import (
 	"github.com/blugelabs/bluge"
 
-	"github.com/zinclabs/zincsearch/pkg/errors"
+	"github.com/zincsearch/zincsearch/pkg/errors"
 )
 
 func BoostingQuery(query map[string]interface{}) (bluge.Query, error) {

@@ -20,7 +20,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
 func TestListTemplates(t *testing.T) {

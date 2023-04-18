@@ -18,7 +18,7 @@ package v1
 import (
 	"time"
 
-	"github.com/zinclabs/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
 // ZincQuery is the query object for the zinc index. All search requests should send this struct

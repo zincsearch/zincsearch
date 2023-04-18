@@ -13,7 +13,7 @@ ZincSearch Installer
 
 Website: https://zinc.dev
 Docs: https://zincsearch-docs.zinc.dev
-Repo: https://github.com/zinclabs/zincsearch
+Repo: https://github.com/zincsearch/zincsearch
 
 EOF
 }
@@ -123,7 +123,7 @@ install_zincsearch()
 		zinc_version=$1
 	fi
 
-	zinc_url="https://github.com/zinclabs/zincsearch/releases/download/${zinc_tag}/zinc_${zinc_version}_${zinc_os}_${zinc_arch}${zinc_arm}.tar.gz"
+	zinc_url="https://github.com/zincsearch/zincsearch/releases/download/${zinc_tag}/zinc_${zinc_version}_${zinc_os}_${zinc_arch}${zinc_arm}.tar.gz"
 
 	dl="/tmp/$zinc_file"
 	rm -rf -- "$dl"

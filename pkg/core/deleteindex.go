@@ -21,8 +21,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/zinclabs/zincsearch/pkg/config"
-	"github.com/zinclabs/zincsearch/pkg/metadata"
+	"github.com/zincsearch/zincsearch/pkg/config"
+	"github.com/zincsearch/zincsearch/pkg/metadata"
 )
 
 func DeleteIndex(name string) error {

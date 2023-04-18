@@ -19,8 +19,8 @@ import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/blugelabs/bluge/analysis/analyzer"
 
-	zinctoken "github.com/zinclabs/zincsearch/pkg/bluge/analysis/token"
-	"github.com/zinclabs/zincsearch/pkg/zutils"
+	zinctoken "github.com/zincsearch/zincsearch/pkg/bluge/analysis/token"
+	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
 func NewStandardAnalyzer(options interface{}) (*analysis.Analyzer, error) {
