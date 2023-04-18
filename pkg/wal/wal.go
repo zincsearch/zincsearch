@@ -18,7 +18,7 @@ package wal
 import (
 	"path"
 
-	"github.com/zinclabs/wal"
+	"github.com/zincsearch/wal"
 	"github.com/zincsearch/zincsearch/pkg/config"
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/wal/redo"

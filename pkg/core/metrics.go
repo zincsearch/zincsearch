@@ -17,7 +17,7 @@ package core
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
-	ginprometheus "github.com/zinclabs/go-gin-prometheus"
+	ginprometheus "github.com/zincsearch/go-gin-prometheus"
 )
 
 var ZINC_METRICS *ginprometheus.Metric

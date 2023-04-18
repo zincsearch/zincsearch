@@ -17,8 +17,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	ginprometheus "github.com/zinclabs/go-gin-prometheus"
-
+	ginprometheus "github.com/zincsearch/go-gin-prometheus"
 	"github.com/zincsearch/zincsearch/pkg/config"
 	"github.com/zincsearch/zincsearch/pkg/core"
 )
