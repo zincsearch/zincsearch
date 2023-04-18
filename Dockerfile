@@ -2,13 +2,12 @@
 ############################
 # STEP 1 build web dist
 ############################
-FROM node:13.8.0-slim as webBuilder
+FROM node:18.16.0-slim as webBuilder
 WORKDIR /web
 COPY ./web /web/
 
 RUN npm install
 RUN npm run build
-
 
 ############################
 # STEP 2 build executable binary
@@ -48,17 +47,7 @@ COPY --from=webBuilder /web/dist web/dist
 # Fetch dependencies.
 # Using go get.
 RUN go mod tidy
-# Using go mod.
-# RUN go mod download
-# RUN go mod verify
-# Build the binary.
-# to tackle error standard_init_linux.go:207: exec user process caused "no such file or directory" set CGO_ENABLED=0.
-# CGO_ENABLED=0 builds a statically linked binary.
-# docs for -ldflags at https://pkg.go.dev/cmd/link
-#       -w : Omit the DWARF symbol table.
-#       -s : Omit the symbol table and debug information.
-#       Omit the symbol table and debug information will reduce the binary size.
-# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o zincsearch cmd/zincsearch/main.go
+
 ENV VERSION=$VERSION
 ENV COMMIT_HASH=$COMMIT_HASH
 ENV BUILD_DATE=$BUILD_DATE
