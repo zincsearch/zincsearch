@@ -51,7 +51,7 @@ data:
         Name  es
         Match *
         Path /es
-        Host z.zinc.svc.cluster.local
+        Host z.zincsearch.svc.cluster.local
         Port 4080
         Generate_ID On
         HTTP_User admin
