@@ -108,7 +108,7 @@ install_zincsearch()
 	########################
 
 	echo "Downloading ZincSearch for ${zinc_os}/${zinc_arch}${zinc_arm}..."
-	zinc_file="zinc_${zinc_os}_${zinc_arch}${zinc_arm}${zinc_dl_ext}"
+	zinc_file="zincsearch_${zinc_os}_${zinc_arch}${zinc_arm}${zinc_dl_ext}"
 
 	if [[ "$#" -eq 0 ]]; then
 		# get latest release
@@ -123,7 +123,7 @@ install_zincsearch()
 		zinc_version=$1
 	fi
 
-	zinc_url="https://github.com/zincsearch/zincsearch/releases/download/${zinc_tag}/zinc_${zinc_version}_${zinc_os}_${zinc_arch}${zinc_arm}.tar.gz"
+	zinc_url="https://github.com/zincsearch/zincsearch/releases/download/${zinc_tag}/zincsearch_${zinc_version}_${zinc_os}_${zinc_arch}${zinc_arm}.tar.gz"
 
 	dl="/tmp/$zinc_file"
 	rm -rf -- "$dl"

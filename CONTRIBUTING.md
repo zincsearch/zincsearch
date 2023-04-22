@@ -118,7 +118,7 @@ Make sure that you have [docker](https://docs.docker.com/get-docker/).
 Simple build:
 
 ```shell
-docker build --tag zinc:latest . -f Dockerfile
+docker build --tag zincsearch:latest . -f Dockerfile
 ````
 
 Multi-arch build

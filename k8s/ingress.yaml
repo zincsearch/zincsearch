@@ -7,7 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/connection-proxy-header: keep-alive
     nginx.ingress.kubernetes.io/proxy-body-size: 15m
   name: playground.dev.zincsearch.com
-  namespace: zinc
+  namespace: zincsearch
 spec:
   rules:
   - host: playground.dev.zincsearch.com

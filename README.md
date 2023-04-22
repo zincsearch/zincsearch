@@ -8,9 +8,9 @@ ZincSearch is a search engine that does full text indexing. It is a lightweight 
 
 It is very simple and easy to operate as opposed to Elasticsearch which requires a couple dozen knobs to understand and tune which you can get up and running in 2 minutes
 
-It is a drop-in replacement for Elasticsearch if you are just ingesting data using APIs and searching using kibana (Kibana is not supported with zinc. Zinc provides its own UI).
+It is a drop-in replacement for Elasticsearch if you are just ingesting data using APIs and searching using kibana (Kibana is not supported with ZincSearch. ZincSearch provides its own UI).
 
-Check the below video for a quick demo of Zinc.
+Check the below video for a quick demo of ZincSearch.
 
 [![Zinc Youtube](./screenshots/zinc-youtube.jpg)](https://www.youtube.com/watch?v=aZXtuVjt1ow)
 
@@ -60,7 +60,7 @@ ZincSearch has hundreds of production installations is in GA.
 
 # ZincSearch Vs ZincObserve
 
-| Feature             | Zinc      |   ZincObserve                |
+| Feature             | ZincSearch     |   ZincObserve                |
 ----------------------|-----------|-----------------------------------|
 | Ideal use case      | App search| Logs, metrics, traces (Immutable Data)  | 
 | Storage             | Disk      |  Disk, Object (S3), GCS, MinIO, swift and more.   |
@@ -75,7 +75,7 @@ ZincSearch has hundreds of production installations is in GA.
 
 # Community
 
-- How to develop and contribute to Zinc
+- How to develop and contribute to ZincSearch
 
   Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap items](https://github.com/orgs/zinclabs/projects/3)
 

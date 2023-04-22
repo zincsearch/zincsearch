@@ -7,11 +7,11 @@ metadata:
     nginx.ingress.kubernetes.io/connection-proxy-header: keep-alive
     nginx.ingress.kubernetes.io/proxy-body-size: 15m
     nginx.ingress.kubernetes.io/rewrite-target: /$2
-  name: zinc
-  namespace: zinc
+  name: zincsearch
+  namespace: zincsearch
 spec:
   rules:
-  - host: zinc.yourdomain.com
+  - host: zincsearch.yourdomain.com
     http:
       paths:
       - pathType: Prefix
@@ -23,5 +23,5 @@ spec:
         path: /subpath(/|$)(.*)
   tls:
   - hosts:
-    - zinc.yourdomain.com
-    secretName: zinc-tls
+    - zincsearch.yourdomain.com
+    secretName: playground.dev.zincsearch.com

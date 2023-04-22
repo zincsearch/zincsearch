@@ -2,11 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: z
-  namespace: zinc
+  namespace: zincsearch
 spec:
   clusterIP: None
   selector:
-    app: zinc
+    app: zincsearch
   ports:
   - name: http
     port: 4080
@@ -18,22 +18,22 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: zinc
-  namespace: zinc
+  name: zincsearch
+  namespace: zincsearch
   labels:
-    name: zinc
+    name: zincsearch
 spec:
   serviceName: z
   replicas: 1
   selector:
     matchLabels:
-      name: zinc
-      app: zinc
+      name: zincsearch
+      app: zincsearch
   template:
     metadata:
       labels:
-        name: zinc
-        app: zinc
+        name: zincsearch
+        app: zincsearch
     spec:
       securityContext:
         fsGroup: 2000
@@ -42,8 +42,8 @@ spec:
         runAsNonRoot: true
       # terminationGracePeriodSeconds: 0
       containers:
-        - name: zinc
-          image: public.ecr.aws/zinclabs/zinc:latest
+        - name: zincsearch
+          image: public.ecr.aws/zinclabs/zincsearch:latest
           env:
             - name: ZINC_FIRST_ADMIN_USER
               value: admin

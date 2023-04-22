@@ -1,12 +1,12 @@
 #!/bin/sh
 # author xiaojun207
 # eg.1 : sh build-image.sh
-# eg.2, set image: sh build-image.sh public.ecr.aws/zinclabs/zinc
+# eg.2, set image: sh build-image.sh public.ecr.aws/zinclabs/zincsearch
 
 VERSION=`git describe --tags --always` # eg.: 0.2.5
 BUILD_DATE=`date +%Y%m%d` # eg.: 20220701
 COMMIT_HASH=`git rev-parse HEAD` #
-IMAGE="zinclabs/zinc"
+IMAGE="zinclabs/zincsearch"
 
 if [ -n "$1" ]; then
   IMAGE="$1" #
