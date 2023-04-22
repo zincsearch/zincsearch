@@ -16,7 +16,7 @@ Check the below video for a quick demo of ZincSearch.
 
 # Why ZincSearch
 
-  While Elasticsearch is a very good product, it is complex and requires lots of resources and is more than a decade old. I built Zinc so it becomes easier for folks to use full text search indexing without doing a lot of work.
+  While Elasticsearch is a very good product, it is complex and requires lots of resources and is more than a decade old. I built ZincSearch so it becomes easier for folks to use full text search indexing without doing a lot of work.
 
 # Features:
 
