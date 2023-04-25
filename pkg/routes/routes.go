@@ -17,6 +17,7 @@ package routes
 
 import (
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -54,10 +55,13 @@ func SetRoutes(r *gin.Engine) {
 	r.GET("/healthz", meta.GetHealthz)
 
 	// use ginSwagger middleware to serve the API docs
-	r.GET("/swagger", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
-	})
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	if os.Getenv("ZINC_ENV") != "production" {
+		r.GET("/swagger", func(c *gin.Context) {
+			c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+		})
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	front, err := zincsearch.GetFrontendAssets()
 	if err != nil {
