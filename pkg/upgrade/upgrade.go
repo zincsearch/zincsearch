@@ -16,36 +16,12 @@
 package upgrade
 
 import (
-	"strings"
-
 	"github.com/rs/zerolog/log"
 
 	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
 func Do(oldVersion string, index *meta.Index) error {
-	var err error
 	log.Info().Msgf("Begin upgrade[%s] from version[%s]", index.Name, oldVersion)
-	switch strings.TrimPrefix(oldVersion, "v") {
-	case "0.2.4":
-		if err = UpgradeFromV024T025(index); err != nil {
-			return err
-		}
-		return Do("0.2.5", index)
-	case "0.2.5":
-		if err = UpgradeFromV025T026(index); err != nil {
-			return err
-		}
-		return Do("0.2.6", index)
-	case "0.2.6":
-		if err = UpgradeFromV026T027(index); err != nil {
-			return err
-		}
-		return nil
-	case "0.2.7", "0.2.8", "0.2.9":
-		return nil
-	default:
-		// return fmt.Errorf("unsupported upgrade from version: %s", oldVersion)
-		return nil
-	}
+	return nil
 }

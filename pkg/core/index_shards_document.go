@@ -121,6 +121,9 @@ func (s *IndexShard) buildField(mappings *meta.Mappings, bdoc *bluge.Document, k
 		field = bluge.NewKeywordField(key, v)
 	case "bool":
 		field = bluge.NewKeywordField(key, strconv.FormatBool(value.(bool)))
+	case "geo":
+		v := value.(meta.GeoPoint)
+		field = bluge.NewGeoPointField(key, v.Lon, v.Lat)
 	case "date", "time":
 		v, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)
 		if err != nil {
@@ -312,6 +315,11 @@ func (s *IndexShard) checkField(mappings *meta.Mappings, data map[string]interfa
 		v, err = zutils.ToBool(value)
 		if err != nil {
 			return fmt.Errorf("field [%s] was set type to [bool] but the value [%v] can't convert to boolean", key, value)
+		}
+	case "geo":
+		v, err = meta.ParseGeoPoint(value)
+		if err != nil {
+			return fmt.Errorf("field [%s] was set type to [geo] but the value [%v] parse err: %s", key, value, err.Error())
 		}
 	case "date", "time":
 		_, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)

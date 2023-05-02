@@ -17,7 +17,6 @@ package metadata
 
 import (
 	"github.com/zincsearch/zincsearch/pkg/meta"
-	"github.com/zincsearch/zincsearch/pkg/upgrade"
 	"github.com/zincsearch/zincsearch/pkg/zutils/json"
 )
 
@@ -35,16 +34,7 @@ func (t *index) List(offset, limit int) ([]*meta.Index, error) {
 		idx := new(meta.Index)
 		err = json.Unmarshal(d, idx)
 		if err != nil {
-			if err.Error() == "expected { character for map value" {
-				// compatible for v026 --> begin
-				idx, err = upgrade.UpgradeMetadataFromV026T027(d)
-				if err != nil {
-					return nil, err
-				}
-				// compatible for v026 --> end
-			} else {
-				return nil, err
-			}
+			return nil, err
 		}
 		indexes = append(indexes, idx)
 	}
