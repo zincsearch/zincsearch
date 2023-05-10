@@ -33,10 +33,6 @@ Check the below video for a quick demo of ZincSearch.
 
 Documentation is available at [https://zincsearch-docs.zinc.dev/](https://zincsearch-docs.zinc.dev/)
 
-# How to get support
-
-Easiest way to get support is to join the [Slack channel](https://join.slack.com/t/zincsearch/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg).
-
 # Screenshots
 
 ## Search screen
@@ -79,10 +75,4 @@ ZincSearch has hundreds of production installations is in GA.
 
   Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap items](https://github.com/orgs/zinclabs/projects/3)
 
-- Join our Slack Channel
 
-  [![Slack](./screenshots/slack.png)](https://join.slack.com/t/zinc-nvh4832/shared_invite/zt-11r96hv2b-UwxUILuSJ1duzl_6mhJwVg)
-
-- Join our weChat Group
-
-  <img src="./screenshots/wechat_qr.jpg" width="300">
