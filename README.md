@@ -75,7 +75,6 @@ ZincSearch has hundreds of production installations is in GA.
 
   Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap items](https://github.com/orgs/zinclabs/projects/3)
 
-
 # Examples
 
 You can use ZincSearch to index and search any data. Here are some examples that folks have created to index and search enron email dataset using zincsearch:
@@ -86,4 +85,5 @@ You can use ZincSearch to index and search any data. Here are some examples that
 1. https://github.com/devjopa/golab-search
 1. https://github.com/avaco2312/zincsearch
 1. https://github.com/paolorossig/email-indexer
+
 
