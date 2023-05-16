@@ -154,7 +154,8 @@ type DocumentList struct {
 
 func (d *DocumentList) Done() {
 	// do skip
-	for i := int64(0); i < d.from && i < int64(d.Len()); i++ {
+	alldocLen := int64(d.Len())
+	for i := int64(0); i < d.from && i < alldocLen; i++ {
 		heap.Pop(d)
 	}
 	// log size
