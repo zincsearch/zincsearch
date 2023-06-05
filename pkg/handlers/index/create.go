@@ -79,9 +79,6 @@ func CreateES(c *gin.Context) {
 		return
 	}
 
-	// TODO: migrate ES settings to Zinc specific
-	newIndex.Settings = nil
-
 	// default the storage_type to disk, to provide the best possible integration
 	newIndex.StorageType = "disk"
 
