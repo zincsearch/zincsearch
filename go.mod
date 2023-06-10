@@ -13,7 +13,7 @@ require (
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.0
-	github.com/go-ego/gse v0.70.2
+	github.com/go-ego/gse v0.80.2
 	github.com/goccy/go-json v0.10.0
 	github.com/joho/godotenv v1.4.0
 	github.com/prometheus/client_golang v1.15.0

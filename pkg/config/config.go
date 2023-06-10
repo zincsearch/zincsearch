@@ -93,9 +93,10 @@ type elasticsearch struct {
 }
 
 type gse struct {
-	Enable    bool   `env:"ZINC_PLUGIN_GSE_ENABLE,default=false"`
-	DictEmbed string `env:"ZINC_PLUGIN_GSE_DICT_EMBED,default=small"`
-	DictPath  string `env:"ZINC_PLUGIN_GSE_DICT_PATH,default=./plugins/gse/dict"`
+	Enable     bool   `env:"ZINC_PLUGIN_GSE_ENABLE,default=false"`
+	EnableStop bool   `env:"ZINC_PLUGIN_GSE_ENABLE_STOP,default=true"`
+	DictEmbed  string `env:"ZINC_PLUGIN_GSE_DICT_EMBED,default=small"`
+	DictPath   string `env:"ZINC_PLUGIN_GSE_DICT_PATH,default=./plugins/gse/dict"`
 }
 
 var Global = new(config)
