@@ -104,8 +104,8 @@ github.com/gin-contrib/sse v0.1.0/go.mod h1:RHrZQHXnP2xjPF+u1gW/2HnVO7nvIa9PG3Gm
 github.com/gin-gonic/gin v1.8.1/go.mod h1:ji8BvRH1azfM+SYow9zQ6SZMvR8qOMZHmsCuWR9tTTk=
 github.com/gin-gonic/gin v1.9.0 h1:OjyFBKICoexlu99ctXNR2gg+c5pKrKMuyjgARg9qeY8=
 github.com/gin-gonic/gin v1.9.0/go.mod h1:W1Me9+hsUSyj3CePGrd1/QrKJMSJ1Tu/0hFEH89961k=
-github.com/go-ego/gse v0.70.2 h1:y2UMOHJMtI+0b2GjxTtQfKON5DMmlyX1hOQHTo8UVVs=
-github.com/go-ego/gse v0.70.2/go.mod h1:kesekpZfcFQ/kwd9b27VZHUOH5dQUjaaQUZ4OGt4Hj4=
+github.com/go-ego/gse v0.80.2 h1:3LRfkaBuwlsHsmkOZvnhTcsYPXUAhiP06Sqcid7mO1M=
+github.com/go-ego/gse v0.80.2/go.mod h1:kesekpZfcFQ/kwd9b27VZHUOH5dQUjaaQUZ4OGt4Hj4=
 github.com/go-errors/errors v1.4.2 h1:J6MZopCL4uSllY1OfXM374weqZFFItUbrImctkmUxIA=
 github.com/go-ole/go-ole v1.2.6 h1:/Fpf6oFPoeFik9ty7siob0G6Ke8QvQEuVcuChpwXzpY=
 github.com/go-ole/go-ole v1.2.6/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
