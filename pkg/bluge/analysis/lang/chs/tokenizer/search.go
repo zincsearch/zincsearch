@@ -18,6 +18,8 @@ package tokenizer
 import (
 	"github.com/blugelabs/bluge/analysis"
 	"github.com/go-ego/gse"
+
+	"github.com/zincsearch/zincsearch/pkg/config"
 )
 
 type SearchTokenizer struct {
@@ -31,7 +33,7 @@ func NewSearchTokenizer(seg *gse.Segmenter) *SearchTokenizer {
 func (t *SearchTokenizer) Tokenize(input []byte) analysis.TokenStream {
 	result := make(analysis.TokenStream, 0, len(input))
 	text := string(input)
-	search := t.seg.CutSearch(text, true)
+	search := t.seg.CutSearch(text, config.Global.Plugin.GSE.EnableHMM)
 	tokens := t.seg.Analyze(search, text)
 	var start, positionIncr int
 	for _, token := range tokens {

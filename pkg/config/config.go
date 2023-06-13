@@ -95,6 +95,7 @@ type elasticsearch struct {
 type gse struct {
 	Enable     bool   `env:"ZINC_PLUGIN_GSE_ENABLE,default=false"`
 	EnableStop bool   `env:"ZINC_PLUGIN_GSE_ENABLE_STOP,default=true"`
+	EnableHMM  bool   `env:"ZINC_PLUGIN_GSE_ENABLE_HMM,default=true"`
 	DictEmbed  string `env:"ZINC_PLUGIN_GSE_DICT_EMBED,default=small"`
 	DictPath   string `env:"ZINC_PLUGIN_GSE_DICT_PATH,default=./plugins/gse/dict"`
 }
