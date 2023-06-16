@@ -73,18 +73,6 @@ func loadDict(enable, enableStop bool, embed string) {
 				_ = seg.LoadStopStr(_dictStop)
 			}
 		}
-		// load user dict
-		dataPath := config.Global.Plugin.GSE.DictPath
-		userDict := dataPath + "/user.txt"
-		log.Info().Msgf("Loading  Gse user dict... %s", userDict)
-		if ok, _ := zutils.IsExist(userDict); ok {
-			_ = seg.LoadDict(userDict)
-		}
-		stopDict := dataPath + "/stop.txt"
-		log.Info().Msgf("Loading  Gse user stop... %s", stopDict)
-		if ok, _ := zutils.IsExist(stopDict); ok {
-			_ = seg.LoadStop(stopDict)
-		}
 	} else {
 		// load empty dict
 		_ = seg.LoadDictStr(`zinc`)
@@ -92,6 +80,23 @@ func loadDict(enable, enableStop bool, embed string) {
 			_ = seg.LoadStopStr(_dictStop)
 		}
 	}
+
 	seg.Load = true
 	seg.SkipLog = true
+	if !enable {
+		return
+	}
+
+	// load user dict
+	dataPath := config.Global.Plugin.GSE.DictPath
+	userDict := dataPath + "/user.txt"
+	log.Info().Msgf("Loading  Gse user dict... %s", userDict)
+	if ok, _ := zutils.IsExist(userDict); ok {
+		_ = seg.LoadDict(userDict)
+	}
+	stopDict := dataPath + "/stop.txt"
+	log.Info().Msgf("Loading  Gse user stop... %s", stopDict)
+	if ok, _ := zutils.IsExist(stopDict); ok {
+		_ = seg.LoadStop(stopDict)
+	}
 }
