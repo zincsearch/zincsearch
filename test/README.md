@@ -1,5 +1,5 @@
 # Unit Test Workflows
-## Setting up the test enviroment (for etcd metadata storage)
+## Setting up the test environment (for etcd metadata storage)
 1. Need to install **etcd** , add `root` user and enable authentication. You can use this [link](https://etcd.io/docs/v3.4/op-guide/authentication/) to setup etcd. 
 2. Update the root password in your .env file.
 3. You are good to go.
