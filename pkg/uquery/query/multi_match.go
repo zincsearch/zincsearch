@@ -102,6 +102,15 @@ func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, anal
 		subqq := bluge.NewMatchQuery(value.Query).SetField(field).SetOperator(operator)
 		if zer != nil {
 			subqq.SetAnalyzer(zer)
+		} else {
+			indexZer, searchZer := zincanalysis.QueryAnalyzerForField(analyzers, mappings, field)
+			if zer == nil && searchZer != nil {
+				zer = searchZer
+			}
+			if zer == nil && indexZer != nil {
+				zer = indexZer
+			}
+			subqq.SetAnalyzer(zer)
 		}
 		subq.AddShould(subqq)
 	}
