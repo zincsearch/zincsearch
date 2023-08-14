@@ -126,8 +126,14 @@ func (s *IndexShard) Rollback() error {
 		return err
 	}
 
+	err = s.writeRedoLog(RedoActionWrite, readMinID, readMaxID)
+	if err != nil {
+		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Msg(fmt.Sprintf("rollback writeRedoLog(RedoActionWrite, %d, %d)", readMinID, readMaxID))
+		return err
+	}
+
 	// Truncate log
-	minID := readMinID - 1 // minID should be last successfully committed ID
+	minID := readMaxID // minID should be last successfully committed ID
 	if err = s.wal.TruncateFront(minID); err != nil {
 		log.Error().Err(err).Str("index", s.GetIndexName()).Str("shard", s.GetID()).Uint64("id", minID).Msg("rollback wal.Truncate()")
 	}
