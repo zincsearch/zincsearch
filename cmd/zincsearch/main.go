@@ -64,7 +64,7 @@ func main() {
 	telemetry()
 	// Initialize sentry
 	sentries()
-	// Coninuous profiling
+	// Continuous profiling
 	profiling()
 
 	// HTTP init
