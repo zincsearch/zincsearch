@@ -1,12 +1,15 @@
 package cache
 
 import (
+	"bytes"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
 	"testing"
-	"time"
 )
+
+type structTestFile struct {
+}
 
 func TestLru(t *testing.T) {
 	temp := t.TempDir()
@@ -16,34 +19,27 @@ func TestLru(t *testing.T) {
 		maxSize:  1000,
 		rootPath: temp,
 	}
-	// this will be remained because it's already under 70%
+
+	// this will be removed, it's the first access file
 	cache1 := &CachedFile{
-		size:     400,
-		aTime:    time.Now(),
 		refCount: 0,
-		path:     path.Join(temp, "t1"),
+		path:     path.Join(temp, "t1.seg"),
 	}
-	// this will be removed, cause atime
+	// this will be remained, cause refCount
 	cache2 := &CachedFile{
-		size:     200,
-		aTime:    time.Now().AddDate(0, 0, -1),
-		refCount: 0,
-		path:     path.Join(temp, "t2"),
+		refCount: 1,
+		path:     path.Join(temp, "t2.seg"),
 	}
 
-	// this will be remained
-	cache3 := &CachedFile{
-		size:     200,
-		aTime:    time.Now().AddDate(0, 0, -1),
-		refCount: 1,
-		path:     path.Join(temp, "t3"),
-	}
 	// this will be removed
-	cache4 := &CachedFile{
-		size:     300,
-		aTime:    time.Now().AddDate(0, 0, -2),
+	cache3 := &CachedFile{
 		refCount: 0,
-		path:     path.Join(temp, "t4"),
+		path:     path.Join(temp, "t3.seg"),
+	}
+	// this will be remained, it's under 70% max
+	cache4 := &CachedFile{
+		refCount: 0,
+		path:     path.Join(temp, "t4.seg"),
 	}
 
 	m.caches[cache1.path] = cache1
@@ -53,16 +49,20 @@ func TestLru(t *testing.T) {
 
 	for _, c := range m.caches {
 		fi, _ := os.OpenFile(c.path, os.O_CREATE|os.O_RDWR, 0777)
-		_, _ = fi.Write([]byte("test file"))
+		b := bytes.Buffer{}
+		for i := 0; i < 250; i++ {
+			b.Write([]byte("1"))
+		}
+		_, _ = fi.Write(b.Bytes())
 		_ = fi.Close()
 	}
 
 	err := m.doCleanup()
 	assert.Nil(t, err)
 
-	assert.True(t, m.Exists(cache1.path))
-	assert.True(t, m.Exists(cache3.path))
+	assert.False(t, m.Exists(cache1.path))
+	assert.True(t, m.Exists(cache2.path))
 
-	assert.False(t, m.Exists(cache2.path))
-	assert.False(t, m.Exists(cache4.path))
+	assert.False(t, m.Exists(cache3.path))
+	assert.True(t, m.Exists(cache4.path))
 }

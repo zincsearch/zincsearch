@@ -187,6 +187,7 @@ func (o *ObjStore) Load(kind string, id uint64) (*segment.Data, io.Closer, error
 func (o *ObjStore) PrepareFile(fileName string) error {
 	fipath := path.Join(o.path, fileName)
 
+	// the file has already in local and traced.
 	if o.cache.Exists(fipath) {
 		return nil
 	}
@@ -194,13 +195,12 @@ func (o *ObjStore) PrepareFile(fileName string) error {
 	o.lock.Lock()
 	defer o.lock.Unlock()
 
+	// other goroutine has finished file load.
 	if o.cache.Exists(fipath) {
 		return nil
 	}
 
-	// clear exists file, sync data from obj store.
-	_ = o.cache.Remove(fipath)
-	cf := o.cache.CreateCache(fipath)
+	cf := o.cache.TraceCache(fipath)
 
 	fi, err := cf.GetWriter()
 	defer cf.Close()
@@ -217,8 +217,6 @@ func (o *ObjStore) PrepareFile(fileName string) error {
 		return err
 	}
 
-	cf.UpdateSize()
-	o.cache.AddCache(cf)
 	return nil
 
 }
@@ -227,6 +225,7 @@ func (o *ObjStore) Persist(kind string, id uint64, w blugeindex.WriterTo, closeC
 	key := fileName(kind, id)
 	fipath := path.Join(o.path, key)
 	backendKey := path.Join(o.prefix, key)
+
 	errCh1 := make(chan error, 1)
 	errCh2 := make(chan error, 1)
 	wg := &sync.WaitGroup{}
@@ -258,24 +257,20 @@ func (o *ObjStore) Persist(kind string, id uint64, w blugeindex.WriterTo, closeC
 
 	go func(ch chan error) {
 		defer wg.Done()
-		exists := o.cache.Exists(fipath)
+
 		var cf *cache.CachedFile
 		var err error
 
-		if !exists {
-			cf = o.cache.CreateCache(fipath)
-			f, err = cf.GetWriter()
-		} else {
-			cf = o.cache.GetCache(fipath)
-			f, err = cf.GetWriter()
-		}
+		cf = o.cache.TraceCache(fipath)
+		f, err = cf.GetWriter()
+
 		if err != nil {
 			ch <- err
 			return
 		}
 
 		defer func() {
-			_ = (*f).Close()
+			_ = f.Close()
 			cf.Close()
 		}()
 
@@ -285,16 +280,12 @@ func (o *ObjStore) Persist(kind string, id uint64, w blugeindex.WriterTo, closeC
 			return
 		}
 
-		err = (*f).Sync()
+		err = f.Sync()
 		if err != nil {
 			ch <- err
 			return
 		}
 
-		if !exists {
-			o.cache.AddCache(cf)
-		}
-		cf.UpdateSize()
 		close(ch)
 	}(errCh2)
 
