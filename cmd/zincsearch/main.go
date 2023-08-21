@@ -19,6 +19,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/zincsearch/zincsearch/pkg/objstore/cache"
 	"net/http"
 	"os"
 	"os/signal"
@@ -98,7 +99,9 @@ func main() {
 		// close metadata
 		err = metadata.Close()
 		log.Info().Err(err).Msgf("Metadata closed")
-
+		// lru_close
+		cache.Close()
+		log.Info().Msgf("LruCache closed")
 		done <- struct{}{}
 	})
 

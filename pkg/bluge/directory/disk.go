@@ -16,6 +16,8 @@
 package directory
 
 import (
+	"github.com/zincsearch/zincsearch/pkg/config"
+	"github.com/zincsearch/zincsearch/pkg/objstore"
 	"path"
 
 	"github.com/blugelabs/bluge"
@@ -26,12 +28,22 @@ import (
 // rootPath: the root path of data
 // indexName: the name of the index to use.
 func GetDiskConfig(rootPath string, indexName string, timeRange ...int64) bluge.Config {
-	config := index.DefaultConfig(path.Join(rootPath, indexName))
-	config = config.WithPersisterNapTimeMSec(50)
-	if len(timeRange) == 2 {
-		if timeRange[0] <= timeRange[1] {
-			config = config.WithTimeRange(timeRange[0], timeRange[1])
+	cfg := index.DefaultConfig(path.Join(rootPath, indexName))
+	cfg = cfg.WithPersisterNapTimeMSec(50)
+
+	if config.Global.StorageType == config.S3Storage {
+		cfg.DirectoryFunc = func() index.Directory {
+			dir, err := objstore.New(rootPath, indexName, config.Global.S3ConfigPath)
+			if err != nil {
+				panic(err)
+			}
+			return dir
 		}
 	}
-	return bluge.DefaultConfigWithIndexConfig(config)
+	if len(timeRange) == 2 {
+		if timeRange[0] <= timeRange[1] {
+			cfg = cfg.WithTimeRange(timeRange[0], timeRange[1])
+		}
+	}
+	return bluge.DefaultConfigWithIndexConfig(cfg)
 }

@@ -30,6 +30,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const DiskStorage = 1
+const S3Storage = 2
+
 type config struct {
 	GinMode                   string        `env:"GIN_MODE"`
 	ServerPort                string        `env:"ZINC_SERVER_PORT,default=4080"`
@@ -39,6 +42,9 @@ type config struct {
 	ServerMode                string        `env:"ZINC_SERVER_MODE,default=node"`
 	NodeID                    int           `env:"ZINC_NODE_ID,default=1"`
 	DataPath                  string        `env:"ZINC_DATA_PATH,default=./data"`
+	MaxCacheSize              int64         `env:"ZINC_MAX_CACHE_SIZE,default=1073741824"`
+	S3ConfigPath              string        `env:"ZINC_S3_CONFIG_PATH"`
+	StorageType               int           `env:"ZINC_STORAGE_TYPE,default=1"`
 	MetadataStorage           string        `env:"ZINC_METADATA_STORAGE,default=bolt"`
 	IceCompressor             string        `env:"ZINC_ICE_COMPRESSOR,default=zstd"`
 	SentryEnable              bool          `env:"ZINC_SENTRY,default=true"`
