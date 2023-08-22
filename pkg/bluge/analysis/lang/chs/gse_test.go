@@ -28,8 +28,9 @@ import (
 
 func TestLoadDict(t *testing.T) {
 	type args struct {
-		enable bool
-		embed  string
+		enable     bool
+		enableStop bool
+		embed      string
 	}
 	tests := []struct {
 		name string
@@ -38,22 +39,25 @@ func TestLoadDict(t *testing.T) {
 		{
 			name: "enable=false,embed=small",
 			args: args{
-				enable: false,
-				embed:  "SMALL",
+				enable:     false,
+				enableStop: false,
+				embed:      "SMALL",
 			},
 		},
 		{
 			name: "enable=true,embed=small",
 			args: args{
-				enable: true,
-				embed:  "SMALL",
+				enable:     true,
+				enableStop: true,
+				embed:      "SMALL",
 			},
 		},
 		{
 			name: "enable=true,embed=big",
 			args: args{
-				enable: true,
-				embed:  "BIG",
+				enable:     true,
+				enableStop: true,
+				embed:      "BIG",
 			},
 		},
 	}
@@ -69,7 +73,7 @@ func TestLoadDict(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			loadDict(tt.args.enable, tt.args.embed)
+			loadDict(tt.args.enable, tt.args.enableStop, tt.args.embed)
 		})
 	}
 

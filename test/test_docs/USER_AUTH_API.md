@@ -4,14 +4,14 @@
    1. `POST` call to endpoint `/api/login/` with username and password in the body.
    2. Send a request to the server and response would be recorded.
    3. Using assert.Equal will test if the response code is equal to http.StatusOK (i.e 200),that means test is OK. 
-   4. Unmarshal the json recieved in the response body and will check if there is no error using assert.NoError and using assert.True to check the validated field in the response body is true.
+   4. Unmarshal the json received in the response body and will check if there is no error using assert.NoError and using assert.True to check the validated field in the response body is true.
 
 2. ### Testing Login with bad username or password
    This unit test will check the login using bad username and password:
    1. `POST` call to endpoint `/api/login/` with username and password {xxx} in the body.
    2.  Send a request to the server and response would be recorded.
    3. Using assert.Equal will test if the response code is equal to http.StatusUnauthorized (i.e 401),that means test is OK.
-   4. Unmarshal the json recieved in the response body and will check if there is no error using assert.NoError and using assert.False to check the validated field in the response body is false.
+   4. Unmarshal the json received in the response body and will check if there is no error using assert.NoError and using assert.False to check the validated field in the response body is false.
 
 3. ### Testing Create User API
    This unit test will check the API that will create a new user:
@@ -20,7 +20,7 @@
    3. Using assert.Equal will test if the response code is equal to http.StatusOK (i.e 200),that means test is OK. 
    4. Test new user login using the above username and password in body to the endpoint `/api/login`.
    5. Response will be recorded and using assert.Equal will test if the response code is equal to http.StatusUnauthorized (i.e 401),that means test is OK.
-   6. Unmarshal the json recieved in the response body and will check if there is no error using assert.NoError and using assert.True to check the validated field in the response body is true.
+   6. Unmarshal the json received in the response body and will check if there is no error using assert.NoError and using assert.True to check the validated field in the response body is true.
 
 4. ### Test Update User
    This unit test will update the existing user : 
@@ -50,4 +50,4 @@
     This unit test will enlist all the users:
     1. `GET` call to the endpoint `/api/user` with empty body.
     2. Using assert.Equal will test if the response code is equal to http.StatusOK (i.e 200),that means test is OK.
-    3. Unmarshal the json recieved in the response body and will check if there is no error using assert.NoError and using assert.GreaterorEqual to check the length of data (i.e number of users) are greater than or equal to 1 , finally using assert.Equal to verify that the first user is admin.
+    3. Unmarshal the json received in the response body and will check if there is no error using assert.NoError and using assert.GreaterorEqual to check the length of data (i.e number of users) are greater than or equal to 1 , finally using assert.Equal to verify that the first user is admin.

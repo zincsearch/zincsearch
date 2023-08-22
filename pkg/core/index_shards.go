@@ -205,7 +205,7 @@ func (s *IndexShard) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error)
 	rs := make([]*bluge.Reader, 0, 1)
 	chs := make(chan *bluge.Reader, s.GetShardNum())
 	eg := errgroup.Group{}
-	eg.SetLimit(config.Global.Shard.GorutineNum)
+	eg.SetLimit(config.Global.Shard.GoroutineNum)
 	for i := s.GetLatestShardID(); i >= 0; i-- {
 		i := i
 		s.lock.RLock()
@@ -321,7 +321,7 @@ func (s *IndexShard) FindShardByDocID(docID string) (int64, error) {
 	}
 
 	eg, ctx := errgroup.WithContext(ctx)
-	eg.SetLimit(config.Global.Shard.GorutineNum)
+	eg.SetLimit(config.Global.Shard.GoroutineNum)
 	for id := int64(len(writers)) - 1; id >= 0; id-- {
 		id := id
 		w := writers[id]
@@ -333,7 +333,7 @@ func (s *IndexShard) FindShardByDocID(docID string) (int64, error) {
 					Str("shard", s.GetID()).
 					Int64("second shard", id).
 					Msg("failed to get reader")
-				return nil // not check err, if returns err with cancel all gorutines.
+				return nil // not check err, if returns err with cancel all goroutines.
 			}
 			defer r.Close()
 			dmi, err := r.Search(ctx, request)
@@ -343,11 +343,11 @@ func (s *IndexShard) FindShardByDocID(docID string) (int64, error) {
 					Str("shard", s.GetID()).
 					Int64("second shard", id).
 					Msg("failed to do search")
-				return nil // not check err, if returns err with cancel all gorutines.
+				return nil // not check err, if returns err with cancel all goroutines.
 			}
 			if dmi.Aggregations().Count() > 0 {
 				shardID = id
-				return errors.ErrCancelSignal // check err, if returns err with cancel other all gorutines.
+				return errors.ErrCancelSignal // check err, if returns err with cancel other all goroutines.
 			}
 			return nil
 		})
@@ -374,7 +374,7 @@ func (s *IndexShard) FindDocumentByDocID(docID string) (*meta.Hit, error) {
 	}
 
 	eg, ctx := errgroup.WithContext(ctx)
-	eg.SetLimit(config.Global.Shard.GorutineNum)
+	eg.SetLimit(config.Global.Shard.GoroutineNum)
 	for id := int64(len(writers)) - 1; id >= 0; id-- {
 		id := id
 		w := writers[id]
@@ -386,7 +386,7 @@ func (s *IndexShard) FindDocumentByDocID(docID string) (*meta.Hit, error) {
 					Str("shard", s.GetID()).
 					Int64("second shard", id).
 					Msg("failed to get reader")
-				return nil // not check err, if returns err with cancel all gorutines.
+				return nil // not check err, if returns err with cancel all goroutines.
 			}
 			defer r.Close()
 			dmi, err := r.Search(ctx, request)
@@ -396,7 +396,7 @@ func (s *IndexShard) FindDocumentByDocID(docID string) (*meta.Hit, error) {
 					Str("shard", s.GetID()).
 					Int64("second shard", id).
 					Msg("failed to do search")
-				return nil // not check err, if returns err with cancel all gorutines.
+				return nil // not check err, if returns err with cancel all goroutines.
 			}
 			if dmi.Aggregations().Count() > 0 {
 				var id string
@@ -427,7 +427,7 @@ func (s *IndexShard) FindDocumentByDocID(docID string) (*meta.Hit, error) {
 					Timestamp: timestamp,
 					Source:    sourceData,
 				}
-				return errors.ErrCancelSignal // check err, if returns err with cancel other all gorutines.
+				return errors.ErrCancelSignal // check err, if returns err with cancel other all goroutines.
 			}
 
 			return nil

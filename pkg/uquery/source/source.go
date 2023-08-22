@@ -52,12 +52,14 @@ func Request(v interface{}) (*meta.Source, error) {
 }
 
 func Response(source *meta.Source, data []byte) map[string]interface{} {
-	// return empty
-	if !source.Enable {
-		return nil
-	}
 
 	ret := make(map[string]interface{})
+
+	// return empty
+	if !source.Enable {
+		return ret
+	}
+
 	err := json.Unmarshal(data, &ret)
 	if err != nil {
 		return nil

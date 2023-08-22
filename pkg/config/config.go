@@ -68,8 +68,8 @@ type cluster struct {
 }
 
 type shard struct {
-	// control gorutine number for read
-	GorutineNum int `env:"ZINC_SHARD_GORUTINE_NUM,default=3"`
+	// control goroutine number for read
+	GoroutineNum int `env:"ZINC_SHARD_GOROUTINE_NUM,default=3"`
 	// DefaultNum is the default number of shards.
 	Num int64 `env:"ZINC_SHARD_NUM,default=3"`
 	// MaxSize is the maximum size limit for one shard, or will create a new shard.
@@ -93,9 +93,11 @@ type elasticsearch struct {
 }
 
 type gse struct {
-	Enable    bool   `env:"ZINC_PLUGIN_GSE_ENABLE,default=false"`
-	DictEmbed string `env:"ZINC_PLUGIN_GSE_DICT_EMBED,default=small"`
-	DictPath  string `env:"ZINC_PLUGIN_GSE_DICT_PATH,default=./plugins/gse/dict"`
+	Enable     bool   `env:"ZINC_PLUGIN_GSE_ENABLE,default=false"`
+	EnableStop bool   `env:"ZINC_PLUGIN_GSE_ENABLE_STOP,default=true"`
+	EnableHMM  bool   `env:"ZINC_PLUGIN_GSE_ENABLE_HMM,default=true"`
+	DictEmbed  string `env:"ZINC_PLUGIN_GSE_DICT_EMBED,default=small"`
+	DictPath   string `env:"ZINC_PLUGIN_GSE_DICT_PATH,default=./plugins/gse/dict"`
 }
 
 var Global = new(config)
