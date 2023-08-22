@@ -39,12 +39,14 @@ builds:
       - "7"
     main: ./cmd/zincsearch/main.go
 archives:
-  - replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
+  - id: zincsearch
+    name_template: >-
+      {{- .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end -}}
 checksum:
   name_template: "checksums.txt"
 snapshot:
@@ -180,11 +182,14 @@ blobs:
 #     base: core18
 
 #     replacements:
-#       darwin: Darwin
-#       linux: Linux
-#       windows: Windows
-#       386: i386
-#       amd64: x86_64
+#         - id: zincsearch
+#           name_template: >-
+#             {{- .ProjectName }}_
+#             {{- title .Os }}_
+#             {{- if eq .Arch "amd64" }}x86_64
+#             {{- else if eq .Arch "386" }}i386
+#             {{- else }}{{ .Arch }}{{ end }}
+#             {{- if .Arm }}v{{ .Arm }}{{ end -}}
 
     # Whether to publish the snap to the snapcraft store.
     # Remember you need to `snapcraft login` first.
