@@ -139,7 +139,10 @@ func searchV2(shardNum, readerNum int64, dmi search.DocumentMatchIterator, query
 			continue
 		}
 
-		sourceData["@timestamp"] = timestamp
+		if query.Source.(*meta.Source) == nil || !query.Source.(*meta.Source).Enable || len(query.Source.(*meta.Source).Fields) == 0 {
+			sourceData["@timestamp"] = timestamp
+		}
+
 		hit := meta.Hit{
 			Index:     indexName,
 			Type:      "_doc",
