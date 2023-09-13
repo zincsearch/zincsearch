@@ -359,8 +359,8 @@ github.com/zincsearch/go-gin-prometheus v0.1.1 h1:cQDDv4ygIW1TnQBReZkp1vAVOGyiBD
 github.com/zincsearch/go-gin-prometheus v0.1.1/go.mod h1:LTzZwkip1znv5X65Iyup2jASkUoyler8YiX1Z7Rxa4w=
 github.com/zincsearch/ice v1.1.3 h1:K1ZO2YW68LXlpDzRIN4gPxz8JYPnH9upY9doOQ3ebNQ=
 github.com/zincsearch/ice v1.1.3/go.mod h1:wTwGEe30mQnSLaR1ezxu4E80GcwO6EyOww67KpJtIiw=
-github.com/zincsearch/wal v1.2.5 h1:XsUm0c77EsweaStt5HHWIYz5PX7Uyn5OxbpsTE1vvv0=
-github.com/zincsearch/wal v1.2.5/go.mod h1:omJ6BD7oMa8QS8v0AkNeQyDeKauH0U0n406ZXzqm0Mo=
+github.com/zincsearch/wal v1.2.6 h1:yl9ChgUsRsavqc9P/axShJDMaTpJXSGqIXhxajD0fsA=
+github.com/zincsearch/wal v1.2.6/go.mod h1:omJ6BD7oMa8QS8v0AkNeQyDeKauH0U0n406ZXzqm0Mo=
 go.etcd.io/bbolt v1.3.6 h1:/ecaJf0sk1l4l6V4awd65v2C3ILy7MSj+s/x1ADCIMU=
 go.etcd.io/bbolt v1.3.6/go.mod h1:qXsaaIqmgQH0T+OPdb99Bf+PKfBBQVAdyD6TY9G8XM4=
 go.etcd.io/etcd/api/v3 v3.5.7 h1:sbcmosSVesNrWOJ58ZQFitHMdncusIifYcrBfwrlJSY=

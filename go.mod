@@ -27,7 +27,7 @@ require (
 	github.com/swaggo/gin-swagger v1.5.3
 	github.com/swaggo/swag v1.8.11
 	github.com/zincsearch/go-gin-prometheus v0.1.1
-	github.com/zincsearch/wal v1.2.5
+	github.com/zincsearch/wal v1.2.6
 	go.etcd.io/bbolt v1.3.6
 	go.etcd.io/etcd/client/v3 v3.5.7
 	golang.org/x/crypto v0.9.0
