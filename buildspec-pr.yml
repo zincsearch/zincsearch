@@ -16,7 +16,7 @@ phases:
       # install prerequisites
       - apt-get update  && apt-get install bc -y
       # update npm
-      - npm install --location=global npm@latest
+      # - npm install --location=global npm@latest
   pre_build:
     commands:
       # - echo Logging in to Amazon ECR...
