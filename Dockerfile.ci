@@ -15,7 +15,7 @@
 # STEP 2 build executable binary
 ############################
 # FROM golang:alpine AS builder
-FROM --platform=$BUILDPLATFORM public.ecr.aws/docker/library/golang:1.19 as builder
+FROM --platform=$BUILDPLATFORM public.ecr.aws/docker/library/golang:1.21 as builder
 ARG VERSION
 ARG COMMIT_HASH
 ARG BUILD_DATE

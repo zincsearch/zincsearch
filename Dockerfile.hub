@@ -2,7 +2,7 @@
 ############################
 # STEP 1 build web dist
 ############################
-FROM node:18.16.0-slim as webBuilder
+FROM node:18.18.2-slim as webBuilder
 WORKDIR /web
 COPY ./web /web/
 
@@ -13,7 +13,7 @@ RUN npm run build
 # STEP 2 build executable binary
 ############################
 # FROM golang:alpine AS builder
-FROM --platform=$BUILDPLATFORM public.ecr.aws/docker/library/golang:1.19 as builder
+FROM --platform=$BUILDPLATFORM public.ecr.aws/docker/library/golang:1.21 as builder
 ARG VERSION
 ARG COMMIT_HASH
 ARG BUILD_DATE
