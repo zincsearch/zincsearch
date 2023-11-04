@@ -16,7 +16,7 @@
 package meta
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"time"
 
@@ -34,7 +34,7 @@ func init() {
 		BatchSize: 10,
 		Endpoint:  "https://e1.zinclabs.dev",
 		Verbose:   false,
-		Logger:    analytics.StdLogger(log.New(ioutil.Discard, "marker ", log.LstdFlags)), // discard any logs
+		Logger:    analytics.StdLogger(log.New(io.Discard, "marker ", log.LstdFlags)), // discard any logs
 	}
 
 	SEGMENT_CLIENT, _ = analytics.NewWithConfig("", cf)
