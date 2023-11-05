@@ -30,9 +30,7 @@ const (
 	ErrorTypeInvalidArgument          = "invalid_argument"
 )
 
-var (
-	ErrorIDNotFound = errors.New("id not found")
-)
+var ErrorIDNotFound = errors.New("id not found")
 
 type Error struct {
 	Type     string `json:"type"`

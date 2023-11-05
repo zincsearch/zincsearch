@@ -123,7 +123,7 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 			nextLineIsData = false
 			update := false
 
-			var docID = ""
+			docID := ""
 			if val, ok := lastLineMetaData["_id"]; ok && val != nil {
 				docID = val.(string)
 			}

@@ -192,7 +192,7 @@ func Request(req zincaggregation.SearchAggregation, aggs map[string]meta.Aggrega
 
 			// format interval
 			var interval int64
-			var calendarInterval = agg.DateHistogram.CalendarInterval
+			calendarInterval := agg.DateHistogram.CalendarInterval
 			if agg.DateHistogram.CalendarInterval != "" {
 				switch agg.DateHistogram.CalendarInterval {
 				case "second", "1s":

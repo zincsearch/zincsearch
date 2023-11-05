@@ -58,7 +58,7 @@ func TestIndex_Shards(t *testing.T) {
 
 	var index *Index
 	var err error
-	var indexName = "TestIndex_Shards.index_1"
+	indexName := "TestIndex_Shards.index_1"
 	t.Run("perpare", func(t *testing.T) {
 		index, err = NewIndex(indexName, "disk", 2)
 		assert.NoError(t, err)

@@ -165,7 +165,6 @@ func Test_boltStorage_Delete(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-
 		{
 			name: "normal",
 			args: args{

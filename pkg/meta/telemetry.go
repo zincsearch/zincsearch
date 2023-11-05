@@ -23,12 +23,9 @@ import (
 	"github.com/segmentio/analytics-go/v3"
 )
 
-var (
-	SEGMENT_CLIENT analytics.Client
-)
+var SEGMENT_CLIENT analytics.Client
 
 func init() {
-
 	cf := analytics.Config{
 		Interval:  15 * time.Second,
 		BatchSize: 10,

@@ -80,7 +80,6 @@ func RangeQueryNumeric(field string, query map[string]interface{}, mappings *met
 	maxInclusive := false
 	if value.GT != nil && value.GT.(float64) > 0 {
 		min = value.GT.(float64)
-
 	}
 	if value.GTE != nil && value.GTE.(float64) > 0 {
 		min = value.GTE.(float64)

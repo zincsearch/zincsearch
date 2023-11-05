@@ -55,7 +55,8 @@ func NewDateHistogramAggregation(
 	extendedBounds,
 	hardBounds *HistogramBound,
 	minDocCount,
-	size int) *DateHistogramAggregation {
+	size int,
+) *DateHistogramAggregation {
 	rv := &DateHistogramAggregation{
 		src:              field,
 		size:             size,

@@ -275,6 +275,5 @@ func TestApiES(t *testing.T) {
 				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
 		})
-
 	})
 }

@@ -39,8 +39,8 @@ func Open(indexName string) (*Log, error) {
 		SegmentSize:      16777216, // 16 MB log segment files.
 		SegmentCacheSize: 2,        // Number of cached in-memory segments
 		NoCopy:           true,     // Make a new copy of data for every Read call.
-		DirPerms:         0750,     // Permissions for the created directories
-		FilePerms:        0640,     // Permissions for the created data files
+		DirPerms:         0o750,    // Permissions for the created directories
+		FilePerms:        0o640,    // Permissions for the created data files
 		FillID:           true,     // Allow writes with a zero ID
 	}
 	l.log, err = wal.Open(path.Join(config.Global.DataPath, indexName, "wal"), opt)

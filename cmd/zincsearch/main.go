@@ -103,7 +103,6 @@ func main() {
 	})
 
 	err := func() error {
-
 		log.Info().Msg("Listen on " + server.Addr)
 
 		if config.Global.ServerTLSCertificateFile != "" && config.Global.ServerTLSKeyFile != "" {
@@ -129,9 +128,7 @@ func main() {
 		}
 
 		return server.ListenAndServe()
-
 	}()
-
 	if err != nil {
 		if err == http.ErrServerClosed {
 			log.Info().Msg("Server closed")

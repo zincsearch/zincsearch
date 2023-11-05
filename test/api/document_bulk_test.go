@@ -26,7 +26,6 @@ import (
 )
 
 func TestDocumentBulk(t *testing.T) {
-
 	t.Run("POST /api/_bulk", func(t *testing.T) {
 		t.Run("bulk documents", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
@@ -82,5 +81,4 @@ func TestDocumentBulk(t *testing.T) {
 			assert.Equal(t, http.StatusOK, resp.Code)
 		})
 	})
-
 }

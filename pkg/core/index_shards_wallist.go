@@ -69,7 +69,6 @@ func (t *IndexShardWALList) Len() int {
 }
 
 func (t *IndexShardWALList) ConsumeWAL() {
-
 	indexes := make(map[string]*Index)
 	eg := &errgroup.Group{}
 	eg.SetLimit(config.Global.Shard.GoroutineNum)

@@ -17,5 +17,7 @@ package json
 
 import "github.com/goccy/go-json"
 
-var Marshal = json.Marshal
-var Unmarshal = json.Unmarshal
+var (
+	Marshal   = json.Marshal
+	Unmarshal = json.Unmarshal
+)

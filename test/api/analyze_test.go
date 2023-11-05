@@ -1161,7 +1161,6 @@ func TestAnalyze(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, output, tokens)
 		})
-
 	})
 
 	t.Run("test character filter", func(t *testing.T) {

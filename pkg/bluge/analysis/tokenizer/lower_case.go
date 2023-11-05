@@ -25,7 +25,6 @@ type LowerCaseTokenizer struct{}
 
 func NewLowerCaseTokenizer() *LowerCaseTokenizer {
 	return &LowerCaseTokenizer{}
-
 }
 
 func (t *LowerCaseTokenizer) Tokenize(input []byte) analysis.TokenStream {

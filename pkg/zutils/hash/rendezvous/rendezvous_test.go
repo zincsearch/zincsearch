@@ -21,8 +21,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var nodes = []string{"node1", "node2", "node3", "node4", "node5"}
-var key = "1QvEL0YywgM"
+var (
+	nodes = []string{"node1", "node2", "node3", "node4", "node5"}
+	key   = "1QvEL0YywgM"
+)
 
 func TestRendezvous_Lookup(t *testing.T) {
 	type args struct {

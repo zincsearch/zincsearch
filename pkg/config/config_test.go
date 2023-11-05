@@ -139,9 +139,7 @@ func TestConfig(t *testing.T) {
 			loadConfig(reflect.ValueOf(c).Elem())
 			assert.Equal(t, c.WalSyncInterval, v.expect)
 		}
-
 	})
-
 }
 
 func TestSentryDSNOverride(t *testing.T) {

@@ -32,7 +32,6 @@ func TestGetStringFromMap(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-
 		{
 			name: "string",
 			args: args{
