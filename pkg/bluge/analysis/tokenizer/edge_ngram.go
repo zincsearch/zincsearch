@@ -40,6 +40,7 @@ func (t *EdgeNgramTokenizer) Tokenize(input []byte) analysis.TokenStream {
 	n := utf8.RuneCount(input)
 	runes := bytes.Runes(input)
 	start := 0
+	var byteStart = start
 	rv := make(analysis.TokenStream, 0, n)
 	for i := 1; i <= n; i++ {
 		if i-start >= t.minLength {
@@ -53,14 +54,16 @@ func (t *EdgeNgramTokenizer) Tokenize(input []byte) analysis.TokenStream {
 				}
 			}
 			if valid {
+				var term = analysis.BuildTermFromRunes(runes[start:i])
 				rv = append(rv, &analysis.Token{
 					Term:         analysis.BuildTermFromRunes(runes[start:i]),
 					PositionIncr: 1,
-					Start:        start,
-					End:          i,
+					Start:        byteStart,
+					End:          byteStart + len(term),
 					Type:         analysis.AlphaNumeric,
 				})
 			} else {
+				byteStart = byteStart + utf8.RuneLen(runes[start])
 				start = i
 				continue
 			}
