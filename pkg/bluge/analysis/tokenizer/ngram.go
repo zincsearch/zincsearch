@@ -16,6 +16,9 @@
 package tokenizer
 
 import (
+	"bytes"
+	"unicode/utf8"
+
 	"github.com/blugelabs/bluge/analysis"
 )
 
@@ -34,14 +37,16 @@ func NewNgramTokenizer(minLength, maxLength int, tokenChars []string) *NgramToke
 }
 
 func (t *NgramTokenizer) Tokenize(input []byte) analysis.TokenStream {
-	n := len(input)
+	n := utf8.RuneCount(input)
+	runes := bytes.Runes(input)
 	start := 0
 	rv := make(analysis.TokenStream, 0, n)
+	var byteStart = start
 	for i := 1; i <= n; i++ {
 		if i-start >= t.minLength {
 			valid := true
 			if len(t.tokenChars) > 0 {
-				for _, c := range string(input[start:i]) {
+				for _, c := range string(runes[start:i]) {
 					if !t.isChar(c) {
 						valid = false
 						break
@@ -49,17 +54,19 @@ func (t *NgramTokenizer) Tokenize(input []byte) analysis.TokenStream {
 				}
 			}
 			if valid {
+				var term = analysis.BuildTermFromRunes(runes[start:i])
 				rv = append(rv, &analysis.Token{
-					Term:         input[start:i],
+					Term:         term,
 					PositionIncr: 1,
-					Start:        start,
-					End:          i,
+					Start:        byteStart,
+					End:          byteStart + len(term),
 					Type:         analysis.AlphaNumeric,
 				})
 			}
 		}
 
 		if i-start == t.maxLength {
+			byteStart = byteStart + utf8.RuneLen(runes[start])
 			start = start + 1
 			i = start
 		}
