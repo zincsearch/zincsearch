@@ -17,7 +17,6 @@ package query
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/blugelabs/bluge"
@@ -26,6 +25,7 @@ import (
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	zincanalysis "github.com/zincsearch/zincsearch/pkg/uquery/analysis"
+	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
 func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
@@ -51,23 +51,7 @@ func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, anal
 		case "operator":
 			value.Operator = v.(string)
 		case "minimum_should_match":
-			switch v := v.(type) {
-			case string:
-				if strings.Contains(v, "%") || strings.Contains(v, "<") {
-					return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[multi_match] %s value only support integer", k))
-				}
-				vi, err := strconv.ParseInt(v, 10, 64)
-				if err != nil {
-					return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[multi_match] %s type string convert to int error: %s", k, err))
-				}
-				value.MinimumShouldMatch = float64(vi)
-			case int:
-				value.MinimumShouldMatch = float64(v)
-			case float64:
-				value.MinimumShouldMatch = v
-			default:
-				return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[multi_match] %s doesn't support values of type: %T", k, v))
-			}
+			value.MinimumShouldMatch = v
 		default:
 			// return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[multi_match] unknown field [%s]", k))
 		}
@@ -92,8 +76,12 @@ func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, anal
 	}
 
 	subq := bluge.NewBooleanQuery()
-	if value.MinimumShouldMatch > 0 {
-		subq.SetMinShould(int(value.MinimumShouldMatch)) // lgtm[go/hardcoded-credentials]
+	if value.MinimumShouldMatch != nil {
+		minValue, err := zutils.CalculateMin(len(value.Fields), value.MinimumShouldMatch)
+		if err != nil {
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[multi_match] unsupported MinimumShouldMatch value: %v", err))
+		}
+		subq.SetMinShould(minValue) // lgtm[go/hardcoded-credentials]
 	}
 	if value.Boost >= 0 {
 		subq.SetBoost(value.Boost)
