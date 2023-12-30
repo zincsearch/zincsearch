@@ -107,7 +107,9 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 			newProp = meta.NewProperty("bool")
 		case "time", "datetime":
 			newProp = meta.NewProperty("date")
-		case "flattened", "object", "nested", "wildcard", "byte", "alias", "geo_point", "ip", "ip_range", "scaled_float":
+		case "geo", "geo_point":
+			newProp = meta.NewProperty("geo")
+		case "flattened", "object", "nested", "wildcard", "byte", "alias", "ip", "ip_range", "scaled_float":
 			// ignore
 		default:
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[mappings] properties [%s] doesn't support type [%s]", field, propTypeStr))
