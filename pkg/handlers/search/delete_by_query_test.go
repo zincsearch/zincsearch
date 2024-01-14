@@ -32,7 +32,6 @@ type success struct {
 }
 
 type failure struct {
-	outcome    bool
 	statusCode int
 	body       body
 }
