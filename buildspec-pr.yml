@@ -4,15 +4,16 @@ phases:
   install:
     commands:
       # - GORELEASER_LATEST_VERSION=(curl -sL -o /dev/null -w %{url_effective} "https://github.com/goreleaser/goreleaser/releases/latest" | rev | cut -f1 -d'/'| rev)
-      - GORELEASER_LATEST_VERSION=v1.10.1-pro
+      - GORELEASER_LATEST_VERSION=v1.23.0-pro
       - wget -nv https://github.com/goreleaser/goreleaser-pro/releases/download/$GORELEASER_LATEST_VERSION/goreleaser-pro_$(uname -s)_$(uname -m).tar.gz
       - tar -xzf goreleaser-pro_$(uname -s)_$(uname -m).tar.gz
       - sudo mv goreleaser /usr/local/bin/goreleaser
+      - go version
       # install buildx
-      - wget -nv https://github.com/docker/buildx/releases/download/v0.7.1/buildx-v0.7.1.linux-amd64
-      - chmod +x buildx-v0.7.1.linux-amd64
+      - wget -nv https://github.com/docker/buildx/releases/download/v0.12.1/buildx-v0.12.1.linux-amd64
+      - chmod +x buildx-v0.12.1.linux-amd64
       - mkdir -p ~/.docker/cli-plugins
-      - mv buildx-v0.7.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
+      - mv buildx-v0.12.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
       # install prerequisites
       - apt-get update  && apt-get install bc -y
       # update npm

@@ -15,10 +15,10 @@ phases:
       # - rm -rf aws
 
       # install buildx
-      - wget -nv https://github.com/docker/buildx/releases/download/v0.7.1/buildx-v0.7.1.linux-amd64
-      - chmod +x buildx-v0.7.1.linux-amd64
+      - wget -nv https://github.com/docker/buildx/releases/download/v0.12.1/buildx-v0.12.1.linux-amd64
+      - chmod +x buildx-v0.12.1.linux-amd64
       - mkdir -p ~/.docker/cli-plugins
-      - mv buildx-v0.7.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
+      - mv buildx-v0.12.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
 
       # - Install Go
       # - cd /root/.goenv/plugins/go-build/../.. && git pull && cd -
