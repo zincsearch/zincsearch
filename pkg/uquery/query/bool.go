@@ -17,7 +17,6 @@ package query
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/blugelabs/bluge"
@@ -25,10 +24,12 @@ import (
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
 func BoolQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
 	boolQuery := bluge.NewBooleanQuery()
+	var minimumShouldMatch interface{}
 	for k, v := range query {
 		k := strings.ToLower(k)
 		switch k {
@@ -111,26 +112,18 @@ func BoolQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers 
 			}
 			boolQuery.AddMust(filterQuery)
 		case "minimum_should_match":
-			switch v := v.(type) {
-			case string:
-				if strings.Contains(v, "%") || strings.Contains(v, "<") {
-					return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s value only support integer", k))
-				}
-				vi, err := strconv.ParseInt(v, 10, 64)
-				if err != nil {
-					return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s type string convert to int error: %s", k, err))
-				}
-				boolQuery.SetMinShould(int(vi)) // lgtm[go/hardcoded-credentials]
-			case int:
-				boolQuery.SetMinShould(v)
-			case float64:
-				boolQuery.SetMinShould(int(v))
-			default:
-				return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s doesn't support values of type: %T", k, v))
-			}
+			minimumShouldMatch = v
 		default:
 			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[bool] unknown field [%s]", k))
 		}
+	}
+
+	if minimumShouldMatch != nil {
+		minValue, err := zutils.CalculateMin(len(boolQuery.Shoulds()), minimumShouldMatch)
+		if err != nil {
+			return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[bool] unsupported MinimumShouldMatch value: %v", err))
+		}
+		boolQuery.SetMinShould(minValue)
 	}
 
 	return boolQuery, nil

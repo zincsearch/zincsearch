@@ -102,7 +102,7 @@ type BoolQuery struct {
 	Must               interface{} `json:"must,omitempty"`                 // query, [query1, query2]
 	MustNot            interface{} `json:"must_not,omitempty"`             // query, [query1, query2]
 	Filter             interface{} `json:"filter,omitempty"`               // query, [query1, query2]
-	MinimumShouldMatch float64     `json:"minimum_should_match,omitempty"` // only for should
+	MinimumShouldMatch interface{} `json:"minimum_should_match,omitempty"` // only for should
 }
 
 type BoolQueryForSDK struct {
@@ -151,13 +151,13 @@ type MatchPhrasePrefixQuery struct {
 }
 
 type MultiMatchQuery struct {
-	Query              string   `json:"query,omitempty"`
-	Analyzer           string   `json:"analyzer,omitempty"`
-	Fields             []string `json:"fields,omitempty"`
-	Boost              float64  `json:"boost,omitempty"`
-	Type               string   `json:"type,omitempty"`     // best_fields(default), most_fields, cross_fields, phrase, phrase_prefix, bool_prefix
-	Operator           string   `json:"operator,omitempty"` // or(default), and
-	MinimumShouldMatch float64  `json:"minimum_should_match,omitempty"`
+	Query              string      `json:"query,omitempty"`
+	Analyzer           string      `json:"analyzer,omitempty"`
+	Fields             []string    `json:"fields,omitempty"`
+	Boost              float64     `json:"boost,omitempty"`
+	Type               string      `json:"type,omitempty"`     // best_fields(default), most_fields, cross_fields, phrase, phrase_prefix, bool_prefix
+	Operator           string      `json:"operator,omitempty"` // or(default), and
+	MinimumShouldMatch interface{} `json:"minimum_should_match,omitempty"`
 }
 
 type CombinedFieldsQuery struct {
