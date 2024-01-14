@@ -1,6 +1,6 @@
 module github.com/zincsearch/zincsearch
 
-go 1.21
+go 1.20
 
 require (
 	github.com/blugelabs/bluge v0.1.9
