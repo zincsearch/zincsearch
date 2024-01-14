@@ -91,7 +91,7 @@ func MultiWorker(indexName string, body io.Reader) (int64, error) {
 
 		update := false
 
-		var docID = ""
+		docID := ""
 		if val, ok := doc["_id"]; ok && val != nil {
 			docID = val.(string)
 		}

@@ -40,6 +40,7 @@ func NewGseSearchAnalyzer() *analysis.Analyzer {
 func NewGseStandardTokenizer() analysis.Tokenizer {
 	return tokenizer.NewStandardTokenizer(seg)
 }
+
 func NewGseSearchTokenizer() analysis.Tokenizer {
 	return tokenizer.NewSearchTokenizer(seg)
 }

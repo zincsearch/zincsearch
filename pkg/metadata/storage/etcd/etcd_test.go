@@ -176,7 +176,6 @@ func Test_etcdStorage_Delete(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-
 		{
 			name: "normal",
 			args: args{

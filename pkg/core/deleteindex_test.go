@@ -22,7 +22,7 @@ import (
 )
 
 func TestDeleteIndex(t *testing.T) {
-	var indexName = "TestDeleteIndex.index_1"
+	indexName := "TestDeleteIndex.index_1"
 	type args struct {
 		name string
 	}

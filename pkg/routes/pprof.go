@@ -22,5 +22,4 @@ import (
 
 func SetPProf(app *gin.Engine) {
 	pprof.Register(app)
-
 }

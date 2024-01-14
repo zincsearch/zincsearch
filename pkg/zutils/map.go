@@ -42,6 +42,7 @@ func GetBoolFromMap(m interface{}, key string) (bool, error) {
 
 	return vs, nil
 }
+
 func GetFloatFromMap(m interface{}, key string) (float64, error) {
 	v, err := GetAnyFromMap(m, key)
 	if err != nil {

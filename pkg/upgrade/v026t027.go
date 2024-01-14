@@ -71,14 +71,14 @@ func UpgradeFromV026T027(index *meta.Index) error {
 	if err != nil {
 		return err
 	}
-	if err := os.Mkdir(path.Join(rootPath, indexName), 0755); err != nil {
+	if err := os.Mkdir(path.Join(rootPath, indexName), 0o755); err != nil {
 		return err
 	}
 
 	// make new shards
 	shardNames := make([]string, 0, index.ShardNum)
 	for id := range index.Shards {
-		if err := os.Mkdir(path.Join(rootPath, indexName, id), 0755); err != nil {
+		if err := os.Mkdir(path.Join(rootPath, indexName, id), 0o755); err != nil {
 			return err
 		}
 		shardNames = append(shardNames, id)

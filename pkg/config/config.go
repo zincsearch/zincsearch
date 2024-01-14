@@ -116,7 +116,7 @@ func init() {
 
 	// check data path
 	testPath := path.Join(Global.DataPath, "_test_")
-	if err := os.MkdirAll(testPath, 0755); err != nil {
+	if err := os.MkdirAll(testPath, 0o755); err != nil {
 		log.Fatal().Err(err).Msg("ZINC_DATA_PATH is not writable")
 	}
 	if err := os.Remove(testPath); err != nil {

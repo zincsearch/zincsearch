@@ -32,8 +32,10 @@ import (
  * |---------------------------------------------------------------|
  */
 
-var ErrNotFound = errors.New("not found")
-var ErrValueTooLarge = errors.New("value too large")
+var (
+	ErrNotFound      = errors.New("not found")
+	ErrValueTooLarge = errors.New("value too large")
+)
 
 const ValueFixedLength = 64
 
@@ -55,12 +57,12 @@ func DefaultOptions() *Options {
 }
 
 func Open(name string, opt *Options) (*Log, error) {
-	err := os.MkdirAll(path.Dir(name), 0755)
+	err := os.MkdirAll(path.Dir(name), 0o755)
 	if err != nil {
 		return nil, err
 	}
 
-	f, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE, 0644)
+	f, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE, 0o644)
 	if err != nil {
 		return nil, err
 	}

@@ -41,7 +41,7 @@ func UpgradeFromV024T025(index *meta.Index) error {
 	if err := os.Rename(path.Join(rootPath, indexName), path.Join(rootPath, indexName+"_old")); err != nil {
 		return err
 	}
-	if err := os.Mkdir(path.Join(rootPath, indexName), 0755); err != nil {
+	if err := os.Mkdir(path.Join(rootPath, indexName), 0o755); err != nil {
 		return err
 	}
 	if err := os.Rename(path.Join(rootPath, indexName+"_old"), path.Join(rootPath, indexName, "000000")); err != nil {

@@ -52,7 +52,6 @@ func Request(v interface{}) (*meta.Source, error) {
 }
 
 func Response(source *meta.Source, data []byte) map[string]interface{} {
-
 	ret := make(map[string]interface{})
 
 	// return empty

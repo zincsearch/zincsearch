@@ -17,7 +17,9 @@ package errors
 
 import "errors"
 
-var ErrCancelSignal = errors.New("cancelled") // just for cancel notice
-var ErrNotFound = errors.New("not found")
-var ErrKeyNotFound = errors.New("key not found")
-var ErrKeyEmpty = errors.New("key is be empty")
+var (
+	ErrCancelSignal = errors.New("cancelled") // just for cancel notice
+	ErrNotFound     = errors.New("not found")
+	ErrKeyNotFound  = errors.New("key not found")
+	ErrKeyEmpty     = errors.New("key is be empty")
+)

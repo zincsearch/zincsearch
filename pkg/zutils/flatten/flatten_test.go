@@ -48,6 +48,7 @@ func TestFlattern(t *testing.T) {
 	assert.Equal(t, "a1", fdata["foo.arm.1.b1"].(string))
 	assert.Equal(t, 3, len(fdata["foo.arr"].([]interface{})))
 }
+
 func TestUnflatten(t *testing.T) {
 	data := map[string]interface{}{
 		"foo.bar.coo": "abc",
