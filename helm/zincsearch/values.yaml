@@ -71,3 +71,7 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+extraContainers: []
+
+extraInitContainers: []
