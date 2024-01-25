@@ -44,6 +44,22 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /go/bin/data
+      {{- if .Values.extraContainers }}
+      {{- if eq "string" (printf "%T" .Values.extraContainers) }}
+{{ tpl .Values.extraContainers . | indent 8 }}
+      {{- else }}
+{{ toYaml .Values.extraContainers | indent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.extraInitContainers }}
+      initContainers:
+      {{- if eq "string" (printf "%T" .Values.extraInitContainers) }}
+{{ tpl .Values.extraInitContainers . | indent 8 }}
+      {{- else }}
+{{ toYaml .Values.extraInitContainers | indent 8 }}
+      {{- end }}
+      {{- end }}
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
