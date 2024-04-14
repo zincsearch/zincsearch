@@ -58,7 +58,7 @@ Setting GOOS and GOARCH appropriately allows for cross platform compilation. Che
 
 Setting CGO_ENABLED=0 allows for static linking, which results in a single binary output that has no dependencies.
 
-setting up ldflags allows for passing values like version number to the binary at build time instead of hardcoding the value in cource code. Generally the version number is set by the CI pipeline during build by using the git tag.
+setting up ldflags allows for passing values like version number to the binary at build time instead of hardcoding the value in source code. Generally the version number is set by the CI pipeline during build by using the git tag.
 
 ## Developing
 
@@ -138,7 +138,7 @@ We check for following in CI pipeline for any pull requests.
     - You can test coverage yourself by running `./coverage.sh` 
     - We use codecov for visualizing code coverage of go code, codecov updates coverage for every PR through a comment. It allows you to see missing coverage for any lines.
 1. Linting in Javascript for GUI
-    - We run eslint for javacript anf any linting failures will result in build failures.
+    - We run eslint for javascript anf any linting failures will result in build failures.
     - You can test for linting failures by running `./lint.sh` in web folder.
     - You can also fix automatically fixable linting error by running `npm run lint-autofix`
 
