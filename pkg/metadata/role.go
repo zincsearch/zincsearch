@@ -29,14 +29,14 @@ func (t *role) List(offset, limit int) ([]*meta.Role, error) {
 	if err != nil {
 		return nil, err
 	}
-	roles := make([]*meta.Role, 0, len(data))
-	for _, d := range data {
+	roles := make([]*meta.Role, len(data))
+	for i, d := range data {
 		u := new(meta.Role)
 		err = json.Unmarshal(d, u)
 		if err != nil {
 			return nil, err
 		}
-		roles = append(roles, u)
+		roles[i] = u
 	}
 	return roles, nil
 }
@@ -47,8 +47,7 @@ func (t *role) Get(id string) (*meta.Role, error) {
 		return nil, err
 	}
 	r := new(meta.Role)
-	err = json.Unmarshal(data, r)
-	return r, err
+	return r, json.Unmarshal(data, r)
 }
 
 func (t *role) Set(id string, val meta.Role) error {

@@ -15,6 +15,8 @@
 
 package metadata
 
+import "slices"
+
 type permission struct {
 	ps []string
 }
@@ -26,13 +28,7 @@ func (p *permission) List() []string {
 }
 
 func (p *permission) Add(v string) {
-	has := false
-	for _, o := range p.ps {
-		if o == v {
-			has = true
-		}
-	}
-	if !has {
+	if !slices.Contains(p.ps, v) {
 		p.ps = append(p.ps, v)
 	}
 }
