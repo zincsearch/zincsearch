@@ -16,6 +16,7 @@ require (
 	github.com/go-ego/gse v0.80.2
 	github.com/goccy/go-json v0.10.2
 	github.com/joho/godotenv v1.4.0
+	github.com/liuzl/gocc v0.0.0-20231231122217-0372e1059ca5
 	github.com/prometheus/client_golang v1.15.1
 	github.com/pyroscope-io/client v0.6.0
 	github.com/robfig/cron/v3 v3.0.1
@@ -38,6 +39,7 @@ require (
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
+	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
 	github.com/axiomhq/hyperloglog v0.0.0-20230201085229-3ddf4bad03dc // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.2.2 // indirect
@@ -82,6 +84,8 @@ require (
 	github.com/klauspost/compress v1.15.15 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
+	github.com/liuzl/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
+	github.com/liuzl/da v0.0.0-20180704015230-14771aad5b1d // indirect
 	github.com/lufia/plan9stats v0.0.0-20231016141302-07b5767bb0ed // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
