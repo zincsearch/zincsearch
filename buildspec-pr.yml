@@ -2,6 +2,9 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      golang: 1.21
+      nodejs: 20
     commands:
       # - GORELEASER_LATEST_VERSION=(curl -sL -o /dev/null -w %{url_effective} "https://github.com/goreleaser/goreleaser/releases/latest" | rev | cut -f1 -d'/'| rev)
       - GORELEASER_LATEST_VERSION=v1.23.0-pro

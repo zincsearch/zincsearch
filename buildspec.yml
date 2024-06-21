@@ -1,6 +1,10 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      golang: 1.21
+      nodejs: 20
   pre_build:
     commands:
       
