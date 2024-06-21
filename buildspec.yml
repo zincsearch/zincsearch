@@ -4,7 +4,7 @@ phases:
   install:
     runtime-versions:
       golang: 1.21
-      NodeJS: 20
+      nodejs: 20
   pre_build:
     commands:
       
