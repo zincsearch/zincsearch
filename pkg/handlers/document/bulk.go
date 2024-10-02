@@ -240,6 +240,10 @@ func DoesExistInThisRequest(slice []string, val string) int {
 }
 
 func NewBulkResponseItem(seqNo int64, index, id, result string, err error) BulkResponseItem {
+	s_err := ""
+	if err != nil {
+	        s_err = err.Error()
+	}  
 	return BulkResponseItem{
 		Index:   index,
 		Type:    "_doc",
@@ -254,7 +258,7 @@ func NewBulkResponseItem(seqNo int64, index, id, result string, err error) BulkR
 		Status:      200,
 		SeqNo:       globalSeqNo + seqNo,
 		PrimaryTerm: 1,
-		Error:       err,
+		Error:       s_err,
 	}
 }
 
@@ -278,7 +282,7 @@ type BulkResponseItem struct {
 	Shards      BulkResponseItemShard `json:"_shards"`
 	SeqNo       int64                 `json:"_seq_no"`
 	PrimaryTerm int                   `json:"_primary_term"`
-	Error       error                 `json:"error,omitempty"`
+	Error       string                `json:"error,omitempty"`
 }
 
 type BulkResponseItemShard struct {
