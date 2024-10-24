@@ -28,7 +28,7 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
-	"github.com/pyroscope-io/client/pyroscope"
+	"github.com/grafana/pyroscope-go"
 	"github.com/rs/zerolog/log"
 
 	"github.com/zincsearch/zincsearch/pkg/config"

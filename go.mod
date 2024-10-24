@@ -15,15 +15,15 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-ego/gse v0.80.2
 	github.com/goccy/go-json v0.10.2
+	github.com/grafana/pyroscope-go v1.2.0
 	github.com/joho/godotenv v1.4.0
 	github.com/liuzl/gocc v0.0.0-20231231122217-0372e1059ca5
 	github.com/prometheus/client_golang v1.15.1
-	github.com/pyroscope-io/client v0.6.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.29.1
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/shirou/gopsutil/v3 v3.23.10
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
 	github.com/swaggo/gin-swagger v1.5.3
 	github.com/swaggo/swag v1.8.12
@@ -79,9 +79,10 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/flatbuffers v1.12.1 // indirect
 	github.com/google/uuid v1.3.1 // indirect
+	github.com/grafana/pyroscope-go/godeltaprof v0.1.8 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.15.15 // indirect
+	github.com/klauspost/compress v1.17.8 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/liuzl/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
@@ -101,7 +102,6 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
-	github.com/pyroscope-io/godeltaprof v0.1.2 // indirect
 	github.com/segmentio/backo-go v1.0.1 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
