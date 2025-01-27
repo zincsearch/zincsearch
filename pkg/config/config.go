@@ -27,6 +27,7 @@ import (
 	"github.com/docker/go-units"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -57,6 +58,7 @@ type config struct {
 	WalSyncInterval           time.Duration `env:"ZINC_WAL_SYNC_INTERVAL,default=1s"`      // sync wal to disk, 1s, 10ms
 	WalRedoLogNoSync          bool          `env:"ZINC_WAL_REDOLOG_NO_SYNC,default=false"` // control sync after every write
 	ZincSwaggerEnable         bool          `env:"ZINC_SWAGGER_ENABLE,default=true"`
+	LogLevel                  string        `env:"ZINC_LOG_LEVEL,default=debug"`
 	Cluster                   cluster
 	Shard                     shard
 	Etcd                      etcd
@@ -108,6 +110,13 @@ func init() {
 		log.Print(err.Error())
 	}
 	loadConfig(reflect.ValueOf(Global).Elem())
+
+	// set the log level
+	logLevel, logLevelErr := zerolog.ParseLevel(Global.LogLevel)
+	if logLevelErr != nil {
+		log.Error().Err(logLevelErr).Msg("ZINC_LOG_LEVEL is not valid")
+	}
+	zerolog.SetGlobalLevel(logLevel)
 
 	// configure gin
 	if Global.GinMode == "release" {
