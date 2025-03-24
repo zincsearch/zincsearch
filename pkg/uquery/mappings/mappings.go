@@ -70,8 +70,20 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 
 		if v, ok := prop["fields"]; ok {
 			if propFields, ok = v.(map[string]interface{}); !ok {
-				return nil, errors.New(errors.ErrorTypeParsingException,
-					fmt.Sprintf("[mappings] property.fields [%s] should be an object, got %T", field, v))
+				return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] property.fields [%s] should be an object, got %T", field, v))
+			}
+
+			// check if sub field contains property "type"
+			for _, subProp := range v.(map[string]any) {
+				if subPropField, ok := subProp.(map[string]any); ok {
+					subPropType, ok := subPropField["type"]
+					if !ok {
+						return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be exists", "type"))
+					}
+					if _, ok = subPropType.(string); !ok {
+						return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be a string", "type"))
+					}
+				}
 			}
 		}
 
@@ -82,7 +94,7 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 
 		propTypeStr, ok := propType.(string)
 		if !ok {
-			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be an string", "type"))
+			return nil, errors.New(errors.ErrorTypeParsingException, fmt.Sprintf("[mappings] properties [%s] should be a string", "type"))
 		}
 
 		var newProp meta.Property
