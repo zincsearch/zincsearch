@@ -53,6 +53,7 @@
               </q-td>
               <q-td v-else>
                 <high-light
+                  :truncate="true"
                   :content="col.value + ''"
                   :query-string="queryString"
                 ></high-light>

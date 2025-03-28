@@ -1,8 +1,10 @@
 <template>
-  <span v-for="item in list" :key="item.key" v-bind="item">
-    <span v-if="item.isKeyWord" class="highlight">{{ item.text }}</span>
-    <span v-else>{{ item.text }}</span>
-  </span>
+  <div :class="{ 'truncate-lines': truncate }">
+    <span v-for="item in list" :key="item.key" v-bind="item">
+      <span v-if="item.isKeyWord" class="highlight">{{ item.text }}</span>
+      <span v-else>{{ item.text }}</span>
+    </span>
+  </div>
 </template>
 
 <script>
@@ -18,6 +20,10 @@ export default defineComponent({
     queryString: {
       type: String,
       default: "",
+    },
+    truncate: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -35,6 +41,11 @@ export default defineComponent({
     queryString: {
       handler() {
         this.keywords = this.getKeywords(this.queryString);
+        this.init();
+      },
+    },
+    truncate: {
+      handler() {
         this.init();
       },
     },
@@ -147,5 +158,12 @@ export default defineComponent({
 <style lang="scss">
 .highlight {
   background-color: rgb(255, 213, 0);
+}
+.truncate-lines {
+  display: -webkit-box;
+  line-clamp: 5;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>
