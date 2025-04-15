@@ -52,10 +52,13 @@
                 <span v-text="col.value"></span>
               </q-td>
               <q-td v-else>
-                <high-light
-                  :content="col.value + ''"
-                  :query-string="queryString"
-                ></high-light>
+                <div class="truncate-lines">
+                  <high-light
+                    :truncate="true"
+                    :content="col.value + ''"
+                    :query-string="queryString"
+                  ></high-light>
+                </div>
               </q-td>
             </template>
           </q-tr>
@@ -570,6 +573,13 @@ export default defineComponent({
 <style lang="scss">
 .max-result {
   width: 170px;
+}
+.truncate-lines {
+  display: -webkit-box;
+  line-clamp: 5;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .search-list {
   width: 100%;
