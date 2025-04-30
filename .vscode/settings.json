@@ -8,5 +8,10 @@
         "vue"
     ],
     "eslint.format.enable": true,
-    "eslint.workingDirectories": [ "./web" ]
+    "eslint.workingDirectories": [
+        "./web"
+    ],
+    "[powershell]": {
+        "editor.defaultFormatter": "ms-vscode.powershell"
+    }
 }
