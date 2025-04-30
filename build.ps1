@@ -23,7 +23,11 @@ $ldFlags = "-w -s -X 'github.com/zincsearch/zincsearch/pkg/meta.Version=$version
 "-X 'github.com/zincsearch/zincsearch/pkg/meta.BuildDate=$buildDate'" +
 "-X 'github.com/zincsearch/zincsearch/pkg/meta.CommitHash=$commitHash'"
 
-$output = go build -ldflags $ldFlags -o zincsearch.exe cmd/zincsearch/main.go 2>&1
+$output = & {
+    $env:GOOS = "windows"
+    $env:GOARCH = "amd64"
+    go build -ldflags $ldFlags -o zincsearch.exe cmd/zincsearch/main.go
+} 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host $output -ForegroundColor Red
     exit $LASTEXITCODE
