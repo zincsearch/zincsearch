@@ -13,6 +13,7 @@ export default {
   menu: {
     about: "Hakkında",
     user: "Kullanıcı",
+    role: "Yetki",
     index: "İndeks",
     search: "Ara",
     template: "Şablon",
@@ -31,6 +32,17 @@ export default {
     userid: "Kullanıcı Adı",
     signIn: "Giriş Yap",
     password: "Parola",
+  },
+  role: {
+    header: "Yetkiler",
+    id: "Yetki ID",
+    name: "Yetki Adı",
+    CREATED: "OLUŞTURULDU",
+    UPDATED: "GÜNCELLENDİ",
+    addOrUpdate: "Yetki Ekle/Güncelle",
+    add: "Ekle",
+    search: "Ara",
+    permission: "Yetki",
   },
   user: {
     header: "Kullanıcılar",
