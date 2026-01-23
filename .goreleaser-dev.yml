@@ -1,5 +1,7 @@
 # This is an example .goreleaser.yml file with some sensible defaults.
 # Make sure to check the documentation at https://goreleaser.com
+version: 2
+
 project_name: zincsearch
 before:
   hooks:
@@ -133,11 +135,10 @@ docker_manifests:
 # https://goreleaser.com/customization/homebrew/
 brews:
   - name: zincsearch
-    tap:
+    repository:
       owner: zinclabs
       name: homebrew-tap-nightly
-      # token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    folder: Formula
+    directory: Formula
     homepage: "https://github.com/zincsearch/zincsearch"
     description: |
       ZincSearch is a search engine that does full text indexing. It is a lightweight
@@ -151,16 +152,18 @@ brews:
       data using APIs and searching using kibana (Kibana is not supported with
       ZincSearch. ZincSearch provides its own UI).
     license: "Apache-2.0"
+
 blobs:
   - provider: s3
     region: us-west-2
     bucket: zincsearch-releases
+    directory: "dev/{{.Version}}-{{.Date}}"
     ids:
       - zincsearch_binaries
-    folder: "dev/{{.Version}}-{{.Date}}"
     extra_files:
       - glob: ./dist/*.tar.gz
       - glob: ./dist/CHANGELOG.md
+
 # snapcrafts:
 #   - id: zincsearch-snap
 #     name: zincsearch-snap

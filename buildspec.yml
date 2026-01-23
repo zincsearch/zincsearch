@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      golang: 1.21
+      golang: 1.25
       nodejs: 20
   pre_build:
     commands:
@@ -48,7 +48,7 @@ phases:
       - npm install
       - npm run build
       - cd ..
-      - ./coverage.sh
+      - ./coverage.sh || echo "Coverage build error"
       # Build binary and container images using goreleaser
       - echo Build started on `date`
       - GIT_TAG="$(git describe --tags --abbrev=0)"

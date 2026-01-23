@@ -22,123 +22,172 @@ import (
 	"time"
 )
 
+var (
+	dayDuration   = time.Hour * 24
+	monthDuration = dayDuration * 30
+	yearDuration  = monthDuration * 12
+)
+
 func ParseDuration(s string) (time.Duration, error) {
-	d, err := time.ParseDuration(s)
-	if err == nil {
+	if d, err := time.ParseDuration(s); err == nil {
 		return d, nil
 	}
 
 	if strings.HasSuffix(s, "d") {
 		h := strings.TrimSuffix(s, "d")
-		hour, _ := strconv.Atoi(h)
-		d = time.Hour * 24 * time.Duration(hour)
-		return d, nil
+		hour, err := strconv.Atoi(h)
+		if err != nil {
+			return 0, fmt.Errorf("invalid day format: %s", s)
+		}
+		return dayDuration * time.Duration(hour), nil
 	}
 
 	dv, err := strconv.ParseInt(s, 10, 64)
-	return time.Duration(dv), err
+	if err != nil {
+		return 0, fmt.Errorf("invalid duration format: %s", s)
+	}
+	return time.Duration(dv), nil
 }
 
 func FormatDuration(d time.Duration) string {
-	var s string
-	if d.Hours() >= 24*30*12 {
-		t := int64(d.Hours()) / 24 / 30 / 12
-		s += strconv.FormatInt(t, 10) + "y"
-		d -= time.Hour * 24 * 30 * 12 * time.Duration(t)
+	if d == 0 {
+		return "0s"
 	}
-	if d.Hours() >= 24*30 {
-		t := int64(d.Hours()) / 24 / 30
-		s += strconv.FormatInt(t, 10) + "M"
-		d -= time.Hour * 24 * 30 * time.Duration(t)
+
+	var sb strings.Builder
+	sb.Grow(16)
+
+	// Process years
+	if d >= yearDuration {
+		years := int64(d / yearDuration)
+		sb.WriteString(strconv.FormatInt(years, 10))
+		sb.WriteByte('y')
+		d -= yearDuration * time.Duration(years)
 	}
-	if d.Hours() >= 24 {
-		t := int64(d.Hours()) / 24
-		s += strconv.FormatInt(t, 10) + "d"
-		d -= time.Hour * 24 * time.Duration(t)
+
+	// Process months
+	if d >= monthDuration {
+		months := int64(d / monthDuration)
+		sb.WriteString(strconv.FormatInt(months, 10))
+		sb.WriteByte('M')
+		d -= monthDuration * time.Duration(months)
 	}
-	if d.Hours() >= 1 {
-		t := int64(d.Hours())
-		s += strconv.FormatInt(t, 10) + "h"
-		d -= time.Hour * time.Duration(t)
+
+	// Process days
+	if d >= dayDuration {
+		days := int64(d / dayDuration)
+		sb.WriteString(strconv.FormatInt(days, 10))
+		sb.WriteByte('d')
+		d -= dayDuration * time.Duration(days)
 	}
-	if d.Minutes() >= 1 {
-		t := int64(d.Minutes())
-		s += strconv.FormatInt(t, 10) + "m"
-		d -= time.Minute * time.Duration(t)
+
+	// Process hours
+	if d >= time.Hour {
+		hours := int64(d / time.Hour)
+		sb.WriteString(strconv.FormatInt(hours, 10))
+		sb.WriteByte('h')
+		d -= time.Hour * time.Duration(hours)
 	}
+
+	// Process minutes
+	if d >= time.Minute {
+		minutes := int64(d / time.Minute)
+		sb.WriteString(strconv.FormatInt(minutes, 10))
+		sb.WriteByte('m')
+		d -= time.Minute * time.Duration(minutes)
+	}
+
+	// Process seconds
 	if d > 0 {
-		s += strconv.FormatInt(int64(d.Seconds()), 10) + "s"
+		seconds := int64(d / time.Second)
+		sb.WriteString(strconv.FormatInt(seconds, 10))
+		sb.WriteByte('s')
 	}
-	return s
+
+	return sb.String()
 }
 
 func Unix(n int64) time.Time {
-	if n > 1e18 {
+	switch {
+	case n == 0:
+		return time.Unix(0, 0)
+	case n > 1e18: // Nanoseconds (19+ digits)
 		return time.Unix(0, n)
-	}
-	if n > 1e15 {
+	case n > 1e15: // Microseconds (16-18 digits)
 		return time.UnixMicro(n)
-	}
-	if n > 1e12 {
+	case n > 1e12: // Milliseconds (13-15 digits)
 		return time.UnixMilli(n)
+	default: // Seconds (1-12 digits)
+		return time.Unix(n, 0)
 	}
-	return time.Unix(n, 0)
 }
 
 func ParseTime(value interface{}, format, timeZone string) (time.Time, error) {
-	var vInt int64
-	var vStr string
 	switch v := value.(type) {
 	case float64:
-		vInt = int64(v)
+		return parseNumericTime(int64(v))
 	case int64:
-		vInt = v
+		return parseNumericTime(v)
+	case int:
+		return parseNumericTime(int64(v))
+	case int32:
+		return parseNumericTime(int64(v))
 	case string:
-		vStr = v
+		return parseStringTime(v, format, timeZone)
 	default:
-		return time.Time{}, fmt.Errorf("value type of time must be string / float64 / int64")
+		return time.Time{}, fmt.Errorf("value type of time must be string or numeric, got %T", value)
 	}
+}
 
-	if vInt != 0 {
-		t := Unix(vInt)
-		if t.IsZero() {
-			return time.Time{}, fmt.Errorf("time format is [epoch_millis] but the value [%d] is not a valid timestamp", vInt)
-		}
-		return t, nil
+func parseNumericTime(vInt int64) (time.Time, error) {
+	t := Unix(vInt)
+	if t.IsZero() && vInt != 0 {
+		return time.Time{}, fmt.Errorf("value [%d] is not a valid timestamp", vInt)
 	}
+	return t, nil
+}
 
+func parseStringTime(vStr, format, timeZone string) (time.Time, error) {
 	if vStr == "" {
 		return time.Time{}, fmt.Errorf("time value is empty")
 	}
 
-	var err error
+	if format == "epoch_millis" {
+		v, err := strconv.ParseInt(vStr, 10, 64)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("time format is [epoch_millis] but value [%s] cannot be converted to int", vStr)
+		}
+		return parseNumericTime(v)
+	}
+
+	loc, err := parseTimeZone(timeZone)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("invalid time zone: %s", timeZone)
+	}
+
 	timFormat := time.RFC3339
-	timZone := time.UTC
 	if format != "" {
 		timFormat = format
 	}
-	if timeZone != "" {
-		timZone, err = ParseTimeZone(timeZone)
-		if err != nil {
-			return time.Time{}, fmt.Errorf("invalid time zone: %s", timeZone)
-		}
-	}
 
-	if timFormat == "epoch_millis" {
-		v, err := ToInt(vStr)
-		if err != nil {
-			return time.Time{}, fmt.Errorf("time format is [epoch_millis] but the value [%s] can't convert to int", vStr)
-		}
-		if t := Unix(int64(v)); t.IsZero() {
-			return time.Time{}, fmt.Errorf("time format is [epoch_millis] but the value [%s] is not a valid timestamp", vStr)
-		} else {
-			return t, nil
-		}
-	}
-
-	t, err := time.ParseInLocation(timFormat, vStr, timZone)
+	t, err := time.ParseInLocation(timFormat, vStr, loc)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("time format is [%s] but the value [%s] parse err: %s", timFormat, vStr, err.Error())
+		return time.Time{}, fmt.Errorf("time format [%s] value [%s] parse error: %w", timFormat, vStr, err)
 	}
 	return t, nil
+}
+
+func parseTimeZone(timeZone string) (*time.Location, error) {
+	if timeZone == "" {
+		return time.UTC, nil
+	}
+
+	switch strings.ToUpper(timeZone) {
+	case "UTC", "":
+		return time.UTC, nil
+	case "LOCAL", "SYSTEM":
+		return time.Local, nil
+	}
+
+	return time.LoadLocation(timeZone)
 }
