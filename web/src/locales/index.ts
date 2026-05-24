@@ -5,6 +5,7 @@ import { getLanguage } from "../utils/cookies";
 import enLocale from "./en";
 import trLocale from "./tr";
 import zhLocale from "./zh-cn";
+import zhTwLocale from "./zh-tw";
 
 const messages = {
   en: {
@@ -15,6 +16,9 @@ const messages = {
   },
   "zh-cn": {
     ...zhLocale,
+  },
+  "zh-tw": {
+    ...zhTwLocale,
   },
 };
 
