@@ -35,3 +35,9 @@ func TestNewNode(t *testing.T) {
 		assert.NotEmpty(t, id)
 	}
 }
+
+func TestNewNodeNegativeID(t *testing.T) {
+	node, err := NewNode(-1)
+	assert.Error(t, err)
+	assert.Nil(t, node)
+}
