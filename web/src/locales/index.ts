@@ -3,6 +3,7 @@ import { getLanguage } from "../utils/cookies";
 
 // User defined lang
 import enLocale from "./en";
+import koLocale from "./ko";
 import trLocale from "./tr";
 import zhLocale from "./zh-cn";
 import zhTwLocale from "./zh-tw";
@@ -10,6 +11,9 @@ import zhTwLocale from "./zh-tw";
 const messages = {
   en: {
     ...enLocale,
+  },
+  ko: {
+    ...koLocale,
   },
   tr: {
     ...trLocale,
