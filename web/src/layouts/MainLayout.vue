@@ -180,6 +180,10 @@ export default {
         value: "en",
       },
       {
+        label: "한국어",
+        value: "ko",
+      },
+      {
         label: "Türkçe",
         value: "tr",
       },
