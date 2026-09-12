@@ -3,17 +3,13 @@ set -e
 
 BUILD_OUTPUT="zincsearch"
 MAIN_PACKAGE="cmd/zincsearch/main.go"
-WEB_DIR="web"
+FRONTEND_DIR="frontend"
 
 echo "Cleaning previous builds..."
 rm -f "$BUILD_OUTPUT"
 
-if [ -d "$WEB_DIR" ]; then
-    echo "Building web assets..."
-    cd "$WEB_DIR" && npm run build && cd ..
-else
-    echo "Warning: Web directory '$WEB_DIR' not found, skipping web build"
-fi
+echo "Building frontend assets..."
+(cd "$FRONTEND_DIR" && npm ci && npm run build)
 
 # Get build metadata
 VERSION=$(git describe --tags --always 2>/dev/null || echo "dev")

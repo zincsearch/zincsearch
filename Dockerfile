@@ -1,12 +1,12 @@
 # syntax=docker/dockerfile:experimental
 ############################
-# STEP 1 build web dist
+# STEP 1 build frontend dist
 ############################
-FROM node:18.18.2-slim as webBuilder
-WORKDIR /web
-COPY ./web /web/
+FROM node:24-slim as frontendBuilder
+WORKDIR /frontend
+COPY ./frontend /frontend/
 
-RUN npm install
+RUN npm ci
 RUN npm run build
 
 ############################
@@ -42,7 +42,7 @@ RUN adduser \
 RUN mkdir -p /var/lib/zincsearch /data && chown zincsearch:zincsearch /var/lib/zincsearch /data
 WORKDIR $GOPATH/src/github.com/zincsearch/zincsearch/
 COPY . .
-COPY --from=webBuilder /web/dist web/dist
+COPY --from=frontendBuilder /frontend/dist frontend/dist
 
 # Fetch dependencies.
 # Using go get.

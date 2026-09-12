@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:experimental
 ############################
-# STEP 1 build web dist - This is built outside of docker and can be reused for other binaries and other docker images too.
+# STEP 1 build frontend dist - This is built outside of docker and can be reused for other binaries and other docker images too.
 # No need to do this in dockerfile
 ############################
-# FROM node:13.8.0-slim as webBuilder
-# WORKDIR /web
-# COPY ./web /web/
+# FROM node:24-slim as frontendBuilder
+# WORKDIR /frontend
+# COPY ./frontend /frontend/
 
-# RUN npm install
+# RUN npm ci
 # RUN npm run build
 
 
@@ -46,9 +46,9 @@ RUN adduser \
 RUN mkdir -p /var/lib/zincsearch /data && chown zincsearch:zincsearch /var/lib/zincsearch /data
 WORKDIR $GOPATH/src/github.com/zincsearch/zincsearch/
 
-# Copy the whole repo to the current directory. This includes prebuilt front end assets. in web/dist folder
+# Copy the whole repo to the current directory. This includes prebuilt front end assets. in frontend/dist folder
 COPY . .
-# COPY --from=webBuilder /web/dist web/dist
+# COPY --from=frontendBuilder /frontend/dist frontend/dist
 
 # Fetch dependencies.
 # Using go get.

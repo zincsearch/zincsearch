@@ -1,7 +1,9 @@
 if (Test-Path "zincsearch.exe") { Remove-Item -Force .\zincsearch.exe }
 
-Set-Location .\web
+Set-Location .\frontend -ErrorAction Stop
 try {
+    $output = npm ci 2>&1
+    if ($LASTEXITCODE -ne 0) { throw $output }
     $output = npm run build 2>&1
     if ($LASTEXITCODE -ne 0) { throw $output }
 }
