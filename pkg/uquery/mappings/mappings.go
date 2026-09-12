@@ -34,6 +34,24 @@ func Request(analyzers map[string]*analysis.Analyzer, data map[string]interface{
 		return nil, nil
 	}
 
+	if sql, ok := data["sql"]; ok {
+		if !config.Global.EnableSQLMappings {
+			return nil, errors.New(errors.ErrorTypeParsingException, "[mappings] SQL mappings are disabled")
+		}
+		if len(data) != 1 {
+			return nil, errors.New(errors.ErrorTypeParsingException, "[mappings] sql cannot be combined with other mapping options")
+		}
+		ddl, ok := sql.(string)
+		if !ok || strings.TrimSpace(ddl) == "" {
+			return nil, errors.New(errors.ErrorTypeParsingException, "[mappings] sql should be a non-empty string")
+		}
+		properties, err := sqlProperties(ddl)
+		if err != nil {
+			return nil, errors.New(errors.ErrorTypeParsingException, "[mappings] "+err.Error())
+		}
+		return Request(analyzers, map[string]interface{}{"properties": properties})
+	}
+
 	if data["properties"] == nil {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[mappings] properties should be defined")
 	}
