@@ -16,6 +16,7 @@
 package routes
 
 import (
+	"io/fs"
 	"net/http"
 	"strings"
 	"time"
@@ -70,18 +71,23 @@ func SetRoutes(r *gin.Engine) {
 	HTTPCacheForUI(r)
 	r.StaticFS("/ui/", http.FS(front))
 	r.NoRoute(func(c *gin.Context) {
+		if c.Request.Method == http.MethodGet && strings.HasPrefix(c.Request.URL.Path, "/ui/") &&
+			!strings.HasPrefix(c.Request.URL.Path, "/ui/assets/") {
+			index, err := fs.ReadFile(front, "index.html")
+			if err != nil {
+				log.Error().Err(err).Msg("read frontend index")
+				c.Status(http.StatusInternalServerError)
+				return
+			}
+			c.Data(http.StatusOK, "text/html; charset=utf-8", index)
+			return
+		}
+
 		log.Error().
 			Str("method", c.Request.Method).
 			Int("code", 404).
 			Int("took", 0).
 			Msg(c.Request.RequestURI)
-
-		if strings.HasPrefix(c.Request.RequestURI, "/ui/") {
-			path := strings.TrimPrefix(c.Request.RequestURI, "/ui/")
-			locationPath := strings.Repeat("../", strings.Count(path, "/"))
-			c.Status(http.StatusFound)
-			c.Writer.Header().Set("Location", "./"+locationPath)
-		}
 	})
 
 	// auth
