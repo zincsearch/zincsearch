@@ -1,8 +1,11 @@
 name: Nightly
 
 on:
-  push:
-    branches: [main]
+  # Disabled: the push to ghcr.io/zincsearch/zincsearch-dev fails on forks with
+  # "denied: permission_denied: The requested installation does not exist"
+  # (GITHUB_TOKEN can only push packages under the repo owner). Run manually instead.
+  # push:
+  #   branches: [main]
   workflow_dispatch:
 
 permissions:
