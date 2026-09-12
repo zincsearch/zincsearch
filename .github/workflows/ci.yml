@@ -22,15 +22,15 @@ jobs:
         with:
           node-version: "24"
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: web/package-lock.json
       - run: npm ci
-        working-directory: frontend
+        working-directory: web
       - run: npm run build
-        working-directory: frontend
+        working-directory: web
       - uses: actions/upload-artifact@v7
         with:
-          name: frontend-dist
-          path: frontend/dist
+          name: web-dist
+          path: web/dist
           retention-days: 1
           if-no-files-found: error
 
@@ -42,8 +42,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:
-          name: frontend-dist
-          path: frontend/dist
+          name: web-dist
+          path: web/dist
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
@@ -59,8 +59,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:
-          name: frontend-dist
-          path: frontend/dist
+          name: web-dist
+          path: web/dist
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
