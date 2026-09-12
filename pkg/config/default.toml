@@ -1,0 +1,49 @@
+# Built-in defaults. Overridden by ./conf/zinc.toml in the working directory, then by non-empty environment variables.
+#
+# zinc_first_admin_user = "admin"
+# zinc_first_admin_password = "admin"
+zinc_server_port = "4080"
+zinc_server_mode = "node"
+zinc_node_id = 1
+zinc_data_path = "./data"
+zinc_metadata_storage = "bolt"
+zinc_ice_compressor = "zstd"
+# 
+# zinc_sentry = true
+# zinc_sentry_dsn = ""
+# zinc_profiler = false
+# zinc_profiler_server = ""
+# zinc_profiler_api_key = ""
+# zinc_telemetry = true
+# 
+zinc_prometheus_enable = false
+zinc_enable_text_keyword_mapping = false
+# Accept MySQL CREATE TABLE schemas in mappings.sql; JSON mappings are always supported.
+zinc_enable_sql_mappings = true
+# 
+zinc_batch_size = 1024
+zinc_max_results = 10000
+zinc_aggregation_terms_size = 1000
+zinc_max_document_size = 1000000
+zinc_wal_sync_interval = 1000000000
+zinc_wal_redolog_no_sync = false
+zinc_swagger_enable = true
+zinc_log_level = "debug"
+
+[Cluster]
+zinc_cluster_name = "ZincCluster"
+
+[Shard]
+zinc_shard_goroutine_num = 3
+zinc_shard_num = 3
+zinc_shard_max_size = 1073741824
+
+[Etcd]
+zinc_etcd_prefix = "/zinc"
+
+[Plugin.GSE]
+zinc_plugin_gse_enable = false
+zinc_plugin_gse_enable_stop = true
+zinc_plugin_gse_enable_hmm = true
+zinc_plugin_gse_dict_embed = "small"
+zinc_plugin_gse_dict_path = "./plugins/gse/dict"
