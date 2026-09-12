@@ -22,9 +22,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
 	"github.com/rs/zerolog/log"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/zincsearch/zincsearch/pkg/config"
@@ -68,7 +68,7 @@ type IndexShard struct {
 type IndexSecondShard struct {
 	root   *Index
 	ref    *meta.IndexSecondShard
-	writer *bluge.Writer
+	writer *riot.Writer
 	lock   sync.RWMutex
 }
 
@@ -150,7 +150,7 @@ func (s *IndexShard) NewShard() error {
 }
 
 // GetWriter return the newest shard writer or special shard writer
-func (s *IndexShard) GetWriter(shardID ...int64) (*bluge.Writer, error) {
+func (s *IndexShard) GetWriter(shardID ...int64) (*riot.Writer, error) {
 	var id int64
 	if len(shardID) == 1 {
 		id = shardID[0]
@@ -188,8 +188,8 @@ func (s *IndexShard) GetWriter(shardID ...int64) (*bluge.Writer, error) {
 }
 
 // GetWriters return all shard writers
-func (s *IndexShard) GetWriters() ([]*bluge.Writer, error) {
-	ws := make([]*bluge.Writer, 0, s.GetShardNum())
+func (s *IndexShard) GetWriters() ([]*riot.Writer, error) {
+	ws := make([]*riot.Writer, 0, s.GetShardNum())
 	for i := int64(0); i < s.GetShardNum(); i++ {
 		w, err := s.GetWriter(i)
 		if err != nil {
@@ -201,9 +201,9 @@ func (s *IndexShard) GetWriters() ([]*bluge.Writer, error) {
 }
 
 // GetReaders return all shard readers
-func (s *IndexShard) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error) {
-	rs := make([]*bluge.Reader, 0, 1)
-	chs := make(chan *bluge.Reader, s.GetShardNum())
+func (s *IndexShard) GetReaders(timeMin, timeMax int64) ([]*riot.Reader, error) {
+	rs := make([]*riot.Reader, 0, 1)
+	chs := make(chan *riot.Reader, s.GetShardNum())
 	eg := errgroup.Group{}
 	eg.SetLimit(config.Global.Shard.GoroutineNum)
 	for i := s.GetLatestShardID(); i >= 0; i-- {
@@ -308,9 +308,9 @@ func (s *IndexShard) SetTimestamp(t int64) {
 
 // FindShardByDocID finds docID in which shard and returns the shard id
 func (s *IndexShard) FindShardByDocID(docID string) (int64, error) {
-	query := bluge.NewBooleanQuery()
-	query.AddMust(bluge.NewTermQuery(docID).SetField("_id"))
-	request := bluge.NewTopNSearch(1, query).WithStandardAggregations()
+	query := riot.NewBooleanQuery()
+	query.AddMust(riot.NewTermQuery(docID).SetField("_id"))
+	request := riot.NewTopNSearch(1, query).WithStandardAggregations()
 	ctx := context.Background()
 
 	// check id store by which shard
@@ -361,9 +361,9 @@ func (s *IndexShard) FindShardByDocID(docID string) (int64, error) {
 
 // FindDocumentByDocID finds docID and returns the document
 func (s *IndexShard) FindDocumentByDocID(docID string) (*meta.Hit, error) {
-	query := bluge.NewBooleanQuery()
-	query.AddMust(bluge.NewTermQuery(docID).SetField("_id"))
-	request := bluge.NewTopNSearch(1, query).WithStandardAggregations()
+	query := riot.NewBooleanQuery()
+	query.AddMust(riot.NewTermQuery(docID).SetField("_id"))
+	request := riot.NewTopNSearch(1, query).WithStandardAggregations()
 	ctx := context.Background()
 
 	// check id store by which shard
@@ -411,7 +411,7 @@ func (s *IndexShard) FindDocumentByDocID(docID string) (*meta.Hit, error) {
 						case "_index":
 							indexName = string(value)
 						case "@timestamp":
-							timestamp, _ = bluge.DecodeDateTime(value)
+							timestamp, _ = riot.DecodeDateTime(value)
 						case "_source":
 							sourceData = source.Response(&meta.Source{Enable: true}, value)
 						default: // do nothing

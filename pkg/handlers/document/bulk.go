@@ -178,7 +178,8 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 				for k := range lastLineMetaData {
 					delete(lastLineMetaData, k)
 				}
-				if k == "index" || k == "create" || k == "update" {
+				switch k {
+				case "index", "create", "update":
 					nextLineIsData = true
 					lastLineMetaData["operation"] = k
 
@@ -191,7 +192,7 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 						return nil, errors.New("bulk index data format error")
 					}
 					lastLineMetaData["_id"] = vm["_id"]
-				} else if k == "delete" {
+				case "delete":
 					nextLineIsData = false
 					docID := vm["_id"].(string)
 					indexName := target
@@ -213,7 +214,7 @@ func BulkWorker(target string, body io.Reader) (*BulkResponse, error) {
 					bulkRes.Items = append(bulkRes.Items, map[string]BulkResponseItem{
 						"delete": NewBulkResponseItem(bulkRes.Count, indexName, docID, "deleted", err),
 					})
-				} else {
+				default:
 					lastLineMetaData["_index"] = target
 					lastLineMetaData["operation"] = "index"
 				}
@@ -242,8 +243,8 @@ func DoesExistInThisRequest(slice []string, val string) int {
 func NewBulkResponseItem(seqNo int64, index, id, result string, err error) BulkResponseItem {
 	s_err := ""
 	if err != nil {
-	        s_err = err.Error()
-	}  
+		s_err = err.Error()
+	}
 	return BulkResponseItem{
 		Index:   index,
 		Type:    "_doc",

@@ -18,14 +18,14 @@ package directory
 import (
 	"path"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/index"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/index"
 )
 
 // GetDiskConfig returns a bluge config that will store index data in local disk
 // rootPath: the root path of data
 // indexName: the name of the index to use.
-func GetDiskConfig(rootPath string, indexName string, timeRange ...int64) bluge.Config {
+func GetDiskConfig(rootPath string, indexName string, timeRange ...int64) riot.Config {
 	config := index.DefaultConfig(path.Join(rootPath, indexName))
 	config = config.WithPersisterNapTimeMSec(50)
 	if len(timeRange) == 2 {
@@ -33,5 +33,5 @@ func GetDiskConfig(rootPath string, indexName string, timeRange ...int64) bluge.
 			config = config.WithTimeRange(timeRange[0], timeRange[1])
 		}
 	}
-	return bluge.DefaultConfigWithIndexConfig(config)
+	return riot.DefaultConfigWithIndexConfig(config)
 }

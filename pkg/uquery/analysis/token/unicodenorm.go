@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/analysis/token"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/analysis/token"
 	"golang.org/x/text/unicode/norm"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"

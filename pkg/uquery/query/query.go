@@ -19,15 +19,15 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	"github.com/zincsearch/zincsearch/pkg/zutils/json"
 )
 
-func Query(query interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
+func Query(query interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (riot.Query, error) {
 	if query == nil {
 		return MatchAllQuery()
 	}
@@ -48,7 +48,7 @@ func Query(query interface{}, mappings *meta.Mappings, analyzers map[string]*ana
 		return nil, errors.New(errors.ErrorTypeInvalidArgument, "query must be a map[string]interface{}")
 	}
 
-	var subq bluge.Query
+	var subq riot.Query
 	var cmd string
 	var err error
 	for k, t := range q {

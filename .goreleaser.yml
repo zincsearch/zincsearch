@@ -58,7 +58,7 @@ dockers_v2:
   - id: zincsearch
     ids:
       - zincsearch_binaries
-    dockerfile: Dockerfile.release
+    dockerfile: docker/Dockerfile.release
     images:
       - ghcr.io/zincsearch/zincsearch
     tags:

@@ -21,14 +21,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blugelabs/bluge"
-
+	"github.com/vcaesar/riot"
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
-func RangeQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
+func RangeQuery(query map[string]interface{}, mappings *meta.Mappings) (riot.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[range] query doesn't support multiple fields")
 	}
@@ -53,7 +52,7 @@ func RangeQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Qu
 	return nil, nil
 }
 
-func RangeQueryNumeric(field string, query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
+func RangeQueryNumeric(field string, query map[string]interface{}, mappings *meta.Mappings) (riot.Query, error) {
 	value := new(meta.RangeQuery)
 	value.Boost = -1.0
 	for k, v := range query {
@@ -95,7 +94,7 @@ func RangeQueryNumeric(field string, query map[string]interface{}, mappings *met
 	if max == 0 {
 		max = float64(math.MaxInt64)
 	}
-	subq := bluge.NewNumericRangeInclusiveQuery(min, max, minInclusive, maxInclusive).SetField(field)
+	subq := riot.NewNumericRangeInclusiveQuery(min, max, minInclusive, maxInclusive).SetField(field)
 	if value.Boost >= 0 {
 		subq.SetBoost(value.Boost)
 	}
@@ -103,7 +102,7 @@ func RangeQueryNumeric(field string, query map[string]interface{}, mappings *met
 	return subq, nil
 }
 
-func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
+func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.Mappings) (riot.Query, error) {
 	value := new(meta.RangeQuery)
 	value.Boost = -1.0
 	for k, v := range query {
@@ -210,7 +209,7 @@ func RangeQueryTime(field string, query map[string]interface{}, mappings *meta.M
 	if max.IsZero() {
 		max = time.Now()
 	}
-	subq := bluge.NewDateRangeInclusiveQuery(min.UTC(), max.UTC(), minInclusive, maxInclusive).SetField(field)
+	subq := riot.NewDateRangeInclusiveQuery(min.UTC(), max.UTC(), minInclusive, maxInclusive).SetField(field)
 	if value.Boost >= 0 {
 		subq.SetBoost(value.Boost)
 	}

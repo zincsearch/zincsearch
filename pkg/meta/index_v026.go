@@ -19,7 +19,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/blugelabs/bluge"
+	"github.com/vcaesar/riot"
 	"github.com/zincsearch/zincsearch/pkg/wal"
 )
 
@@ -42,11 +42,11 @@ type IndexV026 struct {
 }
 
 type IndexShardV026 struct {
-	ID          int64         `json:"id"`
-	DocTimeMin  int64         `json:"doc_time_min"`
-	DocTimeMax  int64         `json:"doc_time_max"`
-	DocNum      uint64        `json:"doc_num"`
-	StorageSize uint64        `json:"storage_size"`
-	Writer      *bluge.Writer `json:"-"`
-	Lock        sync.RWMutex  `json:"-"`
+	ID          int64        `json:"id"`
+	DocTimeMin  int64        `json:"doc_time_min"`
+	DocTimeMax  int64        `json:"doc_time_max"`
+	DocNum      uint64       `json:"doc_num"`
+	StorageSize uint64       `json:"storage_size"`
+	Writer      *riot.Writer `json:"-"`
+	Lock        sync.RWMutex `json:"-"`
 }

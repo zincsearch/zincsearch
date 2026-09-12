@@ -21,9 +21,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
 	"github.com/rs/zerolog/log"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
 
 	zincsearch "github.com/zincsearch/zincsearch/pkg/bluge/search"
 	"github.com/zincsearch/zincsearch/pkg/meta"
@@ -34,7 +34,7 @@ import (
 func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchResponse, error) {
 	var mappings *meta.Mappings
 	var analyzers map[string]*analysis.Analyzer
-	var readers []*bluge.Reader
+	var readers []*riot.Reader
 	var shardNum int64
 
 	timeMin, timeMax := timerange.Query(query.Query)
@@ -92,7 +92,7 @@ func MultiSearch(indexNames []string, query *meta.ZincQuery) (*meta.SearchRespon
 		defer cancel()
 	}
 
-	// dmi, err := bluge.MultiSearch(ctx, searchRequest, readers...)
+	// dmi, err := riot.MultiSearch(ctx, searchRequest, readers...)
 	dmi, err := zincsearch.MultiSearch(ctx, query, mappings, analyzers, readers...)
 	if err != nil {
 		log.Printf("core.MultiSearchV2: error executing search: %s", err.Error())

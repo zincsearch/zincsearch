@@ -19,8 +19,8 @@ import (
 	"testing"
 	"time"
 
-	blugeindex "github.com/blugelabs/bluge/index"
 	"github.com/stretchr/testify/assert"
+	blugeindex "github.com/vcaesar/riot/index"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 

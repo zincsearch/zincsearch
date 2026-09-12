@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$(dirname "$0")/.." || exit 1
+
 export ZINC_FIRST_ADMIN_USER=admin  
 export ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
 export ZINC_WAL_SYNC_INTERVAL=10ms

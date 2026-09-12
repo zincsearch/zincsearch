@@ -20,9 +20,9 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/blugelabs/bluge"
-	blugeindex "github.com/blugelabs/bluge/index"
 	"github.com/rs/zerolog/log"
+	"github.com/vcaesar/riot"
+	blugeindex "github.com/vcaesar/riot/index"
 
 	"github.com/zincsearch/zincsearch/pkg/config"
 	"github.com/zincsearch/zincsearch/pkg/errors"
@@ -347,8 +347,8 @@ func (w *walMergeDocs) WriteToShard(shard *IndexShard, shardID int64, batch *blu
 	if !ok {
 		return nil
 	}
-	var writer *bluge.Writer
-	otherWriters := make([]*bluge.Writer, 0)
+	var writer *riot.Writer
+	otherWriters := make([]*riot.Writer, 0)
 	otherBatch := blugeindex.NewBatch()
 	if shardID == ShardIDNeedLatest {
 		shardID = shard.GetLatestShardID()
@@ -449,7 +449,7 @@ func (w *walMergeDocs) WriteToShardRollback(shard *IndexShard, shardID int64, ba
 	if !ok {
 		return nil
 	}
-	var writer *bluge.Writer
+	var writer *riot.Writer
 	var err error
 	if shardID >= 0 {
 		writer, err = shard.GetWriter(shardID)

@@ -18,7 +18,7 @@ package sort
 import (
 	"strings"
 
-	"github.com/blugelabs/bluge/search"
+	"github.com/vcaesar/riot/search"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 )

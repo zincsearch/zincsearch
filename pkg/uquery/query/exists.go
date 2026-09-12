@@ -16,11 +16,10 @@
 package query
 
 import (
-	"github.com/blugelabs/bluge"
-
+	"github.com/vcaesar/riot"
 	"github.com/zincsearch/zincsearch/pkg/errors"
 )
 
-func ExistsQuery(query map[string]interface{}) (bluge.Query, error) {
+func ExistsQuery(query map[string]interface{}) (riot.Query, error) {
 	return nil, errors.New(errors.ErrorTypeNotImplemented, "[exists] query doesn't support")
 }

@@ -36,6 +36,10 @@ func TestSearchV2(t *testing.T) {
 		resp := request("PUT", "/api/"+indexName+"/_doc", body)
 		assert.NoError(t, core.ZINC_INDEX_ALIAS_LIST.AddIndexesToAlias(indexAlias, []string{indexName}))
 		assert.Equal(t, http.StatusOK, resp.Code)
+
+		created := new(meta.HTTPResponseID)
+		assert.NoError(t, json.Unmarshal(resp.Body.Bytes(), created))
+		waitForDocument(t, indexName, created.ID)
 	})
 
 	t.Run("POST /es/:target/_search", func(t *testing.T) {
@@ -131,11 +135,10 @@ func TestSearchV2(t *testing.T) {
 		})
 		t.Run("search document type: daterange", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(
-				fmt.Sprintf(`{"query": {"range": {"@timestamp": { "gte": "%s", "lt": "%s"}}}, "size":10}`,
-					time.Now().UTC().Add(time.Hour*-24).Format("2006-01-02T15:04:05Z"),
-					time.Now().UTC().Format("2006-01-02T15:04:05Z"),
-				))
+			fmt.Fprintf(body,
+				`{"query": {"range": {"@timestamp": { "gte": "%s", "lt": "%s"}}}, "size":10}`,
+				time.Now().UTC().Add(time.Hour*-24).Format("2006-01-02T15:04:05Z"),
+				time.Now().UTC().Add(time.Hour).Format("2006-01-02T15:04:05Z"))
 			resp := request("POST", "/es/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 

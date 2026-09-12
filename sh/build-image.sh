@@ -1,7 +1,9 @@
 #!/bin/sh
 # author xiaojun207
-# eg.1 : sh build-image.sh
-# eg.2, set image: sh build-image.sh public.ecr.aws/zinclabs/zincsearch
+# eg.1 : sh sh/build-image.sh
+# eg.2, set image: sh sh/build-image.sh public.ecr.aws/zinclabs/zincsearch
+
+cd "$(dirname "$0")/.." || exit 1
 
 VERSION=`git describe --tags --always` # eg.: 0.2.5
 BUILD_DATE=`date +%Y%m%d` # eg.: 20220701
@@ -19,7 +21,7 @@ docker buildx build \
   --build-arg BUILD_DATE="${BUILD_DATE}" \
   --tag "$IMAGE:${VERSION}" \
   --tag "$IMAGE:latest" \
-  . -f Dockerfile
+  . -f docker/Dockerfile
 
 # push to image rep
 if [ -n "$1" ]; then

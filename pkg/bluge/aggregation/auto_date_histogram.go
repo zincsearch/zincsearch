@@ -20,9 +20,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/blugelabs/bluge/search"
-	"github.com/blugelabs/bluge/search/aggregations"
 	"github.com/rs/zerolog/log"
+	"github.com/vcaesar/riot/search"
+	"github.com/vcaesar/riot/search/aggregations"
 
 	"github.com/zincsearch/zincsearch/pkg/config"
 	"github.com/zincsearch/zincsearch/pkg/zutils"
@@ -243,7 +243,7 @@ func (a *AutoDateHistogramCalculator) Finish() {
 			}
 		}
 		// check bucket size
-		if !(len(a.bucketsMap) > a.size && a.currentInterval < len(a.intervals)-1) {
+		if len(a.bucketsMap) <= a.size || a.currentInterval >= len(a.intervals)-1 {
 			break
 		}
 		a.currentInterval++

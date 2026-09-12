@@ -18,9 +18,9 @@ package uquery
 import (
 	"fmt"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/search"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/search"
 
 	"github.com/zincsearch/zincsearch/pkg/config"
 	"github.com/zincsearch/zincsearch/pkg/errors"
@@ -34,7 +34,7 @@ import (
 )
 
 // ParseQueryDSL parse query DSL and return searchRequest
-func ParseQueryDSL(q *meta.ZincQuery, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.SearchRequest, error) {
+func ParseQueryDSL(q *meta.ZincQuery, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (riot.SearchRequest, error) {
 	// parse size
 	if q.Size > config.Global.MaxResults {
 		q.Size = config.Global.MaxResults
@@ -50,7 +50,7 @@ func ParseQueryDSL(q *meta.ZincQuery, mappings *meta.Mappings, analyzers map[str
 	}
 
 	// create search request
-	request := bluge.NewTopNSearch(q.Size, query).WithStandardAggregations()
+	request := riot.NewTopNSearch(q.Size, query).WithStandardAggregations()
 
 	// parse highlight
 	if q.Highlight != nil {

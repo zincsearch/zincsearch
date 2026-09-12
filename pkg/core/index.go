@@ -19,8 +19,8 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/zincsearch/zincsearch/pkg/meta"
@@ -249,8 +249,8 @@ func (index *Index) GetWALSize() uint64 {
 }
 
 // GetReaders return all shard readers
-func (index *Index) GetReaders(timeMin, timeMax int64) ([]*bluge.Reader, error) {
-	readers := make([]*bluge.Reader, 0)
+func (index *Index) GetReaders(timeMin, timeMax int64) ([]*riot.Reader, error) {
+	readers := make([]*riot.Reader, 0)
 	for _, shard := range index.shards {
 		rs, err := shard.GetReaders(timeMin, timeMax)
 		if err != nil {

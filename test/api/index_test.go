@@ -31,7 +31,7 @@ func TestIndex(t *testing.T) {
 	t.Run("PUT /api/index", func(t *testing.T) {
 		t.Run("create index with payload", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(fmt.Sprintf(`{"name":"%s","storage_type":"disk"}`, "newindex"))
+			fmt.Fprintf(body, `{"name":"%s","storage_type":"disk"}`, "newindex")
 			resp := request("PUT", "/api/index", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -45,7 +45,7 @@ func TestIndex(t *testing.T) {
 
 		t.Run("create index with error input", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(fmt.Sprintf(`{"name":"%s","storage_type":"disk"}`, ""))
+			fmt.Fprintf(body, `{"name":"%s","storage_type":"disk"}`, "")
 			resp := request("PUT", "/api/index", body)
 			assert.Equal(t, http.StatusBadRequest, resp.Code)
 		})
@@ -77,6 +77,7 @@ func TestIndex(t *testing.T) {
 
 		t.Run("PUT /api/:target/_mapping", func(t *testing.T) {
 			t.Run("update mappings for index", func(t *testing.T) {
+				request("DELETE", "/api/index/"+indexName+"-mapping", nil) // drop leftovers from a previous run
 				body := bytes.NewBuffer(nil)
 				body.WriteString(`{
 					"properties":{

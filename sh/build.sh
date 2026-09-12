@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+cd "$(dirname "$0")/.."
 
 BUILD_OUTPUT="zincsearch"
 MAIN_PACKAGE="cmd/zincsearch/main.go"

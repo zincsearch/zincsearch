@@ -14,6 +14,13 @@ miniodata
 # Test binary, built with `go test -c`
 *.test
 
+/test
+.v0
+v0
+.codg
+# web
+mysearch
+
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 out/

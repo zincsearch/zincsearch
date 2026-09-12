@@ -2,3 +2,8 @@ version: "2"
 run:
   # Timeout for analysis, e.g. 30s, 5m.
   timeout: 5m
+linters:
+  exclusions:
+    # Restore the v1 default: unchecked errors from deferred Close/Flush/print are tolerated.
+    presets:
+      - std-error-handling

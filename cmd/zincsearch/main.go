@@ -87,8 +87,8 @@ func main() {
 			if err := server.Shutdown(ctx); err != nil {
 				log.Fatal().Err(err).Msg("Server Shutdown")
 			}
-		} else {
-			server.Close()
+		} else if err := server.Close(); err != nil {
+			log.Error().Err(err).Msg("Server Close")
 		}
 
 		log.Info().Msg("Index closing...")
@@ -190,7 +190,7 @@ func profiling() {
 
 		// optionally, if authentication is enabled, specify the API key:
 		// AuthToken: os.Getenv("PYROSCOPE_AUTH_TOKEN"),
-		AuthToken: config.Global.ProfilerAPIKey,
+		AuthToken: config.Global.ProfilerAPIKey, //nolint:staticcheck // token auth; BasicAuthUser/Password needs a new config field
 
 		// by default all profilers are enabled,
 		// but you can select the ones you want to use:

@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
@@ -28,7 +28,7 @@ import (
 	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
-func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
+func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (riot.Query, error) {
 	value := new(meta.MultiMatchQuery)
 	value.Boost = -1.0
 	for k, v := range query {
@@ -62,20 +62,20 @@ func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, anal
 		zer, _ = zincanalysis.QueryAnalyzer(analyzers, value.Analyzer)
 	}
 
-	var operator bluge.MatchQueryOperator = bluge.MatchQueryOperatorOr
+	var operator riot.MatchQueryOperator = riot.MatchQueryOperatorOr
 	if value.Operator != "" {
 		op := strings.ToUpper(value.Operator)
 		switch op {
 		case "OR":
-			operator = bluge.MatchQueryOperatorOr
+			operator = riot.MatchQueryOperatorOr
 		case "AND":
-			operator = bluge.MatchQueryOperatorAnd
+			operator = riot.MatchQueryOperatorAnd
 		default:
 			return nil, errors.New(errors.ErrorTypeIllegalArgumentException, fmt.Sprintf("[multi_match] unknown operator %s", op))
 		}
 	}
 
-	subq := bluge.NewBooleanQuery()
+	subq := riot.NewBooleanQuery()
 	if value.MinimumShouldMatch != nil {
 		minValue, err := zutils.CalculateMin(len(value.Fields), value.MinimumShouldMatch)
 		if err != nil {
@@ -87,7 +87,7 @@ func MultiMatchQuery(query map[string]interface{}, mappings *meta.Mappings, anal
 		subq.SetBoost(value.Boost)
 	}
 	for _, field := range value.Fields {
-		subqq := bluge.NewMatchQuery(value.Query).SetField(field).SetOperator(operator)
+		subqq := riot.NewMatchQuery(value.Query).SetField(field).SetOperator(operator)
 		if zer != nil {
 			subqq.SetAnalyzer(zer)
 		} else {

@@ -19,13 +19,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-
+	"github.com/vcaesar/riot"
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
-func IdsQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
+func IdsQuery(query map[string]interface{}, mappings *meta.Mappings) (riot.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[ids] query doesn't support multiple fields")
 	}

@@ -19,9 +19,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/analysis/analyzer"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/analysis/analyzer"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
@@ -29,7 +29,7 @@ import (
 	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
-func FuzzyQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
+func FuzzyQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (riot.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[fuzzy] query doesn't support multiple fields")
 	}
@@ -72,7 +72,7 @@ func FuzzyQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers
 		zer = indexZer
 	}
 
-	subq := bluge.NewFuzzyQuery(value.Value).SetField(field)
+	subq := riot.NewFuzzyQuery(value.Value).SetField(field)
 	if value.Fuzziness != nil {
 		v := ParseFuzziness(value.Fuzziness, value.Value, zer)
 		if v > 0 {

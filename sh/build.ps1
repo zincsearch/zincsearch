@@ -1,3 +1,5 @@
+Set-Location (Join-Path $PSScriptRoot "..") -ErrorAction Stop
+
 if (Test-Path "zincsearch.exe") { Remove-Item -Force .\zincsearch.exe }
 
 Set-Location .\frontend -ErrorAction Stop

@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/analysis/char"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/analysis/char"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	zincchar "github.com/zincsearch/zincsearch/pkg/uquery/analysis/char"
