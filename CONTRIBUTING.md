@@ -9,7 +9,7 @@ ZincSearch uses Go (For server) and React / TypeScript (For Web UI)
 You must have following installed:
 
 1. Git
-2. Go 1.27.1+
+2. Go 1.27.1+ (We recommend go 1.27+, I will move to 1.20+)
 3. Node.js 24 and npm
 
 ## Building from source code
@@ -136,19 +136,18 @@ docker buildx build --platform linux/amd64 --tag zinc:latest-linux-amd64 . -f do
 We check for following in CI pipeline for any pull requests.
 
 1. Unit test code coverage for go code.
-    - If code coverage is less than 81% (according to go test) the CI tests will fail.
-    - You can test coverage yourself by running `./sh/coverage.sh` 
-    - We use codecov for visualizing code coverage of go code, codecov updates coverage for every PR through a comment. It allows you to see missing coverage for any lines.
+   - If code coverage is less than 70% (according to go test) the CI tests will fail.
+   - You can test coverage yourself by running `./sh/coverage.sh`
+   - We use codecov for visualizing code coverage of go code, codecov updates coverage for every PR through a comment. It allows you to see missing coverage for any lines.
 1. Frontend production build
-    - Run `npm ci && npm run build` in `frontend/` to check TypeScript and build the embedded assets.
-    - Build the frontend before running Go tests or building the server.
-
+   - Run `npm ci && npm run build` in `frontend/` to check TypeScript and build the embedded assets.
+   - Build the frontend before running Go tests or building the server.
 
 ## How to contribute code
 
 1. Fork the repository on github (e.g. awesomedev/zincsearch)
 1. Clone the repo from the forked repository ( e.g. awesomedev/zincsearch) to your machine.
-1. create a new branch locally. 
+1. create a new branch locally.
 1. Make the changes to code.
 1. Push the code to your repo.
 1. Create a PR
