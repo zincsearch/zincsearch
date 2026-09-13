@@ -1,6 +1,6 @@
 module github.com/zincsearch/zincsearch
 
-go 1.27.1
+go 1.26.7
 
 require (
 	github.com/dgraph-io/badger/v4 v4.9.6
@@ -24,9 +24,9 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
-	github.com/vcaesar/ice v1.2.2
-	github.com/vcaesar/query_string v0.4.0
-	github.com/vcaesar/riot v1.23.0
+	github.com/vcaesar/ice v1.2.3
+	github.com/vcaesar/query_string v0.6.0
+	github.com/vcaesar/riot v1.23.1
 	github.com/zincsearch/go-gin-prometheus v0.1.1
 	github.com/zincsearch/wal v1.2.6
 	go.etcd.io/bbolt v1.5.0
@@ -116,7 +116,7 @@ require (
 	github.com/tklauser/numcpus v0.12.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.2 // indirect
-	github.com/vcaesar/bluge_segment_api v1.1.0 // indirect
+	github.com/vcaesar/bluge_segment_api v1.2.0 // indirect
 	github.com/vcaesar/cedar v0.50.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.etcd.io/etcd/api/v3 v3.7.1 // indirect
