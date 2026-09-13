@@ -20,26 +20,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vcaesar/riot/analysis"
-	"github.com/vcaesar/riot/analysis/tokenizer"
+
+	"github.com/zincsearch/zincsearch/pkg/uquery/analysis/internal/testutil"
 )
-
-func tokens(text string) analysis.TokenStream {
-	return tokenizer.NewWhitespaceTokenizer().Tokenize([]byte(text))
-}
-
-func terms(ts analysis.TokenStream) []string {
-	out := make([]string, 0, len(ts))
-	for _, t := range ts {
-		out = append(out, string(t.Term))
-	}
-	return out
-}
 
 func TestNewDictTokenFilter(t *testing.T) {
 	t.Run("decompound", func(t *testing.T) {
 		f, err := NewDictTokenFilter(map[string]interface{}{"words": []interface{}{"soft", "ball"}})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"softball", "soft", "ball"}, terms(f.Filter(tokens("softball"))))
+		assert.Equal(t, []string{"softball", "soft", "ball"}, testutil.Terms(f.Filter(testutil.Tokens("softball"))))
 	})
 	t.Run("min_word_size skips short words", func(t *testing.T) {
 		f, err := NewDictTokenFilter(map[string]interface{}{
@@ -47,7 +36,7 @@ func TestNewDictTokenFilter(t *testing.T) {
 			"min_word_size": float64(20),
 		})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"softball"}, terms(f.Filter(tokens("softball"))))
+		assert.Equal(t, []string{"softball"}, testutil.Terms(f.Filter(testutil.Tokens("softball"))))
 	})
 	t.Run("missing words", func(t *testing.T) {
 		f, err := NewDictTokenFilter(nil)
@@ -82,7 +71,7 @@ func TestNewEdgeNgramTokenFilter(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, terms(f.Filter(tokens("abcd"))))
+			assert.Equal(t, tt.want, testutil.Terms(f.Filter(testutil.Tokens("abcd"))))
 		})
 	}
 }
@@ -91,12 +80,12 @@ func TestNewElisionTokenFilter(t *testing.T) {
 	t.Run("default french articles", func(t *testing.T) {
 		f, err := NewElisionTokenFilter(nil)
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"avion", "homme"}, terms(f.Filter(tokens("l'avion d'homme"))))
+		assert.Equal(t, []string{"avion", "homme"}, testutil.Terms(f.Filter(testutil.Tokens("l'avion d'homme"))))
 	})
 	t.Run("custom articles", func(t *testing.T) {
 		f, err := NewElisionTokenFilter(map[string]interface{}{"articles": []interface{}{"x"}})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"avion", "l'homme"}, terms(f.Filter(tokens("x'avion l'homme"))))
+		assert.Equal(t, []string{"avion", "l'homme"}, testutil.Terms(f.Filter(testutil.Tokens("x'avion l'homme"))))
 	})
 }
 
@@ -104,7 +93,7 @@ func TestNewKeywordTokenFilter(t *testing.T) {
 	t.Run("marks keywords", func(t *testing.T) {
 		f, err := NewKeywordTokenFilter(map[string]interface{}{"keywords": []interface{}{"foo"}})
 		assert.NoError(t, err)
-		out := f.Filter(tokens("foo bar"))
+		out := f.Filter(testutil.Tokens("foo bar"))
 		assert.True(t, out[0].KeyWord)
 		assert.False(t, out[1].KeyWord)
 	})
@@ -119,12 +108,12 @@ func TestNewLengthTokenFilter(t *testing.T) {
 	t.Run("default 1-2", func(t *testing.T) {
 		f, err := NewLengthTokenFilter(nil)
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"a", "bb"}, terms(f.Filter(tokens("a bb ccc"))))
+		assert.Equal(t, []string{"a", "bb"}, testutil.Terms(f.Filter(testutil.Tokens("a bb ccc"))))
 	})
 	t.Run("custom", func(t *testing.T) {
 		f, err := NewLengthTokenFilter(map[string]interface{}{"min": float64(2), "max": float64(3)})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"bb", "ccc"}, terms(f.Filter(tokens("a bb ccc dddd"))))
+		assert.Equal(t, []string{"bb", "ccc"}, testutil.Terms(f.Filter(testutil.Tokens("a bb ccc dddd"))))
 	})
 }
 
@@ -148,7 +137,7 @@ func TestNewNgramTokenFilter(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, terms(f.Filter(tokens("abc"))))
+			assert.Equal(t, tt.want, testutil.Terms(f.Filter(testutil.Tokens("abc"))))
 		})
 	}
 }
@@ -175,7 +164,7 @@ func TestNewRegexpTokenFilter(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, terms(f.Filter(tokens("foo bar"))))
+			assert.Equal(t, tt.want, testutil.Terms(f.Filter(testutil.Tokens("foo bar"))))
 		})
 	}
 }
@@ -202,7 +191,7 @@ func TestNewShingleTokenFilter(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f, err := NewShingleTokenFilter(tt.options)
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, terms(f.Filter(tokens("a b c"))))
+			assert.Equal(t, tt.want, testutil.Terms(f.Filter(testutil.Tokens("a b c"))))
 		})
 	}
 }
@@ -211,12 +200,12 @@ func TestNewStopTokenFilter(t *testing.T) {
 	t.Run("default english", func(t *testing.T) {
 		f, err := NewStopTokenFilter(nil)
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"quick", "fox"}, terms(f.Filter(tokens("the quick fox"))))
+		assert.Equal(t, []string{"quick", "fox"}, testutil.Terms(f.Filter(testutil.Tokens("the quick fox"))))
 	})
 	t.Run("custom", func(t *testing.T) {
 		f, err := NewStopTokenFilter(map[string]interface{}{"stopwords": []interface{}{"fox"}})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"the", "quick"}, terms(f.Filter(tokens("the quick fox"))))
+		assert.Equal(t, []string{"the", "quick"}, testutil.Terms(f.Filter(testutil.Tokens("the quick fox"))))
 	})
 }
 
@@ -224,19 +213,19 @@ func TestNewTrimTokenFilter(t *testing.T) {
 	f, err := NewTrimTokenFilter()
 	assert.NoError(t, err)
 	ts := analysis.TokenStream{{Term: []byte("  foo "), Type: analysis.AlphaNumeric}}
-	assert.Equal(t, []string{"foo"}, terms(f.Filter(ts)))
+	assert.Equal(t, []string{"foo"}, testutil.Terms(f.Filter(ts)))
 }
 
 func TestNewTruncateTokenFilter(t *testing.T) {
 	t.Run("default 10", func(t *testing.T) {
 		f, err := NewTruncateTokenFilter(nil)
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"abcdefghij"}, terms(f.Filter(tokens("abcdefghijklmn"))))
+		assert.Equal(t, []string{"abcdefghij"}, testutil.Terms(f.Filter(testutil.Tokens("abcdefghijklmn"))))
 	})
 	t.Run("custom", func(t *testing.T) {
 		f, err := NewTruncateTokenFilter(map[string]interface{}{"length": float64(3)})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"abc", "de"}, terms(f.Filter(tokens("abcdef de"))))
+		assert.Equal(t, []string{"abc", "de"}, testutil.Terms(f.Filter(testutil.Tokens("abcdef de"))))
 	})
 }
 
@@ -268,7 +257,7 @@ func TestNewUnicodenormTokenFilter(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, []string{tt.want}, terms(f.Filter(tokens(tt.in))))
+			assert.Equal(t, []string{tt.want}, testutil.Terms(f.Filter(testutil.Tokens(tt.in))))
 		})
 	}
 }
@@ -276,5 +265,5 @@ func TestNewUnicodenormTokenFilter(t *testing.T) {
 func TestNewUpperCaseTokenFilter(t *testing.T) {
 	f, err := NewUpperCaseTokenFilter()
 	assert.NoError(t, err)
-	assert.Equal(t, []string{"FOO", "BAR"}, terms(f.Filter(tokens("foo Bar"))))
+	assert.Equal(t, []string{"FOO", "BAR"}, testutil.Terms(f.Filter(testutil.Tokens("foo Bar"))))
 }

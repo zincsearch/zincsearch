@@ -19,16 +19,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/vcaesar/riot/analysis"
-)
 
-func terms(ts analysis.TokenStream) []string {
-	out := make([]string, 0, len(ts))
-	for _, t := range ts {
-		out = append(out, string(t.Term))
-	}
-	return out
-}
+	"github.com/zincsearch/zincsearch/pkg/uquery/analysis/internal/testutil"
+)
 
 func TestNewRegexpAnalyzer(t *testing.T) {
 	tests := []struct {
@@ -71,7 +64,7 @@ func TestNewRegexpAnalyzer(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, terms(ana.Analyze([]byte(tt.text))))
+			assert.Equal(t, tt.want, testutil.Terms(ana.Analyze([]byte(tt.text))))
 		})
 	}
 }
@@ -80,12 +73,12 @@ func TestNewStandardAnalyzer(t *testing.T) {
 	t.Run("default", func(t *testing.T) {
 		ana, err := NewStandardAnalyzer(nil)
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"hello", "world"}, terms(ana.Analyze([]byte("Hello World"))))
+		assert.Equal(t, []string{"hello", "world"}, testutil.Terms(ana.Analyze([]byte("Hello World"))))
 	})
 	t.Run("stopwords", func(t *testing.T) {
 		ana, err := NewStandardAnalyzer(map[string]interface{}{"stopwords": []string{"hello"}})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"world"}, terms(ana.Analyze([]byte("Hello World"))))
+		assert.Equal(t, []string{"world"}, testutil.Terms(ana.Analyze([]byte("Hello World"))))
 	})
 }
 
@@ -93,17 +86,17 @@ func TestNewStopAnalyzer(t *testing.T) {
 	t.Run("default english stopwords", func(t *testing.T) {
 		ana, err := NewStopAnalyzer(nil)
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"quick", "fox"}, terms(ana.Analyze([]byte("The quick fox"))))
+		assert.Equal(t, []string{"quick", "fox"}, testutil.Terms(ana.Analyze([]byte("The quick fox"))))
 	})
 	t.Run("custom stopwords", func(t *testing.T) {
 		ana, err := NewStopAnalyzer(map[string]interface{}{"stopwords": []interface{}{"quick"}})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"the", "fox"}, terms(ana.Analyze([]byte("The quick fox"))))
+		assert.Equal(t, []string{"the", "fox"}, testutil.Terms(ana.Analyze([]byte("The quick fox"))))
 	})
 }
 
 func TestNewWhitespaceAnalyzer(t *testing.T) {
 	ana, err := NewWhitespaceAnalyzer()
 	assert.NoError(t, err)
-	assert.Equal(t, []string{"Hello", "World-Foo"}, terms(ana.Analyze([]byte("Hello  World-Foo"))))
+	assert.Equal(t, []string{"Hello", "World-Foo"}, testutil.Terms(ana.Analyze([]byte("Hello  World-Foo"))))
 }

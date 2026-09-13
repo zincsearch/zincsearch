@@ -19,6 +19,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zincsearch/zincsearch/pkg/uquery/analysis/internal/testutil"
 )
 
 func TestRequestTokenizer(t *testing.T) {
@@ -34,7 +36,7 @@ func TestRequestTokenizer(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Len(t, got, 2)
-		assert.Equal(t, []string{"a", "b"}, terms(got["my_re"].Tokenize([]byte("a1b"))))
+		assert.Equal(t, []string{"a", "b"}, testutil.Terms(got["my_re"].Tokenize([]byte("a1b"))))
 	})
 	t.Run("missing type", func(t *testing.T) {
 		got, err := RequestTokenizer(map[string]interface{}{"x": map[string]interface{}{}})
@@ -104,7 +106,7 @@ func TestRequestTokenizerSingle(t *testing.T) {
 	t.Run("case insensitive", func(t *testing.T) {
 		got, err := RequestTokenizerSingle("WhiteSpace", nil)
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"A", "b"}, terms(got.Tokenize([]byte("A b"))))
+		assert.Equal(t, []string{"A", "b"}, testutil.Terms(got.Tokenize([]byte("A b"))))
 	})
 	t.Run("option error propagates", func(t *testing.T) {
 		got, err := RequestTokenizerSingle("character", map[string]interface{}{"char": "bad"})

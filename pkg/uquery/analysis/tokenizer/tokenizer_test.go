@@ -19,22 +19,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/vcaesar/riot/analysis"
-)
 
-func terms(ts analysis.TokenStream) []string {
-	out := make([]string, 0, len(ts))
-	for _, t := range ts {
-		out = append(out, string(t.Term))
-	}
-	return out
-}
+	"github.com/zincsearch/zincsearch/pkg/uquery/analysis/internal/testutil"
+)
 
 func TestNewCharGroupTokenizer(t *testing.T) {
 	t.Run("split on chars", func(t *testing.T) {
 		z, err := NewCharGroupTokenizer(map[string]interface{}{"tokenize_on_chars": []interface{}{"-", "whitespace"}})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"a", "b", "c"}, terms(z.Tokenize([]byte("a-b c"))))
+		assert.Equal(t, []string{"a", "b", "c"}, testutil.Terms(z.Tokenize([]byte("a-b c"))))
 	})
 	t.Run("missing option", func(t *testing.T) {
 		z, err := NewCharGroupTokenizer(nil)
@@ -76,7 +69,7 @@ func TestNewCharacterTokenizer(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, terms(z.Tokenize([]byte(tt.text))))
+			assert.Equal(t, tt.want, testutil.Terms(z.Tokenize([]byte(tt.text))))
 		})
 	}
 }
@@ -101,7 +94,7 @@ func TestNewEdgeNgramTokenizer(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, terms(z.Tokenize([]byte("abcd"))))
+			assert.Equal(t, tt.want, testutil.Terms(z.Tokenize([]byte("abcd"))))
 		})
 	}
 }
@@ -110,7 +103,7 @@ func TestNewExceptionTokenizer(t *testing.T) {
 	t.Run("keeps matched patterns whole", func(t *testing.T) {
 		z, err := NewExceptionTokenizer(map[string]interface{}{"patterns": []interface{}{`[a-z]+\.[a-z]+`}})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"visit", "zinc.com", "now"}, terms(z.Tokenize([]byte("visit zinc.com now"))))
+		assert.Equal(t, []string{"visit", "zinc.com", "now"}, testutil.Terms(z.Tokenize([]byte("visit zinc.com now"))))
 	})
 	t.Run("missing patterns", func(t *testing.T) {
 		z, err := NewExceptionTokenizer(nil)
@@ -127,7 +120,7 @@ func TestNewExceptionTokenizer(t *testing.T) {
 func TestNewLowerCaseTokenizer(t *testing.T) {
 	z, err := NewLowerCaseTokenizer()
 	assert.NoError(t, err)
-	assert.Equal(t, []string{"hello", "world"}, terms(z.Tokenize([]byte("Hello World"))))
+	assert.Equal(t, []string{"hello", "world"}, testutil.Terms(z.Tokenize([]byte("Hello World"))))
 }
 
 func TestNewNgramTokenizer(t *testing.T) {
@@ -150,7 +143,7 @@ func TestNewNgramTokenizer(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, terms(z.Tokenize([]byte("abc"))))
+			assert.Equal(t, tt.want, testutil.Terms(z.Tokenize([]byte("abc"))))
 		})
 	}
 }
@@ -180,7 +173,7 @@ func TestNewPathHierarchyTokenizer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			z, err := NewPathHierarchyTokenizer(tt.options)
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, terms(z.Tokenize([]byte(tt.text))))
+			assert.Equal(t, tt.want, testutil.Terms(z.Tokenize([]byte(tt.text))))
 		})
 	}
 }
@@ -205,7 +198,7 @@ func TestNewRegexpTokenizer(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, terms(z.Tokenize([]byte("a1-b c"))))
+			assert.Equal(t, tt.want, testutil.Terms(z.Tokenize([]byte("a1-b c"))))
 		})
 	}
 }

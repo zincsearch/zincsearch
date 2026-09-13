@@ -19,7 +19,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/vcaesar/riot/analysis/tokenizer"
+
+	"github.com/zincsearch/zincsearch/pkg/uquery/analysis/internal/testutil"
 )
 
 func TestRequestTokenFilter(t *testing.T) {
@@ -35,8 +36,7 @@ func TestRequestTokenFilter(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Len(t, got, 2)
-		ts := tokenizer.NewWhitespaceTokenizer().Tokenize([]byte("abcd"))
-		assert.Equal(t, []string{"ab"}, terms(got["my_trunc"].Filter(ts)))
+		assert.Equal(t, []string{"ab"}, testutil.Terms(got["my_trunc"].Filter(testutil.Tokens("abcd"))))
 	})
 	t.Run("missing type", func(t *testing.T) {
 		got, err := RequestTokenFilter(map[string]interface{}{"x": map[string]interface{}{}})
@@ -143,8 +143,7 @@ func TestRequestTokenFilterSingle(t *testing.T) {
 	t.Run("case insensitive", func(t *testing.T) {
 		got, err := RequestTokenFilterSingle("LowerCase", nil)
 		assert.NoError(t, err)
-		ts := tokenizer.NewWhitespaceTokenizer().Tokenize([]byte("ABC"))
-		assert.Equal(t, []string{"abc"}, terms(got.Filter(ts)))
+		assert.Equal(t, []string{"abc"}, testutil.Terms(got.Filter(testutil.Tokens("ABC"))))
 	})
 	t.Run("option error propagates", func(t *testing.T) {
 		got, err := RequestTokenFilterSingle("unicodenorm", map[string]interface{}{"form": "bad"})

@@ -22,15 +22,8 @@ import (
 	"github.com/vcaesar/riot/analysis"
 
 	"github.com/zincsearch/zincsearch/pkg/meta"
+	"github.com/zincsearch/zincsearch/pkg/uquery/analysis/internal/testutil"
 )
-
-func terms(ts analysis.TokenStream) []string {
-	out := make([]string, 0, len(ts))
-	for _, t := range ts {
-		out = append(out, string(t.Term))
-	}
-	return out
-}
 
 func TestRequestAnalyzer(t *testing.T) {
 	t.Run("nil data", func(t *testing.T) {
@@ -56,7 +49,7 @@ func TestRequestAnalyzer(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Len(t, got, 1)
-		assert.Equal(t, []string{"hello", "world"}, terms(got["a"].Analyze([]byte("<b>Hello</b> WORLD"))))
+		assert.Equal(t, []string{"hello", "world"}, testutil.Terms(got["a"].Analyze([]byte("<b>Hello</b> WORLD"))))
 	})
 
 	t.Run("custom tokenizer, char_filter and token_filter", func(t *testing.T) {
@@ -80,7 +73,7 @@ func TestRequestAnalyzer(t *testing.T) {
 			},
 		})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"ONE", "FOO"}, terms(got["a"].Analyze([]byte("1 foo"))))
+		assert.Equal(t, []string{"ONE", "FOO"}, testutil.Terms(got["a"].Analyze([]byte("1 foo"))))
 	})
 
 	t.Run("filter alias for token_filter", func(t *testing.T) {
@@ -94,7 +87,7 @@ func TestRequestAnalyzer(t *testing.T) {
 		}
 		got, err := RequestAnalyzer(data)
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"FOO"}, terms(got["a"].Analyze([]byte("foo"))))
+		assert.Equal(t, []string{"FOO"}, testutil.Terms(got["a"].Analyze([]byte("foo"))))
 		// aliases are normalized in place
 		assert.Nil(t, data.Filter)
 		assert.NotNil(t, data.TokenFilter)
@@ -109,7 +102,7 @@ func TestRequestAnalyzer(t *testing.T) {
 			},
 		})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"a", "c"}, terms(got["a"].Analyze([]byte("a b c"))))
+		assert.Equal(t, []string{"a", "c"}, testutil.Terms(got["a"].Analyze([]byte("a b c"))))
 	})
 	t.Run("type regexp invalid pattern", func(t *testing.T) {
 		got, err := RequestAnalyzer(&meta.IndexAnalysis{
@@ -123,21 +116,21 @@ func TestRequestAnalyzer(t *testing.T) {
 			Analyzer: map[string]*meta.Analyzer{"a": {Type: "standard", Stopwords: []string{"foo"}}},
 		})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"bar"}, terms(got["a"].Analyze([]byte("Foo Bar"))))
+		assert.Equal(t, []string{"bar"}, testutil.Terms(got["a"].Analyze([]byte("Foo Bar"))))
 	})
 	t.Run("type stop", func(t *testing.T) {
 		got, err := RequestAnalyzer(&meta.IndexAnalysis{
 			Analyzer: map[string]*meta.Analyzer{"a": {Type: "STOP", Stopwords: []string{"foo"}}},
 		})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"bar"}, terms(got["a"].Analyze([]byte("foo bar"))))
+		assert.Equal(t, []string{"bar"}, testutil.Terms(got["a"].Analyze([]byte("foo bar"))))
 	})
 	t.Run("type builtin analyzer with extra filter", func(t *testing.T) {
 		got, err := RequestAnalyzer(&meta.IndexAnalysis{
 			Analyzer: map[string]*meta.Analyzer{"a": {Type: "whitespace", TokenFilter: []string{"uppercase"}}},
 		})
 		assert.NoError(t, err)
-		assert.Equal(t, []string{"FOO", "BAR"}, terms(got["a"].Analyze([]byte("foo Bar"))))
+		assert.Equal(t, []string{"FOO", "BAR"}, testutil.Terms(got["a"].Analyze([]byte("foo Bar"))))
 	})
 	t.Run("type unsupported builtin", func(t *testing.T) {
 		got, err := RequestAnalyzer(&meta.IndexAnalysis{
