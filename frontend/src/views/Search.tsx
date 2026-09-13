@@ -32,9 +32,7 @@ export default function Search() {
     setLoading(true);
     setError('');
     try {
-      const query = buildSearch(data, maxRecords);
-      // The unchanged service declares string, but the Vue caller sends an object to axios.
-      const response = await searchService.search({ index: name, query: query as unknown as string });
+      const response = await searchService.search({ index: name, query: buildSearch(data, maxRecords) });
       if (id !== requestId.current) return;
       const next: SearchResponse = response.data;
       setResult(next);

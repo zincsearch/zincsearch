@@ -69,6 +69,9 @@ describe('Search migration', () => {
     expect(screen.getByLabelText('search.typeSearch')).toHaveValue('');
     expect(screen.getByRole('checkbox', { name: 'message' })).not.toBeChecked();
     expect(screen.getByRole('columnheader', { name: '_source' })).toBeInTheDocument();
+    const source = screen.getAllByRole('cell').find(cell => cell.textContent?.includes('"message":"Gold 0"'));
+    expect(source).toHaveTextContent(JSON.stringify({ message: 'Gold 0', nested: { city: 'Paris' }, tags: ['one', 'two'] }));
+    expect(source).not.toHaveTextContent('"_id"');
   });
   it('recovers after a failed request and clears stale histogram data', async () => {
     render(<Search />);

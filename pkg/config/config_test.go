@@ -259,7 +259,11 @@ func TestLoadIgnoresOtherSources(t *testing.T) {
 	}
 	assert.NoError(t, os.WriteFile(".env", []byte("ZINC_SERVER_PORT=2\n"), 0o600))
 	t.Setenv("ZINC_CONFIG_FILE", "other.toml")
-	assert.Equal(t, "4080", mustLoad(t).ServerPort)
+	c := mustLoad(t)
+	assert.Equal(t, "4080", c.ServerPort)
+	// built-in defaults must never carry admin credentials
+	assert.Empty(t, c.FirstAdminUser)
+	assert.Empty(t, c.FirstAdminPassword)
 }
 
 func TestLoadInvalidTOML(t *testing.T) {

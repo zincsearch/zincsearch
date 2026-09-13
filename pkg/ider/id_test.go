@@ -29,12 +29,17 @@ func TestGenerate(t *testing.T) {
 }
 
 func TestNewNode(t *testing.T) {
-	for i := 1023; i < 1026; i++ {
+	for _, i := range []int{0, 1, maxNodeID} {
 		node, err := NewNode(i)
 		assert.NoError(t, err)
 		assert.NotNil(t, node)
 		id := node.Generate()
 		assert.NotEmpty(t, id)
+	}
+	for _, i := range []int{-1, maxNodeID + 1, 2048} {
+		node, err := NewNode(i)
+		assert.Error(t, err, "node id %d must be rejected", i)
+		assert.Nil(t, node)
 	}
 }
 
@@ -44,7 +49,7 @@ func TestGenerate_Unique(t *testing.T) {
 	const n = 10000
 	seen := make(map[string]struct{}, n)
 	prev := int64(0)
-	for i := 0; i < n; i++ {
+	for range n {
 		raw, err := node.node.NextID()
 		assert.NoError(t, err)
 		assert.Greater(t, raw, prev, "ids must be strictly increasing")

@@ -17,7 +17,7 @@ export default function SearchResult({ result, columns, query, interval, loading
   const [sort, setSort] = useState({ field: '', descending: false });
   const rows = result?.hits.hits || [];
   const fields = ['@timestamp', ...(columns.length ? columns.filter(field => field !== '@timestamp') : ['_source'])];
-  const cell = (row: Hit, field: string): unknown => field === '_source' ? JSON.stringify(row) : field === '@timestamp' ? row['@timestamp'] : ['_id', '_index', '_score'].includes(field) ? row[field as '_id' | '_index' | '_score'] : fieldValue(row._source, field);
+  const cell = (row: Hit, field: string): unknown => field === '_source' ? JSON.stringify(row._source) : field === '@timestamp' ? row['@timestamp'] : ['_id', '_index', '_score'].includes(field) ? row[field as '_id' | '_index' | '_score'] : fieldValue(row._source, field);
   const sorted = sort.field ? [...rows].sort((a, b) => {
     const left = cell(a, sort.field), right = cell(b, sort.field);
     const order = typeof left === 'number' && typeof right === 'number' ? left - right : displayValue(left).localeCompare(displayValue(right));

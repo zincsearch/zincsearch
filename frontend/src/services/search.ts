@@ -1,7 +1,7 @@
 import http from "./http";
 
-var search = {
-  search: ({ index, query }: { index: string; query: string }) => {
+const search = {
+  search: ({ index, query }: { index: string; query: Record<string, unknown> }) => {
     let url = "/es/_search";
     if (index != "") {
       url = "/es/" + index + "/_search";

@@ -16,6 +16,7 @@
 package ider
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -46,14 +47,21 @@ func Generate() string {
 	return local.Generate()
 }
 
-// NewNode returns a Twitter snowflake layout generator: 41 bits of milliseconds, 10 bits of node, 12 bits of sequence.
+// maxNodeID is the largest node id representable in 10 machine bits.
+const maxNodeID = 1<<10 - 1
+
+// NewNode returns a generator laid out as 41 bits of milliseconds, 12 bits of sequence, 10 bits of node (low bits).
+// id must be in [0, maxNodeID]; out-of-range ids are rejected rather than folded onto another node.
 func NewNode(id int) (*Node, error) {
+	if id < 0 || id > maxNodeID {
+		return nil, fmt.Errorf("node id %d out of range [0, %d]", id, maxNodeID)
+	}
 	node, err := sonyflake.New(sonyflake.Settings{
 		BitsSequence:  12,
 		BitsMachineID: 10,
 		TimeUnit:      time.Millisecond,
 		StartTime:     epoch,
-		MachineID:     func() (int, error) { return id % 1024, nil },
+		MachineID:     func() (int, error) { return id, nil },
 	})
 	if err != nil {
 		return nil, err

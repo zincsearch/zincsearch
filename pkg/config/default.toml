@@ -1,7 +1,8 @@
 # Built-in defaults. Overridden by ./conf/zinc.toml in the working directory, then by non-empty environment variables.
 #
-zinc_first_admin_user = "admin"
-zinc_first_admin_password = "Complexpass#123"
+# No built-in admin credentials: set both on first start via ./conf/zinc.toml or the environment.
+# zinc_first_admin_user = ""
+# zinc_first_admin_password = ""
 zinc_server_port = "4080"
 zinc_server_mode = "node"
 zinc_node_id = 1
