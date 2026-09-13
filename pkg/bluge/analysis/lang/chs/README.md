@@ -32,10 +32,9 @@ you need pass environment to enable gse support:
 
 `ZINC_PLUGIN_GSE_DICT_PATH` custom dictionary path, default is `./plugins/gse/dict`
 
-
 ## API example
 
-POST http://localhost:4080/es/_analyze
+POST http://localhost:4080/es/\_analyze
 
 ```
 {
@@ -44,7 +43,7 @@ POST http://localhost:4080/es/_analyze
 }
 ```
 
-POST http://localhost:4080/es/_analyze
+POST http://localhost:4080/es/\_analyze
 
 ```
 {
@@ -90,7 +89,7 @@ POST http://localhost:4080/api/my-index-chs/document
 }
 ```
 
-POST http://localhost:4080/es/my-index-chs/_search
+POST http://localhost:4080/es/my-index-chs/\_search
 
 ```
 {
@@ -138,6 +137,6 @@ like:
 
 ## Credit
 
-* https://github.com/zincsearch/zincsearch
-* https://github.com/blugelabs/bluge
-* https://github.com/go-ego/gse
+- https://github.com/zincsearch/zincsearch
+- https://github.com/vcaesar/riot
+- https://github.com/go-ego/gse

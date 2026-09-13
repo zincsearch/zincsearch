@@ -19,8 +19,8 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/blugelabs/bluge/search"
-	"github.com/blugelabs/bluge/search/aggregations"
+	"github.com/vcaesar/riot/search"
+	"github.com/vcaesar/riot/search/aggregations"
 )
 
 type TermsAggregation struct {

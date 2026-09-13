@@ -16,7 +16,6 @@
 package core
 
 import (
-	"math/rand"
 	"strconv"
 	"testing"
 	"time"
@@ -258,15 +257,12 @@ func TestIndex_Search(t *testing.T) {
 			Highlightable: true,
 		})
 
-		for _, d := range prepareData {
-			r := rand.New(rand.NewSource(time.Now().UnixNano()))
-			docId := r.Intn(1000)
-			err := index.CreateDocument(strconv.Itoa(docId), d, false)
+		for i, d := range prepareData {
+			err := index.CreateDocument(strconv.Itoa(i), d, false)
 			assert.NoError(t, err)
 		}
 
-		// wait for WAL write to index
-		time.Sleep(time.Second)
+		waitForDocs(t, index, len(prepareData))
 	})
 
 	for _, tt := range tests {
@@ -285,4 +281,14 @@ func TestIndex_Search(t *testing.T) {
 		err = DeleteIndex(indexName)
 		assert.NoError(t, err)
 	})
+}
+
+// waitForDocs waits until all shards have consumed the WAL and n documents are searchable.
+func waitForDocs(t *testing.T, index *Index, n int) {
+	t.Helper()
+	query := &meta.ZincQuery{Query: &meta.Query{MatchAll: &meta.MatchAllQuery{}}, Size: n + 1}
+	assert.Eventually(t, func() bool {
+		res, err := index.Search(query)
+		return err == nil && res.Hits.Total.Value == n
+	}, 30*time.Second, 50*time.Millisecond, "expected %d documents to be indexed", n)
 }

@@ -20,14 +20,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-
+	"github.com/vcaesar/riot"
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
-func TermQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
+func TermQuery(query map[string]interface{}, mappings *meta.Mappings) (riot.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[term] query doesn't support multiple fields")
 	}
@@ -76,36 +75,36 @@ func TermQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Que
 	}
 }
 
-func TermQueryNumeric(field string, value *meta.TermQuery) (bluge.Query, error) {
+func TermQueryNumeric(field string, value *meta.TermQuery) (riot.Query, error) {
 	val, err := zutils.ToFloat64(value.Value)
 	if err != nil {
 		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] convert value to numeric error: %s", err))
 	}
-	subq := bluge.NewNumericRangeInclusiveQuery(val, val, true, true).SetField(field)
+	subq := riot.NewNumericRangeInclusiveQuery(val, val, true, true).SetField(field)
 	if value.Boost >= 0 {
 		subq.SetBoost(value.Boost)
 	}
 	return subq, nil
 }
 
-func TermQueryBool(field string, value *meta.TermQuery) (bluge.Query, error) {
+func TermQueryBool(field string, value *meta.TermQuery) (riot.Query, error) {
 	val, err := zutils.ToBool(value.Value)
 	if err != nil {
 		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] convert value to boolean error: %s", err))
 	}
-	subq := bluge.NewTermQuery(strconv.FormatBool(val)).SetField(field)
+	subq := riot.NewTermQuery(strconv.FormatBool(val)).SetField(field)
 	if value.Boost >= 0 {
 		subq.SetBoost(value.Boost)
 	}
 	return subq, nil
 }
 
-func TermQueryText(field string, value *meta.TermQuery) (bluge.Query, error) {
+func TermQueryText(field string, value *meta.TermQuery) (riot.Query, error) {
 	val, err := zutils.ToString(value.Value)
 	if err != nil {
 		return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[term] convert value to string error: %s", err))
 	}
-	subq := bluge.NewTermQuery(val).SetField(field)
+	subq := riot.NewTermQuery(val).SetField(field)
 	if value.Boost >= 0 {
 		subq.SetBoost(value.Boost)
 	}

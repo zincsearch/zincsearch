@@ -20,10 +20,10 @@ import (
 	"context"
 	"sync/atomic"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/search"
-	"github.com/blugelabs/bluge/search/aggregations"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/search"
+	"github.com/vcaesar/riot/search/aggregations"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/zincsearch/zincsearch/pkg/config"
@@ -36,7 +36,7 @@ func MultiSearch(
 	query *meta.ZincQuery,
 	mappings *meta.Mappings,
 	analyzers map[string]*analysis.Analyzer,
-	readers ...*bluge.Reader,
+	readers ...*riot.Reader,
 ) (search.DocumentMatchIterator, error) {
 	if len(readers) == 0 {
 		return &DocumentList{
@@ -95,7 +95,7 @@ func MultiSearch(
 			return nil, err
 		}
 		if docList.sort == nil {
-			if req, ok := req.(*bluge.TopNSearch); ok {
+			if req, ok := req.(*riot.TopNSearch); ok {
 				docList.sort = req.SortOrder().Copy()
 			}
 		}

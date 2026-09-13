@@ -34,6 +34,10 @@ func TestSearchV1(t *testing.T) {
 		body.WriteString(indexData)
 		resp := request("PUT", "/api/"+indexName+"/_doc", body)
 		assert.Equal(t, http.StatusOK, resp.Code)
+
+		created := new(meta.HTTPResponseID)
+		assert.NoError(t, json.Unmarshal(resp.Body.Bytes(), created))
+		waitForDocument(t, indexName, created.ID)
 	})
 
 	t.Run("POST /api/:target/_search", func(t *testing.T) {
@@ -123,7 +127,7 @@ func TestSearchV1(t *testing.T) {
 		})
 		t.Run("search document type: daterange", func(t *testing.T) {
 			body := bytes.NewBuffer(nil)
-			body.WriteString(fmt.Sprintf(`{
+			fmt.Fprintf(body, `{
 				"search_type": "daterange",
 				"query": {
 					"start_time": "%s",
@@ -131,8 +135,7 @@ func TestSearchV1(t *testing.T) {
 				}
 			}`,
 				time.Now().UTC().Add(time.Hour*-24).Format("2006-01-02T15:04:05Z"),
-				time.Now().UTC().Format("2006-01-02T15:04:05Z"),
-			))
+				time.Now().UTC().Add(time.Hour).Format("2006-01-02T15:04:05Z"))
 			resp := request("POST", "/api/"+indexName+"/_search", body)
 			assert.Equal(t, http.StatusOK, resp.Code)
 

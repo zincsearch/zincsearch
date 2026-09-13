@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	zincanalysis "github.com/zincsearch/zincsearch/pkg/uquery/analysis"
@@ -28,7 +28,7 @@ import (
 	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
-func MatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
+func MatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (riot.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[match] query doesn't support multiple fields")
 	}
@@ -91,7 +91,7 @@ func MatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers
 		return genQueryWithMinimumShouldMatch(zer, field, value, minimumShouldMatch)
 	}
 
-	subq := bluge.NewMatchQuery(value.Query).SetField(field)
+	subq := riot.NewMatchQuery(value.Query).SetField(field)
 	if zer != nil {
 		subq.SetAnalyzer(zer)
 	}
@@ -99,9 +99,9 @@ func MatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers
 		op := strings.ToUpper(value.Operator)
 		switch op {
 		case "OR":
-			subq.SetOperator(bluge.MatchQueryOperatorOr)
+			subq.SetOperator(riot.MatchQueryOperatorOr)
 		case "AND":
-			subq.SetOperator(bluge.MatchQueryOperatorAnd)
+			subq.SetOperator(riot.MatchQueryOperatorAnd)
 		default:
 			return nil, errors.New(errors.ErrorTypeIllegalArgumentException, fmt.Sprintf("[match] unknown operator %s", op))
 		}
@@ -124,7 +124,7 @@ func MatchQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers
 	return subq, nil
 }
 
-func genQueryWithMinimumShouldMatch(ana *analysis.Analyzer, field string, value *meta.MatchQuery, minimumShouldMatch interface{}) (bluge.Query, error) {
+func genQueryWithMinimumShouldMatch(ana *analysis.Analyzer, field string, value *meta.MatchQuery, minimumShouldMatch interface{}) (riot.Query, error) {
 	if ana == nil {
 		ana, _ = zincanalyzer.NewStandardAnalyzer(nil)
 	}
@@ -146,10 +146,10 @@ func genQueryWithMinimumShouldMatch(ana *analysis.Analyzer, field string, value 
 
 	tokens := ana.Analyze([]byte(value.Query))
 	if len(tokens) > 0 {
-		tqs := make([]bluge.Query, len(tokens))
+		tqs := make([]riot.Query, len(tokens))
 		if fuzziness != 0 {
 			for i, token := range tokens {
-				query := bluge.NewFuzzyQuery(string(token.Term))
+				query := riot.NewFuzzyQuery(string(token.Term))
 				query.SetFuzziness(fuzziness)
 				query.SetPrefix(int(value.PrefixLength))
 				query.SetField(field)
@@ -158,7 +158,7 @@ func genQueryWithMinimumShouldMatch(ana *analysis.Analyzer, field string, value 
 			}
 		} else {
 			for i, token := range tokens {
-				tq := bluge.NewTermQuery(string(token.Term))
+				tq := riot.NewTermQuery(string(token.Term))
 				tq.SetField(field)
 				tq.SetBoost(boost)
 				tqs[i] = tq
@@ -168,11 +168,11 @@ func genQueryWithMinimumShouldMatch(ana *analysis.Analyzer, field string, value 
 		if err != nil {
 			return nil, err
 		}
-		booleanQuery := bluge.NewBooleanQuery()
+		booleanQuery := riot.NewBooleanQuery()
 		booleanQuery.AddShould(tqs...)
 		booleanQuery.SetMinShould(minValue)
 		booleanQuery.SetBoost(boost)
 		return booleanQuery, nil
 	}
-	return bluge.NewMatchNoneQuery(), nil
+	return riot.NewMatchNoneQuery(), nil
 }

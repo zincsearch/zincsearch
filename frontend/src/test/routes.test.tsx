@@ -1,0 +1,62 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router';
+import { beforeEach, expect, it, vi } from 'vitest';
+import { AppRoutes } from '../App';
+import { setCredentials } from '../auth';
+import { changeLanguage } from '../locales';
+
+vi.mock('../views/Search', () => ({ default: () => <input aria-label="Saved search" /> }));
+vi.mock('../views/Index', () => ({ default: () => <h1>Indexes page</h1> }));
+vi.mock('../views/Template', () => ({ default: () => <h1>Templates page</h1> }));
+vi.mock('../views/User', () => ({ default: () => <h1>Users page</h1> }));
+vi.mock('../views/Role', () => ({ default: () => <h1>Roles page</h1> }));
+vi.mock('../services/about', () => ({ default: { get: vi.fn().mockResolvedValue({ data: { version: '1.0-test', build: 'test' } }) } }));
+beforeEach(() => { setCredentials(null); changeLanguage('en'); });
+it('guards deep links and unknown routes when signed out', () => {
+  render(<MemoryRouter initialEntries={['/role']}><AppRoutes /></MemoryRouter>);
+  expect(screen.getByRole('button', { name: 'Sign In' })).toBeInTheDocument();
+  expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+});
+it('preserves search state across navigation and signs out', async () => {
+  setCredentials({ _id: 'admin', name: 'Admin', role: 'admin', base64encoded: 'YQ==' });
+  const user = userEvent.setup();
+  render(<MemoryRouter initialEntries={['/search']}><AppRoutes /></MemoryRouter>);
+  await user.type(screen.getByLabelText('Saved search'), 'status:200');
+  await user.click(screen.getByRole('link', { name: 'Index' }));
+  expect(screen.getByRole('heading', { name: 'Indexes page' })).toBeInTheDocument();
+  await user.click(screen.getByRole('link', { name: 'Search' }));
+  expect(screen.getByLabelText('Saved search')).toHaveValue('status:200');
+  await user.click(screen.getByRole('link', { name: 'About' }));
+  expect(await screen.findByText('1.0-test')).toBeInTheDocument();
+  await user.click(screen.getByLabelText('Language'));
+  await user.click(screen.getByRole('option', { name: '简体中文' }));
+  expect(screen.queryByRole('link', { name: 'About' })).not.toBeInTheDocument();
+  await user.click(screen.getByLabelText('语言'));
+  await user.click(screen.getByRole('option', { name: 'English' }));
+  await user.click(screen.getByRole('button', { name: 'Sign Out' }));
+  expect(screen.getByRole('button', { name: 'Sign In' })).toBeInTheDocument();
+});
+it('keeps rail and section navigation in sync and supports collapsing the rail', async () => {
+  setCredentials({ _id: 'admin', name: 'Admin', role: 'admin', base64encoded: 'YQ==' });
+  const user = userEvent.setup();
+  render(<MemoryRouter initialEntries={['/index']}><AppRoutes /></MemoryRouter>);
+  expect(screen.getByRole('link', { name: 'Index workspace' })).toHaveAttribute('aria-current', 'page');
+  expect(screen.getByRole('link', { name: 'Index' })).toHaveAttribute('aria-current', 'page');
+  expect(screen.getByRole('link', { name: 'Skip to content' })).toHaveAttribute('href', '#workspace');
+  expect(screen.getByRole('main')).toHaveAttribute('id', 'workspace');
+  await user.click(screen.getByRole('link', { name: 'Search workspace' }));
+  expect(screen.getByRole('link', { name: 'Search' })).toHaveAttribute('aria-current', 'page');
+  await user.click(screen.getByRole('button', { name: 'Menu' }));
+  expect(screen.getByRole('button', { name: 'Menu' })).toHaveAttribute('aria-expanded', 'false');
+  expect(screen.queryByRole('navigation', { name: 'Workspace shortcuts' })).not.toBeInTheDocument();
+  expect(screen.getByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: 'Sign Out' }));
+  expect(screen.getByRole('button', { name: 'Sign In' })).toBeInTheDocument();
+});
+it('renders a recoverable 404 for authenticated users', () => {
+  setCredentials({ _id: 'admin', name: 'Admin', role: 'admin', base64encoded: 'YQ==' });
+  render(<MemoryRouter initialEntries={['/missing']}><AppRoutes /></MemoryRouter>);
+  expect(screen.getByRole('heading', { name: '404' })).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Go Home' })).toHaveAttribute('href', '/search');
+});

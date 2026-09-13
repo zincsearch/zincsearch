@@ -20,8 +20,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
 
 	"github.com/zincsearch/zincsearch/pkg/bluge/directory"
 	"github.com/zincsearch/zincsearch/pkg/config"
@@ -119,12 +119,12 @@ func NewIndex(name, storageType string, shardNum int64) (*Index, error) {
 }
 
 // LoadIndexWriter load the index writer from the storage
-func OpenIndexWriter(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) (*bluge.Writer, error) {
+func OpenIndexWriter(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) (*riot.Writer, error) {
 	cfg := getOpenConfig(name, storageType, defaultSearchAnalyzer, timeRange...)
-	return bluge.OpenWriter(cfg)
+	return riot.OpenWriter(cfg)
 }
 
-func getOpenConfig(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) bluge.Config {
+func getOpenConfig(name string, storageType string, defaultSearchAnalyzer *analysis.Analyzer, timeRange ...int64) riot.Config {
 	dataPath := config.Global.DataPath
 	cfg := directory.GetDiskConfig(dataPath, name, timeRange...)
 	if defaultSearchAnalyzer != nil {

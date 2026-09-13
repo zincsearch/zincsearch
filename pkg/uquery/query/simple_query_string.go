@@ -16,12 +16,12 @@
 package query
 
 import (
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
 
 	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
-func SimpleQueryStringQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
+func SimpleQueryStringQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (riot.Query, error) {
 	return QueryStringQuery(query, mappings, analyzers)
 }

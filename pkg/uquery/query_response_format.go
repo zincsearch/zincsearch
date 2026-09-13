@@ -16,7 +16,7 @@
 package uquery
 
 import (
-	"github.com/blugelabs/bluge/search"
+	"github.com/vcaesar/riot/search"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"

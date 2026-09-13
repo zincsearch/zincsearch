@@ -20,8 +20,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/blugelabs/bluge/analysis"
 	"github.com/stretchr/testify/assert"
+	"github.com/vcaesar/riot/analysis"
 
 	"github.com/zincsearch/zincsearch/pkg/config"
 )
@@ -78,7 +78,7 @@ func TestLoadDict(t *testing.T) {
 	}
 
 	t.Run("clean dict", func(t *testing.T) {
-		os.RemoveAll("data")
+		assert.NoError(t, os.RemoveAll("data"))
 	})
 }
 
@@ -193,9 +193,11 @@ func writeFile(path string, content string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-	_, err = f.Write([]byte(content))
-	return err
+	if _, err = f.Write([]byte(content)); err != nil {
+		f.Close()
+		return err
+	}
+	return f.Close()
 }
 
 func collectToken(tokens analysis.TokenStream) string {

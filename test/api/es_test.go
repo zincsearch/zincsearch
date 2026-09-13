@@ -20,7 +20,6 @@ import (
 	"net/http"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/zincsearch/zincsearch/pkg/zutils/json"
@@ -168,8 +167,7 @@ func TestApiES(t *testing.T) {
 				assert.Equal(t, http.StatusBadRequest, resp.Code)
 			})
 			t.Run("delete document with exist indexName and exist id", func(t *testing.T) {
-				// wait for WAL write to index
-				time.Sleep(time.Second)
+				waitForDocument(t, indexName, "1111")
 				resp := request("DELETE", "/es/"+indexName+"/_doc/1111", nil)
 				assert.Equal(t, http.StatusOK, resp.Code)
 			})
@@ -249,14 +247,14 @@ func TestApiES(t *testing.T) {
 				assert.Equal(t, http.StatusInternalServerError, resp.Code)
 			})
 			t.Run("update document with exist indexName", func(t *testing.T) {
-				// wait for WAL write to index
-				time.Sleep(time.Second)
+				waitForDocument(t, indexName, "1111")
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/"+indexName+"/_update/1111", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
 			})
 			t.Run("update document with exist indexName not exist id", func(t *testing.T) {
+				waitForDocument(t, indexName, "notexistCreate")
 				body := bytes.NewBuffer(nil)
 				body.WriteString(indexData)
 				resp := request("POST", "/es/"+indexName+"/_update/notexistCreate", body)

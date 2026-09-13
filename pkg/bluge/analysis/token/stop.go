@@ -16,8 +16,8 @@
 package token
 
 import (
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/analysis/token"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/analysis/token"
 )
 
 func NewStopTokenFilter(stopwords []string) analysis.TokenFilter {

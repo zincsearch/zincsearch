@@ -18,7 +18,7 @@ package tokenizer
 import (
 	"unicode"
 
-	"github.com/blugelabs/bluge/analysis/tokenizer"
+	"github.com/vcaesar/riot/analysis/tokenizer"
 )
 
 type IsTokenRune func(r rune) bool

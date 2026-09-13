@@ -19,17 +19,17 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/analysis/analyzer"
-	querystr "github.com/blugelabs/query_string"
+	querystr "github.com/vcaesar/query_string"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/analysis/analyzer"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	zincanalysis "github.com/zincsearch/zincsearch/pkg/uquery/analysis"
 )
 
-func QueryStringQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
+func QueryStringQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (riot.Query, error) {
 	value := new(meta.QueryStringQuery)
 	for k, v := range query {
 		k := strings.ToLower(k)

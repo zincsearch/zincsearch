@@ -16,11 +16,10 @@
 package query
 
 import (
-	"github.com/blugelabs/bluge"
-
+	"github.com/vcaesar/riot"
 	"github.com/zincsearch/zincsearch/pkg/errors"
 )
 
-func CombinedFieldsQuery(query map[string]interface{}) (bluge.Query, error) {
+func CombinedFieldsQuery(query map[string]interface{}) (riot.Query, error) {
 	return nil, errors.New(errors.ErrorTypeNotImplemented, "[combined_fields] query doesn't support")
 }

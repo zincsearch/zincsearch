@@ -15,8 +15,8 @@
 
 package query
 
-import "github.com/blugelabs/bluge"
+import "github.com/vcaesar/riot"
 
-func MatchNoneQuery() (bluge.Query, error) {
-	return bluge.NewMatchNoneQuery(), nil
+func MatchNoneQuery() (riot.Query, error) {
+	return riot.NewMatchNoneQuery(), nil
 }

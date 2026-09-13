@@ -16,22 +16,26 @@
 package zincsearch
 
 import (
+	"io/fs"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetFrontendAssets(t *testing.T) {
 	t.Run("embed::GetFrontendAssets", func(t *testing.T) {
 		f, err := GetFrontendAssets()
-		assert.NoError(t, err)
-		assert.NotNil(t, f)
+		require.NoError(t, err)
+		require.NotNil(t, f)
 		t.Run("index.html", func(t *testing.T) {
-			ff, err := f.Open("index.html")
-			assert.NoError(t, err)
-			fs, err := ff.Stat()
-			assert.NoError(t, err)
-			assert.Equal(t, "index.html", fs.Name())
+			content, err := fs.ReadFile(f, "index.html")
+			require.NoError(t, err)
+			assert.NotEmpty(t, content)
+
+			expected, err := embedFrontend.ReadFile("frontend/dist/index.html")
+			require.NoError(t, err)
+			assert.Equal(t, expected, content)
 		})
 	})
 }

@@ -18,8 +18,8 @@ package token
 import (
 	"strings"
 
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/analysis/token"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/analysis/token"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/zutils"

@@ -20,9 +20,9 @@ import (
 	"io/fs"
 )
 
-//go:embed web/dist
+//go:embed frontend/dist
 var embedFrontend embed.FS
 
 func GetFrontendAssets() (fs.FS, error) {
-	return fs.Sub(embedFrontend, "web/dist")
+	return fs.Sub(embedFrontend, "frontend/dist")
 }

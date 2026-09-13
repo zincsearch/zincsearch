@@ -20,8 +20,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/blugelabs/bluge"
-
+	"github.com/vcaesar/riot"
 	"github.com/zincsearch/zincsearch/pkg/config"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	zincanalysis "github.com/zincsearch/zincsearch/pkg/uquery/analysis"
@@ -33,7 +32,7 @@ import (
 // BuildBlugeDocumentFromJSON returns the bluge document for the json document. It also updates the mapping for the fields if not found.
 // If no mappings are found, it creates te mapping for all the encountered fields. If mapping for some fields is found but not for others
 // then it creates the mapping for the missing fields.
-func (s *IndexShard) BuildBlugeDocumentFromJSON(docID string, doc map[string]interface{}) (*bluge.Document, error) {
+func (s *IndexShard) BuildBlugeDocumentFromJSON(docID string, doc map[string]interface{}) (*riot.Document, error) {
 	// Pick the index mapping from the cache if it already exists
 	mappings := s.root.GetMappings()
 
@@ -42,7 +41,7 @@ func (s *IndexShard) BuildBlugeDocumentFromJSON(docID string, doc map[string]int
 	delete(doc, meta.ShardFieldName)
 
 	// Create a new bluge document
-	bdoc := bluge.NewDocument(docID)
+	bdoc := riot.NewDocument(docID)
 	// Iterate through each field and add it to the bluge document
 	for key, value := range doc {
 		if value == nil || key == meta.TimeFieldName || key == meta.SourceFieldName {
@@ -74,7 +73,7 @@ func (s *IndexShard) BuildBlugeDocumentFromJSON(docID string, doc map[string]int
 		delete(doc, meta.TimeFieldName)
 		timestamp = time.Unix(0, int64(value.(float64)))
 	}
-	bdoc.AddField(bluge.NewDateTimeField(meta.TimeFieldName, timestamp).StoreValue().Sortable().Aggregatable())
+	bdoc.AddField(riot.NewDateTimeField(meta.TimeFieldName, timestamp).StoreValue().Sortable().Aggregatable())
 
 	// set source
 	var sourceByteVal []byte
@@ -84,10 +83,10 @@ func (s *IndexShard) BuildBlugeDocumentFromJSON(docID string, doc map[string]int
 		delete(doc, meta.SourceFieldName)
 		sourceByteVal, _ = json.Marshal(doc)
 	}
-	bdoc.AddField(bluge.NewStoredOnlyField("_source", sourceByteVal))
+	bdoc.AddField(riot.NewStoredOnlyField("_source", sourceByteVal))
 
-	bdoc.AddField(bluge.NewStoredOnlyField("_index", []byte(s.GetIndexName())))
-	bdoc.AddField(bluge.NewCompositeFieldExcluding("_all", []string{"_id", "_index", "_source", meta.TimeFieldName}))
+	bdoc.AddField(riot.NewStoredOnlyField("_index", []byte(s.GetIndexName())))
+	bdoc.AddField(riot.NewCompositeFieldExcluding("_all", []string{"_id", "_index", "_source", meta.TimeFieldName}))
 
 	// Add time for index
 	bdoc.SetTimestamp(timestamp.UnixNano())
@@ -97,8 +96,8 @@ func (s *IndexShard) BuildBlugeDocumentFromJSON(docID string, doc map[string]int
 	return bdoc, nil
 }
 
-func (s *IndexShard) buildField(mappings *meta.Mappings, bdoc *bluge.Document, key string, value interface{}) error {
-	var field *bluge.TermField
+func (s *IndexShard) buildField(mappings *meta.Mappings, bdoc *riot.Document, key string, value interface{}) error {
+	var field *riot.TermField
 	prop, _ := mappings.GetProperty(key)
 	switch prop.Type {
 	case "text":
@@ -106,27 +105,27 @@ func (s *IndexShard) buildField(mappings *meta.Mappings, bdoc *bluge.Document, k
 		if v == "" {
 			return nil
 		}
-		field = bluge.NewTextField(key, v).SearchTermPositions()
+		field = riot.NewTextField(key, v).SearchTermPositions()
 		fieldAnalyzer, _ := zincanalysis.QueryAnalyzerForField(s.root.GetAnalyzers(), mappings, key)
 		if fieldAnalyzer != nil {
 			field.WithAnalyzer(fieldAnalyzer)
 		}
 	case "numeric":
-		field = bluge.NewNumericField(key, value.(float64))
+		field = riot.NewNumericField(key, value.(float64))
 	case "keyword":
 		v := value.(string)
 		if v == "" {
 			return nil
 		}
-		field = bluge.NewKeywordField(key, v)
+		field = riot.NewKeywordField(key, v)
 	case "bool":
-		field = bluge.NewKeywordField(key, strconv.FormatBool(value.(bool)))
+		field = riot.NewKeywordField(key, strconv.FormatBool(value.(bool)))
 	case "date", "time":
 		v, err := zutils.ParseTime(value, prop.Format, prop.TimeZone)
 		if err != nil {
 			return fmt.Errorf("field [%s] value [%v] parse err: %s", key, value, err.Error())
 		}
-		field = bluge.NewDateTimeField(key, v)
+		field = riot.NewDateTimeField(key, v)
 	}
 	if prop.Store || prop.Highlightable {
 		field.StoreValue()

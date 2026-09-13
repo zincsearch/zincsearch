@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/blugelabs/bluge/analysis"
+	"github.com/vcaesar/riot/analysis"
 
 	"github.com/zincsearch/zincsearch/pkg/bluge/analysis/token"
 	"github.com/zincsearch/zincsearch/pkg/errors"

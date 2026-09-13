@@ -15,7 +15,7 @@
 
 package aggregation
 
-import "github.com/blugelabs/bluge/search"
+import "github.com/vcaesar/riot/search"
 
 const (
 	TextValueSource = iota

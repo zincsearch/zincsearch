@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/analysis/tokenizer"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/analysis/tokenizer"
 
 	"github.com/zincsearch/zincsearch/pkg/bluge/analysis/lang/chs"
 	"github.com/zincsearch/zincsearch/pkg/errors"

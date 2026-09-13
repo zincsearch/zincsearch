@@ -61,7 +61,7 @@ func TestAuth(t *testing.T) {
 		t.Run("POST /api/login", func(t *testing.T) {
 			t.Run("with username and password", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
-				body.WriteString(fmt.Sprintf(`{"_id": "%s", "password": "%s"}`, username, password))
+				fmt.Fprintf(body, `{"_id": "%s", "password": "%s"}`, username, password)
 				resp := request("POST", "/api/login", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -72,7 +72,7 @@ func TestAuth(t *testing.T) {
 			})
 			t.Run("with bad username or password", func(t *testing.T) {
 				body := bytes.NewBuffer(nil)
-				body.WriteString(fmt.Sprintf(`{"_id": "%s", "password": "xxx"}`, username))
+				fmt.Fprintf(body, `{"_id": "%s", "password": "xxx"}`, username)
 				resp := request("POST", "/api/login", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -91,13 +91,13 @@ func TestAuth(t *testing.T) {
 			t.Run("create user with payload", func(t *testing.T) {
 				// create user
 				body := bytes.NewBuffer(nil)
-				body.WriteString(fmt.Sprintf(`{"_id":"%s","name":"%s","password":"%s","role":"admin"}`, username, username, password))
+				fmt.Fprintf(body, `{"_id":"%s","name":"%s","password":"%s","role":"admin"}`, username, username, password)
 				resp := request("PUT", "/api/user", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
 
 				// login check
 				body.Reset()
-				body.WriteString(fmt.Sprintf(`{"_id":"%s","password":"%s"}`, username, password))
+				fmt.Fprintf(body, `{"_id":"%s","password":"%s"}`, username, password)
 				resp = request("POST", "/api/login", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
 
@@ -109,7 +109,7 @@ func TestAuth(t *testing.T) {
 			t.Run("update user", func(t *testing.T) {
 				// update user
 				body := bytes.NewBuffer(nil)
-				body.WriteString(fmt.Sprintf(`{"_id":"%s","name":"%s-updated","password":"%s","role":"admin"}`, username, username, password))
+				fmt.Fprintf(body, `{"_id":"%s","name":"%s-updated","password":"%s","role":"admin"}`, username, username, password)
 				resp := request("PUT", "/api/user", body)
 				assert.Equal(t, http.StatusOK, resp.Code)
 

@@ -20,10 +20,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/analysis/analyzer"
 	"github.com/stretchr/testify/assert"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/analysis/analyzer"
 
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	"github.com/zincsearch/zincsearch/pkg/zutils/json"
@@ -71,7 +71,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 		name    string
 		args    args
 		init    func()
-		want    *bluge.Document
+		want    *riot.Document
 		wantErr bool
 	}{
 		{
@@ -98,7 +98,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init:    func() {},
-			want:    &bluge.Document{},
+			want:    &riot.Document{},
 			wantErr: false,
 		},
 		{
@@ -116,7 +116,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init:    func() {},
-			want:    &bluge.Document{},
+			want:    &riot.Document{},
 			wantErr: false,
 		},
 		{
@@ -145,7 +145,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 					Format: "2006-01-02 15:04:05.000",
 				})
 			},
-			want:    &bluge.Document{},
+			want:    &riot.Document{},
 			wantErr: false,
 		},
 		{
@@ -174,7 +174,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				})
 				index.analyzers["analyzer_1"] = analyzer.NewStandardAnalyzer()
 			},
-			want:    &bluge.Document{},
+			want:    &riot.Document{},
 			wantErr: false,
 		},
 		{
@@ -187,7 +187,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init:    func() {},
-			want:    &bluge.Document{},
+			want:    &riot.Document{},
 			wantErr: false,
 		},
 		{
@@ -203,7 +203,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init:    func() {},
-			want:    &bluge.Document{},
+			want:    &riot.Document{},
 			wantErr: false,
 		},
 		{
@@ -215,7 +215,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init:    func() {},
-			want:    &bluge.Document{},
+			want:    &riot.Document{},
 			wantErr: false,
 		},
 		{
@@ -227,7 +227,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init:    func() {},
-			want:    &bluge.Document{},
+			want:    &riot.Document{},
 			wantErr: false,
 		},
 		{
@@ -239,7 +239,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init:    func() {},
-			want:    &bluge.Document{},
+			want:    &riot.Document{},
 			wantErr: false,
 		},
 		{
@@ -251,7 +251,7 @@ func TestIndex_BuildBlugeDocumentFromJSON(t *testing.T) {
 				},
 			},
 			init:    func() {},
-			want:    &bluge.Document{},
+			want:    &riot.Document{},
 			wantErr: false,
 		},
 	}

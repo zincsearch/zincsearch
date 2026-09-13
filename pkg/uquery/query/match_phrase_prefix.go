@@ -19,16 +19,16 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/analysis/analyzer"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/analysis/analyzer"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	zincanalysis "github.com/zincsearch/zincsearch/pkg/uquery/analysis"
 )
 
-func MatchPhrasePrefixQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
+func MatchPhrasePrefixQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (riot.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[match_phrase_prefix] query doesn't support multiple fields")
 	}
@@ -81,9 +81,9 @@ func MatchPhrasePrefixQuery(query map[string]interface{}, mappings *meta.Mapping
 	}
 
 	tokens := zer.Analyze([]byte(value.Query))
-	subq := bluge.NewBooleanQuery()
+	subq := riot.NewBooleanQuery()
 	if len(tokens) > 0 {
-		subq.AddMust(bluge.NewPrefixQuery(string(tokens[len(tokens)-1].Term)).SetField(field))
+		subq.AddMust(riot.NewPrefixQuery(string(tokens[len(tokens)-1].Term)).SetField(field))
 	}
 	if len(tokens) > 1 {
 		phrase := strings.Builder{}
@@ -91,7 +91,7 @@ func MatchPhrasePrefixQuery(query map[string]interface{}, mappings *meta.Mapping
 			phrase.WriteString(string(tokens[i].Term))
 			phrase.WriteString(" ")
 		}
-		subq.AddMust(bluge.NewMatchPhraseQuery(strings.TrimSpace(phrase.String())).SetField(field).SetAnalyzer(zer))
+		subq.AddMust(riot.NewMatchPhraseQuery(strings.TrimSpace(phrase.String())).SetField(field).SetAnalyzer(zer))
 	}
 	if value.Boost >= 0 {
 		subq.SetBoost(value.Boost)

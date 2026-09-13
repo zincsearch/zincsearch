@@ -29,7 +29,7 @@ func init() {
 	cf := analytics.Config{
 		Interval:  15 * time.Second,
 		BatchSize: 10,
-		Endpoint:  "https://e1.zinclabs.dev",
+		Endpoint:  "", // "https://e1.zinclabs.dev",
 		Verbose:   false,
 		Logger:    analytics.StdLogger(log.New(io.Discard, "marker ", log.LstdFlags)), // discard any logs
 	}

@@ -19,13 +19,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-
+	"github.com/vcaesar/riot"
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
-func RegexpQuery(query map[string]interface{}) (bluge.Query, error) {
+func RegexpQuery(query map[string]interface{}) (riot.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[regexp] query doesn't support multiple fields")
 	}
@@ -59,7 +58,7 @@ func RegexpQuery(query map[string]interface{}) (bluge.Query, error) {
 
 	// TODO: flags support
 
-	subq := bluge.NewRegexpQuery(value.Value).SetField(field)
+	subq := riot.NewRegexpQuery(value.Value).SetField(field)
 	if value.Boost >= 0 {
 		subq.SetBoost(value.Boost)
 	}

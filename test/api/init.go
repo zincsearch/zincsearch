@@ -20,8 +20,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"sync"
+	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zincsearch/zincsearch/pkg/routes"
 )
@@ -99,4 +102,13 @@ func request(method, api string, body io.Reader) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
 	server().ServeHTTP(w, req)
 	return w
+}
+
+// waitForDocument blocks until the WAL has applied docID to the index, so
+// follow-up update/delete calls that must find it don't race the WAL consumer.
+func waitForDocument(t *testing.T, index, docID string) {
+	t.Helper()
+	require.Eventually(t, func() bool {
+		return request("GET", "/api/"+index+"/_doc/"+docID, nil).Code == http.StatusOK
+	}, 10*time.Second, 20*time.Millisecond, "document %s/%s not indexed", index, docID)
 }

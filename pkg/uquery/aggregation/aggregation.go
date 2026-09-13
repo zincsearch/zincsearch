@@ -21,8 +21,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/blugelabs/bluge/search"
-	"github.com/blugelabs/bluge/search/aggregations"
+	"github.com/vcaesar/riot/search"
+	"github.com/vcaesar/riot/search/aggregations"
 
 	zincaggregation "github.com/zincsearch/zincsearch/pkg/bluge/aggregation"
 	"github.com/zincsearch/zincsearch/pkg/config"

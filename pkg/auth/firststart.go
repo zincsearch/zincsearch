@@ -17,9 +17,10 @@ package auth
 
 import (
 	"errors"
-	"os"
 
 	"github.com/rs/zerolog/log"
+
+	"github.com/zincsearch/zincsearch/pkg/config"
 )
 
 func init() {
@@ -69,11 +70,10 @@ func initPermissionCache() error {
 }
 
 func initFirstUser() error {
-	// create default user from environment variable
-	adminUser := os.Getenv("ZINC_FIRST_ADMIN_USER")
-	adminPassword := os.Getenv("ZINC_FIRST_ADMIN_PASSWORD")
+	adminUser := config.Global.FirstAdminUser
+	adminPassword := config.Global.FirstAdminPassword
 	if adminUser == "" || adminPassword == "" {
-		return errors.New("ZINC_FIRST_ADMIN_USER and ZINC_FIRST_ADMIN_PASSWORD must be set on first start. You should also change the credentials after first login")
+		return errors.New("set ZINC_FIRST_ADMIN_USER and ZINC_FIRST_ADMIN_PASSWORD in ./conf/zinc.toml (lowercase keys) or in the environment on first start. Change the credentials after first login")
 	}
 
 	_, err := CreateUser(adminUser, adminUser, adminPassword, "admin")

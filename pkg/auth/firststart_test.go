@@ -16,13 +16,21 @@
 package auth
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zincsearch/zincsearch/pkg/config"
 )
 
 func TestInitFirstUser(t *testing.T) {
+	original := *config.Global
+	t.Cleanup(func() { *config.Global = original })
+	t.Setenv("ZINC_FIRST_ADMIN_USER", "")
+	t.Setenv("ZINC_FIRST_ADMIN_PASSWORD", "")
+	config.Global.FirstAdminUser = "TestInitFirstUser"
+	config.Global.FirstAdminPassword = "test-only-password"
+
 	type args struct {
 		init func()
 	}
@@ -42,8 +50,8 @@ func TestInitFirstUser(t *testing.T) {
 			name: "init first user with error",
 			args: args{
 				init: func() {
-					os.Setenv("ZINC_FIRST_ADMIN_USER", "")
-					os.Setenv("ZINC_FIRST_ADMIN_PASSWORD", "")
+					config.Global.FirstAdminUser = ""
+					config.Global.FirstAdminPassword = ""
 				},
 			},
 			wantErr: true,

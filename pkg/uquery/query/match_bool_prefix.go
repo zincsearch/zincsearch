@@ -19,16 +19,16 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
-	"github.com/blugelabs/bluge/analysis/analyzer"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
+	"github.com/vcaesar/riot/analysis/analyzer"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	zincanalysis "github.com/zincsearch/zincsearch/pkg/uquery/analysis"
 )
 
-func MatchBoolPrefixQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
+func MatchBoolPrefixQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (riot.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[match_bool_prefix] query doesn't support multiple fields")
 	}
@@ -81,15 +81,15 @@ func MatchBoolPrefixQuery(query map[string]interface{}, mappings *meta.Mappings,
 	}
 
 	tokens := zer.Analyze([]byte(value.Query))
-	subq := bluge.NewBooleanQuery()
+	subq := riot.NewBooleanQuery()
 	if value.Boost >= 0 {
 		subq.SetBoost(value.Boost)
 	}
 	for i := 0; i < len(tokens); i++ {
 		if i == len(tokens)-1 {
-			subq.AddShould(bluge.NewPrefixQuery(string(tokens[i].Term)).SetField(field))
+			subq.AddShould(riot.NewPrefixQuery(string(tokens[i].Term)).SetField(field))
 		} else {
-			subq.AddShould(bluge.NewTermQuery(string(tokens[i].Term)).SetField(field))
+			subq.AddShould(riot.NewTermQuery(string(tokens[i].Term)).SetField(field))
 		}
 	}
 

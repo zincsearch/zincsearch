@@ -16,6 +16,9 @@
 package config
 
 import (
+	"bytes"
+	_ "embed"
+	"fmt"
 	"os"
 	"path"
 	"reflect"
@@ -23,42 +26,45 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blugelabs/ice/compress"
 	"github.com/docker/go-units"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+	"github.com/pelletier/go-toml/v2"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/vcaesar/ice/compress"
 )
 
 type config struct {
-	GinMode                   string        `env:"GIN_MODE"`
-	ServerPort                string        `env:"ZINC_SERVER_PORT,default=4080"`
-	ServerAddress             string        `env:"ZINC_SERVER_ADDRESS"`
-	ServerTLSCertificateFile  string        `env:"ZINC_SERVER_TLS_CERTIFICATE_FILE"`
-	ServerTLSKeyFile          string        `env:"ZINC_SERVER_TLS_KEY_FILE"`
-	ServerMode                string        `env:"ZINC_SERVER_MODE,default=node"`
-	NodeID                    int           `env:"ZINC_NODE_ID,default=1"`
-	DataPath                  string        `env:"ZINC_DATA_PATH,default=./data"`
-	MetadataStorage           string        `env:"ZINC_METADATA_STORAGE,default=bolt"`
-	IceCompressor             string        `env:"ZINC_ICE_COMPRESSOR,default=zstd"`
-	SentryEnable              bool          `env:"ZINC_SENTRY,default=true"`
-	SentryDSN                 string        `env:"ZINC_SENTRY_DSN,default=https://15b6d9b8be824b44896f32b0234c32b7@o1218932.ingest.sentry.io/6360942"`
-	ProfilerEnable            bool          `env:"ZINC_PROFILER,default=false"`
-	ProfilerServer            string        `env:"ZINC_PROFILER_SERVER,default=https://pyroscope.dev.zincsearch.com"`
-	ProfilerAPIKey            string        `env:"ZINC_PROFILER_API_KEY,default=psx-AfPbC5Bh6gI4dHkCMpoxM2Qd7Xblsqhip5nlwvHdhAE1"`
-	ProfilerFriendlyProfileID string        `env:"ZINC_PROFILER_FRIENDLY_PROFILE_ID"`
-	TelemetryEnable           bool          `env:"ZINC_TELEMETRY,default=true"`
-	PrometheusEnable          bool          `env:"ZINC_PROMETHEUS_ENABLE,default=false"`
-	EnableTextKeywordMapping  bool          `env:"ZINC_ENABLE_TEXT_KEYWORD_MAPPING,default=false"`
-	BatchSize                 int           `env:"ZINC_BATCH_SIZE,default=1024"`
-	MaxResults                int           `env:"ZINC_MAX_RESULTS,default=10000"`
-	AggregationTermsSize      int           `env:"ZINC_AGGREGATION_TERMS_SIZE,default=1000"`
-	MaxDocumentSize           int           `env:"ZINC_MAX_DOCUMENT_SIZE,default=1m"`      // Max size for a single document . Default = 1 MB = 1024 * 1024
-	WalSyncInterval           time.Duration `env:"ZINC_WAL_SYNC_INTERVAL,default=1s"`      // sync wal to disk, 1s, 10ms
-	WalRedoLogNoSync          bool          `env:"ZINC_WAL_REDOLOG_NO_SYNC,default=false"` // control sync after every write
-	ZincSwaggerEnable         bool          `env:"ZINC_SWAGGER_ENABLE,default=true"`
-	LogLevel                  string        `env:"ZINC_LOG_LEVEL,default=debug"`
+	FirstAdminUser            string        `toml:"zinc_first_admin_user"`
+	FirstAdminPassword        string        `toml:"zinc_first_admin_password"`
+	GinMode                   string        `toml:"gin_mode"`
+	ServerPort                string        `toml:"zinc_server_port"`
+	ServerAddress             string        `toml:"zinc_server_address"`
+	ServerTLSCertificateFile  string        `toml:"zinc_server_tls_certificate_file"`
+	ServerTLSKeyFile          string        `toml:"zinc_server_tls_key_file"`
+	ServerMode                string        `toml:"zinc_server_mode"`
+	NodeID                    int           `toml:"zinc_node_id"`
+	DataPath                  string        `toml:"zinc_data_path"`
+	MetadataStorage           string        `toml:"zinc_metadata_storage"`
+	IceCompressor             string        `toml:"zinc_ice_compressor"`
+	SentryEnable              bool          `toml:"zinc_sentry"`
+	SentryDSN                 string        `toml:"zinc_sentry_dsn"`
+	ProfilerEnable            bool          `toml:"zinc_profiler"`
+	ProfilerServer            string        `toml:"zinc_profiler_server"`
+	ProfilerAPIKey            string        `toml:"zinc_profiler_api_key"`
+	ProfilerFriendlyProfileID string        `toml:"zinc_profiler_friendly_profile_id"`
+	TelemetryEnable           bool          `toml:"zinc_telemetry"`
+	PrometheusEnable          bool          `toml:"zinc_prometheus_enable"`
+	EnableTextKeywordMapping  bool          `toml:"zinc_enable_text_keyword_mapping"`
+	EnableSQLMappings         bool          `toml:"zinc_enable_sql_mappings"`
+	BatchSize                 int           `toml:"zinc_batch_size"`
+	MaxResults                int           `toml:"zinc_max_results"`
+	AggregationTermsSize      int           `toml:"zinc_aggregation_terms_size"`
+	MaxDocumentSize           int           `toml:"zinc_max_document_size"`   // Max size for a single document . Default = 1 MB = 1024 * 1024
+	WalSyncInterval           time.Duration `toml:"zinc_wal_sync_interval"`   // sync wal to disk, 1s, 10ms
+	WalRedoLogNoSync          bool          `toml:"zinc_wal_redolog_no_sync"` // control sync after every write
+	ZincSwaggerEnable         bool          `toml:"zinc_swagger_enable"`
+	LogLevel                  string        `toml:"zinc_log_level"`
 	Cluster                   cluster
 	Shard                     shard
 	Etcd                      etcd
@@ -66,23 +72,23 @@ type config struct {
 }
 
 type cluster struct {
-	Name string `env:"ZINC_CLUSTER_NAME,default=ZincCluster"`
+	Name string `toml:"zinc_cluster_name"`
 }
 
 type shard struct {
 	// control goroutine number for read
-	GoroutineNum int `env:"ZINC_SHARD_GOROUTINE_NUM,default=3"`
+	GoroutineNum int `toml:"zinc_shard_goroutine_num"`
 	// DefaultNum is the default number of shards.
-	Num int64 `env:"ZINC_SHARD_NUM,default=3"`
+	Num int64 `toml:"zinc_shard_num"`
 	// MaxSize is the maximum size limit for one shard, or will create a new shard.
-	MaxSize uint64 `env:"ZINC_SHARD_MAX_SIZE,default=1073741824"`
+	MaxSize uint64 `toml:"zinc_shard_max_size"`
 }
 
 type etcd struct {
-	Endpoints []string `env:"ZINC_ETCD_ENDPOINTS"`
-	Prefix    string   `env:"ZINC_ETCD_PREFIX,default=/zinc"`
-	Username  string   `env:"ZINC_ETCD_USERNAME"`
-	Password  string   `env:"ZINC_ETCD_PASSWORD"`
+	Endpoints []string `toml:"zinc_etcd_endpoints"`
+	Prefix    string   `toml:"zinc_etcd_prefix"`
+	Username  string   `toml:"zinc_etcd_username"`
+	Password  string   `toml:"zinc_etcd_password"`
 }
 
 type plugin struct {
@@ -91,25 +97,29 @@ type plugin struct {
 }
 
 type elasticsearch struct {
-	Version string `env:"ZINC_PLUGIN_ES_VERSION"`
+	Version string `toml:"zinc_plugin_es_version"`
 }
 
 type gse struct {
-	Enable     bool   `env:"ZINC_PLUGIN_GSE_ENABLE,default=false"`
-	EnableStop bool   `env:"ZINC_PLUGIN_GSE_ENABLE_STOP,default=true"`
-	EnableHMM  bool   `env:"ZINC_PLUGIN_GSE_ENABLE_HMM,default=true"`
-	DictEmbed  string `env:"ZINC_PLUGIN_GSE_DICT_EMBED,default=small"`
-	DictPath   string `env:"ZINC_PLUGIN_GSE_DICT_PATH,default=./plugins/gse/dict"`
+	Enable     bool   `toml:"zinc_plugin_gse_enable"`
+	EnableStop bool   `toml:"zinc_plugin_gse_enable_stop"`
+	EnableHMM  bool   `toml:"zinc_plugin_gse_enable_hmm"`
+	DictEmbed  string `toml:"zinc_plugin_gse_dict_embed"`
+	DictPath   string `toml:"zinc_plugin_gse_dict_path"`
 }
+
+// configFile is the only config file read at startup, resolved against the working directory.
+const configFile = "conf/zinc.toml"
+
+//go:embed default.toml
+var defaultConfig []byte
 
 var Global = new(config)
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Print(err.Error())
+	if err := load(Global); err != nil {
+		log.Fatal().Err(err).Msg("failed to load configuration")
 	}
-	loadConfig(reflect.ValueOf(Global).Elem())
 
 	// set the log level
 	logLevel, logLevelErr := zerolog.ParseLevel(Global.LogLevel)
@@ -143,18 +153,38 @@ func init() {
 	}
 }
 
-func loadConfig(rv reflect.Value) {
+// load fills c from the embedded defaults, then ./conf/zinc.toml when present,
+// then non-empty process environment variables. TOML keys are lowercase and
+// map to the same names uppercased in the environment.
+func load(c *config) error {
+	if err := toml.Unmarshal(defaultConfig, c); err != nil {
+		return fmt.Errorf("decode built-in defaults: %w", err)
+	}
+	data, err := os.ReadFile(configFile)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("read config %s: %w", configFile, err)
+	}
+	if err == nil {
+		if err := toml.NewDecoder(bytes.NewReader(data)).DisallowUnknownFields().Decode(c); err != nil {
+			// Decoder errors can contain configuration values, including passwords.
+			return fmt.Errorf("invalid TOML configuration in %s", configFile)
+		}
+	}
+	loadEnv(reflect.ValueOf(c).Elem())
+	return nil
+}
+
+func loadEnv(rv reflect.Value) {
 	rt := rv.Type()
 	for i := 0; i < rt.NumField(); i++ {
 		fv := rv.Field(i)
 		ft := rt.Field(i)
 		if ft.Type.Kind() == reflect.Struct {
-			loadConfig(fv)
+			loadEnv(fv)
 			continue
 		}
-		if ft.Tag.Get("env") != "" {
-			tag := ft.Tag.Get("env")
-			setField(fv, tag)
+		if tag := ft.Tag.Get("toml"); tag != "" {
+			setField(fv, strings.ToUpper(tag))
 		}
 	}
 }
@@ -163,16 +193,7 @@ func setField(field reflect.Value, tag string) {
 	if tag == "" {
 		return
 	}
-	tagColumn := strings.Split(tag, ",")
-	v := os.Getenv(tagColumn[0])
-	if v == "" {
-		if len(tagColumn) > 1 {
-			tv := strings.Join(tagColumn[1:], ",")
-			if strings.HasPrefix(tv, "default=") {
-				v = tv[8:]
-			}
-		}
-	}
+	v := os.Getenv(tag)
 	if v == "" {
 		return
 	}

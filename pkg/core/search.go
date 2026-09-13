@@ -19,10 +19,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/search"
-	"github.com/blugelabs/bluge/search/highlight"
 	"github.com/rs/zerolog/log"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/search"
+	"github.com/vcaesar/riot/search/highlight"
 
 	zincsearch "github.com/zincsearch/zincsearch/pkg/bluge/search"
 	"github.com/zincsearch/zincsearch/pkg/meta"
@@ -59,7 +59,7 @@ func (index *Index) Search(query *meta.ZincQuery) (*meta.SearchResponse, error) 
 		defer cancel()
 	}
 
-	// dmi, err := bluge.MultiSearch(ctx, searchRequest, readers...)
+	// dmi, err := riot.MultiSearch(ctx, searchRequest, readers...)
 	dmi, err := zincsearch.MultiSearch(ctx, query, mappings, analyzers, readers...)
 	if err != nil {
 		log.Printf("index.SearchV2: error executing search: %s", err.Error())
@@ -110,7 +110,7 @@ func searchV2(shardNum, readerNum int64, dmi search.DocumentMatchIterator, query
 			case "_index":
 				indexName = string(value)
 			case "@timestamp":
-				timestamp, _ = bluge.DecodeDateTime(value)
+				timestamp, _ = riot.DecodeDateTime(value)
 			case "_source":
 				sourceData = source.Response(query.Source.(*meta.Source), value)
 				if query.Fields != nil {

@@ -16,7 +16,7 @@
 package tokenizer
 
 import (
-	"github.com/blugelabs/bluge/analysis"
+	"github.com/vcaesar/riot/analysis"
 
 	zinctokenizer "github.com/zincsearch/zincsearch/pkg/bluge/analysis/tokenizer"
 )

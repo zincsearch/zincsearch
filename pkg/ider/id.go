@@ -16,15 +16,21 @@
 package ider
 
 import (
-	"github.com/bwmarrin/snowflake"
+	"fmt"
+	"time"
+
 	"github.com/rs/zerolog/log"
+	"github.com/sony/sonyflake/v2"
 
 	"github.com/zincsearch/zincsearch/pkg/config"
 	"github.com/zincsearch/zincsearch/pkg/zutils/base62"
 )
 
+// epoch is the fixed start time of the ID clock; changing it changes the generated IDs.
+var epoch = time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC)
+
 type Node struct {
-	node *snowflake.Node
+	node *sonyflake.Sonyflake
 }
 
 var local *Node
@@ -41,11 +47,32 @@ func Generate() string {
 	return local.Generate()
 }
 
+// maxNodeID is the largest node id representable in 10 machine bits.
+const maxNodeID = 1<<10 - 1
+
+// NewNode returns a generator laid out as 41 bits of milliseconds, 12 bits of sequence, 10 bits of node (low bits).
+// id must be in [0, maxNodeID]; out-of-range ids are rejected rather than folded onto another node.
 func NewNode(id int) (*Node, error) {
-	node, err := snowflake.NewNode(int64(id % 1024))
-	return &Node{node: node}, err
+	if id < 0 || id > maxNodeID {
+		return nil, fmt.Errorf("node id %d out of range [0, %d]", id, maxNodeID)
+	}
+	node, err := sonyflake.New(sonyflake.Settings{
+		BitsSequence:  12,
+		BitsMachineID: 10,
+		TimeUnit:      time.Millisecond,
+		StartTime:     epoch,
+		MachineID:     func() (int, error) { return id, nil },
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &Node{node: node}, nil
 }
 
 func (n *Node) Generate() string {
-	return base62.Encode(n.node.Generate().Int64())
+	id, err := n.node.NextID()
+	if err != nil {
+		log.Fatal().Err(err).Msg("id generate failed")
+	}
+	return base62.Encode(id)
 }

@@ -19,16 +19,16 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	"github.com/zincsearch/zincsearch/pkg/zutils"
 )
 
-func BoolQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
-	boolQuery := bluge.NewBooleanQuery()
+func BoolQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (riot.Query, error) {
+	boolQuery := riot.NewBooleanQuery()
 	var minimumShouldMatch interface{}
 	for k, v := range query {
 		k := strings.ToLower(k)
@@ -91,7 +91,7 @@ func BoolQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers 
 				return nil, errors.New(errors.ErrorTypeXContentParseException, fmt.Sprintf("[bool] %s doesn't support values of type: %T", k, v))
 			}
 		case "filter":
-			filterQuery := bluge.NewBooleanQuery().SetBoost(0)
+			filterQuery := riot.NewBooleanQuery().SetBoost(0)
 			switch v := v.(type) {
 			case map[string]interface{}:
 				if subq, err := Query(v, mappings, analyzers); err != nil {

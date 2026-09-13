@@ -19,13 +19,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-
+	"github.com/vcaesar/riot"
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 )
 
-func TermsQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Query, error) {
+func TermsQuery(query map[string]interface{}, mappings *meta.Mappings) (riot.Query, error) {
 	if len(query) > 2 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[terms] query doesn't support multiple fields")
 	}
@@ -72,7 +71,7 @@ func TermsQuery(query map[string]interface{}, mappings *meta.Mappings) (bluge.Qu
 		}
 	}
 
-	subq := bluge.NewBooleanQuery()
+	subq := riot.NewBooleanQuery()
 	for _, term := range values {
 		subqq, err := TermQueryText(field, &meta.TermQuery{Value: term})
 		if err != nil {

@@ -18,9 +18,9 @@ package chs
 import (
 	"strings"
 
-	"github.com/blugelabs/bluge/analysis"
 	"github.com/go-ego/gse"
 	"github.com/rs/zerolog/log"
+	"github.com/vcaesar/riot/analysis"
 
 	"github.com/zincsearch/zincsearch/pkg/bluge/analysis/lang/chs/analyzer"
 	"github.com/zincsearch/zincsearch/pkg/bluge/analysis/lang/chs/token"

@@ -19,15 +19,15 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blugelabs/bluge"
-	"github.com/blugelabs/bluge/analysis"
+	"github.com/vcaesar/riot"
+	"github.com/vcaesar/riot/analysis"
 
 	"github.com/zincsearch/zincsearch/pkg/errors"
 	"github.com/zincsearch/zincsearch/pkg/meta"
 	zincanalysis "github.com/zincsearch/zincsearch/pkg/uquery/analysis"
 )
 
-func MatchPhraseQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (bluge.Query, error) {
+func MatchPhraseQuery(query map[string]interface{}, mappings *meta.Mappings, analyzers map[string]*analysis.Analyzer) (riot.Query, error) {
 	if len(query) > 1 {
 		return nil, errors.New(errors.ErrorTypeParsingException, "[match_phrase] query doesn't support multiple fields")
 	}
@@ -76,7 +76,7 @@ func MatchPhraseQuery(query map[string]interface{}, mappings *meta.Mappings, ana
 		}
 	}
 
-	subq := bluge.NewMatchPhraseQuery(value.Query).SetField(field)
+	subq := riot.NewMatchPhraseQuery(value.Query).SetField(field)
 	if zer != nil {
 		subq.SetAnalyzer(zer)
 	}

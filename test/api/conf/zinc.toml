@@ -1,0 +1,8 @@
+# Test-only config, read by pkg/config when `go test ./test/api/` runs with this
+# package directory as the working directory. Values match sh/test.sh and
+# init.go so the suite passes without any ZINC_* environment variables.
+zinc_first_admin_user = "admin"
+zinc_first_admin_password = "Complexpass#123"
+zinc_wal_sync_interval = 10000000
+zinc_wal_redolog_no_sync = true
+zinc_enable_text_keyword_mapping = true
