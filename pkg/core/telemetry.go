@@ -24,8 +24,8 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/analytics-go/v3"
-	"github.com/shirou/gopsutil/v3/cpu"
-	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v4/cpu"
+	"github.com/shirou/gopsutil/v4/mem"
 
 	"github.com/zincsearch/zincsearch/pkg/config"
 	"github.com/zincsearch/zincsearch/pkg/errors"
