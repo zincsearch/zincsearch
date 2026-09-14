@@ -9,7 +9,7 @@ ZincSearch uses Go (For server) and React / TypeScript (For Web UI)
 You must have following installed:
 
 1. Git
-2. Go 1.27.1+ (We recommend go 1.27+, I will move to 1.20+)
+2. Go 1.26.7+ (We recommend go 1.27+)
 3. Node.js 24 and npm
 
 ## Building from source code

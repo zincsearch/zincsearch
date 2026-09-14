@@ -150,6 +150,7 @@ func ParseQueryDSLFromV1(q *v1.ZincQuery) (*meta.ZincQuery, error) {
 func covertAggregationFromV1(agg v1.AggregationParams) (meta.Aggregations, error) {
 	newagg := meta.Aggregations{}
 	if len(agg.Aggregations) > 0 {
+		newagg.Aggregations = make(map[string]meta.Aggregations, len(agg.Aggregations))
 		for name, subagg := range agg.Aggregations {
 			newsubagg, err := covertAggregationFromV1(subagg)
 			if err != nil {
