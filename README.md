@@ -1,16 +1,19 @@
 [![CI](https://github.com/zincsearch/zincsearch/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zincsearch/zincsearch/actions/workflows/ci.yml)
 [![Nightly](https://github.com/zincsearch/zincsearch/actions/workflows/nightly.yml/badge.svg?branch=main)](https://github.com/zincsearch/zincsearch/actions/workflows/nightly.yml)
 [![Release](https://github.com/zincsearch/zincsearch/actions/workflows/release.yml/badge.svg)](https://github.com/zincsearch/zincsearch/actions/workflows/release.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/zincsearch/zincsearch)](https://goreportcard.com/report/github.com/zincsearch/zincsearch)
+[![Go Reference](https://pkg.go.dev/badge/github.com/zincsearch/zincsearch.svg)](https://pkg.go.dev/github.com/zincsearch/zincsearch)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/zincsearch/zincsearch)](./go.mod)
+[![golangci-lint](https://img.shields.io/badge/linter-golangci--lint-blue)](https://golangci-lint.run/)
+[![Release](https://img.shields.io/github/v/release/zincsearch/zincsearch)](https://github.com/zincsearch/zincsearch/releases/latest)
 [![Docs](https://img.shields.io/badge/Docs-Docs-green)](https://zincsearch-docs.zinc.dev/) [![codecov](https://codecov.io/github/zincsearch/zincsearch/branch/main/graph/badge.svg)](https://codecov.io/github/zincsearch/zincsearch)
 
 ❗Note: If your use case is of log search (app and security logs) instead of app search (implement search feature in your application or website) then you should check [openobserve/openobserve](https://github.com/openobserve/openobserve) project built in rust that is specifically built for log search use case.
 
 # ZincSearch
 
-ZincSearch is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs using a fraction of the resources. It uses [bluge](https://github.com/vcaesar/riot) as the underlying indexing library.
+ZincSearch is a search engine that does full text indexing. It is a lightweight alternative to Elasticsearch and runs using a fraction of the resources. It uses [bluge](https://github.com/blugelabs/bluge) (via the [vcaesar/riot](https://github.com/vcaesar/riot) fork) as the underlying indexing library.
 
-It is very simple and easy to operate as opposed to Elasticsearch which requires a couple dozen knobs to understand and tune which you can get up and running in 2 minutes
+It is very simple and easy to operate as opposed to Elasticsearch which requires a couple dozen knobs to understand and tune. You can get ZincSearch up and running in 2 minutes.
 
 It is a drop-in replacement for Elasticsearch if you are just ingesting data using APIs and searching using kibana (Kibana is not supported with ZincSearch. ZincSearch provides its own UI).
 
@@ -24,11 +27,11 @@ While Elasticsearch is a very good product, it is complex and requires lots of r
 
 # Features:
 
-go + fiber + react
+go + gin + react
 
 1. Provides full text indexing capability
 2. Single binary for installation and running. Binaries available under releases for multiple platforms.
-3. Web UI for querying data written in Vue
+3. Web UI for querying data written in React (embedded in the binary)
 4. Compatibility with Elasticsearch APIs for ingestion of data (single record and bulk API)
 5. Out of the box authentication
 6. Schema less - No need to define schema upfront and different documents in the same index can have different fields.
@@ -96,7 +99,7 @@ ZincSearch has hundreds of production installations.
 
 - How to develop and contribute to ZincSearch
 
-  Check the [contributing guide](./CONTRIBUTING.md) . Also check the [roadmap items](https://github.com/orgs/zinclabs/projects/3)
+  Check the [contributing guide](./CONTRIBUTING.md). Also check the [roadmap](https://zincsearch-docs.zinc.dev/roadmap/)
 
 # Examples
 
