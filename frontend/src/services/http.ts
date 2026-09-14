@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { getCredentials, setCredentials } from '../auth';
+import { apiEndpoint } from './endpoint';
 
-export const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || import.meta.env.BASE_URL.replace(/\/ui\/$/, '').replace(/\/$/, '');
+export { apiEndpoint };
 const http = () => {
   const credentials = getCredentials();
   const instance = axios.create({
