@@ -1,6 +1,7 @@
 import type en from './en';
 
 export default {
+  passwordInput: { show: "비밀번호 표시", hide: "비밀번호 숨기기" },
   theme: { label: "테마", system: "시스템", light: "라이트", dark: "다크" },
   search: {
     selectIndex: "먼저 인덱스를 선택하세요",
@@ -31,6 +32,21 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "현대적인 오픈 소스 검색 엔진.",
+  },
+  account: {
+    title: "내 계정",
+    userid: "사용자 ID",
+    role: "역할",
+    name: "표시 이름",
+    current: "현재 비밀번호",
+    new: "새 비밀번호",
+    confirm: "새 비밀번호 확인",
+    keepPassword: "비밀번호를 유지하려면 새 비밀번호 필드를 비워 두세요.",
+    submit: "변경 사항 저장",
+    success: "계정이 업데이트되었습니다. 세션이 갱신되었습니다.",
+    nothingToChange: "변경할 내용이 없습니다.",
+    wrongPassword: "현재 비밀번호가 올바르지 않습니다.",
+    failed: "계정을 업데이트할 수 없습니다. 다시 시도해 주세요."
   },
   login: {
     userid: "사용자 ID",

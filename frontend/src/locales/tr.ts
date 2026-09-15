@@ -1,4 +1,5 @@
 export default {
+  passwordInput: { show: "Parolayı göster", hide: "Parolayı gizle" },
   theme: { label: "Tema", system: "Sistem", light: "Açık", dark: "Koyu" },
   search: {
     selectIndex: "İndeks Seçin",
@@ -29,6 +30,21 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "Modern, açık kaynak kodlu arama motoru.",
+  },
+  account: {
+    title: "Hesabım",
+    userid: "Kullanıcı Adı",
+    role: "Rol",
+    name: "Görünen ad",
+    current: "Mevcut şifre",
+    new: "Yeni şifre",
+    confirm: "Yeni şifreyi onayla",
+    keepPassword: "Mevcut şifrenizi korumak için yeni şifre alanlarını boş bırakın.",
+    submit: "Değişiklikleri kaydet",
+    success: "Hesap güncellendi. Oturumunuz yenilendi.",
+    nothingToChange: "Değiştirilecek bir şey yok.",
+    wrongPassword: "Mevcut şifre yanlış.",
+    failed: "Hesap güncellenemedi. Lütfen tekrar deneyin."
   },
   login: {
     userid: "Kullanıcı Adı",

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import auth from '../services/auth';
 import Select from '../components/Select';
+import PasswordInput from '../components/PasswordInput';
 import ThemeSelect from '../components/ThemeSelect';
 import { encodeCredentials, setCredentials, useAuth } from '../auth';
 import { languages, useTranslation, type Locale } from '../locales';
@@ -41,7 +42,7 @@ export default function Login() {
       <ThemeSelect />
       <Select className="language-select" aria-label={t('menu.language')} value={locale} onValueChange={value => changeLanguage(value as Locale)}>{Object.entries(languages).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select>
       <label className="block">{t('login.userid')}<input className="mt-1 w-full" data-cy="login-user-id" autoComplete="username" value={id} onChange={e => setId(e.target.value)} required /></label>
-      <label className="block">{t('login.password')}<input className="mt-1 w-full" data-cy="login-password" type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required /></label>
+      <label className="block">{t('login.password')}<PasswordInput className="mt-1 w-full" data-cy="login-password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required /></label>
       {error && <p className="error" role="alert">{error}</p>}
       <button className="primary w-full" data-cy="login-sign-in" disabled={busy}>{busy ? 'Signing in…' : t('login.signIn')}</button>
     </form>

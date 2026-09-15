@@ -1,6 +1,7 @@
 import type en from './en';
 
 export default {
+  passwordInput: { show: "Mostrar senha", hide: "Ocultar senha" },
   theme: { label: "Tema", system: "Sistema", light: "Claro", dark: "Escuro" },
   search: {
     selectIndex: "Selecione um índice primeiro",
@@ -31,6 +32,21 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "O mecanismo de busca moderno de código aberto.",
+  },
+  account: {
+    title: "Minha conta",
+    userid: "ID do usuário",
+    role: "Função",
+    name: "Nome de exibição",
+    current: "Senha atual",
+    new: "Nova senha",
+    confirm: "Confirmar nova senha",
+    keepPassword: "Deixe os campos de nova senha em branco para manter a senha atual.",
+    submit: "Salvar alterações",
+    success: "Conta atualizada. Sua sessão foi renovada.",
+    nothingToChange: "Nada para alterar.",
+    wrongPassword: "A senha atual está incorreta.",
+    failed: "Não foi possível atualizar a conta. Tente novamente."
   },
   login: {
     userid: "ID do usuário",

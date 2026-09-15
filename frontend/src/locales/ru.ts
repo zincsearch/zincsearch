@@ -1,6 +1,7 @@
 import type en from './en';
 
 export default {
+  passwordInput: { show: "Показать пароль", hide: "Скрыть пароль" },
   theme: { label: "Тема", system: "Системная", light: "Светлая", dark: "Тёмная" },
   search: {
     selectIndex: "Сначала выберите индекс",
@@ -31,6 +32,21 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "Современная поисковая система с открытым исходным кодом.",
+  },
+  account: {
+    title: "Моя учётная запись",
+    userid: "ID пользователя",
+    role: "Роль",
+    name: "Отображаемое имя",
+    current: "Текущий пароль",
+    new: "Новый пароль",
+    confirm: "Подтвердите новый пароль",
+    keepPassword: "Оставьте поля нового пароля пустыми, чтобы сохранить текущий.",
+    submit: "Сохранить изменения",
+    success: "Учётная запись обновлена. Сессия обновлена.",
+    nothingToChange: "Нечего изменять.",
+    wrongPassword: "Текущий пароль неверен.",
+    failed: "Не удалось обновить учётную запись. Попробуйте ещё раз."
   },
   login: {
     userid: "ID пользователя",

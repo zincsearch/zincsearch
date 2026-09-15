@@ -1,4 +1,5 @@
 export default {
+  passwordInput: { show: "Show password", hide: "Hide password" },
   theme: { label: "Theme", system: "System", light: "Light", dark: "Dark" },
   search: {
     selectIndex: "Select Index first",
@@ -29,6 +30,21 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "The modern open source search engine.",
+  },
+  account: {
+    title: "My Account",
+    userid: "User ID",
+    role: "Role",
+    name: "Display name",
+    current: "Current password",
+    new: "New password",
+    confirm: "Confirm new password",
+    keepPassword: "Leave the new password fields blank to keep your current password.",
+    submit: "Save Changes",
+    success: "Account updated. Your session has been refreshed.",
+    nothingToChange: "Nothing to change.",
+    wrongPassword: "Current password is incorrect.",
+    failed: "Unable to update account. Please try again."
   },
   login: {
     userid: "User ID",
