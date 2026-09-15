@@ -12,7 +12,10 @@ import Role from '../../views/Role';
 import SchemaEditor from './SchemaEditor';
 import AccountEditor from './AccountEditor';
 
-vi.mock('../../locales', () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
+vi.mock('../../locales', async (importOriginal) => ({
+  ...await importOriginal<typeof import('../../locales')>(),
+  useTranslation: () => ({ t: (key: string) => key }),
+}));
 vi.mock(
   '../../services/index',
   () => ({ default: { list: vi.fn(), update: vi.fn(), delete: vi.fn() } }),
@@ -80,6 +83,26 @@ beforeEach(() => {
   }
 });
 
+it('uses independent, labeled password toggles in the user editor', async () => {
+  render(<AccountEditor kind='user' onClose={vi.fn()} onUpdated={vi.fn()} />);
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Save User' })).toBeEnabled());
+  const fields = ['user.password', 'user.repassword'].map(label => screen.getByLabelText(label));
+  for (const field of fields) {
+    expect(field.closest('label')).toBeNull();
+    expect(field).toHaveAttribute('autoComplete', 'new-password');
+    fireEvent.change(field, { target: { value: 'example1' } });
+    const toggle = screen.getAllByRole('button', { name: 'passwordInput.show' }).find(button => button.getAttribute('aria-controls') === field.id)!;
+    expect(toggle.closest('label')).toBeNull();
+    fireEvent.click(toggle);
+    expect(field).toHaveAttribute('type', 'text');
+    expect(field).toHaveValue('example1');
+    for (const other of fields.filter(input => input !== field)) expect(other).toHaveAttribute('type', 'password');
+    fireEvent.click(screen.getByRole('button', { name: 'passwordInput.hide' }));
+    expect(field).toHaveAttribute('type', 'password');
+  }
+  expect(userService.update).not.toHaveBeenCalled();
+});
+
 describe('schema editor parity', () => {
   it.each(['index', 'template'] as const)('validates %s JSON immediately and recovers across steps and formats', (kind) => {
     render(<SchemaEditor kind={kind} onClose={vi.fn()} onUpdated={vi.fn()} />);
@@ -120,6 +143,24 @@ describe('schema editor parity', () => {
     expect(screen.getByLabelText('Review JSON')).toHaveTextContent('"message"');
     expect(indexService.update).not.toHaveBeenCalled();
     expect(templateService.update).not.toHaveBeenCalled();
+  });
+  it('checks geo_point and vector mapping properties before review', () => {
+    render(<SchemaEditor kind='index' onClose={vi.fn()} onUpdated={vi.fn()} />);
+    change('Index Name', 'places');
+    click('Continue');
+    click('Continue');
+    change('Mappings JSON', '{"properties":{"embedding":{"type":"vector","dims":0}}}');
+    expect(screen.getByRole('alert')).toHaveTextContent('dims must be a positive integer');
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+    change('Mappings JSON', '{"properties":{"location":{"type":"geo_point","dims":2}}}');
+    expect(screen.getByRole('alert')).toHaveTextContent('only valid for vector');
+    change('Mappings JSON', '{"properties":{"location":{"type":"geo_pt"}}}');
+    expect(screen.getByRole('alert')).toHaveTextContent('unsupported type "geo_pt"');
+    change('Mappings JSON', '{"properties":{"location":{"type":"geo_point"},"embedding":{"type":"vector","dims":3}}}');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    click('Continue');
+    expect(screen.getByLabelText('Review JSON')).toHaveTextContent('"geo_point"');
+    expect(screen.getByLabelText('Review JSON')).toHaveTextContent('"dims": 3');
   });
 });
 
@@ -198,6 +239,40 @@ describe('index management', () => {
       shard_num: 2,
       settings: { analysis: {} },
       mappings: { properties: { message: { type: 'text' } } },
+    });
+  });
+  it('offers disk, s3, minio, gcs and oss storage and submits the selection', async () => {
+    const updated = vi.fn();
+    render(<SchemaEditor kind='index' onClose={vi.fn()} onUpdated={updated} />);
+    const select = screen.getByLabelText('Storage Type');
+    expect(select).toHaveValue('disk');
+    fireEvent.click(select);
+    expect(screen.getAllByRole('option').map((o) => o.dataset.value)).toEqual(['disk', 's3', 'minio', 'gcs', 'oss']);
+    fireEvent.click(select);
+    expect(screen.queryByText(/ZINC_S3_BUCKET/)).toBeNull();
+    change('Index Name', 'events');
+    // the hint renders inside the label, so later picks go through the captured select
+    const pick = (value: string) => {
+      fireEvent.click(select);
+      fireEvent.click(screen.getAllByRole('option').find((o) => o.dataset.value === value)!);
+    };
+    pick('gcs');
+    expect(screen.getByText(/ZINC_GCS_BUCKET/)).toBeTruthy();
+    pick('oss');
+    expect(screen.getByText(/ZINC_OSS_BUCKET/)).toBeTruthy();
+    pick('minio');
+    expect(screen.getByText(/ZINC_S3_BUCKET/)).toBeTruthy();
+    click('Continue');
+    click('Continue');
+    click('Continue');
+    expect(JSON.parse(screen.getByLabelText('Review JSON').textContent!).storage_type).toBe('minio');
+    click('Save Index');
+    await waitFor(() => expect(updated).toHaveBeenCalled());
+    expect(indexService.update).toHaveBeenCalledWith({
+      name: 'events',
+      storage_type: 'minio',
+      settings: {},
+      mappings: {},
     });
   });
 });

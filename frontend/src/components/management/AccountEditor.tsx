@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import Select from '../Select';
+import PasswordInput from '../PasswordInput';
 import userService from '../../services/user';
 import roleService from '../../services/role';
 import permissionService from '../../services/permission';
 import { useTranslation } from '../../locales';
+import { validatePassword } from '../../utils/password';
 import { ErrorMessage, Modal, useList } from './Common';
 
 export type Account = {
@@ -23,6 +25,7 @@ export default function AccountEditor(
     onUpdated: () => void;
   },
 ) {
+  const passwordId = useId();
   const { t } = useTranslation();
   const [id, setId] = useState(value?._id || '');
   const [name, setName] = useState(value?.name || value?._id || '');
@@ -30,7 +33,6 @@ export default function AccountEditor(
   const [permissions, setPermissions] = useState<string[]>(value?.permission || []);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [visible, setVisible] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const options = useList<Account | string>(
@@ -52,22 +54,12 @@ export default function AccountEditor(
         setError('You must select a role');
         return;
       }
-      if (!value || password) {
-        if (password.length < 8) {
-          setError('Your password must be at least 8 characters');
-          return;
-        }
-        if (!/[a-z]/i.test(password)) {
-          setError('Your password must contain at least one letter.');
-          return;
-        }
-        if (!/[0-9]/.test(password)) {
-          setError('Your password must contain at least one digit.');
-          return;
-        }
-      }
-      if (password !== confirmPassword) {
-        setError('Password and Confirmation password should match.');
+      // existing users keep their password when both fields stay blank
+      const message = value && !password && !confirmPassword
+        ? ''
+        : validatePassword(password, confirmPassword);
+      if (message) {
+        setError(message);
         return;
       }
     }
@@ -146,32 +138,29 @@ export default function AccountEditor(
                   )}
                 </Select>
               </label>
-              <label>
-                {t('user.password')}
-                <input
+              <div>
+                <label htmlFor={`${passwordId}-new`}>{t('user.password')}</label>
+                <PasswordInput
+                  id={`${passwordId}-new`}
                   className='block w-full'
                   autoComplete='new-password'
-                  type={visible ? 'text' : 'password'}
                   value={password}
                   disabled={busy}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-              </label>
+              </div>
               {value && <p>Leave password blank to keep the current password.</p>}
-              <label>
-                {t('user.repassword')}
-                <input
+              <div>
+                <label htmlFor={`${passwordId}-confirm`}>{t('user.repassword')}</label>
+                <PasswordInput
+                  id={`${passwordId}-confirm`}
                   className='block w-full'
                   autoComplete='new-password'
-                  type={visible ? 'text' : 'password'}
                   value={confirmPassword}
                   disabled={busy}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
-              </label>
-              <button type='button' aria-pressed={visible} onClick={() => setVisible(!visible)}>
-                {visible ? 'Hide passwords' : 'Show passwords'}
-              </button>
+              </div>
             </>
           )
           : (

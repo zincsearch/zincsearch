@@ -1,4 +1,17 @@
 export default {
+  authErrors: {
+    invalidCredentials: "Invalid user ID or password.",
+    signInFailed: "Unable to sign in. Please try again.",
+    signingIn: "Signing in…",
+    credentialsRequired: "Enter your user ID and password.",
+    currentRequired: "Enter your current password.",
+  },
+  passwordValidation: {
+    tooShort: "Your password must be at least 8 characters",
+    missingLetter: "Your password must contain at least one letter.",
+    missingDigit: "Your password must contain at least one digit.",
+    mismatch: "Password and Confirmation password should match.",
+  },
   passwordInput: { show: "Show password", hide: "Hide password" },
   theme: { label: "Theme", system: "System", light: "Light", dark: "Dark" },
   search: {
