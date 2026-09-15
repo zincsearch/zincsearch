@@ -63,3 +63,19 @@ func TestDeleteUser(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteUserEvictsCachedCredentials(t *testing.T) {
+	const id = "testcacheduser"
+
+	_, err := CreateUser(id, "Test Cached User", "testpassword", "admin")
+	assert.NoError(t, err)
+
+	_, ok := VerifyCredentials(id, "testpassword")
+	assert.True(t, ok)
+
+	err = DeleteUser(id)
+	assert.NoError(t, err)
+
+	_, ok = VerifyCredentials(id, "testpassword")
+	assert.False(t, ok)
+}

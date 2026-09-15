@@ -22,5 +22,7 @@ import (
 )
 
 func DeleteUser(id string) error {
-	return metadata.User.Delete(strings.ToLower(id))
+	id = strings.ToLower(id)
+	ZINC_CACHED_USERS.Delete(id)
+	return metadata.User.Delete(id)
 }
