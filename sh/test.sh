@@ -16,6 +16,8 @@ if [[ $1 == "bench" ]]; then
     # go tool pprof -http=:9999 ./tmp/mem.pprof
 else
     go test -v ./... -test.run=$1
+    # release build tag (no embedded gse dict), see sh/build.sh
+    go test -v -tags ne ./pkg/bluge/analysis/lang/chs/... -test.run=$1
 fi
 
 find ./pkg -name data -type dir|xargs rm -fR

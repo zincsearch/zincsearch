@@ -56,6 +56,7 @@ BUILD_FLAGS=(
         -X github.com/zincsearch/zincsearch/pkg/meta.BuildDate=${BUILD_DATE} \
         -X github.com/zincsearch/zincsearch/pkg/meta.CommitHash=${COMMIT_HASH}"
     -trimpath
+    -tags ne  # drop gse embedded dictionaries, same as .goreleaser.yml
     -o "$BUILD_OUTPUT"
 )
 

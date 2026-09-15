@@ -26,6 +26,13 @@ import (
 	"github.com/zincsearch/zincsearch/pkg/config"
 )
 
+// Analyzer expectations below need the small dict plus two words only the big dict has.
+// Load them explicitly so results don't depend on test order or build tags (-tags ne).
+func init() {
+	loadDict(true, true, "SMALL")
+	_ = seg.LoadDictStr("仇者 7 n\n科幻片 8 n\n")
+}
+
 func TestLoadDict(t *testing.T) {
 	type args struct {
 		enable     bool

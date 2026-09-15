@@ -8,6 +8,12 @@ before:
 
 builds:
   - id: zincsearch_binaries
+    flags:
+      - -trimpath
+    # `ne` drops gse's embedded jp/zh dictionaries (~37MB);
+    # zinc_plugin_gse_dict_embed=big then falls back to the small dict.
+    tags:
+      - ne
     ldflags:
       - -s -w
       - -X github.com/zincsearch/zincsearch/pkg/meta.Version={{.Version}}
@@ -29,6 +35,13 @@ builds:
       - "6"
       - "7"
     main: ./cmd/zincsearch/main.go
+
+# Linux-only: UPX doesn't support macOS/BSD and Windows AV tends to flag packed binaries.
+upx:
+  - enabled: true
+    goos: [linux]
+    compress: best
+    lzma: true
 
 archives:
   - id: zincsearch

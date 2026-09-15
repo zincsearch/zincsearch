@@ -61,6 +61,10 @@ func init() {
 }
 
 func loadDict(enable, enableStop bool, embed string) {
+	if embed == "BIG" && !bigDictEmbedded {
+		log.Warn().Msg("Gse big dict is not compiled into this binary (built with -tags ne), falling back to small dict")
+		embed = "SMALL"
+	}
 	if enable {
 		// load default dict
 		if embed == "BIG" {
