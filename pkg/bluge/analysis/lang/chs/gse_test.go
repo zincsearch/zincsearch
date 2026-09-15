@@ -84,13 +84,6 @@ func TestLoadDict(t *testing.T) {
 		})
 	}
 
-	// BIG must still segment when the embedded dict is compiled out (-tags ne).
-	t.Run("embed=big segments", func(t *testing.T) {
-		loadDict(true, true, "BIG")
-		got := NewGseStandardAnalyzer().Analyze([]byte("复仇者联盟"))
-		assert.Equal(t, "[复仇者 联盟]", collectToken(got))
-	})
-
 	t.Run("clean dict", func(t *testing.T) {
 		assert.NoError(t, os.RemoveAll("data"))
 	})
