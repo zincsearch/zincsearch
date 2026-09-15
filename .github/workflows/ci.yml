@@ -48,7 +48,8 @@ jobs:
           path: frontend/dist
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          # Build with a Go 1.27.x toolchain rather than the older minimum in go.mod.
+          go-version: "1.27.x"
       - uses: golangci/golangci-lint-action@v9
         with:
           version: v2.13.2
@@ -75,7 +76,7 @@ jobs:
           path: frontend/dist
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          go-version: "1.27.x"
       - run: go vet ./...
       - run: go build ./...
       - run: go test ./... -timeout 20m
@@ -94,7 +95,7 @@ jobs:
           path: frontend/dist
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          go-version: "1.27.x"
       - name: Test with coverage threshold
         run: ./sh/coverage.sh
       - name: Upload coverage to Codecov
