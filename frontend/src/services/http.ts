@@ -11,8 +11,7 @@ const http = ({ authenticated = true } = {}) => {
   });
   instance.interceptors.response.use(response => response, error => {
     const current = getCredentials();
-    if (error.response?.status === 401 && credentials &&
-      current?._id === credentials._id && current.base64encoded === credentials.base64encoded) {
+    if (error.response?.status === 401 && credentials && current === credentials) {
       setCredentials(null);
     }
     return Promise.reject(error);

@@ -23,7 +23,7 @@ export default function Account({ user, onClose }: { user: Credentials; onClose:
     }
     const newName = name.trim();
     if (newName.length < 3) {
-      setError('User name must be at least 3 characters long');
+      setError('account.nameTooShort');
       return;
     }
     const message = next || confirm ? validatePassword(next, confirm) : '';
@@ -40,7 +40,7 @@ export default function Account({ user, onClose }: { user: Credentials; onClose:
     try {
       await auth.updateAccount({ _id: user._id, password: current, name: newName, new_password: next || undefined });
       const session = getCredentials();
-      if (session?._id === user._id && session.base64encoded === user.base64encoded) {
+      if (session === user) {
         setCredentials({ ...session, name: newName, base64encoded: encodeCredentials(user._id, next || current) });
       }
       setCurrent('');

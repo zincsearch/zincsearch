@@ -83,6 +83,15 @@ describe('Account dialog', () => {
     expect(validatePassword('abcdefgh', 'abcdefgh')).toContain('digit');
     expect(validatePassword('newpass1', 'newpass1')).toBe('');
   });
+  it('updates the name-validation error when the language changes', async () => {
+    const user = await openDialog();
+    await fill(user, { name: 'ab', current: 'oldpass1' });
+    expect(dialog().getByRole('alert')).toHaveTextContent('at least 3 characters');
+    act(() => changeLanguage('zh-cn'));
+    expect(dialog().getByRole('alert')).toHaveTextContent('3');
+    expect(dialog().getByRole('alert')).not.toHaveTextContent('at least 3 characters');
+    expect(auth.updateAccount).not.toHaveBeenCalled();
+  });
   it('renames and refreshes stale stored credentials with the verified current password', async () => {
     vi.mocked(auth.updateAccount).mockResolvedValue(ok);
     const user = await openDialog();
@@ -100,17 +109,18 @@ describe('Account dialog', () => {
     expect(auth.updateAccount).toHaveBeenCalledWith({ _id: 'admin', password: 'oldpass1', name: 'Admin', new_password: 'newpass1' });
     expect(getCredentials()?.base64encoded).toBe(btoa('admin:newpass1'));
   });
-  it.each(['logout', 'new session'])('does not overwrite a %s while saving', async (change) => {
+  it.each(['logout', 'new session', 'same credentials'])('does not overwrite a %s while saving', async (change) => {
     let finish!: (value: typeof ok) => void;
     vi.mocked(auth.updateAccount).mockReturnValue(new Promise(resolve => { finish = resolve; }));
     const user = await openDialog();
     await fill(user, { name: 'Root', current: 'oldpass1' });
-    const replacement = change === 'logout' ? null : { _id: 'admin', name: 'Admin', role: 'admin', base64encoded: 'new-session' };
+    const replacement = change === 'logout' ? null : { _id: 'admin', name: 'Admin', role: 'admin', base64encoded: change === 'same credentials' ? 'YWRtaW46b2xk' : 'new-session' };
     await act(async () => {
+      setCredentials(null);
       setCredentials(replacement);
       finish(ok);
     });
-    expect(getCredentials()).toEqual(replacement);
+    expect(getCredentials()).toBe(replacement);
   });
   it('reports a wrong current password and keeps the session', async () => {
     vi.mocked(auth.updateAccount).mockRejectedValue(new AxiosError('Unauthorized', 'ERR_BAD_REQUEST', undefined, null, { status: 401, statusText: 'Unauthorized', data: {}, headers: new AxiosHeaders(), config: { headers: new AxiosHeaders() } }));

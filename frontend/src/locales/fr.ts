@@ -51,6 +51,7 @@ export default {
     userid: "Identifiant utilisateur",
     role: "Rôle",
     name: "Nom affiché",
+    nameTooShort: "Le nom d’utilisateur doit comporter au moins 3 caractères.",
     current: "Mot de passe actuel",
     new: "Nouveau mot de passe",
     confirm: "Confirmer le nouveau mot de passe",

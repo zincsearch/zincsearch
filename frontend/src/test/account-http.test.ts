@@ -41,6 +41,19 @@ describe('Account HTTP authentication', () => {
     expect(getCredentials()).toEqual(updated);
   });
 
+  it('keeps a new session with identical credentials when an old request returns 401', async () => {
+    const client = http();
+    const replacement = { ...user };
+    client.defaults.adapter = async config => {
+      setCredentials(null);
+      setCredentials(replacement);
+      throw unauthorized(config);
+    };
+    await expect(client.get('/api/index')).rejects.toThrow('Unauthorized');
+    expect(getCredentials()).toBe(replacement);
+    expect(JSON.parse(localStorage.getItem('creds')!)).toEqual(replacement);
+  });
+
   it('still clears rejected current credentials on protected endpoints', async () => {
     const client = http();
     client.defaults.adapter = async config => { throw unauthorized(config); };

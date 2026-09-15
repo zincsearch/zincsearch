@@ -26,6 +26,19 @@ describe('Localized password validation', () => {
     expect(translate('account.wrongPassword')).toBe(dictionary.account.wrongPassword);
   });
 
+  it.each(Object.keys(languages) as Locale[])('translates the user name length error in %s without fallback', locale => {
+    changeLanguage(locale);
+    const dictionary = dictionaries[`../locales/${locale}.ts`] as typeof en;
+    const message = dictionary.account.nameTooShort;
+    expect(message).toBeTruthy();
+    expect(translate('account.nameTooShort')).toBe(message);
+    if (locale === 'en') {
+      expect(message).toBe('User name must be at least 3 characters long');
+    } else {
+      expect(message).not.toBe(en.account.nameTooShort);
+    }
+  });
+
   it('uses the newly selected language on subsequent validation', () => {
     changeLanguage('en');
     expect(validatePassword('short1', 'short1')).toContain('at least 8');

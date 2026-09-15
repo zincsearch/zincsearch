@@ -51,6 +51,7 @@ export default {
     userid: "ユーザーID",
     role: "ロール",
     name: "表示名",
+    nameTooShort: "ユーザー名は3文字以上で入力してください。",
     current: "現在のパスワード",
     new: "新しいパスワード",
     confirm: "新しいパスワード（確認）",
