@@ -1,4 +1,18 @@
 export default {
+  authErrors: {
+    invalidCredentials: "Kullanıcı adı veya parola yanlış.",
+    signInFailed: "Giriş yapılamadı. Lütfen tekrar deneyin.",
+    signingIn: "Giriş yapılıyor…",
+    credentialsRequired: "Kullanıcı adınızı ve parolanızı girin.",
+    currentRequired: "Mevcut parolanızı girin.",
+  },
+  passwordValidation: {
+    tooShort: "Parolanız en az 8 karakter olmalıdır.",
+    missingLetter: "Parolanız en az bir harf içermelidir.",
+    missingDigit: "Parolanız en az bir rakam içermelidir.",
+    mismatch: "Parola ve parola onayı eşleşmelidir.",
+  },
+  passwordInput: { show: "Parolayı göster", hide: "Parolayı gizle" },
   theme: { label: "Tema", system: "Sistem", light: "Açık", dark: "Koyu" },
   search: {
     selectIndex: "İndeks Seçin",
@@ -29,6 +43,22 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "Modern, açık kaynak kodlu arama motoru.",
+  },
+  account: {
+    title: "Hesabım",
+    userid: "Kullanıcı Adı",
+    role: "Rol",
+    name: "Görünen ad",
+    nameTooShort: "Kullanıcı adı en az 3 karakter uzunluğunda olmalıdır.",
+    current: "Mevcut şifre",
+    new: "Yeni şifre",
+    confirm: "Yeni şifreyi onayla",
+    keepPassword: "Mevcut şifrenizi korumak için yeni şifre alanlarını boş bırakın.",
+    submit: "Değişiklikleri kaydet",
+    success: "Hesap güncellendi. Oturumunuz yenilendi.",
+    nothingToChange: "Değiştirilecek bir şey yok.",
+    wrongPassword: "Mevcut şifre yanlış.",
+    failed: "Hesap güncellenemedi. Lütfen tekrar deneyin."
   },
   login: {
     userid: "Kullanıcı Adı",

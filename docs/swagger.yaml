@@ -32,6 +32,17 @@ definitions:
       role:
         type: string
     type: object
+  auth.UpdateAccountRequest:
+    properties:
+      _id:
+        type: string
+      name:
+        type: string
+      new_password:
+        type: string
+      password:
+        type: string
+    type: object
   core.Index:
     type: object
   index.AnalyzeResponse:
@@ -609,8 +620,7 @@ definitions:
         items:
           type: string
         type: array
-      minimum_should_match:
-        type: number
+      minimum_should_match: {}
       operator:
         description: or(default), and
         type: string
@@ -645,6 +655,9 @@ definitions:
         type: boolean
       analyzer:
         type: string
+      dims:
+        description: vector dimension, 0 accepts any
+        type: integer
       fields:
         additionalProperties:
           $ref: '#/definitions/meta.Property'
@@ -673,7 +686,7 @@ definitions:
         description: date format time_zone
         type: string
       type:
-        description: text, keyword, date, numeric, boolean, geo_point
+        description: text, keyword, date, numeric, boolean, geo_point, vector
         type: string
     type: object
   meta.QueryForSDK:
@@ -1600,6 +1613,40 @@ paths:
       summary: Update document with id
       tags:
       - Document
+  /api/account:
+    put:
+      consumes:
+      - application/json
+      operationId: UpdateAccount
+      parameters:
+      - description: Current password plus new name and/or new password
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/auth.UpdateAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.LoginUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/meta.HTTPResponseError'
+      summary: Update own name and/or password
+      tags:
+      - User
   /api/index:
     get:
       operationId: ListIndexes
@@ -1825,10 +1872,6 @@ paths:
             items:
               type: string
             type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/meta.HTTPResponseError'
       security:
       - BasicAuth: []
       summary: List permissions

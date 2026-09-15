@@ -1,6 +1,20 @@
 import type en from './en';
 
 export default {
+  authErrors: {
+    invalidCredentials: "Ungültige Benutzer-ID oder falsches Passwort.",
+    signInFailed: "Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
+    signingIn: "Anmeldung läuft…",
+    credentialsRequired: "Geben Sie Ihre Benutzer-ID und Ihr Passwort ein.",
+    currentRequired: "Geben Sie Ihr aktuelles Passwort ein.",
+  },
+  passwordValidation: {
+    tooShort: "Das Passwort muss mindestens 8 Zeichen lang sein.",
+    missingLetter: "Das Passwort muss mindestens einen Buchstaben enthalten.",
+    missingDigit: "Das Passwort muss mindestens eine Ziffer enthalten.",
+    mismatch: "Passwort und Bestätigung müssen übereinstimmen.",
+  },
+  passwordInput: { show: "Passwort anzeigen", hide: "Passwort ausblenden" },
   theme: { label: "Design", system: "System", light: "Hell", dark: "Dunkel" },
   search: {
     selectIndex: "Zuerst einen Index auswählen",
@@ -31,6 +45,22 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "Die moderne Open-Source-Suchmaschine.",
+  },
+  account: {
+    title: "Mein Konto",
+    userid: "Benutzer-ID",
+    role: "Rolle",
+    name: "Anzeigename",
+    nameTooShort: "Der Benutzername muss mindestens 3 Zeichen lang sein.",
+    current: "Aktuelles Passwort",
+    new: "Neues Passwort",
+    confirm: "Neues Passwort bestätigen",
+    keepPassword: "Neue Passwortfelder leer lassen, um das aktuelle Passwort zu behalten.",
+    submit: "Änderungen speichern",
+    success: "Konto aktualisiert. Ihre Sitzung wurde erneuert.",
+    nothingToChange: "Keine Änderungen.",
+    wrongPassword: "Das aktuelle Passwort ist falsch.",
+    failed: "Konto konnte nicht aktualisiert werden. Bitte erneut versuchen."
   },
   login: {
     userid: "Benutzer-ID",
