@@ -1,6 +1,19 @@
 import type en from './en';
 
 export default {
+  authErrors: {
+    invalidCredentials: "Identifiant utilisateur ou mot de passe incorrect.",
+    signInFailed: "Connexion impossible. Veuillez réessayer.",
+    signingIn: "Connexion en cours…",
+    credentialsRequired: "Saisissez votre identifiant utilisateur et votre mot de passe.",
+    currentRequired: "Saisissez votre mot de passe actuel.",
+  },
+  passwordValidation: {
+    tooShort: "Le mot de passe doit comporter au moins 8 caractères.",
+    missingLetter: "Le mot de passe doit contenir au moins une lettre.",
+    missingDigit: "Le mot de passe doit contenir au moins un chiffre.",
+    mismatch: "Le mot de passe et sa confirmation doivent correspondre.",
+  },
   passwordInput: { show: "Afficher le mot de passe", hide: "Masquer le mot de passe" },
   theme: { label: "Thème", system: "Système", light: "Clair", dark: "Sombre" },
   search: {

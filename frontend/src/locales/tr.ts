@@ -1,4 +1,17 @@
 export default {
+  authErrors: {
+    invalidCredentials: "Kullanıcı adı veya parola yanlış.",
+    signInFailed: "Giriş yapılamadı. Lütfen tekrar deneyin.",
+    signingIn: "Giriş yapılıyor…",
+    credentialsRequired: "Kullanıcı adınızı ve parolanızı girin.",
+    currentRequired: "Mevcut parolanızı girin.",
+  },
+  passwordValidation: {
+    tooShort: "Parolanız en az 8 karakter olmalıdır.",
+    missingLetter: "Parolanız en az bir harf içermelidir.",
+    missingDigit: "Parolanız en az bir rakam içermelidir.",
+    mismatch: "Parola ve parola onayı eşleşmelidir.",
+  },
   passwordInput: { show: "Parolayı göster", hide: "Parolayı gizle" },
   theme: { label: "Tema", system: "Sistem", light: "Açık", dark: "Koyu" },
   search: {

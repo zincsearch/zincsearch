@@ -1,6 +1,19 @@
 import type en from './en';
 
 export default {
+  authErrors: {
+    invalidCredentials: "ユーザーIDまたはパスワードが正しくありません。",
+    signInFailed: "ログインできませんでした。もう一度お試しください。",
+    signingIn: "ログイン中…",
+    credentialsRequired: "ユーザーIDとパスワードを入力してください。",
+    currentRequired: "現在のパスワードを入力してください。",
+  },
+  passwordValidation: {
+    tooShort: "パスワードは8文字以上にしてください。",
+    missingLetter: "パスワードには英字を1文字以上含めてください。",
+    missingDigit: "パスワードには数字を1文字以上含めてください。",
+    mismatch: "パスワードと確認用パスワードが一致していません。",
+  },
   passwordInput: { show: "パスワードを表示", hide: "パスワードを非表示" },
   theme: { label: "テーマ", system: "システム", light: "ライト", dark: "ダーク" },
   search: {

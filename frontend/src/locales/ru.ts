@@ -1,6 +1,19 @@
 import type en from './en';
 
 export default {
+  authErrors: {
+    invalidCredentials: "Неверный ID пользователя или пароль.",
+    signInFailed: "Не удалось войти. Попробуйте ещё раз.",
+    signingIn: "Вход…",
+    credentialsRequired: "Введите ID пользователя и пароль.",
+    currentRequired: "Введите текущий пароль.",
+  },
+  passwordValidation: {
+    tooShort: "Пароль должен содержать не менее 8 символов.",
+    missingLetter: "Пароль должен содержать хотя бы одну латинскую букву.",
+    missingDigit: "Пароль должен содержать хотя бы одну цифру.",
+    mismatch: "Пароль и подтверждение должны совпадать.",
+  },
   passwordInput: { show: "Показать пароль", hide: "Скрыть пароль" },
   theme: { label: "Тема", system: "Системная", light: "Светлая", dark: "Тёмная" },
   search: {

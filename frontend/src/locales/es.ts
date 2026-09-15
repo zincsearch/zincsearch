@@ -1,6 +1,19 @@
 import type en from './en';
 
 export default {
+  authErrors: {
+    invalidCredentials: "ID de usuario o contraseña incorrectos.",
+    signInFailed: "No se pudo iniciar sesión. Inténtelo de nuevo.",
+    signingIn: "Iniciando sesión…",
+    credentialsRequired: "Introduzca su ID de usuario y contraseña.",
+    currentRequired: "Introduzca su contraseña actual.",
+  },
+  passwordValidation: {
+    tooShort: "La contraseña debe tener al menos 8 caracteres.",
+    missingLetter: "La contraseña debe contener al menos una letra.",
+    missingDigit: "La contraseña debe contener al menos un dígito.",
+    mismatch: "La contraseña y su confirmación deben coincidir.",
+  },
   passwordInput: { show: "Mostrar contraseña", hide: "Ocultar contraseña" },
   theme: { label: "Tema", system: "Sistema", light: "Claro", dark: "Oscuro" },
   search: {

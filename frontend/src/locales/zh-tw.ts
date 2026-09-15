@@ -1,4 +1,17 @@
 export default {
+  authErrors: {
+    invalidCredentials: "使用者 ID 或密碼錯誤。",
+    signInFailed: "登入失敗，請重試。",
+    signingIn: "正在登入…",
+    credentialsRequired: "請輸入使用者 ID 和密碼。",
+    currentRequired: "請輸入目前密碼。",
+  },
+  passwordValidation: {
+    tooShort: "密碼至少需要 8 個字元。",
+    missingLetter: "密碼必須包含至少一個英文字母。",
+    missingDigit: "密碼必須包含至少一個數字。",
+    mismatch: "密碼與確認密碼必須一致。",
+  },
   passwordInput: { show: "顯示密碼", hide: "隱藏密碼" },
   theme: { label: "主題", system: "跟隨系統", light: "淺色", dark: "深色" },
   search: {
