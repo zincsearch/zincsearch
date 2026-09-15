@@ -1,4 +1,6 @@
+import { useRef, useState } from 'react';
 import { useTranslation } from '../../locales';
+import useClickOutside from '../../utils/useClickOutside';
 
 const examples = [
   ['Search for Gold', 'Gold'],
@@ -12,7 +14,13 @@ const examples = [
 ];
 export default function SyntaxGuide() {
   const { t } = useTranslation();
-  return <details className="relative"><summary data-cy="syntax-guide-button">{t('search.syntaxGuide')}</summary>
-    <div className="card absolute z-20 w-96 max-w-[90vw]">{examples.map(([label, query]) => <div className="mb-3" key={query}><p>{label}</p><code>{query}</code></div>)}</div>
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDetailsElement>(null);
+  useClickOutside(root, open, () => setOpen(false));
+  return <details className="search-popover-control" ref={root} open={open}><summary data-cy="syntax-guide-button" onClick={event => { event.preventDefault(); setOpen(!open); }}>{t('search.syntaxGuide')}</summary>
+    <div hidden={!open} className="card search-popover syntax-guide-panel" role="region" aria-label={t('search.syntaxGuide')}>
+      {examples.map(([label, query]) => <div className="mb-3" key={query}><p>{label}</p><code>{query}</code></div>)}
+      <button type="button" onClick={() => setOpen(false)}>Close</button>
+    </div>
   </details>;
 }

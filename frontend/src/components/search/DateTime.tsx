@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Select from '../Select';
+import useClickOutside from '../../utils/useClickOutside';
 import type { Period, TimeRange } from './model';
 
 const presets: Record<Period, number[]> = {
@@ -8,21 +9,23 @@ const presets: Record<Period, number[]> = {
 };
 export default function DateTime({ value, onChange }: { value: TimeRange; onChange: (value: TimeRange) => void }) {
   const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  useClickOutside(root, open, () => setOpen(false));
   const update = (patch: Partial<TimeRange>) => onChange({ ...value, ...patch });
   const label = value.selectedFullTime ? 'FullTime' : value.tab === 'relative'
     ? `${value.selectedRelativeValue} ${value.selectedRelativePeriod}`
     : `${value.startDate} ${value.startTime} - ${value.endDate} ${value.endTime}`;
-  return <div className="relative">
+  return <div className="search-popover-control" ref={root}>
     <button type="button" data-cy="date-time-button" aria-expanded={open} onClick={() => setOpen(!open)}>{label}</button>
-    {open && <section className="card absolute right-0 z-20 w-max max-w-[90vw]" aria-label="Time range">
+    {open && <section className="card search-popover time-range-panel" aria-label="Time range">
       <div className="toolbar" role="tablist" aria-label="Time range type">
         {(['relative', 'absolute'] as const).map(tab => <button type="button" role="tab" aria-selected={value.tab === tab} key={tab} onClick={() => update({ tab })}>{tab}</button>)}
       </div>
       {value.tab === 'relative' ? <div>
-        {Object.entries(presets).map(([period, values]) => <div className="toolbar" key={period}><span className="w-20">{period}</span>{values.map(amount => <button type="button" key={amount} aria-label={`${amount} ${period}`} aria-pressed={value.selectedRelativePeriod === period && value.selectedRelativeValue === amount} className={value.selectedRelativePeriod === period && value.selectedRelativeValue === amount ? 'primary' : ''} onClick={() => update({ selectedRelativePeriod: period as Period, selectedRelativeValue: amount })}>{amount}</button>)}</div>)}
-        <div className="toolbar"><label>Custom<input aria-label="Relative value" type="number" min="1" value={value.selectedRelativeValue} onChange={event => update({ selectedRelativeValue: Number(event.target.value) })} /></label>
+        {Object.entries(presets).map(([period, values]) => <div className="time-range-presets" key={period}><span>{period}</span>{values.map(amount => <button type="button" key={amount} aria-label={`${amount} ${period}`} aria-pressed={value.selectedRelativePeriod === period && value.selectedRelativeValue === amount} className={value.selectedRelativePeriod === period && value.selectedRelativeValue === amount ? 'primary' : ''} onClick={() => update({ selectedRelativePeriod: period as Period, selectedRelativeValue: amount })}>{amount}</button>)}</div>)}
+        <div className="time-range-fields"><label>Custom<input aria-label="Relative value" type="number" min="1" value={value.selectedRelativeValue} onChange={event => update({ selectedRelativeValue: Number(event.target.value) })} /></label>
           <label>Period<Select aria-label="Relative period" value={value.selectedRelativePeriod} onValueChange={value => update({ selectedRelativePeriod: value as Period })}>{Object.keys(presets).map(period => <option key={period}>{period}</option>)}</Select></label></div>
-      </div> : <div className="grid grid-cols-2 gap-2">
+      </div> : <div className="time-range-fields">
         {(['startDate', 'endDate', 'startTime', 'endTime'] as const).map(field => <label key={field}>{({ startDate: 'Start Date', endDate: 'End Date', startTime: 'Start Time', endTime: 'End Time' })[field]}<input type={field.endsWith('Date') ? 'date' : 'time'} value={value[field]} onChange={event => update({ [field]: event.target.value })} /></label>)}
       </div>}
       <div className="time-range-actions">
