@@ -28,7 +28,6 @@ import (
 // @Tags    Permission
 // @Produce json
 // @Success 200 {object} []string
-// @Failure 500 {object} meta.HTTPResponseError
 // @Router /api/permissions [get]
 func ListPermissions(c *gin.Context) {
 	c.JSON(http.StatusOK, auth.GetPermissions())

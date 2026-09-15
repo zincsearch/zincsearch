@@ -161,6 +161,58 @@
                 }
             }
         },
+        "/api/account": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update own name and/or password",
+                "operationId": "UpdateAccount",
+                "parameters": [
+                    {
+                        "description": "Current password plus new name and/or new password",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.UpdateAccountRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginUser"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/meta.HTTPResponseError"
+                        }
+                    }
+                }
+            }
+        },
         "/api/index": {
             "get": {
                 "security": [
@@ -522,12 +574,6 @@
                             "items": {
                                 "type": "string"
                             }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/meta.HTTPResponseError"
                         }
                     }
                 }
@@ -2172,6 +2218,23 @@
                 }
             }
         },
+        "auth.UpdateAccountRequest": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "new_password": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "core.Index": {
             "type": "object"
         },
@@ -3039,9 +3102,7 @@
                         "type": "string"
                     }
                 },
-                "minimum_should_match": {
-                    "type": "number"
-                },
+                "minimum_should_match": {},
                 "operator": {
                     "description": "or(default), and",
                     "type": "string"
@@ -3090,6 +3151,10 @@
                 "analyzer": {
                     "type": "string"
                 },
+                "dims": {
+                    "description": "vector dimension, 0 accepts any",
+                    "type": "integer"
+                },
                 "fields": {
                     "description": "Fields allow the same string value to be indexed in multiple ways for different purposes,\nsuch as one field for search and a multi-field for sorting and aggregations,\nor the same string value analyzed by different analyzers.\nIf the Fields property is defined within a sub-field, it will be ignored.\n\nCurrently, only \"text\" fields support the Fields parameter.",
                     "type": "object",
@@ -3121,7 +3186,7 @@
                     "type": "string"
                 },
                 "type": {
-                    "description": "text, keyword, date, numeric, boolean, geo_point",
+                    "description": "text, keyword, date, numeric, boolean, geo_point, vector",
                     "type": "string"
                 }
             }
