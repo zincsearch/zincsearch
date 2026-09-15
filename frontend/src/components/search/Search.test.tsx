@@ -154,6 +154,52 @@ describe('Search migration', () => {
     fireEvent.click(screen.getByText('search.syntaxGuide'));
     expect(screen.getByText('+Medal:Gold +Year:>2000')).toBeVisible();
   });
+  it('closes the time range and syntax guide popovers when pointing outside', async () => {
+    render(<Search />);
+    await selectIndex();
+    fireEvent.click(screen.getByRole('button', { name: '30 Minutes' }));
+    fireEvent.pointerDown(screen.getByLabelText('Relative value'));
+    expect(screen.getByRole('tab', { name: 'relative' })).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Relative period'));
+    fireEvent.pointerDown(screen.getByRole('option', { name: 'Hours' }));
+    fireEvent.click(screen.getByRole('option', { name: 'Hours' }));
+    expect(screen.getByRole('tab', { name: 'relative' })).toBeInTheDocument();
+    fireEvent.pointerDown(document.body);
+    expect(screen.queryByRole('tab', { name: 'relative' })).toBeNull();
+    fireEvent.click(screen.getByText('search.syntaxGuide'));
+    expect(screen.getByText('+Medal:Gold +Year:>2000')).toBeVisible();
+    fireEvent.pointerDown(document.body);
+    expect(screen.getByText('+Medal:Gold +Year:>2000')).not.toBeVisible();
+  });
+  it('provides an explicit close action for syntax help without submitting a search', () => {
+    const onSearch = vi.fn();
+    render(<SearchBar value={{ query: '', time: initialTime }} onChange={vi.fn()} onSearch={onSearch} onRefresh={vi.fn()} loading={false} />);
+    fireEvent.click(screen.getByText('search.syntaxGuide'));
+    const guide = screen.getByRole('region', { name: 'search.syntaxGuide' });
+    expect(guide).toHaveClass('search-popover', 'syntax-guide-panel');
+    expect(within(guide).getByText('+Medal:Gold +Year:>2000')).toBeVisible();
+    fireEvent.click(within(guide).getByRole('button', { name: 'Close' }));
+    expect(guide).not.toBeVisible();
+    expect(onSearch).not.toHaveBeenCalled();
+  });
+  it('keeps absolute ranges and preset controls in responsive containers', () => {
+    const time = { ...initialTime, tab: 'absolute' as const, startDate: '2026-02-01', startTime: '10:00', endDate: '2026-02-02', endTime: '11:00' };
+    const props = { onChange: vi.fn(), onSearch: vi.fn(), onRefresh: vi.fn(), loading: false };
+    const { rerender } = render(<SearchBar {...props} value={{ query: '', time }} />);
+    const trigger = screen.getByRole('button', { name: '2026-02-01 10:00 - 2026-02-02 11:00' });
+    expect(trigger.parentElement).toHaveClass('search-popover-control');
+    fireEvent.click(trigger);
+    const panel = screen.getByRole('region', { name: 'Time range' });
+    expect(panel).toHaveClass('search-popover', 'time-range-panel');
+    for (const name of ['Start Date', 'End Date', 'Start Time', 'End Time']) {
+      expect(within(panel).getByLabelText(name).parentElement?.parentElement).toHaveClass('time-range-fields');
+    }
+    rerender(<SearchBar {...props} value={{ query: '', time: initialTime }} />);
+    expect(within(panel).getByRole('button', { name: '45 Minutes' }).parentElement).toHaveClass('time-range-presets');
+    fireEvent.click(within(panel).getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('region', { name: 'Time range' })).not.toBeInTheDocument();
+    expect(props.onSearch).not.toHaveBeenCalled();
+  });
   it('does not search when an unchanged query loses focus', async () => {
     render(<Search />);
     await selectIndex();
