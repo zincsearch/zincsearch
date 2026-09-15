@@ -1,6 +1,20 @@
 import type en from './en';
 
 export default {
+  authErrors: {
+    invalidCredentials: "Identifiant utilisateur ou mot de passe incorrect.",
+    signInFailed: "Connexion impossible. Veuillez réessayer.",
+    signingIn: "Connexion en cours…",
+    credentialsRequired: "Saisissez votre identifiant utilisateur et votre mot de passe.",
+    currentRequired: "Saisissez votre mot de passe actuel.",
+  },
+  passwordValidation: {
+    tooShort: "Le mot de passe doit comporter au moins 8 caractères.",
+    missingLetter: "Le mot de passe doit contenir au moins une lettre.",
+    missingDigit: "Le mot de passe doit contenir au moins un chiffre.",
+    mismatch: "Le mot de passe et sa confirmation doivent correspondre.",
+  },
+  passwordInput: { show: "Afficher le mot de passe", hide: "Masquer le mot de passe" },
   theme: { label: "Thème", system: "Système", light: "Clair", dark: "Sombre" },
   search: {
     selectIndex: "Sélectionnez d’abord un index",
@@ -31,6 +45,21 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "Le moteur de recherche moderne et open source.",
+  },
+  account: {
+    title: "Mon compte",
+    userid: "Identifiant utilisateur",
+    role: "Rôle",
+    name: "Nom affiché",
+    current: "Mot de passe actuel",
+    new: "Nouveau mot de passe",
+    confirm: "Confirmer le nouveau mot de passe",
+    keepPassword: "Laissez les champs de nouveau mot de passe vides pour conserver l’actuel.",
+    submit: "Enregistrer",
+    success: "Compte mis à jour. Votre session a été renouvelée.",
+    nothingToChange: "Rien à modifier.",
+    wrongPassword: "Le mot de passe actuel est incorrect.",
+    failed: "Impossible de mettre à jour le compte. Veuillez réessayer."
   },
   login: {
     userid: "Identifiant utilisateur",

@@ -1,4 +1,18 @@
 export default {
+  authErrors: {
+    invalidCredentials: "Invalid user ID or password.",
+    signInFailed: "Unable to sign in. Please try again.",
+    signingIn: "Signing in…",
+    credentialsRequired: "Enter your user ID and password.",
+    currentRequired: "Enter your current password.",
+  },
+  passwordValidation: {
+    tooShort: "Your password must be at least 8 characters",
+    missingLetter: "Your password must contain at least one letter.",
+    missingDigit: "Your password must contain at least one digit.",
+    mismatch: "Password and Confirmation password should match.",
+  },
+  passwordInput: { show: "Show password", hide: "Hide password" },
   theme: { label: "Theme", system: "System", light: "Light", dark: "Dark" },
   search: {
     selectIndex: "Select Index first",
@@ -29,6 +43,21 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "The modern open source search engine.",
+  },
+  account: {
+    title: "My Account",
+    userid: "User ID",
+    role: "Role",
+    name: "Display name",
+    current: "Current password",
+    new: "New password",
+    confirm: "Confirm new password",
+    keepPassword: "Leave the new password fields blank to keep your current password.",
+    submit: "Save Changes",
+    success: "Account updated. Your session has been refreshed.",
+    nothingToChange: "Nothing to change.",
+    wrongPassword: "Current password is incorrect.",
+    failed: "Unable to update account. Please try again."
   },
   login: {
     userid: "User ID",

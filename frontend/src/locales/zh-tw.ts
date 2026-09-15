@@ -1,4 +1,18 @@
 export default {
+  authErrors: {
+    invalidCredentials: "使用者 ID 或密碼錯誤。",
+    signInFailed: "登入失敗，請重試。",
+    signingIn: "正在登入…",
+    credentialsRequired: "請輸入使用者 ID 和密碼。",
+    currentRequired: "請輸入目前密碼。",
+  },
+  passwordValidation: {
+    tooShort: "密碼至少需要 8 個字元。",
+    missingLetter: "密碼必須包含至少一個英文字母。",
+    missingDigit: "密碼必須包含至少一個數字。",
+    mismatch: "密碼與確認密碼必須一致。",
+  },
+  passwordInput: { show: "顯示密碼", hide: "隱藏密碼" },
   theme: { label: "主題", system: "跟隨系統", light: "淺色", dark: "深色" },
   search: {
     selectIndex: "請先選取索引",
@@ -29,6 +43,21 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "現代化的開放原始碼搜尋引擎。",
+  },
+  account: {
+    title: "我的帳號",
+    userid: "使用者 ID",
+    role: "角色",
+    name: "顯示名稱",
+    current: "目前密碼",
+    new: "新密碼",
+    confirm: "確認新密碼",
+    keepPassword: "若不修改密碼，請將新密碼欄位留空。",
+    submit: "儲存變更",
+    success: "帳號已更新，工作階段已刷新。",
+    nothingToChange: "沒有需要修改的內容。",
+    wrongPassword: "目前密碼不正確。",
+    failed: "帳號更新失敗，請重試。"
   },
   login: {
     userid: "使用者 ID",

@@ -1,6 +1,20 @@
 import type en from './en';
 
 export default {
+  authErrors: {
+    invalidCredentials: "ユーザーIDまたはパスワードが正しくありません。",
+    signInFailed: "ログインできませんでした。もう一度お試しください。",
+    signingIn: "ログイン中…",
+    credentialsRequired: "ユーザーIDとパスワードを入力してください。",
+    currentRequired: "現在のパスワードを入力してください。",
+  },
+  passwordValidation: {
+    tooShort: "パスワードは8文字以上にしてください。",
+    missingLetter: "パスワードには英字を1文字以上含めてください。",
+    missingDigit: "パスワードには数字を1文字以上含めてください。",
+    mismatch: "パスワードと確認用パスワードが一致していません。",
+  },
+  passwordInput: { show: "パスワードを表示", hide: "パスワードを非表示" },
   theme: { label: "テーマ", system: "システム", light: "ライト", dark: "ダーク" },
   search: {
     selectIndex: "最初にインデックスを選択してください",
@@ -31,6 +45,21 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "モダンなオープンソース検索エンジン。",
+  },
+  account: {
+    title: "アカウント",
+    userid: "ユーザーID",
+    role: "ロール",
+    name: "表示名",
+    current: "現在のパスワード",
+    new: "新しいパスワード",
+    confirm: "新しいパスワード（確認）",
+    keepPassword: "パスワードを変更しない場合は新しいパスワード欄を空のままにしてください。",
+    submit: "変更を保存",
+    success: "アカウントを更新しました。セッションを更新しました。",
+    nothingToChange: "変更はありません。",
+    wrongPassword: "現在のパスワードが正しくありません。",
+    failed: "アカウントを更新できませんでした。もう一度お試しください。"
   },
   login: {
     userid: "ユーザーID",
