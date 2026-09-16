@@ -2,6 +2,12 @@
 version: 2
 
 project_name: zincsearch
+
+# Build with the Go toolchain installed by the workflow (1.27.x) instead of
+# letting go.mod's older `go` directive select/download a toolchain.
+env:
+  - GOTOOLCHAIN=local
+
 before:
   hooks:
     - go mod tidy
