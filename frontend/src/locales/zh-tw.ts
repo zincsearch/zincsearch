@@ -49,6 +49,7 @@ export default {
     userid: "使用者 ID",
     role: "角色",
     name: "顯示名稱",
+    nameTooShort: "使用者名稱至少需要 3 個字元。",
     current: "目前密碼",
     new: "新密碼",
     confirm: "確認新密碼",

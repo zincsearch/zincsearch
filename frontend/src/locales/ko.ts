@@ -51,6 +51,7 @@ export default {
     userid: "사용자 ID",
     role: "역할",
     name: "표시 이름",
+    nameTooShort: "사용자 이름은 3자 이상이어야 합니다.",
     current: "현재 비밀번호",
     new: "새 비밀번호",
     confirm: "새 비밀번호 확인",

@@ -51,6 +51,7 @@ export default {
     userid: "ID do usuário",
     role: "Função",
     name: "Nome de exibição",
+    nameTooShort: "O nome de usuário deve ter pelo menos 3 caracteres.",
     current: "Senha atual",
     new: "Nova senha",
     confirm: "Confirmar nova senha",

@@ -49,6 +49,7 @@ export default {
     userid: "Kullanıcı Adı",
     role: "Rol",
     name: "Görünen ad",
+    nameTooShort: "Kullanıcı adı en az 3 karakter uzunluğunda olmalıdır.",
     current: "Mevcut şifre",
     new: "Yeni şifre",
     confirm: "Yeni şifreyi onayla",

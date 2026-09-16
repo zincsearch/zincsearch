@@ -51,6 +51,7 @@ export default {
     userid: "Benutzer-ID",
     role: "Rolle",
     name: "Anzeigename",
+    nameTooShort: "Der Benutzername muss mindestens 3 Zeichen lang sein.",
     current: "Aktuelles Passwort",
     new: "Neues Passwort",
     confirm: "Neues Passwort bestätigen",

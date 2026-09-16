@@ -49,6 +49,7 @@ export default {
     userid: "用户名",
     role: "角色",
     name: "显示名称",
+    nameTooShort: "用户名至少需要 3 个字符。",
     current: "当前密码",
     new: "新密码",
     confirm: "确认新密码",

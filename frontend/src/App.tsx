@@ -13,6 +13,7 @@ import About from './views/About';
 import Icon from './components/Icon';
 import Select from './components/Select';
 import ThemeSelect from './components/ThemeSelect';
+import Account from './components/Account';
 
 const pages = ['search', 'index', 'template', 'user', 'role', 'about'] as const;
 
@@ -23,13 +24,14 @@ function Console() {
   const { t, locale, changeLanguage } = useTranslation();
   const [drawer, setDrawer] = useState(true);
   const [visited, setVisited] = useState<string[]>([]);
+  const [editingAccount, setEditingAccount] = useState(false);
   const path = location.pathname.replace(/\/$/, '') || '/';
   if (path in retainedPages && !visited.includes(path)) setVisited([...visited, path]);
   if (!user) return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   return <div className={`console-shell ${drawer ? '' : 'rail-collapsed'}`}>
     <a className="skip-link" href="#workspace">Skip to content</a>
     {drawer && <aside className="icon-rail" id="console-navigation">
-      <Link className="workspace-avatar" to="/search" aria-label={t('menu.zincSearch')} title={user.name}>{user.name.slice(0, 2).toUpperCase()}</Link>
+      <button className="workspace-avatar" type="button" aria-label={t('menu.account')} title={`${user.name} · ${t('menu.account')}`} onClick={() => setEditingAccount(true)}><Icon name="account" /></button>
       <nav aria-label="Workspace shortcuts" className="rail-pages">
         {pages.map(name => <NavLink key={name} to={`/${name}`} aria-label={`${t(`menu.${name}`)} workspace`} title={t(`menu.${name}`)} className={({ isActive }) => `rail-link ${isActive ? 'active' : ''}`}><Icon name={name} /></NavLink>)}
       </nav>
@@ -47,9 +49,10 @@ function Console() {
           <ThemeSelect />
           <Select displayValue={locale.toUpperCase()} title={languages[locale]} className="language-select" aria-label={t('menu.language')} value={locale} onValueChange={value => changeLanguage(value as Locale)}>{Object.entries(languages).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select>
           {!drawer && <button type="button" aria-label={t('menu.signOut')} onClick={() => setCredentials(null)}><Icon name="signOut" /></button>}
-          <span className="account-name" title={user.name}>{user.name}</span>
+          <button className="account-name" type="button" title={`${user.name} · ${t('menu.account')}`} onClick={() => setEditingAccount(true)}>{user.name}</button>
         </div>
       </header>
+      {editingAccount && <Account user={user} onClose={() => setEditingAccount(false)} />}
       <nav aria-label="Main navigation" className="section-tabs">
         {pages.map(name => <NavLink key={name} to={`/${name}`} className={({ isActive }) => `section-tab ${isActive ? 'active' : ''}`}>{t(`menu.${name}`)}</NavLink>)}
       </nav>

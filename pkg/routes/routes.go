@@ -93,7 +93,7 @@ func SetRoutes(r *gin.Engine) {
 
 	// auth
 	r.POST("/api/login", auth.Login)
-	// r.PUT("/api/account", auth.UpdateAccount)
+	r.PUT("/api/account", auth.UpdateAccount)
 	r.POST("/api/user", AuthMiddleware("auth.CreateUpdateUser"), auth.CreateUpdateUser)
 	r.PUT("/api/user", AuthMiddleware("auth.CreateUpdateUser"), auth.CreateUpdateUser)
 	r.DELETE("/api/user/:id", AuthMiddleware("auth.DeleteUser"), auth.DeleteUser)
