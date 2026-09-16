@@ -15,6 +15,26 @@ function login() {
   render(<MemoryRouter initialEntries={['/login']}><Routes><Route path="/login" element={<Login />} /><Route path="/search" element={<h1>Search page</h1>} /></Routes></MemoryRouter>);
 }
 describe('Authentication', () => {
+  it('shows and hides the password with the keyboard without submitting', async () => {
+    vi.mocked(auth.login).mockClear();
+    login();
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText('User ID'), 'admin');
+    const password = screen.getByLabelText('Password');
+    await user.type(password, 'secret');
+    expect(password).toHaveAttribute('type', 'password');
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Show password' })).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Show password' }).closest('label')).toBeNull();
+    expect(password.closest('label')).toBeNull();
+    await user.keyboard('{Enter}');
+    expect(password).toHaveAttribute('type', 'text');
+    expect(password).toHaveValue('secret');
+    await user.click(screen.getByRole('button', { name: 'Hide password' }));
+    expect(password).toHaveAttribute('type', 'password');
+    expect(password).toHaveValue('secret');
+    expect(auth.login).not.toHaveBeenCalled();
+  });
   it('accepts legacy credentials and safely handles malformed storage', () => {
     localStorage.setItem('creds', '{broken');
     expect(readCredentials()).toBeNull();
@@ -40,7 +60,7 @@ describe('Authentication', () => {
     await user.type(screen.getByLabelText('User ID'), 'admin');
     await user.type(screen.getByLabelText('Password'), 'secret');
     await user.click(screen.getByRole('button', { name: 'Sign In' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Network Error');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to sign in. Please try again.');
     expect(screen.getByRole('button', { name: 'Sign In' })).toBeEnabled();
     expect(getCredentials()).toBeNull();
   });
