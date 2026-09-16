@@ -1,4 +1,18 @@
 export default {
+  authErrors: {
+    invalidCredentials: "用户名或密码错误。",
+    signInFailed: "登录失败，请重试。",
+    signingIn: "正在登录…",
+    credentialsRequired: "请输入用户名和密码。",
+    currentRequired: "请输入当前密码。",
+  },
+  passwordValidation: {
+    tooShort: "密码至少需要 8 个字符。",
+    missingLetter: "密码必须包含至少一个英文字母。",
+    missingDigit: "密码必须包含至少一个数字。",
+    mismatch: "密码与确认密码必须一致。",
+  },
+  passwordInput: { show: "显示密码", hide: "隐藏密码" },
   theme: { label: "主题", system: "跟随系统", light: "浅色", dark: "深色" },
   search: {
     selectIndex: "选择索引",
@@ -29,6 +43,21 @@ export default {
   about: {
     name: "ZincSearch",
     introduction: "一个现代化搜索引擎.",
+  },
+  account: {
+    title: "我的账号",
+    userid: "用户名",
+    role: "角色",
+    name: "显示名称",
+    current: "当前密码",
+    new: "新密码",
+    confirm: "确认新密码",
+    keepPassword: "如不修改密码，请将新密码留空。",
+    submit: "保存修改",
+    success: "账号已更新，会话已刷新。",
+    nothingToChange: "没有需要修改的内容。",
+    wrongPassword: "当前密码不正确。",
+    failed: "账号更新失败，请重试。"
   },
   login: {
     userid: "用户名",

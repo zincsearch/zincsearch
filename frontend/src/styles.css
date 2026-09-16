@@ -42,6 +42,10 @@
 }
 
 @layer components {
+  .password-input { display: block; position: relative; }
+  .password-input > input { width: 100%; padding-right: 48px; }
+  .password-toggle { position: absolute; right: 3px; top: 50%; transform: translateY(-50%); border: 0; padding: 6px; background: transparent; }
+  .password-toggle svg { width: 22px; height: 22px; }
   .ui-select { position: relative; min-width: 0; max-width: 100%; min-height: 40px; padding: 9px 32px 9px 12px; border-color: light-dark(#d9e2ef, #37465d); color: light-dark(#273449, #dbe6f5); font-size: 14px; text-align: left; }
   .ui-select-value { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ui-select-arrow { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: light-dark(#71839e, #a1b2cb); }
@@ -61,7 +65,7 @@
   button[aria-pressed=true] { border-color: light-dark(#eaf2ff, #233c60); background: light-dark(#eaf2ff, #233c60); color: light-dark(#2563c5, #8bbaff); }
   .error { border: 1px solid light-dark(#fecaca, #82404c); border-radius: 10px; background: light-dark(#fff1f2, #3b202b); padding: 12px; color: light-dark(#b42332, #ffabb5); }
   .dialog-backdrop { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: light-dark(#172b4d66, #00000099); padding: 20px; backdrop-filter: blur(3px); }
-  .dialog label > :is(input, .ui-select, textarea).block { margin-top: 8px; }
+  .dialog label > :is(input, .ui-select, .password-input, textarea).block { margin-top: 8px; }
   .dialog p + p { margin-top: 12px; }
   .template-indicators { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; }
   .dialog { max-height: 90vh; width: 100%; max-width: 768px; overflow: auto; border: 1px solid light-dark(#dfe6f1, #37465d); border-radius: 18px; background: light-dark(white, #1b2638); padding: 28px; box-shadow: 0 24px 80px light-dark(#182b4a26, #00000066); }
