@@ -21,8 +21,6 @@ require (
 	github.com/shirou/gopsutil/v4 v4.26.8
 	github.com/sony/sonyflake/v2 v2.2.0
 	github.com/stretchr/testify v1.12.1
-	github.com/swaggo/files v1.0.1
-	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
 	github.com/vcaesar/ice v1.2.3
 	github.com/vcaesar/query_string v0.6.0

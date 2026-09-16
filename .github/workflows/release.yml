@@ -26,7 +26,11 @@ jobs:
         working-directory: frontend
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          # Release with the latest Go 1.27 patch, not the older minimum in go.mod.
+          # check-latest so a fresh security patch isn't missed while the runner
+          # image still caches the previous one.
+          go-version: "1.27.x"
+          check-latest: true
       - run: sudo apt-get update && sudo apt-get install -y upx-ucl
       - uses: docker/setup-qemu-action@v4
       - uses: docker/setup-buildx-action@v4
